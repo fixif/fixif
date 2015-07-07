@@ -1,0 +1,1352 @@
+
+
+		 number_asa_open = 2
+		ADAPTIVE SIMULATED ANNEALING
+
+/* $Id: asa.c,v 25.15 2004/09/23 18:10:46 ingber Exp ingber $ */
+
+OPTIONS_FILE = 1
+OPTIONS_FILE_DATA = 1
+RECUR_OPTIONS_FILE = 0
+RECUR_OPTIONS_FILE_DATA = 0
+COST_FILE = 1
+ASA_LIB = 0
+HAVE_ANSI = 1
+IO_PROTOTYPES = 0
+TIME_CALC = 0
+TIME_STD = 0
+TIME_GETRUSAGE = 1
+INT_LONG = 1
+INT_ALLOC = 0
+SMALL_FLOAT =       1e-018
+MIN_DOUBLE =       1e-018
+MAX_DOUBLE =       1e+018
+EPS_DOUBLE =       1e-018
+CHECK_EXPONENT = 0
+NO_PARAM_TEMP_TEST = 0
+NO_COST_TEMP_TEST = 0
+SELF_OPTIMIZE = 0
+ASA_TEST = 0
+ASA_TEST_POINT = 0
+ASA_TEMPLATE = 0
+MY_TEMPLATE = 1
+ASA_TEMPLATE_LIB = 0
+ASA_TEMPLATE_ASA_OUT_PID = 0
+ASA_TEMPLATE_MULTIPLE = 0
+ASA_TEMPLATE_SELFOPT = 0
+ASA_TEMPLATE_SAMPLE = 0
+ASA_TEMPLATE_QUEUE = 0
+ASA_TEMPLATE_PARALLEL = 0
+ASA_TEMPLATE_SAVE = 0
+USER_INITIAL_COST_TEMP = 0
+RATIO_TEMPERATURE_SCALES = 0
+USER_INITIAL_PARAMETERS_TEMPS = 0
+DELTA_PARAMETERS = 0
+QUENCH_PARAMETERS = 0
+QUENCH_COST = 0
+QUENCH_PARAMETERS_SCALE = 1
+QUENCH_COST_SCALE = 1
+OPTIONAL_DATA_DBL = 0
+OPTIONAL_DATA_INT = 0
+OPTIONAL_DATA_PTR = 0
+USER_COST_SCHEDULE = 0
+USER_ACCEPT_ASYMP_EXP = 0
+USER_ACCEPT_THRESHOLD = 0
+USER_ACCEPTANCE_TEST = 1
+USER_GENERATING_FUNCTION = 0
+USER_REANNEAL_COST = 0
+USER_REANNEAL_PARAMETERS = 0
+MAXIMUM_REANNEAL_INDEX = 50000
+REANNEAL_SCALE =           10
+ASA_SAMPLE = 0
+ASA_QUEUE = 0
+ASA_RESOLUTION = 0
+FITLOC = 0
+FITLOC_ROUND = 1
+FITLOC_PRINT = 1
+MULTI_MIN = 0
+ASA_PARALLEL = 0
+FDLIBM_POW = 0
+FDLIBM_LOG = 0
+FDLIBM_EXP = 0
+
+ASA_PRINT = 1
+USER_OUT = asa_usr_out
+ASA_OUT = asatest2.log
+USER_ASA_OUT = 1
+ASA_PRINT_INTERMED = 1
+ASA_PRINT_MORE = 0
+INCL_STDOUT = 1
+G_FIELD = 12
+G_PRECISION = 7
+ASA_SAVE = 0
+ASA_SAVE_OPT = 0
+ASA_SAVE_BACKUP = 0
+ASA_PIPE = 0
+ASA_PIPE_FILE = 0
+SYSTEM_CALL = 1
+
+OPTIONS->Limit_Acceptances = 1000
+OPTIONS->Limit_Generated = 99999
+OPTIONS->Limit_Invalid_Generated_States = 1000
+OPTIONS->Accepted_To_Generated_Ratio =       0.0001
+
+OPTIONS->Cost_Precision =       1e-018
+OPTIONS->Maximum_Cost_Repeat = 5
+OPTIONS->Number_Cost_Samples = 5
+OPTIONS->Temperature_Ratio_Scale =       1e-005
+OPTIONS->Cost_Parameter_Scale_Ratio =            1
+OPTIONS->Temperature_Anneal_Scale =          100
+OPTIONS->Include_Integer_Parameters = 0
+OPTIONS->User_Initial_Parameters = 0
+OPTIONS->Sequential_Parameters = -1
+OPTIONS->Initial_Parameter_Temperature =            1
+OPTIONS->Acceptance_Frequency_Modulus = 100
+OPTIONS->Generated_Frequency_Modulus = 10000
+OPTIONS->Reanneal_Cost = 1
+OPTIONS->Reanneal_Parameters = 1
+
+OPTIONS->Delta_X =        0.001
+OPTIONS->User_Tangents = 0
+OPTIONS->Curvature_0 = 0
+OPTIONS->Asa_Recursive_Level = 0
+
+
+Initial Random Seed = 40679
+
+*number_parameters = 4
+
+index_v parameter_minimum parameter_maximum parameter_value parameter_type 
+ 0        -10000       		 10000        	 999          -1     
+ 1        -10000       		 10000        	 -1007        -1     
+ 2        -10000       		 10000        	 1001         -1     
+ 3        -10000       		 10000        	 -903         -1     
+
+
+temperature_scale =     3.640707
+temperature_scale_parameters[0] =     3.640707
+*temperature_scale_cost =     3.640707
+
+
+
+*index_cost_acceptances = 0, *current_cost_temperature = 2.312645e+010
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 0, *number_accepted = 0
+best...->cost = 9.192184e+010, last...->cost = 9.192184e+010
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -6249.891		           1	           0
+1	   -9463.506		           1	           0
+2	    1691.675		           1	           0
+3	    4791.876		           1	           0
+
+
+best...->cost=3.655368e+008  *number_accepted=1  *number_generated=1
+best...->cost=7.216186e+007  *number_accepted=2  *number_generated=2
+best...->cost=1.96043e+007  *number_accepted=17  *number_generated=66
+best...->cost=1.739556e+007  *number_accepted=18  *number_generated=70
+best...->cost=5739862       *number_accepted=20  *number_generated=90
+best...->cost=3434188       *number_accepted=27  *number_generated=139
+best...->cost=3330096       *number_accepted=67  *number_generated=435
+best...->cost=3081946       *number_accepted=69  *number_generated=447
+best...->cost=3000401       *number_accepted=71  *number_generated=451
+best...->cost=2620080       *number_accepted=72  *number_generated=456
+best...->cost=2600579       *number_accepted=73  *number_generated=457
+best...->cost=1276282       *number_accepted=75  *number_generated=460
+best...->cost=490562.4      *number_accepted=76  *number_generated=467
+best...->cost=342557.5      *number_accepted=97  *number_generated=605
+
+*index_cost_acceptances = 0, *current_cost_temperature =     238043.4
+*accepted_to_generated_ratio =    0.3076923, *number_invalid... = 0
+*number_generated = 617, *number_accepted = 100
+best...->cost =     342557.5, last...->cost =     489330.5
+index_v  best...->parameter current_parameter_temp	tangent
+0	    257.5975		1.317427e-008	    219487.6
+1	   -7.210583		1.317427e-008	           0
+2	   -465.4351		1.317427e-008	    -3965767
+3	    -2.80828		1.317427e-008	           0
+
+
+best...->cost=318920        *number_accepted=102  *number_generated=625
+best...->cost=220552.4      *number_accepted=103  *number_generated=626
+best...->cost=204836.2      *number_accepted=104  *number_generated=642
+best...->cost=164974.2      *number_accepted=105  *number_generated=643
+best...->cost=89474.68      *number_accepted=107  *number_generated=655
+best...->cost=79407.25      *number_accepted=108  *number_generated=657
+best...->cost=58531.5       *number_accepted=110  *number_generated=669
+best...->cost=38314.18      *number_accepted=111  *number_generated=680
+best...->cost=38116.78      *number_accepted=112  *number_generated=683
+best...->cost=28012.03      *number_accepted=113  *number_generated=691
+best...->cost=27993.48      *number_accepted=114  *number_generated=710
+best...->cost=20817.32      *number_accepted=116  *number_generated=732
+best...->cost=19103.68      *number_accepted=117  *number_generated=739
+best...->cost=17011.49      *number_accepted=118  *number_generated=743
+best...->cost=16978.45      *number_accepted=120  *number_generated=809
+best...->cost=16051.19      *number_accepted=121  *number_generated=815
+best...->cost=16033.21      *number_accepted=122  *number_generated=820
+best...->cost=4006.537      *number_accepted=123  *number_generated=836
+best...->cost=936.7495      *number_accepted=124  *number_generated=837
+best...->cost=883.2116      *number_accepted=126  *number_generated=944
+best...->cost=158.5911      *number_accepted=128  *number_generated=1021
+best...->cost=94.74807      *number_accepted=129  *number_generated=1022
+best...->cost=67.33532      *number_accepted=155  *number_generated=1379
+best...->cost=43.84657      *number_accepted=157  *number_generated=1387
+best...->cost=10.54677      *number_accepted=159  *number_generated=1410
+best...->cost=9.476625      *number_accepted=160  *number_generated=1420
+best...->cost=9.125625      *number_accepted=162  *number_generated=1428
+best...->cost=6.744557      *number_accepted=174  *number_generated=1610
+best...->cost=5.46699       *number_accepted=175  *number_generated=1612
+best...->cost=5.431994      *number_accepted=176  *number_generated=1618
+best...->cost=5.367428      *number_accepted=177  *number_generated=1619
+best...->cost=3.910875      *number_accepted=178  *number_generated=1629
+
+*index_cost_acceptances = 0, *current_cost_temperature =     5.036739
+*accepted_to_generated_ratio =    0.1105769, *number_invalid... = 0
+*number_generated = 1836, *number_accepted = 200
+best...->cost =     3.910875, last...->cost =     8.313647
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.244277		1.316151e-010	           0
+1	    0.230903		4.467369e-011	           0
+2	 -0.02794935		4.496469e-011	           0
+3	  -0.2073798		4.467369e-011	           0
+
+
+best...->cost=2.278302      *number_accepted=209  *number_generated=1981
+best...->cost=1.237445      *number_accepted=210  *number_generated=1983
+best...->cost=1.235457      *number_accepted=211  *number_generated=1991
+best...->cost=1.220446      *number_accepted=212  *number_generated=2013
+best...->cost=0.928125      *number_accepted=213  *number_generated=2036
+best...->cost=0.1507781     *number_accepted=214  *number_generated=2088
+best...->cost=0.1141284     *number_accepted=216  *number_generated=2115
+best...->cost=0.1139879     *number_accepted=217  *number_generated=2148
+best...->cost=0.113153      *number_accepted=219  *number_generated=2170
+best...->cost=0.079125      *number_accepted=220  *number_generated=2174
+best...->cost=0.052125      *number_accepted=271  *number_generated=2922
+best...->cost=0.037125      *number_accepted=281  *number_generated=3142
+best...->cost=0.03375       *number_accepted=293  *number_generated=3259
+
+*index_cost_acceptances = 7, *current_cost_temperature = 8.557339e-005
+*accepted_to_generated_ratio =          0.1, *number_invalid... = 0
+*number_generated = 3338, *number_accepted = 300
+best...->cost =      0.03375, last...->cost =      0.03375
+index_v  best...->parameter current_parameter_temp	tangent
+0	  0.04507687		1.870781e-012	           0
+1	  0.04469288		9.588269e-013	           0
+2	   0.1773544		9.628105e-013	           0
+3	  0.01514442		9.588269e-013	           0
+
+
+best...->cost=0             *number_accepted=335  *number_generated=3680
+
+*index_cost_acceptances = 0, *current_cost_temperature = 2.850392e-007
+*accepted_to_generated_ratio =    0.1130137, *number_invalid... = 0
+*number_generated = 4263, *number_accepted = 400
+best...->cost =            0, last...->cost =            0
+index_v  best...->parameter current_parameter_temp	tangent
+0	  0.01467097		2.907767e-013	           0
+1	  0.02876664		1.674497e-013	           0
+2	  0.02477989		1.680285e-013	           0
+3	 -0.03838191		1.674497e-013	           0
+
+
+
+*index_cost_acceptances = 1, *current_cost_temperature = 2.62338e-020
+*accepted_to_generated_ratio =    0.1118531, *number_invalid... = 0
+*number_generated = 4278, *number_accepted = 401
+best...->cost =            0, last...->cost =            0
+index_v  best...->parameter current_parameter_temp	tangent
+0	  0.01467097		2.824166e-013	           0
+1	  0.02876664		1.62897e-013	           0
+2	  0.02477989		1.634586e-013	           0
+3	 -0.03838191		1.62897e-013	           0
+
+curvature[0][0] =            0
+
+curvature[1][0] =            0 	 = curvature[0][1]
+curvature[1][1] =            0
+
+curvature[2][0] =            0 	 = curvature[0][2]
+curvature[2][1] =            0 	 = curvature[1][2]
+curvature[2][2] =            0
+
+curvature[3][0] =            0 	 = curvature[0][3]
+curvature[3][1] =            0 	 = curvature[1][3]
+curvature[3][2] =            0 	 = curvature[2][3]
+curvature[3][3] =            0
+
+
+
+ C_TEMP_TOO_SMALL exit_status = 2
+*current_cost_temperature too small = 2.62338e-020
+ Locate_Cost = 5, calculating curvatures while exiting asa ()
+final_cost = best_generated_state->cost = 0           
+*number_accepted at best_generated_state->cost = 335
+*number_generated at best_generated_state->cost = 3680
+
+
+
+
+
+		 number_asa_open = 2
+		ADAPTIVE SIMULATED ANNEALING
+
+/* $Id: asa.c,v 25.15 2004/09/23 18:10:46 ingber Exp ingber $ */
+
+OPTIONS_FILE = 1
+OPTIONS_FILE_DATA = 1
+RECUR_OPTIONS_FILE = 0
+RECUR_OPTIONS_FILE_DATA = 0
+COST_FILE = 1
+ASA_LIB = 0
+HAVE_ANSI = 1
+IO_PROTOTYPES = 0
+TIME_CALC = 0
+TIME_STD = 0
+TIME_GETRUSAGE = 1
+INT_LONG = 1
+INT_ALLOC = 0
+SMALL_FLOAT =       1e-018
+MIN_DOUBLE =       1e-018
+MAX_DOUBLE =       1e+018
+EPS_DOUBLE =       1e-018
+CHECK_EXPONENT = 0
+NO_PARAM_TEMP_TEST = 0
+NO_COST_TEMP_TEST = 0
+SELF_OPTIMIZE = 0
+ASA_TEST = 0
+ASA_TEST_POINT = 0
+ASA_TEMPLATE = 0
+MY_TEMPLATE = 1
+ASA_TEMPLATE_LIB = 0
+ASA_TEMPLATE_ASA_OUT_PID = 0
+ASA_TEMPLATE_MULTIPLE = 0
+ASA_TEMPLATE_SELFOPT = 0
+ASA_TEMPLATE_SAMPLE = 0
+ASA_TEMPLATE_QUEUE = 0
+ASA_TEMPLATE_PARALLEL = 0
+ASA_TEMPLATE_SAVE = 0
+USER_INITIAL_COST_TEMP = 0
+RATIO_TEMPERATURE_SCALES = 0
+USER_INITIAL_PARAMETERS_TEMPS = 0
+DELTA_PARAMETERS = 0
+QUENCH_PARAMETERS = 0
+QUENCH_COST = 0
+QUENCH_PARAMETERS_SCALE = 1
+QUENCH_COST_SCALE = 1
+OPTIONAL_DATA_DBL = 0
+OPTIONAL_DATA_INT = 0
+OPTIONAL_DATA_PTR = 0
+USER_COST_SCHEDULE = 0
+USER_ACCEPT_ASYMP_EXP = 0
+USER_ACCEPT_THRESHOLD = 0
+USER_ACCEPTANCE_TEST = 1
+USER_GENERATING_FUNCTION = 0
+USER_REANNEAL_COST = 0
+USER_REANNEAL_PARAMETERS = 0
+MAXIMUM_REANNEAL_INDEX = 50000
+REANNEAL_SCALE =           10
+ASA_SAMPLE = 0
+ASA_QUEUE = 0
+ASA_RESOLUTION = 0
+FITLOC = 0
+FITLOC_ROUND = 1
+FITLOC_PRINT = 1
+MULTI_MIN = 0
+ASA_PARALLEL = 0
+FDLIBM_POW = 0
+FDLIBM_LOG = 0
+FDLIBM_EXP = 0
+
+ASA_PRINT = 1
+USER_OUT = asa_usr_out
+ASA_OUT = asatest2.log
+USER_ASA_OUT = 1
+ASA_PRINT_INTERMED = 1
+ASA_PRINT_MORE = 1
+INCL_STDOUT = 1
+G_FIELD = 12
+G_PRECISION = 7
+ASA_SAVE = 0
+ASA_SAVE_OPT = 0
+ASA_SAVE_BACKUP = 0
+ASA_PIPE = 0
+ASA_PIPE_FILE = 0
+SYSTEM_CALL = 1
+
+OPTIONS->Limit_Acceptances = 1000
+OPTIONS->Limit_Generated = 99999
+OPTIONS->Limit_Invalid_Generated_States = 1000
+OPTIONS->Accepted_To_Generated_Ratio =       0.0001
+
+OPTIONS->Cost_Precision =       1e-018
+OPTIONS->Maximum_Cost_Repeat = 5
+OPTIONS->Number_Cost_Samples = 5
+OPTIONS->Temperature_Ratio_Scale =       1e-005
+OPTIONS->Cost_Parameter_Scale_Ratio =            1
+OPTIONS->Temperature_Anneal_Scale =          100
+OPTIONS->Include_Integer_Parameters = 0
+OPTIONS->User_Initial_Parameters = 0
+OPTIONS->Sequential_Parameters = -1
+OPTIONS->Initial_Parameter_Temperature =            1
+OPTIONS->Acceptance_Frequency_Modulus = 100
+OPTIONS->Generated_Frequency_Modulus = 10000
+OPTIONS->Reanneal_Cost = 1
+OPTIONS->Reanneal_Parameters = 1
+
+OPTIONS->Delta_X =        0.001
+OPTIONS->User_Tangents = 0
+OPTIONS->Curvature_0 = 0
+OPTIONS->Asa_Recursive_Level = 0
+
+
+Initial Random Seed = 40679
+
+*number_parameters = 4
+
+index_v parameter_minimum parameter_maximum parameter_value parameter_type 
+ 0        -10000       		 10000        	 999          -1     
+ 1        -10000       		 10000        	 -1007        -1     
+ 2        -10000       		 10000        	 1001         -1     
+ 3        -10000       		 10000        	 -903         -1     
+
+
+temperature_scale =     3.640707
+temperature_scale_parameters[0] =     3.640707
+*temperature_scale_cost =     3.640707
+
+
+
+*index_cost_acceptances = 0, *current_cost_temperature = 2.312645e+010
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 0, *number_accepted = 0
+best...->cost = 9.192184e+010, last...->cost = 9.192184e+010
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -6249.891		           1	           0
+1	   -9463.506		           1	           0
+2	    1691.675		           1	           0
+3	    4791.876		           1	           0
+
+
+best...->cost=3.655368e+008  *number_accepted=1  *number_generated=1
+Present Random Seed = 8331
+
+
+*index_cost_acceptances = 1, *current_cost_temperature = 2.312645e+010
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 1, *number_accepted = 1
+best...->cost = 3.655368e+008, last...->cost = 3.655368e+008
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -5563.566		   0.0262338	           0
+1	   -1373.843		   0.0262338	           0
+2	    6940.558		   0.0262338	           0
+3	   -608.8498		   0.0262338	           0
+
+best...->cost=7.216186e+007  *number_accepted=2  *number_generated=2
+Present Random Seed = 35377
+
+
+*index_cost_acceptances = 2, *current_cost_temperature = 6.066947e+008
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 2, *number_accepted = 2
+best...->cost = 7.216186e+007, last...->cost = 7.216186e+007
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -4974.918		  0.01317342	           0
+1	    -131.142		  0.01317342	           0
+2	   -1492.298		  0.01317342	           0
+3	   -727.7811		  0.01317342	           0
+
+best...->cost=1.96043e+007  *number_accepted=17  *number_generated=66
+Present Random Seed = 46053
+
+
+*index_cost_acceptances = 17, *current_cost_temperature = 1.591591e+007
+*accepted_to_generated_ratio =    0.2461538, *number_invalid... = 0
+*number_generated = 66, *number_accepted = 17
+best...->cost = 1.96043e+007, last...->cost = 1.96043e+007
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1553.666		3.114065e-005	           0
+1	    118.7631		3.114065e-005	           0
+2	    580.6111		3.114065e-005	           0
+3	   -985.6393		3.114065e-005	           0
+
+best...->cost=1.739556e+007  *number_accepted=18  *number_generated=70
+Present Random Seed = 30633
+
+
+*index_cost_acceptances = 18, *current_cost_temperature = 1.424093e+007
+*accepted_to_generated_ratio =          0.4, *number_invalid... = 0
+*number_generated = 70, *number_accepted = 18
+best...->cost = 1.739556e+007, last...->cost = 1.739556e+007
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1515.407		2.670201e-005	           0
+1	    124.1941		2.670201e-005	           0
+2	     563.033		2.670201e-005	           0
+3	   -975.2024		2.670201e-005	           0
+
+best...->cost=5739862       *number_accepted=20  *number_generated=90
+Present Random Seed = 13965
+
+
+*index_cost_acceptances = 20, *current_cost_temperature = 1.156142e+007
+*accepted_to_generated_ratio =    0.1428571, *number_invalid... = 0
+*number_generated = 90, *number_accepted = 20
+best...->cost =      5739862, last...->cost =      5739862
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1357.984		1.348905e-005	           0
+1	    180.7981		1.348905e-005	           0
+2	    561.0107		1.348905e-005	           0
+3	   -77.79269		1.348905e-005	           0
+
+best...->cost=3434188       *number_accepted=27  *number_generated=139
+Present Random Seed = 16753
+
+
+*index_cost_acceptances = 27, *current_cost_temperature =      6219250
+*accepted_to_generated_ratio =         0.16, *number_invalid... = 0
+*number_generated = 139, *number_accepted = 27
+best...->cost =      3434188, last...->cost =      3434188
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -2949.243		3.723503e-006	           0
+1	     74.1734		3.723503e-006	           0
+2	    781.8389		3.723503e-006	           0
+3	    62.30027		3.723503e-006	           0
+
+best...->cost=3330096       *number_accepted=67  *number_generated=435
+Present Random Seed = 7675
+
+
+*index_cost_acceptances = 67, *current_cost_temperature =     720172.6
+*accepted_to_generated_ratio =    0.1380471, *number_invalid... = 0
+*number_generated = 435, *number_accepted = 67
+best...->cost =      3330096, last...->cost =      3330096
+index_v  best...->parameter current_parameter_temp	tangent
+0	    1164.679		6.012894e-008	           0
+1	    43.43935		6.012894e-008	           0
+2	   -995.8351		6.012894e-008	           0
+3	   -116.7752		6.012894e-008	           0
+
+best...->cost=3081946       *number_accepted=69  *number_generated=447
+Present Random Seed = 6897
+
+
+*index_cost_acceptances = 69, *current_cost_temperature =     666310.1
+*accepted_to_generated_ratio =    0.2307692, *number_invalid... = 0
+*number_generated = 447, *number_accepted = 69
+best...->cost =      3081946, last...->cost =      3081946
+index_v  best...->parameter current_parameter_temp	tangent
+0	    1165.863		5.367736e-008	           0
+1	    29.36177		5.367736e-008	           0
+2	   -995.8332		5.367736e-008	           0
+3	   -84.23285		5.367736e-008	           0
+
+best...->cost=3000401       *number_accepted=71  *number_generated=451
+Present Random Seed = 59783
+
+
+*index_cost_acceptances = 71, *current_cost_temperature =     617522.7
+*accepted_to_generated_ratio =          0.6, *number_invalid... = 0
+*number_generated = 451, *number_accepted = 71
+best...->cost =      3000401, last...->cost =      3000401
+index_v  best...->parameter current_parameter_temp	tangent
+0	    1163.245		5.171077e-008	           0
+1	   -36.12315		5.171077e-008	           0
+2	   -961.5547		5.171077e-008	           0
+3	   -84.04755		5.171077e-008	           0
+
+best...->cost=2620080       *number_accepted=72  *number_generated=456
+Present Random Seed = 13315
+
+
+*index_cost_acceptances = 72, *current_cost_temperature =     594847.9
+*accepted_to_generated_ratio =    0.3333333, *number_invalid... = 0
+*number_generated = 456, *number_accepted = 72
+best...->cost =      2620080, last...->cost =      2620080
+index_v  best...->parameter current_parameter_temp	tangent
+0	    1166.741		4.93707e-008	           0
+1	   -40.37193		4.93707e-008	           0
+2	     175.286		4.93707e-008	           0
+3	   -84.10268		4.93707e-008	           0
+
+best...->cost=2600579       *number_accepted=73  *number_generated=457
+Present Random Seed = 25653
+
+
+*index_cost_acceptances = 73, *current_cost_temperature =       573231
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 457, *number_accepted = 73
+best...->cost =      2600579, last...->cost =      2600579
+index_v  best...->parameter current_parameter_temp	tangent
+0	    1166.703		4.891779e-008	           0
+1	   -40.44998		4.891779e-008	           0
+2	    174.6944		4.891779e-008	           0
+3	   -83.06518		4.891779e-008	           0
+
+best...->cost=1276282       *number_accepted=75  *number_generated=460
+Present Random Seed = 65171
+
+
+*index_cost_acceptances = 75, *current_cost_temperature =     532933.4
+*accepted_to_generated_ratio =         0.75, *number_invalid... = 0
+*number_generated = 460, *number_accepted = 75
+best...->cost =      1276282, last...->cost =      1276282
+index_v  best...->parameter current_parameter_temp	tangent
+0	    1165.042		4.758813e-008	           0
+1	   -40.44645		4.758813e-008	           0
+2	    117.7412		4.758813e-008	           0
+3	   -83.05826		4.758813e-008	           0
+
+best...->cost=490562.4      *number_accepted=76  *number_generated=467
+Present Random Seed = 65003
+
+
+*index_cost_acceptances = 76, *current_cost_temperature =     514143.9
+*accepted_to_generated_ratio =         0.25, *number_invalid... = 0
+*number_generated = 467, *number_accepted = 76
+best...->cost =     490562.4, last...->cost =     490562.4
+index_v  best...->parameter current_parameter_temp	tangent
+0	    528.6016		4.464768e-008	           0
+1	    -40.3801		4.464768e-008	           0
+2	    133.8511		4.464768e-008	           0
+3	   -15.89906		4.464768e-008	           0
+
+best...->cost=342557.5      *number_accepted=97  *number_generated=605
+Present Random Seed = 31327
+
+
+*index_cost_acceptances = 97, *current_cost_temperature =     259942.3
+*accepted_to_generated_ratio =    0.1582734, *number_invalid... = 0
+*number_generated = 605, *number_accepted = 97
+best...->cost =     342557.5, last...->cost =     342557.5
+index_v  best...->parameter current_parameter_temp	tangent
+0	    257.5975		1.439875e-008	           0
+1	   -7.210583		1.439875e-008	           0
+2	   -465.4351		1.439875e-008	           0
+3	    -2.80828		1.439875e-008	           0
+
+
+*index_cost_acceptances = 0, *current_cost_temperature =     238043.4
+*accepted_to_generated_ratio =    0.3076923, *number_invalid... = 0
+*number_generated = 617, *number_accepted = 100
+best...->cost =     342557.5, last...->cost =     489330.5
+index_v  best...->parameter current_parameter_temp	tangent
+0	    257.5975		1.317427e-008	    219487.6
+1	   -7.210583		1.317427e-008	           0
+2	   -465.4351		1.317427e-008	    -3965767
+3	    -2.80828		1.317427e-008	           0
+
+
+best...->cost=318920        *number_accepted=102  *number_generated=625
+Present Random Seed = 47653
+
+
+*index_cost_acceptances = 2, *current_cost_temperature =        12837
+*accepted_to_generated_ratio =    0.2857143, *number_invalid... = 0
+*number_generated = 625, *number_accepted = 102
+best...->cost =       318920, last...->cost =       318920
+index_v  best...->parameter current_parameter_temp	tangent
+0	    293.0114		2.208854e-007	    219487.6
+1	   -7.341947		1.242527e-008	           0
+2	   -409.9784		1.260776e-008	    -3965767
+3	   0.7369927		1.242527e-008	           0
+
+best...->cost=220552.4      *number_accepted=103  *number_generated=626
+Present Random Seed = 36155
+
+
+*index_cost_acceptances = 3, *current_cost_temperature =     6446.155
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 626, *number_accepted = 103
+best...->cost =     220552.4, last...->cost =     220552.4
+index_v  best...->parameter current_parameter_temp	tangent
+0	    293.0388		2.182097e-007	    219487.6
+1	    -7.26131		1.233518e-008	           0
+2	   -321.3671		1.251613e-008	    -3965767
+3	   0.7356841		1.233518e-008	           0
+
+best...->cost=204836.2      *number_accepted=104  *number_generated=642
+Present Random Seed = 46259
+
+
+*index_cost_acceptances = 4, *current_cost_temperature =     4061.688
+*accepted_to_generated_ratio =    0.1176471, *number_invalid... = 0
+*number_generated = 642, *number_accepted = 104
+best...->cost =     204836.2, last...->cost =     204836.2
+index_v  best...->parameter current_parameter_temp	tangent
+0	    293.1839		1.802409e-007	    219487.6
+1	    11.52871		1.099226e-008	           0
+2	   -198.3931		1.115046e-008	    -3965767
+3	   0.4506732		1.099226e-008	           0
+
+best...->cost=164974.2      *number_accepted=105  *number_generated=643
+Present Random Seed = 11801
+
+
+*index_cost_acceptances = 5, *current_cost_temperature =     2841.413
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 643, *number_accepted = 105
+best...->cost =     164974.2, last...->cost =     164974.2
+index_v  best...->parameter current_parameter_temp	tangent
+0	    293.1368		1.781416e-007	    219487.6
+1	    11.59176		1.091414e-008	           0
+2	   -198.3933		1.107103e-008	    -3965767
+3	   0.4536295		1.091414e-008	           0
+
+best...->cost=89474.68      *number_accepted=107  *number_generated=655
+Present Random Seed = 47307
+
+
+*index_cost_acceptances = 7, *current_cost_temperature =     1640.538
+*accepted_to_generated_ratio =    0.2307692, *number_invalid... = 0
+*number_generated = 655, *number_accepted = 107
+best...->cost =     89474.68, last...->cost =     89474.68
+index_v  best...->parameter current_parameter_temp	tangent
+0	    262.0001		1.550915e-007	    219487.6
+1	    11.58216		1.002533e-008	           0
+2	   -198.4457		1.016745e-008	    -3965767
+3	    1.255173		1.002533e-008	           0
+
+best...->cost=79407.25      *number_accepted=108  *number_generated=657
+Present Random Seed = 44199
+
+
+*index_cost_acceptances = 8, *current_cost_temperature =     1311.472
+*accepted_to_generated_ratio =    0.6666667, *number_invalid... = 0
+*number_generated = 657, *number_accepted = 108
+best...->cost =     79407.25, last...->cost =     79407.25
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -38.75044		1.516045e-007	    219487.6
+1	    11.58083		9.885527e-009	           0
+2	     -198.43		1.002533e-008	    -3965767
+3	    1.255222		9.885527e-009	           0
+
+best...->cost=58531.5       *number_accepted=110  *number_generated=669
+Present Random Seed = 33737
+
+
+*index_cost_acceptances = 10, *current_cost_temperature =     893.2839
+*accepted_to_generated_ratio =    0.2307692, *number_invalid... = 0
+*number_generated = 669, *number_accepted = 110
+best...->cost =      58531.5, last...->cost =      58531.5
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -54.25669		1.325376e-007	    219487.6
+1	    11.57345		9.092745e-009	           0
+2	   -153.6193		9.219592e-009	    -3965767
+3	   -3.810735		9.092745e-009	           0
+
+best...->cost=38314.18      *number_accepted=111  *number_generated=680
+Present Random Seed = 40567
+
+
+*index_cost_acceptances = 11, *current_cost_temperature =     754.9109
+*accepted_to_generated_ratio =    0.1666667, *number_invalid... = 0
+*number_generated = 680, *number_accepted = 111
+best...->cost =     38314.18, last...->cost =     38314.18
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -37.17405		1.175184e-007	    219487.6
+1	    2.787862		8.430284e-009	           0
+2	   -156.6077		8.546448e-009	    -3965767
+3	   -3.810612		8.430284e-009	           0
+
+best...->cost=38116.78      *number_accepted=112  *number_generated=683
+Present Random Seed = 55289
+
+
+*index_cost_acceptances = 12, *current_cost_temperature =     645.7956
+*accepted_to_generated_ratio =          0.5, *number_invalid... = 0
+*number_generated = 683, *number_accepted = 112
+best...->cost =     38116.78, last...->cost =     38116.78
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -37.19409		1.137794e-007	    219487.6
+1	    2.827293		8.259459e-009	           0
+2	   -156.6051		8.37289e-009	    -3965767
+3	  -0.9943902		8.259459e-009	           0
+
+best...->cost=28012.03      *number_accepted=113  *number_generated=691
+Present Random Seed = 39623
+
+
+*index_cost_acceptances = 13, *current_cost_temperature =     558.1763
+*accepted_to_generated_ratio =    0.2222222, *number_invalid... = 0
+*number_generated = 691, *number_accepted = 113
+best...->cost =     28012.03, last...->cost =     28012.03
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -37.17892		1.044787e-007	    219487.6
+1	    3.260061		7.823221e-009	           0
+2	   -106.8185		7.92972e-009	    -3965767
+3	  -0.9147204		7.823221e-009	           0
+
+best...->cost=27993.48      *number_accepted=114  *number_generated=710
+Present Random Seed = 11507
+
+
+*index_cost_acceptances = 14, *current_cost_temperature =     486.7323
+*accepted_to_generated_ratio =          0.1, *number_invalid... = 0
+*number_generated = 710, *number_accepted = 114
+best...->cost =     27993.48, last...->cost =     27993.48
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -36.19695		8.577402e-008	    219487.6
+1	    3.259261		 6.8901e-009	           0
+2	   -106.8345		6.981991e-009	    -3965767
+3	  -0.9018358		 6.8901e-009	           0
+
+best...->cost=20817.32      *number_accepted=116  *number_generated=732
+Present Random Seed = 57235
+
+
+*index_cost_acceptances = 16, *current_cost_temperature =     378.3881
+*accepted_to_generated_ratio =    0.1304348, *number_invalid... = 0
+*number_generated = 732, *number_accepted = 116
+best...->cost =     20817.32, last...->cost =     20817.32
+index_v  best...->parameter current_parameter_temp	tangent
+0	    -36.9421		6.884899e-008	    219487.6
+1	    2.800961		5.966534e-009	           0
+2	   -107.1592		6.044294e-009	    -3965767
+3	   -8.624202		5.966534e-009	           0
+
+best...->cost=19103.68      *number_accepted=117  *number_generated=739
+Present Random Seed = 16107
+
+
+*index_cost_acceptances = 17, *current_cost_temperature =     336.7632
+*accepted_to_generated_ratio =         0.25, *number_invalid... = 0
+*number_generated = 739, *number_accepted = 117
+best...->cost =     19103.68, last...->cost =     19103.68
+index_v  best...->parameter current_parameter_temp	tangent
+0	    47.75379		6.431469e-008	    219487.6
+1	    3.576242		5.703355e-009	           0
+2	   -102.5956		5.777152e-009	    -3965767
+3	   -8.627786		5.703355e-009	           0
+
+best...->cost=17011.49      *number_accepted=118  *number_generated=743
+Present Random Seed = 7921
+
+
+*index_cost_acceptances = 18, *current_cost_temperature =     301.3226
+*accepted_to_generated_ratio =          0.4, *number_invalid... = 0
+*number_generated = 743, *number_accepted = 118
+best...->cost =     17011.49, last...->cost =     17011.49
+index_v  best...->parameter current_parameter_temp	tangent
+0	    7.471582		6.18822e-008	    219487.6
+1	   0.8328878		5.559011e-009	           0
+2	   -102.5943		5.630647e-009	    -3965767
+3	   -8.583882		5.559011e-009	           0
+
+best...->cost=16978.45      *number_accepted=120  *number_generated=809
+Present Random Seed = 3055
+
+
+*index_cost_acceptances = 20, *current_cost_temperature =      244.627
+*accepted_to_generated_ratio =   0.04477612, *number_invalid... = 0
+*number_generated = 809, *number_accepted = 120
+best...->cost =     16978.45, last...->cost =     16978.45
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.167843		3.394252e-008	    219487.6
+1	   0.5835881		3.693897e-009	           0
+2	   -102.8191		3.738534e-009	    -3965767
+3	   -8.601712		3.693897e-009	           0
+
+best...->cost=16051.19      *number_accepted=121  *number_generated=815
+Present Random Seed = 53905
+
+
+*index_cost_acceptances = 21, *current_cost_temperature =      221.769
+*accepted_to_generated_ratio =    0.2857143, *number_invalid... = 0
+*number_generated = 815, *number_accepted = 121
+best...->cost =     16051.19, last...->cost =     16051.19
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.066823		3.223645e-008	    219487.6
+1	    0.583527		3.563633e-009	           0
+2	   -102.8079		3.606456e-009	    -3965767
+3	   -3.357198		3.563633e-009	           0
+
+best...->cost=16033.21      *number_accepted=122  *number_generated=820
+Present Random Seed = 32319
+
+
+*index_cost_acceptances = 22, *current_cost_temperature =     201.7744
+*accepted_to_generated_ratio =    0.3333333, *number_invalid... = 0
+*number_generated = 820, *number_accepted = 122
+best...->cost =     16033.21, last...->cost =     16033.21
+index_v  best...->parameter current_parameter_temp	tangent
+0	    13.03877		3.089125e-008	    219487.6
+1	    0.165796		3.459119e-009	           0
+2	    -102.807		3.500494e-009	    -3965767
+3	   -3.382048		3.459119e-009	           0
+
+best...->cost=4006.537      *number_accepted=123  *number_generated=836
+Present Random Seed = 33625
+
+
+*index_cost_acceptances = 23, *current_cost_temperature =     184.1924
+*accepted_to_generated_ratio =    0.1176471, *number_invalid... = 0
+*number_generated = 836, *number_accepted = 123
+best...->cost =     4006.537, last...->cost =     4006.537
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -6.514436		2.700845e-008	    219487.6
+1	  0.07443318		3.147681e-009	           0
+2	    19.46849		3.184786e-009	    -3965767
+3	   -3.381971		3.147681e-009	           0
+
+best...->cost=936.7495      *number_accepted=124  *number_generated=837
+Present Random Seed = 14671
+
+
+*index_cost_acceptances = 24, *current_cost_temperature =     168.6573
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 837, *number_accepted = 124
+best...->cost =     936.7495, last...->cost =     936.7495
+index_v  best...->parameter current_parameter_temp	tangent
+0	    -36.2179		2.678541e-008	    219487.6
+1	   0.1037057		3.129316e-009	           0
+2	    19.43459		3.166171e-009	    -3965767
+3	   -3.374831		3.129316e-009	           0
+
+best...->cost=883.2116      *number_accepted=126  *number_generated=944
+Present Random Seed = 15561
+
+
+*index_cost_acceptances = 26, *current_cost_temperature =     142.5832
+*accepted_to_generated_ratio =   0.02777778, *number_invalid... = 0
+*number_generated = 944, *number_accepted = 126
+best...->cost =     883.2116, last...->cost =     883.2116
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -20.60978		1.172541e-008	    219487.6
+1	  -0.9717556		1.721018e-009	           0
+2	    18.64838		1.739527e-009	    -3965767
+3	   -3.353716		1.721018e-009	           0
+
+best...->cost=158.5911      *number_accepted=128  *number_generated=1021
+Present Random Seed = 54609
+
+
+*index_cost_acceptances = 28, *current_cost_temperature =     121.7265
+*accepted_to_generated_ratio =   0.03846154, *number_invalid... = 0
+*number_generated = 1021, *number_accepted = 128
+best...->cost =     158.5911, last...->cost =     158.5911
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.922887		 6.8901e-009	    219487.6
+1	  -0.9667878		1.154214e-009	           0
+2	   -3.554254		1.165914e-009	    -3965767
+3	  0.07841025		1.154214e-009	           0
+
+best...->cost=94.74807      *number_accepted=129  *number_generated=1022
+Present Random Seed = 65159
+
+
+*index_cost_acceptances = 29, *current_cost_temperature =     112.8409
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 1022, *number_accepted = 129
+best...->cost =     94.74807, last...->cost =     94.74807
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.854539		6.84468e-009	    219487.6
+1	  -0.7937365		1.148414e-009	           0
+2	   -2.211369		1.160047e-009	    -3965767
+3	  -0.0222734		1.148414e-009	           0
+
+best...->cost=67.33532      *number_accepted=155  *number_generated=1379
+Present Random Seed = 40265
+
+
+*index_cost_acceptances = 55, *current_cost_temperature =     25.31872
+*accepted_to_generated_ratio =   0.07541899, *number_invalid... = 0
+*number_generated = 1379, *number_accepted = 155
+best...->cost =     67.33532, last...->cost =     67.33532
+index_v  best...->parameter current_parameter_temp	tangent
+0	    4.101502		9.144449e-010	    219487.6
+1	  -0.6290954		2.316288e-010	           0
+2	   0.7167982		2.335006e-010	    -3965767
+3	 0.002133637		2.316288e-010	           0
+
+best...->cost=43.84657      *number_accepted=157  *number_generated=1387
+Present Random Seed = 25731
+
+
+*index_cost_acceptances = 57, *current_cost_temperature =     23.13634
+*accepted_to_generated_ratio =    0.3333333, *number_invalid... = 0
+*number_generated = 1387, *number_accepted = 157
+best...->cost =     43.84657, last...->cost =     43.84657
+index_v  best...->parameter current_parameter_temp	tangent
+0	    5.944285		8.795858e-010	    219487.6
+1	  -0.1527198		 2.2431e-010	           0
+2	   0.7167319		2.261148e-010	    -3965767
+3	 0.002025105		 2.2431e-010	           0
+
+best...->cost=10.54677      *number_accepted=159  *number_generated=1410
+Present Random Seed = 41299
+
+
+*index_cost_acceptances = 59, *current_cost_temperature =     21.19251
+*accepted_to_generated_ratio =        0.125, *number_invalid... = 0
+*number_generated = 1410, *number_accepted = 159
+best...->cost =     10.54677, last...->cost =     10.54677
+index_v  best...->parameter current_parameter_temp	tangent
+0	    5.964129		7.87533e-010	    219487.6
+1	  -0.1532377		2.046883e-010	           0
+2	   0.5701884		2.06315e-010	    -3965767
+3	   0.1186442		2.046883e-010	           0
+
+best...->cost=9.476625      *number_accepted=160  *number_generated=1420
+Present Random Seed = 17881
+
+
+*index_cost_acceptances = 60, *current_cost_temperature =     20.29995
+*accepted_to_generated_ratio =    0.1818182, *number_invalid... = 0
+*number_generated = 1420, *number_accepted = 160
+best...->cost =     9.476625, last...->cost =     9.476625
+index_v  best...->parameter current_parameter_temp	tangent
+0	    5.964094		7.509827e-010	    219487.6
+1	  -0.1537779		1.967704e-010	           0
+2	   0.5718683		1.983258e-010	    -3965767
+3	   0.2327481		1.967704e-010	           0
+
+best...->cost=9.125625      *number_accepted=162  *number_generated=1428
+Present Random Seed = 13129
+
+
+*index_cost_acceptances = 62, *current_cost_temperature =     18.65613
+*accepted_to_generated_ratio =    0.3333333, *number_invalid... = 0
+*number_generated = 1428, *number_accepted = 162
+best...->cost =     9.125625, last...->cost =     9.125625
+index_v  best...->parameter current_parameter_temp	tangent
+0	    5.771536		7.231346e-010	    219487.6
+1	  -0.1732841		1.906856e-010	           0
+2	   0.5714389		1.921866e-010	    -3965767
+3	   0.2260258		1.906856e-010	           0
+
+best...->cost=6.744557      *number_accepted=174  *number_generated=1610
+Present Random Seed = 51179
+
+
+*index_cost_acceptances = 74, *current_cost_temperature =     11.69266
+*accepted_to_generated_ratio =   0.07103825, *number_invalid... = 0
+*number_generated = 1610, *number_accepted = 174
+best...->cost =     6.744557, last...->cost =     6.744557
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.319102		3.218709e-010	    219487.6
+1	  -0.2252167		9.647427e-011	           0
+2	   -0.197353		9.716802e-011	    -3965767
+3	  -0.1263241		9.647427e-011	           0
+
+best...->cost=5.46699       *number_accepted=175  *number_generated=1612
+Present Random Seed = 11189
+
+
+*index_cost_acceptances = 75, *current_cost_temperature =     11.27629
+*accepted_to_generated_ratio =    0.6666667, *number_invalid... = 0
+*number_generated = 1612, *number_accepted = 175
+best...->cost =      5.46699, last...->cost =      5.46699
+index_v  best...->parameter current_parameter_temp	tangent
+0	    -1.31177		3.191759e-010	    219487.6
+1	  -0.2251985		9.57861e-011	           0
+2	  -0.2216253		9.647427e-011	    -3965767
+3	  -0.1845985		9.57861e-011	           0
+
+best...->cost=5.431994      *number_accepted=176  *number_generated=1618
+Present Random Seed = 50985
+
+
+*index_cost_acceptances = 76, *current_cost_temperature =     10.87873
+*accepted_to_generated_ratio =    0.2857143, *number_invalid... = 0
+*number_generated = 1618, *number_accepted = 176
+best...->cost =     5.431994, last...->cost =     5.431994
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.311295		3.112437e-010	    219487.6
+1	  -0.2263728		9.375466e-011	           0
+2	  -0.0170252		9.442635e-011	    -3965767
+3	  -0.1846003		9.375466e-011	           0
+
+best...->cost=5.367428      *number_accepted=177  *number_generated=1619
+Present Random Seed = 28831
+
+
+*index_cost_acceptances = 77, *current_cost_temperature =     10.49893
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 1619, *number_accepted = 177
+best...->cost =     5.367428, last...->cost =     5.367428
+index_v  best...->parameter current_parameter_temp	tangent
+0	    -1.28644		3.099435e-010	    219487.6
+1	   -0.229612		9.342085e-011	           0
+2	 -0.02794959		9.408983e-011	    -3965767
+3	   -0.186929		9.342085e-011	           0
+
+best...->cost=3.910875      *number_accepted=178  *number_generated=1629
+Present Random Seed = 31225
+
+
+*index_cost_acceptances = 78, *current_cost_temperature =     10.13592
+*accepted_to_generated_ratio =    0.1818182, *number_invalid... = 0
+*number_generated = 1629, *number_accepted = 178
+best...->cost =     3.910875, last...->cost =     3.910875
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.244277		2.972763e-010	    219487.6
+1	    0.230903		9.015551e-011	           0
+2	 -0.02794935		9.079812e-011	    -3965767
+3	  -0.2073798		9.015551e-011	           0
+
+
+*index_cost_acceptances = 0, *current_cost_temperature =     5.036739
+*accepted_to_generated_ratio =    0.1105769, *number_invalid... = 0
+*number_generated = 1836, *number_accepted = 200
+best...->cost =     3.910875, last...->cost =     8.313647
+index_v  best...->parameter current_parameter_temp	tangent
+0	   -1.244277		1.316151e-010	           0
+1	    0.230903		4.467369e-011	           0
+2	 -0.02794935		4.496469e-011	           0
+3	  -0.2073798		4.467369e-011	           0
+
+
+best...->cost=2.278302      *number_accepted=209  *number_generated=1981
+Present Random Seed = 19665
+
+
+*index_cost_acceptances = 9, *current_cost_temperature =     0.018224
+*accepted_to_generated_ratio =   0.09065156, *number_invalid... = 0
+*number_generated = 1981, *number_accepted = 209
+best...->cost =     2.278302, last...->cost =     2.278302
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.7620256		7.805037e-011	           0
+1	  -0.0457372		2.828068e-011	           0
+2	   0.8102179		2.845466e-011	           0
+3	   0.1161971		2.828068e-011	           0
+
+best...->cost=1.237445      *number_accepted=210  *number_generated=1983
+Present Random Seed = 22861
+
+
+*index_cost_acceptances = 10, *current_cost_temperature =   0.01517675
+*accepted_to_generated_ratio =    0.6666667, *number_invalid... = 0
+*number_generated = 1983, *number_accepted = 210
+best...->cost =     1.237445, last...->cost =     1.237445
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.7620043		7.750864e-011	           0
+1	 -0.04700748		2.810791e-011	           0
+2	   0.8102163		2.828068e-011	           0
+3	  0.05561657		2.810791e-011	           0
+
+best...->cost=1.235457      *number_accepted=211  *number_generated=1991
+Present Random Seed = 43387
+
+
+*index_cost_acceptances = 11, *current_cost_temperature =   0.01282582
+*accepted_to_generated_ratio =    0.2222222, *number_invalid... = 0
+*number_generated = 1991, *number_accepted = 211
+best...->cost =     1.235457, last...->cost =     1.235457
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.7619498		7.538374e-011	           0
+1	 -0.04250179		2.742855e-011	           0
+2	   0.8183935		2.759665e-011	           0
+3	  0.05543752		2.742855e-011	           0
+
+best...->cost=1.220446      *number_accepted=212  *number_generated=2013
+Present Random Seed = 5469
+
+
+*index_cost_acceptances = 12, *current_cost_temperature =   0.01097196
+*accepted_to_generated_ratio =   0.08695652, *number_invalid... = 0
+*number_generated = 2013, *number_accepted = 212
+best...->cost =     1.220446, last...->cost =     1.220446
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.7732517		6.987138e-011	           0
+1	 -0.04392884		2.565351e-011	           0
+2	   0.8183915		2.580943e-011	           0
+3	   0.0540667		2.565351e-011	           0
+
+best...->cost=0.928125      *number_accepted=213  *number_generated=2036
+Present Random Seed = 11347
+
+
+*index_cost_acceptances = 13, *current_cost_temperature =  0.009483325
+*accepted_to_generated_ratio =   0.08333333, *number_invalid... = 0
+*number_generated = 2036, *number_accepted = 213
+best...->cost =     0.928125, last...->cost =     0.928125
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.7732439		6.458951e-011	           0
+1	 -0.04393091		2.393445e-011	           0
+2	   0.7847031		2.407868e-011	           0
+3	  0.04948944		2.393445e-011	           0
+
+best...->cost=0.1507781     *number_accepted=214  *number_generated=2088
+Present Random Seed = 25489
+
+
+*index_cost_acceptances = 14, *current_cost_temperature =  0.008269504
+*accepted_to_generated_ratio =   0.03773585, *number_invalid... = 0
+*number_generated = 2088, *number_accepted = 214
+best...->cost =    0.1507781, last...->cost =    0.1507781
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.6116027		5.422782e-011	           0
+1	 -0.04392726		2.050444e-011	           0
+2	    0.102666		2.062568e-011	           0
+3	  0.04990769		2.050444e-011	           0
+
+best...->cost=0.1141284     *number_accepted=216  *number_generated=2115
+Present Random Seed = 45815
+
+
+*index_cost_acceptances = 16, *current_cost_temperature =  0.006428753
+*accepted_to_generated_ratio =    0.1071429, *number_invalid... = 0
+*number_generated = 2115, *number_accepted = 216
+best...->cost =    0.1141284, last...->cost =    0.1141284
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.6108778		4.959609e-011	           0
+1	 -0.04393476		1.894357e-011	           0
+2	  0.08291765		1.905451e-011	           0
+3	  0.04987172		1.894357e-011	           0
+
+best...->cost=0.1139879     *number_accepted=217  *number_generated=2148
+Present Random Seed = 20065
+
+
+*index_cost_acceptances = 17, *current_cost_temperature =  0.005721553
+*accepted_to_generated_ratio =   0.05882353, *number_invalid... = 0
+*number_generated = 2148, *number_accepted = 217
+best...->cost =    0.1139879, last...->cost =    0.1139879
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.6147597		4.452899e-011	           0
+1	 -0.04614158		1.721389e-011	           0
+2	  0.08283289		1.731352e-011	           0
+3	  0.04979303		1.721389e-011	           0
+
+best...->cost=0.113153      *number_accepted=219  *number_generated=2170
+Present Random Seed = 50177
+
+
+*index_cost_acceptances = 19, *current_cost_temperature =  0.004602712
+*accepted_to_generated_ratio =    0.1304348, *number_invalid... = 0
+*number_generated = 2170, *number_accepted = 219
+best...->cost =     0.113153, last...->cost =     0.113153
+index_v  best...->parameter current_parameter_temp	tangent
+0	    0.632479		4.147525e-011	           0
+1	 -0.04614274		1.615929e-011	           0
+2	  0.08232741		1.625211e-011	           0
+3	-0.007686354		1.615929e-011	           0
+
+best...->cost=0.079125      *number_accepted=220  *number_generated=2174
+Present Random Seed = 51513
+
+
+*index_cost_acceptances = 20, *current_cost_temperature =  0.004156174
+*accepted_to_generated_ratio =          0.4, *number_invalid... = 0
+*number_generated = 2174, *number_accepted = 220
+best...->cost =     0.079125, last...->cost =     0.079125
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.6359417		4.094573e-011	           0
+1	 -0.04614319		1.597544e-011	           0
+2	   0.1619492		1.606707e-011	           0
+3	-0.007100499		1.597544e-011	           0
+
+best...->cost=0.052125      *number_accepted=271  *number_generated=2922
+Present Random Seed = 38251
+
+
+*index_cost_acceptances = 71, *current_cost_temperature = 0.0002219911
+*accepted_to_generated_ratio =    0.0694259, *number_invalid... = 0
+*number_generated = 2922, *number_accepted = 271
+best...->cost =     0.052125, last...->cost =     0.052125
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.4357457		4.983939e-012	           0
+1	  0.04685848		2.371798e-012	           0
+2	   0.2419892		2.38269e-012	           0
+3	  0.01386688		2.371798e-012	           0
+
+best...->cost=0.037125      *number_accepted=281  *number_generated=3142
+Present Random Seed = 41235
+
+
+*index_cost_acceptances = 81, *current_cost_temperature = 0.0001552686
+*accepted_to_generated_ratio =   0.04977376, *number_invalid... = 0
+*number_generated = 3142, *number_accepted = 281
+best...->cost =     0.037125, last...->cost =     0.037125
+index_v  best...->parameter current_parameter_temp	tangent
+0	   0.2123058		2.928622e-012	           0
+1	  0.04389794		1.45273e-012	           0
+2	   0.1855182		1.459047e-012	           0
+3	  0.03684331		1.45273e-012	           0
+
+best...->cost=0.03375       *number_accepted=293  *number_generated=3259
+Present Random Seed = 49207
+
+
+*index_cost_acceptances = 93, *current_cost_temperature = 0.0001054241
+*accepted_to_generated_ratio =    0.1101695, *number_invalid... = 0
+*number_generated = 3259, *number_accepted = 293
+best...->cost =      0.03375, last...->cost =      0.03375
+index_v  best...->parameter current_parameter_temp	tangent
+0	  0.04507687		2.235136e-012	           0
+1	  0.04469288		1.131068e-012	           0
+2	   0.1773544		1.135853e-012	           0
+3	  0.01514442		1.131068e-012	           0
+
+
+*index_cost_acceptances = 7, *current_cost_temperature = 8.557339e-005
+*accepted_to_generated_ratio =          0.1, *number_invalid... = 0
+*number_generated = 3338, *number_accepted = 300
+best...->cost =      0.03375, last...->cost =      0.03375
+index_v  best...->parameter current_parameter_temp	tangent
+0	  0.04507687		1.870781e-012	           0
+1	  0.04469288		9.588269e-013	           0
+2	   0.1773544		9.628105e-013	           0
+3	  0.01514442		9.588269e-013	           0
+
+
+best...->cost=0             *number_accepted=335  *number_generated=3680
+Present Random Seed = 43335
+
+
+*index_cost_acceptances = 42, *current_cost_temperature = 3.367422e-006
+*accepted_to_generated_ratio =    0.1018957, *number_invalid... = 0
+*number_generated = 3680, *number_accepted = 335
+best...->cost =            0, last...->cost =            0
+index_v  best...->parameter current_parameter_temp	tangent
+0	  0.01467097		8.993598e-013	           0
+1	  0.02876664		4.842501e-013	           0
+2	  0.02477989		4.861197e-013	           0
+3	 -0.03838191		4.842501e-013	           0
+
+
+*index_cost_acceptances = 0, *current_cost_temperature = 2.850392e-007
+*accepted_to_generated_ratio =    0.1130137, *number_invalid... = 0
+*number_generated = 4263, *number_accepted = 400
+best...->cost =            0, last...->cost =            0
+index_v  best...->parameter current_parameter_temp	tangent
+0	  0.01467097		2.907767e-013	           0
+1	  0.02876664		1.674497e-013	           0
+2	  0.02477989		1.680285e-013	           0
+3	 -0.03838191		1.674497e-013	           0
+
+
+
+*index_cost_acceptances = 1, *current_cost_temperature = 2.62338e-020
+*accepted_to_generated_ratio =    0.1118531, *number_invalid... = 0
+*number_generated = 4278, *number_accepted = 401
+best...->cost =            0, last...->cost =            0
+index_v  best...->parameter current_parameter_temp	tangent
+0	  0.01467097		2.824166e-013	           0
+1	  0.02876664		1.62897e-013	           0
+2	  0.02477989		1.634586e-013	           0
+3	 -0.03838191		1.62897e-013	           0
+
+curvature[0][0] =            0
+
+curvature[1][0] =            0 	 = curvature[0][1]
+curvature[1][1] =            0
+
+curvature[2][0] =            0 	 = curvature[0][2]
+curvature[2][1] =            0 	 = curvature[1][2]
+curvature[2][2] =            0
+
+curvature[3][0] =            0 	 = curvature[0][3]
+curvature[3][1] =            0 	 = curvature[1][3]
+curvature[3][2] =            0 	 = curvature[2][3]
+curvature[3][3] =            0
+
+
+
+ C_TEMP_TOO_SMALL exit_status = 2
+*current_cost_temperature too small = 2.62338e-020
+ Locate_Cost = 5, calculating curvatures while exiting asa ()
+final_cost = best_generated_state->cost = 0           
+*number_accepted at best_generated_state->cost = 335
+*number_generated at best_generated_state->cost = 3680
+
+
+

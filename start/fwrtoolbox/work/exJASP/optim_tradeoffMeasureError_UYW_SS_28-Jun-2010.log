@@ -1,0 +1,1233 @@
+		ADAPTIVE SIMULATED ANNEALING
+
+/* $Id: asa.c,v 25.15 2004/09/23 18:10:46 ingber Exp ingber $ */
+
+OPTIONS_FILE = 1
+OPTIONS_FILE_DATA = 1
+RECUR_OPTIONS_FILE = 0
+RECUR_OPTIONS_FILE_DATA = 0
+COST_FILE = 1
+ASA_LIB = 0
+HAVE_ANSI = 1
+IO_PROTOTYPES = 0
+TIME_CALC = 0
+TIME_STD = 0
+TIME_GETRUSAGE = 1
+INT_LONG = 1
+INT_ALLOC = 0
+SMALL_FLOAT =        1e-18
+MIN_DOUBLE =        1e-18
+MAX_DOUBLE =        1e+18
+EPS_DOUBLE =        1e-18
+CHECK_EXPONENT = 0
+NO_PARAM_TEMP_TEST = 0
+NO_COST_TEMP_TEST = 0
+SELF_OPTIMIZE = 0
+ASA_TEST = 0
+ASA_TEST_POINT = 0
+ASA_TEMPLATE = 0
+MY_TEMPLATE = 1
+ASA_TEMPLATE_LIB = 0
+ASA_TEMPLATE_ASA_OUT_PID = 0
+ASA_TEMPLATE_MULTIPLE = 0
+ASA_TEMPLATE_SELFOPT = 0
+ASA_TEMPLATE_SAMPLE = 0
+ASA_TEMPLATE_QUEUE = 0
+ASA_TEMPLATE_PARALLEL = 0
+ASA_TEMPLATE_SAVE = 0
+USER_INITIAL_COST_TEMP = 0
+RATIO_TEMPERATURE_SCALES = 0
+USER_INITIAL_PARAMETERS_TEMPS = 0
+DELTA_PARAMETERS = 0
+QUENCH_PARAMETERS = 0
+QUENCH_COST = 0
+QUENCH_PARAMETERS_SCALE = 1
+QUENCH_COST_SCALE = 1
+OPTIONAL_DATA_DBL = 0
+OPTIONAL_DATA_INT = 0
+OPTIONAL_DATA_PTR = 0
+USER_COST_SCHEDULE = 0
+USER_ACCEPT_ASYMP_EXP = 0
+USER_ACCEPT_THRESHOLD = 0
+USER_ACCEPTANCE_TEST = 1
+USER_GENERATING_FUNCTION = 0
+USER_REANNEAL_COST = 0
+USER_REANNEAL_PARAMETERS = 0
+MAXIMUM_REANNEAL_INDEX = 50000
+REANNEAL_SCALE =           10
+ASA_SAMPLE = 0
+ASA_QUEUE = 0
+ASA_RESOLUTION = 0
+FITLOC = 0
+FITLOC_ROUND = 1
+FITLOC_PRINT = 1
+MULTI_MIN = 0
+ASA_PARALLEL = 0
+FDLIBM_POW = 0
+FDLIBM_LOG = 0
+FDLIBM_EXP = 0
+
+ASA_PRINT = 1
+USER_OUT = asa_usr_out
+ASA_OUT = optim_tradeoffMeasureError_UYW_SS_28-Jun-2010.log
+USER_ASA_OUT = 1
+ASA_PRINT_INTERMED = 1
+ASA_PRINT_MORE = 0
+INCL_STDOUT = 1
+G_FIELD = 12
+G_PRECISION = 7
+ASA_SAVE = 0
+ASA_SAVE_OPT = 0
+ASA_SAVE_BACKUP = 0
+ASA_PIPE = 0
+ASA_PIPE_FILE = 0
+SYSTEM_CALL = 1
+
+OPTIONS->Limit_Acceptances = 1000000
+OPTIONS->Limit_Generated = 1000000
+OPTIONS->Limit_Invalid_Generated_States = 1000000
+OPTIONS->Accepted_To_Generated_Ratio =        1e-12
+
+OPTIONS->Cost_Precision =        1e-18
+OPTIONS->Maximum_Cost_Repeat = 5
+OPTIONS->Number_Cost_Samples = 5
+OPTIONS->Temperature_Ratio_Scale =        1e-08
+OPTIONS->Cost_Parameter_Scale_Ratio =            1
+OPTIONS->Temperature_Anneal_Scale =          100
+OPTIONS->Include_Integer_Parameters = 0
+OPTIONS->User_Initial_Parameters = 1
+OPTIONS->Sequential_Parameters = -1
+OPTIONS->Initial_Parameter_Temperature =            1
+OPTIONS->Acceptance_Frequency_Modulus = 100
+OPTIONS->Generated_Frequency_Modulus = 10000
+OPTIONS->Reanneal_Cost = 1
+OPTIONS->Reanneal_Parameters = 1
+
+OPTIONS->Delta_X =        0.001
+OPTIONS->User_Tangents = 0
+OPTIONS->Curvature_0 = 0
+OPTIONS->Asa_Recursive_Level = 0
+
+
+Initial Random Seed = -16794
+
+*number_parameters = 16
+
+index_v parameter_minimum parameter_maximum parameter_value parameter_type 
+ 0        -10000       		 10000        	 1            -1     
+ 1        -10000       		 10000        	 0            -1     
+ 2        -10000       		 10000        	 0            -1     
+ 3        -10000       		 10000        	 0            -1     
+ 4        -10000       		 10000        	 0            -1     
+ 5        -10000       		 10000        	 1            -1     
+ 6        -10000       		 10000        	 0            -1     
+ 7        -10000       		 10000        	 0            -1     
+ 8        -10000       		 10000        	 0            -1     
+ 9        -10000       		 10000        	 0            -1     
+ 10       -10000       		 10000        	 1            -1     
+ 11       -10000       		 10000        	 0            -1     
+ 12       -10000       		 10000        	 0            -1     
+ 13       -10000       		 10000        	 0            -1     
+ 14       -10000       		 10000        	 0            -1     
+ 15       -10000       		 10000        	 1            -1     
+
+
+temperature_scale =     13.81356
+temperature_scale_parameters[0] =     13.81356
+*temperature_scale_cost =     13.81356
+
+
+
+*index_cost_acceptances = 0, *current_cost_temperature =     10976.46
+*accepted_to_generated_ratio =            1, *number_invalid... = 0
+*number_generated = 0, *number_accepted = 0
+best...->cost =     5.303011, last...->cost =     5.303011
+index_v  best...->parameter current_parameter_temp	tangent
+0	           1		           1	           0
+1	           0		           1	           0
+2	           0		           1	           0
+3	           0		           1	           0
+4	           0		           1	           0
+5	           1		           1	           0
+6	           0		           1	           0
+7	           0		           1	           0
+8	           0		           1	           0
+9	           0		           1	           0
+10	           1		           1	           0
+11	           0		           1	           0
+12	           0		           1	           0
+13	           0		           1	           0
+14	           0		           1	           0
+15	           1		           1	           0
+
+
+best...->cost=5.029031      *number_accepted=7  *number_generated=18
+best...->cost=4.804839      *number_accepted=8  *number_generated=19
+best...->cost=4.226999      *number_accepted=9  *number_generated=29
+best...->cost=3.66907       *number_accepted=10  *number_generated=37
+best...->cost=3.664659      *number_accepted=11  *number_generated=42
+best...->cost=3.655824      *number_accepted=12  *number_generated=45
+best...->cost=3.284922      *number_accepted=13  *number_generated=48
+best...->cost=2.984894      *number_accepted=14  *number_generated=60
+best...->cost=2.966155      *number_accepted=15  *number_generated=75
+best...->cost=2.955317      *number_accepted=16  *number_generated=77
+best...->cost=2.951009      *number_accepted=17  *number_generated=92
+best...->cost=2.93493       *number_accepted=18  *number_generated=100
+best...->cost=2.929753      *number_accepted=19  *number_generated=129
+best...->cost=2.912944      *number_accepted=20  *number_generated=219
+best...->cost=2.886722      *number_accepted=21  *number_generated=229
+best...->cost=2.886576      *number_accepted=22  *number_generated=240
+best...->cost=2.878883      *number_accepted=23  *number_generated=243
+best...->cost=2.877152      *number_accepted=24  *number_generated=287
+best...->cost=2.856754      *number_accepted=25  *number_generated=296
+best...->cost=2.855251      *number_accepted=26  *number_generated=312
+best...->cost=2.839649      *number_accepted=27  *number_generated=320
+best...->cost=2.766947      *number_accepted=28  *number_generated=322
+best...->cost=2.756522      *number_accepted=29  *number_generated=343
+best...->cost=2.756169      *number_accepted=30  *number_generated=349
+best...->cost=2.723764      *number_accepted=31  *number_generated=361
+best...->cost=2.716839      *number_accepted=32  *number_generated=399
+best...->cost=2.702114      *number_accepted=33  *number_generated=404
+best...->cost=2.694534      *number_accepted=34  *number_generated=409
+best...->cost=2.685508      *number_accepted=35  *number_generated=465
+best...->cost=2.683305      *number_accepted=36  *number_generated=490
+best...->cost=2.6828        *number_accepted=38  *number_generated=565
+best...->cost=2.682498      *number_accepted=40  *number_generated=616
+best...->cost=2.664389      *number_accepted=41  *number_generated=660
+best...->cost=2.64676       *number_accepted=42  *number_generated=767
+best...->cost=2.596182      *number_accepted=44  *number_generated=1068
+best...->cost=2.592081      *number_accepted=46  *number_generated=1138
+best...->cost=2.590073      *number_accepted=47  *number_generated=1175
+best...->cost=2.58661       *number_accepted=48  *number_generated=1196
+best...->cost=2.566625      *number_accepted=49  *number_generated=1224
+best...->cost=2.564048      *number_accepted=50  *number_generated=1253
+best...->cost=2.549208      *number_accepted=51  *number_generated=1282
+best...->cost=2.548473      *number_accepted=52  *number_generated=1297
+best...->cost=2.548417      *number_accepted=53  *number_generated=1304
+best...->cost=2.546697      *number_accepted=54  *number_generated=1349
+best...->cost=2.544971      *number_accepted=55  *number_generated=1435
+best...->cost=2.544694      *number_accepted=56  *number_generated=1445
+best...->cost=2.543767      *number_accepted=57  *number_generated=1480
+best...->cost=2.538199      *number_accepted=58  *number_generated=1496
+best...->cost=2.533356      *number_accepted=59  *number_generated=1560
+best...->cost=2.467631      *number_accepted=60  *number_generated=1594
+best...->cost=2.466177      *number_accepted=61  *number_generated=1626
+best...->cost=2.461492      *number_accepted=62  *number_generated=1641
+best...->cost=2.460666      *number_accepted=63  *number_generated=1670
+best...->cost=2.424757      *number_accepted=64  *number_generated=1737
+best...->cost=2.424197      *number_accepted=65  *number_generated=1749
+best...->cost=2.414023      *number_accepted=66  *number_generated=1751
+best...->cost=2.412527      *number_accepted=67  *number_generated=1813
+best...->cost=2.410505      *number_accepted=68  *number_generated=1853
+best...->cost=2.410441      *number_accepted=70  *number_generated=1879
+best...->cost=2.409732      *number_accepted=71  *number_generated=1896
+best...->cost=2.403591      *number_accepted=72  *number_generated=1904
+best...->cost=2.403135      *number_accepted=73  *number_generated=1921
+best...->cost=2.40018       *number_accepted=74  *number_generated=1930
+best...->cost=2.398997      *number_accepted=75  *number_generated=1956
+best...->cost=2.38387       *number_accepted=76  *number_generated=1964
+best...->cost=2.381594      *number_accepted=77  *number_generated=1969
+best...->cost=2.379919      *number_accepted=78  *number_generated=1973
+best...->cost=2.379545      *number_accepted=79  *number_generated=2063
+best...->cost=2.377118      *number_accepted=80  *number_generated=2100
+best...->cost=2.377038      *number_accepted=81  *number_generated=2155
+best...->cost=2.37479       *number_accepted=82  *number_generated=2306
+best...->cost=2.373352      *number_accepted=83  *number_generated=2348
+best...->cost=2.37235       *number_accepted=85  *number_generated=2495
+best...->cost=2.371948      *number_accepted=86  *number_generated=2612
+best...->cost=2.37138       *number_accepted=87  *number_generated=2650
+best...->cost=2.371344      *number_accepted=88  *number_generated=2683
+best...->cost=2.371174      *number_accepted=89  *number_generated=2707
+best...->cost=2.370303      *number_accepted=90  *number_generated=2714
+best...->cost=2.370118      *number_accepted=91  *number_generated=2846
+best...->cost=2.369451      *number_accepted=92  *number_generated=2966
+best...->cost=2.367922      *number_accepted=93  *number_generated=3054
+best...->cost=2.367893      *number_accepted=94  *number_generated=3162
+best...->cost=2.367637      *number_accepted=95  *number_generated=3622
+best...->cost=2.367054      *number_accepted=96  *number_generated=3962
+best...->cost=2.367029      *number_accepted=97  *number_generated=4015
+best...->cost=2.36695       *number_accepted=99  *number_generated=4567
+best...->cost=2.366929      *number_accepted=100  *number_generated=5023
+
+*index_cost_acceptances = 0, *current_cost_temperature = 0.0001110416
+*accepted_to_generated_ratio =  0.004376368, *number_invalid... = 0
+*number_generated = 5023, *number_accepted = 100
+best...->cost =     2.366929, last...->cost =     2.366929
+index_v  best...->parameter current_parameter_temp	tangent
+0	    498.0955		6.042174e-11	-8.233577e-05
+1	    2950.595		6.042174e-11	 -0.00010613
+2	    4401.877		6.042174e-11	3.075613e-05
+3	   -125.4468		6.042174e-11	-2.861567e-05
+4	    3373.731		6.042174e-11	  0.01280932
+5	   -1728.473		6.042174e-11	-1.466579e-05
+6	    7410.195		6.042174e-11	 0.005842349
+7	    3261.098		6.042174e-11	  0.01326998
+8	    -7127.14		6.042174e-11	-5.503984e-06
+9	    3448.383		6.042174e-11	3.131074e-05
+10	    8353.393		6.042174e-11	-8.690446e-06
+11	    7609.455		6.042174e-11	-2.47072e-05
+12	   -4467.568		6.042174e-11	1.922441e-05
+13	   -3135.545		6.042174e-11	-1.166061e-05
+14	     3855.83		6.042174e-11	2.253474e-05
+15	   -3222.125		6.042174e-11	-1.226706e-05
+
+
+best...->cost=2.363732      *number_accepted=105  *number_generated=5098
+best...->cost=2.356285      *number_accepted=106  *number_generated=5156
+best...->cost=2.355101      *number_accepted=107  *number_generated=5244
+best...->cost=2.353948      *number_accepted=108  *number_generated=5373
+best...->cost=2.350926      *number_accepted=109  *number_generated=5382
+best...->cost=2.350801      *number_accepted=110  *number_generated=5501
+best...->cost=2.346624      *number_accepted=111  *number_generated=5528
+best...->cost=2.345797      *number_accepted=112  *number_generated=5684
+best...->cost=2.345718      *number_accepted=113  *number_generated=5697
+best...->cost=2.345313      *number_accepted=114  *number_generated=5964
+best...->cost=2.344906      *number_accepted=115  *number_generated=6031
+best...->cost=2.344372      *number_accepted=116  *number_generated=6094
+best...->cost=2.344044      *number_accepted=117  *number_generated=6343
+best...->cost=2.343628      *number_accepted=118  *number_generated=6421
+best...->cost=2.342492      *number_accepted=119  *number_generated=6435
+best...->cost=2.341079      *number_accepted=120  *number_generated=6490
+best...->cost=2.3408        *number_accepted=121  *number_generated=6525
+best...->cost=2.339006      *number_accepted=122  *number_generated=6549
+best...->cost=2.338543      *number_accepted=123  *number_generated=6553
+best...->cost=2.337087      *number_accepted=124  *number_generated=6661
+best...->cost=2.335413      *number_accepted=125  *number_generated=6742
+best...->cost=2.325027      *number_accepted=126  *number_generated=6776
+best...->cost=2.317152      *number_accepted=127  *number_generated=6795
+best...->cost=2.310184      *number_accepted=128  *number_generated=6837
+best...->cost=2.307977      *number_accepted=129  *number_generated=6894
+best...->cost=2.307528      *number_accepted=130  *number_generated=6933
+best...->cost=2.304964      *number_accepted=131  *number_generated=6934
+best...->cost=2.304064      *number_accepted=132  *number_generated=6990
+best...->cost=2.302565      *number_accepted=133  *number_generated=7043
+best...->cost=2.301424      *number_accepted=134  *number_generated=7073
+best...->cost=2.3008        *number_accepted=135  *number_generated=7078
+best...->cost=2.300303      *number_accepted=136  *number_generated=7092
+best...->cost=2.289949      *number_accepted=137  *number_generated=7097
+best...->cost=2.289665      *number_accepted=138  *number_generated=7109
+best...->cost=2.283603      *number_accepted=139  *number_generated=7179
+best...->cost=2.283088      *number_accepted=140  *number_generated=7190
+best...->cost=2.282284      *number_accepted=141  *number_generated=7205
+best...->cost=2.282083      *number_accepted=142  *number_generated=7220
+best...->cost=2.281542      *number_accepted=143  *number_generated=7304
+best...->cost=2.281302      *number_accepted=144  *number_generated=7416
+best...->cost=2.279786      *number_accepted=145  *number_generated=7427
+best...->cost=2.278537      *number_accepted=146  *number_generated=7429
+best...->cost=2.278482      *number_accepted=147  *number_generated=7442
+best...->cost=2.2748        *number_accepted=148  *number_generated=7446
+best...->cost=2.274613      *number_accepted=149  *number_generated=7459
+best...->cost=2.271041      *number_accepted=150  *number_generated=7517
+best...->cost=2.270423      *number_accepted=151  *number_generated=7532
+best...->cost=2.266641      *number_accepted=152  *number_generated=7536
+best...->cost=2.266558      *number_accepted=153  *number_generated=7545
+best...->cost=2.266151      *number_accepted=154  *number_generated=7664
+best...->cost=2.263262      *number_accepted=155  *number_generated=7672
+best...->cost=2.261425      *number_accepted=156  *number_generated=7678
+best...->cost=2.260747      *number_accepted=157  *number_generated=7695
+best...->cost=2.260154      *number_accepted=158  *number_generated=7715
+best...->cost=2.260119      *number_accepted=159  *number_generated=7717
+best...->cost=2.259253      *number_accepted=160  *number_generated=7730
+best...->cost=2.258736      *number_accepted=161  *number_generated=7808
+best...->cost=2.258604      *number_accepted=162  *number_generated=7814
+best...->cost=2.257756      *number_accepted=163  *number_generated=7884
+best...->cost=2.257339      *number_accepted=164  *number_generated=7909
+best...->cost=2.256581      *number_accepted=165  *number_generated=7927
+best...->cost=2.256571      *number_accepted=166  *number_generated=8020
+best...->cost=2.256466      *number_accepted=167  *number_generated=8031
+best...->cost=2.255779      *number_accepted=168  *number_generated=8097
+best...->cost=2.252188      *number_accepted=169  *number_generated=8109
+best...->cost=2.252146      *number_accepted=170  *number_generated=8173
+best...->cost=2.251555      *number_accepted=171  *number_generated=8195
+best...->cost=2.25091       *number_accepted=172  *number_generated=8204
+best...->cost=2.250796      *number_accepted=173  *number_generated=8211
+best...->cost=2.250706      *number_accepted=174  *number_generated=8230
+best...->cost=2.250107      *number_accepted=175  *number_generated=8253
+best...->cost=2.250016      *number_accepted=176  *number_generated=8313
+best...->cost=2.249936      *number_accepted=177  *number_generated=8491
+best...->cost=2.248672      *number_accepted=178  *number_generated=8626
+best...->cost=2.246881      *number_accepted=179  *number_generated=8714
+best...->cost=2.246365      *number_accepted=180  *number_generated=8811
+best...->cost=2.245993      *number_accepted=181  *number_generated=8942
+best...->cost=2.243286      *number_accepted=182  *number_generated=9077
+best...->cost=2.24327       *number_accepted=183  *number_generated=9182
+best...->cost=2.243227      *number_accepted=184  *number_generated=9574
+best...->cost=2.242978      *number_accepted=185  *number_generated=9720
+best...->cost=2.242969      *number_accepted=186  *number_generated=9878
+best...->cost=2.241122      *number_accepted=187  *number_generated=9967
+
+*index_cost_acceptances = 82, *current_cost_temperature = 2.776605e-08
+*accepted_to_generated_ratio =   0.02941176, *number_invalid... = 0
+*number_generated = 10000, *number_accepted = 187
+best...->cost =     2.241122, last...->cost =     2.241122
+index_v  best...->parameter current_parameter_temp	tangent
+0	    601.0045		5.946147e-11	-5.38651e-05
+1	    3762.105		5.903321e-11	-9.031797e-05
+2	     5202.84		 6.05103e-11	 3.89889e-05
+3	    549.3528		6.056354e-11	-1.395055e-05
+4	    4176.788		2.187472e-11	1.807193e-06
+5	   -3030.818		6.088457e-11	-1.042688e-06
+6	    7992.623		3.121505e-11	6.509388e-06
+7	    2561.697		2.147642e-11	-5.214573e-06
+8	   -5984.366		6.111816e-11	-4.170904e-06
+9	    2894.432		6.049257e-11	 1.92614e-05
+10	    9469.283		6.104613e-11	-4.830351e-07
+11	     7724.96		6.065243e-11	-1.765558e-05
+12	   -4014.677		6.077725e-11	-7.251638e-06
+13	   -2045.474		6.095628e-11	1.122274e-05
+14	    1616.574		6.070587e-11	-3.567786e-06
+15	   -2799.513		6.095628e-11	-2.170776e-05
+
+
+best...->cost=2.235622      *number_accepted=188  *number_generated=10219
+best...->cost=2.235614      *number_accepted=189  *number_generated=10301
+best...->cost=2.235579      *number_accepted=190  *number_generated=11152
+best...->cost=2.235484      *number_accepted=191  *number_generated=11194
+best...->cost=2.234818      *number_accepted=192  *number_generated=11203
+best...->cost=2.234762      *number_accepted=193  *number_generated=11428
+best...->cost=2.234739      *number_accepted=194  *number_generated=11525
+best...->cost=2.234687      *number_accepted=195  *number_generated=11727
+best...->cost=2.234332      *number_accepted=196  *number_generated=11977
+best...->cost=2.234319      *number_accepted=197  *number_generated=12156
+best...->cost=2.234318      *number_accepted=198  *number_generated=12435
+best...->cost=2.23425       *number_accepted=199  *number_generated=12454
+best...->cost=2.234109      *number_accepted=200  *number_generated=12654
+
+*index_cost_acceptances = 93, *current_cost_temperature = 2.406265e-08
+*accepted_to_generated_ratio =  0.009950249, *number_invalid... = 0
+*number_generated = 12654, *number_accepted = 200
+best...->cost =     2.234109, last...->cost =     2.234109
+index_v  best...->parameter current_parameter_temp	tangent
+0	    625.3842		4.410563e-11	-4.729719e-05
+1	    3764.978		3.162357e-11	   0.1816936
+2	    5208.504		5.347216e-11	3.323689e-05
+3	    557.7058		8.462567e-11	-9.543067e-06
+4	    4179.881		1.127879e-10	-8.818805e-07
+5	   -3030.522		1.387493e-10	-1.300054e-06
+6	    8053.757		8.763318e-11	7.763666e-06
+7	    2572.856		8.305071e-11	-7.323362e-06
+8	   -5909.108		1.171223e-10	-5.319103e-07
+9	    2900.333		7.471088e-11	1.595853e-05
+10	      9425.4		1.447394e-10	9.215737e-07
+11	    7629.765		7.747344e-11	  0.08960772
+12	   -4056.078		1.035314e-10	6.453732e-07
+13	   -2230.284		9.134175e-11	-4.984513e-06
+14	    1656.199		1.202956e-10	2.453246e-06
+15	   -2801.091		7.124053e-11	-1.993175e-05
+
+
+best...->cost=2.233714      *number_accepted=201  *number_generated=13025
+best...->cost=2.233707      *number_accepted=202  *number_generated=13585
+best...->cost=2.233551      *number_accepted=203  *number_generated=13746
+best...->cost=2.232833      *number_accepted=204  *number_generated=14121
+best...->cost=2.232821      *number_accepted=205  *number_generated=14287
+best...->cost=2.232568      *number_accepted=206  *number_generated=14306
+best...->cost=2.232325      *number_accepted=207  *number_generated=14410
+best...->cost=2.231201      *number_accepted=208  *number_generated=14630
+best...->cost=2.231046      *number_accepted=209  *number_generated=14676
+best...->cost=2.231018      *number_accepted=210  *number_generated=14746
+best...->cost=2.230369      *number_accepted=211  *number_generated=14837
+best...->cost=2.229787      *number_accepted=212  *number_generated=15331
+best...->cost=2.229745      *number_accepted=213  *number_generated=15442
+best...->cost=2.229541      *number_accepted=214  *number_generated=15603
+best...->cost=2.229457      *number_accepted=215  *number_generated=15866
+best...->cost=2.229127      *number_accepted=216  *number_generated=15921
+best...->cost=2.22814       *number_accepted=217  *number_generated=15937
+best...->cost=2.227502      *number_accepted=218  *number_generated=16155
+best...->cost=2.227309      *number_accepted=219  *number_generated=16311
+best...->cost=2.227025      *number_accepted=220  *number_generated=16364
+best...->cost=2.226839      *number_accepted=221  *number_generated=16523
+best...->cost=2.226726      *number_accepted=222  *number_generated=16534
+best...->cost=2.226718      *number_accepted=223  *number_generated=16604
+best...->cost=2.226387      *number_accepted=224  *number_generated=16655
+best...->cost=2.225992      *number_accepted=225  *number_generated=16705
+best...->cost=2.225895      *number_accepted=226  *number_generated=16720
+best...->cost=2.224914      *number_accepted=227  *number_generated=16974
+best...->cost=2.224849      *number_accepted=228  *number_generated=16996
+best...->cost=2.224804      *number_accepted=229  *number_generated=17297
+best...->cost=2.224732      *number_accepted=230  *number_generated=17438
+best...->cost=2.224662      *number_accepted=231  *number_generated=17726
+best...->cost=2.224659      *number_accepted=232  *number_generated=18005
+best...->cost=2.224497      *number_accepted=233  *number_generated=18171
+best...->cost=2.224286      *number_accepted=234  *number_generated=18224
+best...->cost=2.224234      *number_accepted=235  *number_generated=18857
+best...->cost=2.224166      *number_accepted=236  *number_generated=18918
+best...->cost=2.224083      *number_accepted=237  *number_generated=18955
+best...->cost=2.223308      *number_accepted=238  *number_generated=19025
+best...->cost=2.223004      *number_accepted=239  *number_generated=19050
+best...->cost=2.22297       *number_accepted=240  *number_generated=19158
+best...->cost=2.222865      *number_accepted=241  *number_generated=19239
+best...->cost=2.222117      *number_accepted=242  *number_generated=19249
+best...->cost=2.221748      *number_accepted=243  *number_generated=19261
+best...->cost=2.221409      *number_accepted=244  *number_generated=19318
+best...->cost=2.221023      *number_accepted=245  *number_generated=19512
+best...->cost=2.22099       *number_accepted=246  *number_generated=19587
+best...->cost=2.220988      *number_accepted=247  *number_generated=19866
+best...->cost=2.220921      *number_accepted=248  *number_generated=19931
+best...->cost=2.219918      *number_accepted=249  *number_generated=19954
+best...->cost=2.219841      *number_accepted=250  *number_generated=19989
+
+*index_cost_acceptances = 142, *current_cost_temperature = 1.473172e-08
+*accepted_to_generated_ratio =   0.08333333, *number_invalid... = 0
+*number_generated = 20000, *number_accepted = 250
+best...->cost =     2.219841, last...->cost =     2.219841
+index_v  best...->parameter current_parameter_temp	tangent
+0	    631.2662		3.428171e-11	-5.385291e-05
+1	    3759.726		1.131165e-11	-8.231885e-05
+2	    5217.608		3.430279e-11	3.147632e-05
+3	    851.5033		 3.43239e-11	3.439703e-06
+4	    4220.965		 3.43239e-11	4.561491e-06
+5	   -3048.466		 3.43239e-11	1.303031e-07
+6	    7830.918		 3.43239e-11	8.176475e-06
+7	    2424.225		 3.43239e-11	-1.214576e-05
+8	   -5964.908		 3.43239e-11	-4.04072e-06
+9	    2484.171		3.431686e-11	2.103444e-05
+10	     9237.01		 3.43239e-11	-7.293518e-07
+11	    7765.616		2.169587e-11	-1.493448e-05
+12	   -3787.793		 3.43239e-11	8.023894e-06
+13	   -1798.947		 3.43239e-11	-3.844171e-06
+14	    1783.129		 3.43239e-11	1.807183e-06
+15	   -2619.608		3.431686e-11	-1.671506e-05
+
+
+best...->cost=2.219526      *number_accepted=251  *number_generated=20085
+best...->cost=2.219043      *number_accepted=252  *number_generated=20374
+best...->cost=2.218948      *number_accepted=253  *number_generated=20439
+best...->cost=2.218921      *number_accepted=254  *number_generated=20508
+best...->cost=2.218211      *number_accepted=255  *number_generated=20529
+best...->cost=2.2182        *number_accepted=256  *number_generated=20542
+best...->cost=2.218143      *number_accepted=257  *number_generated=20714
+best...->cost=2.217454      *number_accepted=258  *number_generated=20881
+best...->cost=2.217422      *number_accepted=259  *number_generated=21018
+best...->cost=2.217393      *number_accepted=260  *number_generated=21442
+best...->cost=2.21739       *number_accepted=261  *number_generated=21721
+best...->cost=2.217332      *number_accepted=262  *number_generated=21844
+best...->cost=2.217128      *number_accepted=263  *number_generated=21940
+best...->cost=2.216658      *number_accepted=264  *number_generated=22110
+best...->cost=2.216627      *number_accepted=265  *number_generated=22180
+best...->cost=2.216352      *number_accepted=266  *number_generated=22231
+best...->cost=2.215202      *number_accepted=267  *number_generated=22258
+best...->cost=2.214613      *number_accepted=268  *number_generated=22296
+best...->cost=2.214572      *number_accepted=269  *number_generated=22572
+best...->cost=2.213854      *number_accepted=270  *number_generated=22740
+best...->cost=2.213826      *number_accepted=271  *number_generated=22877
+best...->cost=2.212064      *number_accepted=272  *number_generated=23356
+best...->cost=2.212063      *number_accepted=273  *number_generated=23580
+best...->cost=2.211956      *number_accepted=274  *number_generated=23799
+best...->cost=2.211913      *number_accepted=275  *number_generated=24083
+best...->cost=2.211898      *number_accepted=276  *number_generated=24431
+best...->cost=2.211868      *number_accepted=277  *number_generated=24732
+best...->cost=2.211812      *number_accepted=278  *number_generated=25028
+best...->cost=2.2118        *number_accepted=279  *number_generated=26293
+
+*index_cost_acceptances = 170, *current_cost_temperature = 1.184479e-08
+*accepted_to_generated_ratio = 0.0002696872, *number_invalid... = 0
+*number_generated = 30000, *number_accepted = 279
+best...->cost =       2.2118, last...->cost =       2.2118
+index_v  best...->parameter current_parameter_temp	tangent
+0	     616.629		1.081955e-11	  0.08459226
+1	    3770.265		5.015505e-12	   0.1863817
+2	    5222.699		1.298589e-11	  0.01002143
+3	    960.6382		1.917022e-11	  0.05436562
+4	    4171.227		1.867794e-11	4.066658e-06
+5	   -3003.165		2.130929e-11	2.634028e-06
+6	    7740.293		1.739167e-11	8.568523e-06
+7	     2463.09		1.630102e-11	-1.354248e-05
+8	   -5839.283		1.889866e-11	-0.008932811
+9	    2334.657		1.449649e-11	    0.022377
+10	    9397.301		2.075766e-11	 0.005558183
+11	    7882.775		1.407665e-11	  0.08909496
+12	   -3879.062		1.743875e-11	 -0.01344762
+13	   -1731.375		1.898489e-11	-5.967801e-06
+14	    1706.189		2.002664e-11	1.294326e-06
+15	   -2498.762		1.529118e-11	 -0.02091217
+
+
+best...->cost=2.211714      *number_accepted=280  *number_generated=33414
+best...->cost=2.211698      *number_accepted=281  *number_generated=33456
+best...->cost=2.211272      *number_accepted=282  *number_generated=33474
+best...->cost=2.211242      *number_accepted=283  *number_generated=33559
+best...->cost=2.210689      *number_accepted=284  *number_generated=33678
+best...->cost=2.210663      *number_accepted=285  *number_generated=33731
+best...->cost=2.209963      *number_accepted=286  *number_generated=33778
+best...->cost=2.209623      *number_accepted=287  *number_generated=33878
+best...->cost=2.209076      *number_accepted=288  *number_generated=33899
+best...->cost=2.208787      *number_accepted=289  *number_generated=33924
+best...->cost=2.208757      *number_accepted=290  *number_generated=34032
+best...->cost=2.208754      *number_accepted=291  *number_generated=34234
+best...->cost=2.208751      *number_accepted=292  *number_generated=34740
+best...->cost=2.208669      *number_accepted=293  *number_generated=34759
+best...->cost=2.208637      *number_accepted=294  *number_generated=34959
+best...->cost=2.208398      *number_accepted=295  *number_generated=35250
+best...->cost=2.208394      *number_accepted=296  *number_generated=35316
+best...->cost=2.208374      *number_accepted=297  *number_generated=35419
+best...->cost=2.208354      *number_accepted=298  *number_generated=35591
+best...->cost=2.208325      *number_accepted=299  *number_generated=35689
+best...->cost=2.208095      *number_accepted=300  *number_generated=36145
+
+*index_cost_acceptances = 189, *current_cost_temperature = 1.040626e-08
+*accepted_to_generated_ratio =  0.004376368, *number_invalid... = 0
+*number_generated = 36145, *number_accepted = 300
+best...->cost =     2.208095, last...->cost =     2.208095
+index_v  best...->parameter current_parameter_temp	tangent
+0	     652.281		1.087253e-11	    1.065652
+1	    3778.365		3.504467e-12	   0.1840827
+2	    5203.347		2.990946e-11	2.735207e-05
+3	    966.6626		1.883708e-11	-1.444052e-06
+4	    4160.419		4.483471e-11	4.124342e-06
+5	   -3003.702		4.484558e-11	   -0.231429
+6	    7747.379		4.482385e-11	7.234969e-06
+7	    2525.283		4.479128e-11	   0.2752939
+8	   -5876.853		3.344191e-11	  -0.1183078
+9	     2347.47		2.416074e-11	1.500739e-05
+10	    9363.747		3.680419e-11	2.687998e-06
+11	    7879.131		  1.2358e-11	  0.08822526
+12	   -3905.127		2.991509e-11	  -0.1780426
+13	    -1550.15		4.483471e-11	  -0.4485429
+14	    2122.224		4.484558e-11	6.759348e-06
+15	   -2479.613		2.520889e-11	-1.354608e-05
+
+
+best...->cost=2.207481      *number_accepted=301  *number_generated=37107
+best...->cost=2.207435      *number_accepted=302  *number_generated=37172
+best...->cost=2.207063      *number_accepted=303  *number_generated=37223
+best...->cost=2.207034      *number_accepted=304  *number_generated=37448
+best...->cost=2.20703       *number_accepted=305  *number_generated=38455
+best...->cost=2.206984      *number_accepted=306  *number_generated=38674
+best...->cost=2.206912      *number_accepted=307  *number_generated=38914
+best...->cost=2.206783      *number_accepted=308  *number_generated=38965
+best...->cost=2.206753      *number_accepted=309  *number_generated=39030
+best...->cost=2.206738      *number_accepted=310  *number_generated=39306
+best...->cost=2.206718      *number_accepted=311  *number_generated=39611
+best...->cost=2.206297      *number_accepted=312  *number_generated=39802
+
+*index_cost_acceptances = 200, *current_cost_temperature = 9.710083e-09
+*accepted_to_generated_ratio =  0.005025126, *number_invalid... = 0
+*number_generated = 40000, *number_accepted = 312
+best...->cost =     2.206297, last...->cost =     2.206297
+index_v  best...->parameter current_parameter_temp	tangent
+0	    662.2111		7.638224e-12	-6.036918e-05
+1	    3790.337		1.241804e-11	   0.1832998
+2	    5218.349		8.891918e-11	2.834674e-05
+3	    1002.244		8.891918e-11	2.117908e-06
+4	    4170.792		8.891918e-11	4.619339e-06
+5	   -2996.058		  4.6653e-11	2.684082e-06
+6	    7753.964		8.891918e-11	7.482136e-06
+7	    2553.646		4.355068e-11	-1.21193e-05
+8	   -5854.828		5.322684e-11	4.842985e-07
+9	    2387.996		8.891918e-11	1.887063e-05
+10	    9353.271		8.891918e-11	-6.96061e-07
+11	    7944.701		4.089216e-11	   0.0874044
+12	   -3919.011		 4.41268e-11	3.712072e-06
+13	   -1551.042		3.498139e-11	-6.32129e-06
+14	    2109.486		8.891918e-11	5.683139e-06
+15	     -2453.2		8.891918e-11	-9.458646e-06
+
+
+best...->cost=2.206243      *number_accepted=313  *number_generated=40885
+best...->cost=2.206231      *number_accepted=314  *number_generated=41160
+best...->cost=2.206229      *number_accepted=315  *number_generated=42167
+best...->cost=2.206204      *number_accepted=316  *number_generated=42741
+best...->cost=2.206197      *number_accepted=317  *number_generated=43017
+best...->cost=2.206183      *number_accepted=318  *number_generated=43321
+best...->cost=2.206097      *number_accepted=319  *number_generated=43831
+best...->cost=2.204939      *number_accepted=320  *number_generated=43915
+best...->cost=2.204935      *number_accepted=321  *number_generated=44025
+best...->cost=2.20487       *number_accepted=322  *number_generated=44483
+best...->cost=2.204533      *number_accepted=323  *number_generated=44534
+best...->cost=2.204502      *number_accepted=324  *number_generated=44600
+best...->cost=2.204451      *number_accepted=325  *number_generated=44703
+best...->cost=2.204432      *number_accepted=326  *number_generated=44875
+best...->cost=2.20379       *number_accepted=327  *number_generated=44911
+best...->cost=2.203764      *number_accepted=328  *number_generated=44972
+best...->cost=2.203756      *number_accepted=329  *number_generated=45179
+best...->cost=2.20372       *number_accepted=330  *number_generated=45376
+best...->cost=2.203661      *number_accepted=331  *number_generated=45472
+best...->cost=2.203659      *number_accepted=332  *number_generated=45882
+best...->cost=2.203584      *number_accepted=333  *number_generated=45901
+best...->cost=2.203571      *number_accepted=334  *number_generated=46734
+best...->cost=2.203306      *number_accepted=335  *number_generated=46928
+best...->cost=2.203264      *number_accepted=336  *number_generated=47035
+best...->cost=2.203247      *number_accepted=337  *number_generated=47237
+best...->cost=2.203246      *number_accepted=338  *number_generated=47744
+best...->cost=2.203204      *number_accepted=339  *number_generated=47763
+best...->cost=2.20309       *number_accepted=340  *number_generated=47910
+best...->cost=2.203066      *number_accepted=341  *number_generated=47963
+best...->cost=2.203034      *number_accepted=342  *number_generated=48204
+best...->cost=2.202825      *number_accepted=343  *number_generated=48255
+best...->cost=2.202814      *number_accepted=344  *number_generated=48321
+best...->cost=2.20279       *number_accepted=345  *number_generated=48424
+best...->cost=2.202782      *number_accepted=346  *number_generated=48596
+best...->cost=2.202771      *number_accepted=347  *number_generated=48694
+best...->cost=2.202413      *number_accepted=348  *number_generated=49157
+best...->cost=2.202412      *number_accepted=349  *number_generated=49606
+
+*index_cost_acceptances = 236, *current_cost_temperature = 7.950106e-09
+*accepted_to_generated_ratio =  0.002531646, *number_invalid... = 0
+*number_generated = 50000, *number_accepted = 349
+best...->cost =     2.202412, last...->cost =     2.202412
+index_v  best...->parameter current_parameter_temp	tangent
+0	    670.1681		2.131906e-11	    1.042046
+1	    3839.893		5.311332e-12	   0.1819833
+2	    5236.711		2.146983e-11	 0.009777166
+3	     1007.88		2.147312e-11	-2.356471e-06
+4	    4144.655		2.147312e-11	4.219911e-06
+5	   -3006.807		2.147312e-11	  -0.2322712
+6	    7761.757		2.147312e-11	7.182843e-06
+7	    2573.634		2.146983e-11	-1.090375e-05
+8	   -5818.724		2.147312e-11	  -0.1288158
+9	    2446.864		2.146983e-11	1.726418e-05
+10	    9482.465		2.147312e-11	 0.005385099
+11	    7961.914		 1.28098e-11	  0.08771813
+12	   -3943.415		2.147312e-11	 -0.01293901
+13	   -1479.472		2.147312e-11	-3.805708e-06
+14	    2084.922		2.147312e-11	4.136385e-06
+15	   -2434.669		2.147312e-11	-9.245488e-06
+
+
+best...->cost=2.202353      *number_accepted=350  *number_generated=51679
+best...->cost=2.202339      *number_accepted=351  *number_generated=52309
+best...->cost=2.202293      *number_accepted=352  *number_generated=52878
+best...->cost=2.202291      *number_accepted=353  *number_generated=53315
+best...->cost=2.202253      *number_accepted=354  *number_generated=53774
+best...->cost=2.20223       *number_accepted=355  *number_generated=53890
+best...->cost=2.20222       *number_accepted=356  *number_generated=54166
+best...->cost=2.202213      *number_accepted=357  *number_generated=54470
+best...->cost=2.202212      *number_accepted=358  *number_generated=55173
+best...->cost=2.202205      *number_accepted=359  *number_generated=56025
+best...->cost=2.202205      *number_accepted=360  *number_generated=57035
+best...->cost=2.202199      *number_accepted=361  *number_generated=57887
+best...->cost=2.202057      *number_accepted=362  *number_generated=58580
+best...->cost=2.202057      *number_accepted=363  *number_generated=58897
+
+*index_cost_acceptances = 249, *current_cost_temperature = 7.436707e-09
+*accepted_to_generated_ratio = 0.0009057971, *number_invalid... = 0
+*number_generated = 60000, *number_accepted = 363
+best...->cost =     2.202057, last...->cost =     2.202057
+index_v  best...->parameter current_parameter_temp	tangent
+0	    670.1687		 7.21071e-12	  0.07612543
+1	    3839.752		8.596477e-12	    0.181712
+2	    5239.738		2.039143e-11	  0.01049225
+3	    1010.012		2.147312e-11	-3.814497e-06
+4	    4143.402		2.147312e-11	0.0009113223
+5	   -3011.045		1.326116e-11	2.126002e-06
+6	    7761.716		2.147312e-11	7.078189e-06
+7	     2595.31		2.147312e-11	 0.001437557
+8	   -5795.803		1.538142e-11	-0.009452144
+9	    2446.918		2.147312e-11	1.734854e-05
+10	    9482.484		2.079831e-11	 0.005782637
+11	    7967.418		1.493489e-11	 0.001121402
+12	   -3937.488		2.013318e-11	 -0.01296234
+13	   -1465.787		2.147312e-11	-2.651832e-06
+14	    2071.703		2.147312e-11	3.429069e-06
+15	   -2421.334		2.147312e-11	-8.681841e-06
+
+
+best...->cost=2.202042      *number_accepted=364  *number_generated=61905
+best...->cost=2.202042      *number_accepted=365  *number_generated=62608
+best...->cost=2.202041      *number_accepted=366  *number_generated=64467
+best...->cost=2.202041      *number_accepted=367  *number_generated=66327
+best...->cost=2.202015      *number_accepted=368  *number_generated=68724
+best...->cost=2.202001      *number_accepted=369  *number_generated=68766
+best...->cost=2.20199       *number_accepted=370  *number_generated=69041
+best...->cost=2.20197       *number_accepted=371  *number_generated=69139
+best...->cost=2.201671      *number_accepted=372  *number_generated=69235
+best...->cost=2.201459      *number_accepted=373  *number_generated=69382
+best...->cost=2.201322      *number_accepted=374  *number_generated=69595
+best...->cost=2.201095      *number_accepted=375  *number_generated=69602
+
+*index_cost_acceptances = 260, *current_cost_temperature = 7.054741e-09
+*accepted_to_generated_ratio =  0.002506266, *number_invalid... = 0
+*number_generated = 70000, *number_accepted = 375
+best...->cost =     2.201095, last...->cost =     2.201095
+index_v  best...->parameter current_parameter_temp	tangent
+0	    690.6815		6.423011e-12	     1.00388
+1	    3839.668		4.206467e-12	   0.1806972
+2	    5233.274		1.744583e-11	 2.72052e-05
+3	    1024.266		2.147312e-11	2.297291e-07
+4	    4137.426		2.081397e-11	3.750895e-06
+5	   -3011.937		2.147312e-11	2.384503e-06
+6	    7750.749		2.146983e-11	7.146469e-06
+7	    2591.732		2.052562e-11	-1.096706e-05
+8	   -5804.663		1.698372e-11	 2.52161e-06
+9	    2446.947		2.145665e-11	1.696377e-05
+10	    9473.233		1.877582e-11	4.889553e-07
+11	     7969.93		2.043702e-11	   0.0870052
+12	   -3944.037		1.685784e-11	4.054374e-06
+13	   -1430.319		2.147312e-11	-6.69423e-06
+14	    2260.061		2.147312e-11	7.417386e-06
+15	   -2405.398		2.146653e-11	-9.167787e-06
+
+
+best...->cost=2.201082      *number_accepted=376  *number_generated=70896
+best...->cost=2.200983      *number_accepted=377  *number_generated=71163
+best...->cost=2.200976      *number_accepted=378  *number_generated=71199
+best...->cost=2.200049      *number_accepted=379  *number_generated=71276
+best...->cost=2.199551      *number_accepted=380  *number_generated=72410
+best...->cost=2.199518      *number_accepted=381  *number_generated=72476
+best...->cost=2.199511      *number_accepted=382  *number_generated=72493
+best...->cost=2.199449      *number_accepted=383  *number_generated=72579
+best...->cost=2.199438      *number_accepted=384  *number_generated=72751
+best...->cost=2.199142      *number_accepted=385  *number_generated=72918
+best...->cost=2.199134      *number_accepted=386  *number_generated=73055
+best...->cost=2.1991        *number_accepted=387  *number_generated=73252
+best...->cost=2.19907       *number_accepted=388  *number_generated=73348
+best...->cost=2.199068      *number_accepted=389  *number_generated=73758
+best...->cost=2.199028      *number_accepted=390  *number_generated=73977
+best...->cost=2.198977      *number_accepted=391  *number_generated=74217
+best...->cost=2.198952      *number_accepted=392  *number_generated=74333
+best...->cost=2.198947      *number_accepted=393  *number_generated=74609
+best...->cost=2.198935      *number_accepted=394  *number_generated=74706
+best...->cost=2.198882      *number_accepted=395  *number_generated=74776
+best...->cost=2.198879      *number_accepted=396  *number_generated=74913
+best...->cost=2.198853      *number_accepted=397  *number_generated=75110
+best...->cost=2.198853      *number_accepted=398  *number_generated=75616
+best...->cost=2.198851      *number_accepted=399  *number_generated=76468
+best...->cost=2.198837      *number_accepted=400  *number_generated=78054
+
+*index_cost_acceptances = 283, *current_cost_temperature = 6.358236e-09
+*accepted_to_generated_ratio =  0.001260239, *number_invalid... = 0
+*number_generated = 78054, *number_accepted = 400
+best...->cost =     2.198837, last...->cost =     2.198837
+index_v  best...->parameter current_parameter_temp	tangent
+0	    690.0707		3.831405e-12	-7.004767e-05
+1	    3854.243		8.944262e-12	   0.1797959
+2	    5232.666		2.986447e-11	  0.00997269
+3	    1041.855		2.987009e-11	-6.073335e-06
+4	    4143.719		2.987009e-11	5.108127e-06
+5	   -3082.353		2.987009e-11	6.528493e-07
+6	    7802.478		2.987009e-11	6.362321e-06
+7	    2645.271		2.987009e-11	-8.427608e-06
+8	   -5768.719		2.987009e-11	1.612758e-06
+9	    2445.103		2.987009e-11	2.010106e-05
+10	    9467.141		2.987009e-11	-1.458042e-06
+11	    8009.215		2.150944e-11	  0.08647723
+12	   -3952.654		2.987009e-11	9.240989e-07
+13	   -1267.011		2.987009e-11	2.595863e-06
+14	    2245.899		2.987009e-11	2.825377e-06
+15	   -2390.186		2.987009e-11	-7.855737e-06
+
+
+best...->cost=2.198816      *number_accepted=401  *number_generated=79136
+best...->cost=2.198813      *number_accepted=402  *number_generated=79332
+best...->cost=2.198677      *number_accepted=403  *number_generated=79351
+best...->cost=2.198603      *number_accepted=404  *number_generated=79905
+
+*index_cost_acceptances = 286, *current_cost_temperature = 6.270191e-09
+*accepted_to_generated_ratio =   0.01041667, *number_invalid... = 0
+*number_generated = 80000, *number_accepted = 404
+best...->cost =     2.198603, last...->cost =     2.198603
+index_v  best...->parameter current_parameter_temp	tangent
+0	    692.2346		2.182785e-10	-7.023607e-05
+1	    3855.499		7.561735e-12	-7.631498e-05
+2	    5234.093		1.274491e-10	3.154286e-05
+3	    1043.266		2.340028e-10	-5.698231e-06
+4	    4143.365		2.341696e-10	4.721721e-06
+5	   -3081.794		2.341696e-10	8.306537e-07
+6	    7790.935		2.340028e-10	6.530175e-06
+7	     2644.88		2.340028e-10	-8.643116e-06
+8	   -5750.657		2.341696e-10	2.733185e-06
+9	    2449.804		2.335037e-10	 1.81426e-05
+10	    9512.808		2.341696e-10	-5.300908e-08
+11	    8008.681		2.960792e-11	-8.682195e-06
+12	   -3953.462		2.341696e-10	2.087496e-06
+13	   -1291.454		2.341696e-10	4.918374e-07
+14	    2244.772		2.341696e-10	4.042135e-06
+15	   -2390.109		2.340028e-10	-8.542814e-06
+
+
+best...->cost=2.198547      *number_accepted=405  *number_generated=80678
+best...->cost=2.198544      *number_accepted=406  *number_generated=81182
+best...->cost=2.198507      *number_accepted=407  *number_generated=81400
+best...->cost=2.19844       *number_accepted=408  *number_generated=81755
+best...->cost=2.198377      *number_accepted=409  *number_generated=81858
+best...->cost=2.198362      *number_accepted=410  *number_generated=82030
+best...->cost=2.198356      *number_accepted=411  *number_generated=82333
+best...->cost=2.198348      *number_accepted=412  *number_generated=83886
+best...->cost=2.198346      *number_accepted=413  *number_generated=84893
+best...->cost=2.19833       *number_accepted=414  *number_generated=85469
+best...->cost=2.198324      *number_accepted=415  *number_generated=85745
+best...->cost=2.198323      *number_accepted=416  *number_generated=86753
+best...->cost=2.198319      *number_accepted=417  *number_generated=87605
+best...->cost=2.198315      *number_accepted=418  *number_generated=87703
+best...->cost=2.198314      *number_accepted=419  *number_generated=88614
+best...->cost=2.198311      *number_accepted=420  *number_generated=89466
+best...->cost=2.198309      *number_accepted=421  *number_generated=89564
+
+*index_cost_acceptances = 302, *current_cost_temperature = 5.864249e-09
+*accepted_to_generated_ratio =   0.00228833, *number_invalid... = 0
+*number_generated = 90000, *number_accepted = 421
+best...->cost =     2.198309, last...->cost =     2.198309
+index_v  best...->parameter current_parameter_temp	tangent
+0	    692.2119		1.635834e-11	   0.9978363
+1	    3855.541		3.860508e-12	   0.1792654
+2	    5240.325		1.709739e-11	3.183544e-05
+3	    1041.373		 2.06272e-11	-6.561238e-06
+4	    4144.779		2.074517e-11	4.629216e-06
+5	   -3081.506		2.130929e-11	  -0.2241685
+6	    7780.392		2.053175e-11	  6.4354e-06
+7	     2665.49		2.030074e-11	   0.2591739
+8	   -5745.783		2.100667e-11	  -0.1202425
+9	    2447.807		1.944248e-11	1.800213e-05
+10	     9512.96		2.146324e-11	-3.685958e-07
+11	    8017.542		1.663019e-11	  0.08735668
+12	   -3959.278		2.110249e-11	  -0.1745064
+13	   -1307.974		2.137131e-11	  -0.5282399
+14	    2239.786		2.082966e-11	3.870606e-06
+15	   -2374.317		2.031279e-11	-7.590706e-06
+
+
+best...->cost=2.19824       *number_accepted=422  *number_generated=91870
+best...->cost=2.198238      *number_accepted=423  *number_generated=94186
+best...->cost=2.198238      *number_accepted=424  *number_generated=95038
+best...->cost=2.19818       *number_accepted=425  *number_generated=95634
+best...->cost=2.198179      *number_accepted=426  *number_generated=96046
+best...->cost=2.198163      *number_accepted=427  *number_generated=96623
+best...->cost=2.198162      *number_accepted=428  *number_generated=96898
+best...->cost=2.198113      *number_accepted=429  *number_generated=97495
+best...->cost=2.198112      *number_accepted=430  *number_generated=97908
+best...->cost=2.198112      *number_accepted=431  *number_generated=98760
+best...->cost=2.198111      *number_accepted=432  *number_generated=99770
+best...->cost=2.197976      *number_accepted=433  *number_generated=99892
+
+*index_cost_acceptances = 313, *current_cost_temperature = 5.610787e-09
+*accepted_to_generated_ratio =  0.009174312, *number_invalid... = 0
+*number_generated = 100000, *number_accepted = 433
+best...->cost =     2.197976, last...->cost =     2.197976
+index_v  best...->parameter current_parameter_temp	tangent
+0	    696.3166		6.242682e-12	-6.866795e-05
+1	     3855.54		7.240224e-12	-7.724104e-05
+2	    5242.155		2.146653e-11	 0.009848006
+3	    1053.967		2.147312e-11	 0.004846322
+4	    4142.415		2.147312e-11	4.731839e-06
+5	   -3076.798		1.320204e-11	9.952658e-07
+6	    7764.275		2.147312e-11	0.0006642348
+7	     2665.07		1.244273e-11	-8.722111e-06
+8	   -5751.192		  1.5393e-11	2.626912e-06
+9	    2447.851		2.147312e-11	 1.88802e-05
+10	    9505.764		2.147312e-11	 0.000537446
+11	    8020.427		1.567321e-11	-7.881326e-06
+12	   -3972.119		1.410851e-11	-0.001285813
+13	    -1292.96		9.746903e-12	-0.003955281
+14	    2283.499		2.147312e-11	4.414746e-06
+15	   -2365.844		2.147312e-11	-7.270269e-06
+
+
+best...->cost=2.197931      *number_accepted=434  *number_generated=100345
+best...->cost=2.197573      *number_accepted=435  *number_generated=100362
+best...->cost=2.197546      *number_accepted=436  *number_generated=100922
+best...->cost=2.197545      *number_accepted=437  *number_generated=103482
+best...->cost=2.197544      *number_accepted=438  *number_generated=105342
+best...->cost=2.197508      *number_accepted=439  *number_generated=105561
+best...->cost=2.197501      *number_accepted=440  *number_generated=105918
+best...->cost=2.197491      *number_accepted=441  *number_generated=106194
+best...->cost=2.19749       *number_accepted=442  *number_generated=107203
+best...->cost=2.197482      *number_accepted=443  *number_generated=108055
+best...->cost=2.197481      *number_accepted=444  *number_generated=109064
+
+*index_cost_acceptances = 323, *current_cost_temperature = 5.396401e-09
+*accepted_to_generated_ratio =  0.001067236, *number_invalid... = 0
+*number_generated = 110000, *number_accepted = 444
+best...->cost =     2.197481, last...->cost =     2.197481
+index_v  best...->parameter current_parameter_temp	tangent
+0	    696.1485		1.930558e-11	   0.9899154
+1	    3855.608		1.935011e-11	   0.1788511
+2	    5243.992		7.236741e-12	3.150396e-05
+3	    1057.244		 1.00669e-11	 0.004822043
+4	    4132.895		2.139095e-11	0.0009237688
+5	   -3072.555		2.144348e-11	  -0.2243052
+6	    7752.874		1.718229e-11	0.0006640935
+7	    2677.674		2.123136e-11	   0.2588213
+8	    -5726.89		2.140735e-11	  -0.1203617
+9	    2433.962		2.117966e-11	1.786293e-05
+10	    9505.703		1.771108e-11	-5.494834e-07
+11	    8033.366		2.129301e-11	  0.08579342
+12	   -3977.766		1.369835e-11	    -0.17458
+13	   -1298.401		7.705684e-12	  -0.5309144
+14	    2281.803		2.139423e-11	4.714022e-06
+15	    -2361.53		2.134842e-11	-6.816703e-06
+
+
+best...->cost=2.19748       *number_accepted=445  *number_generated=114637
+best...->cost=2.197479      *number_accepted=446  *number_generated=118358
+
+*index_cost_acceptances = 324, *current_cost_temperature = 5.374624e-09
+*accepted_to_generated_ratio = 0.0006086427, *number_invalid... = 0
+*number_generated = 120000, *number_accepted = 446
+best...->cost =     2.197479, last...->cost =     2.197479
+index_v  best...->parameter current_parameter_temp	tangent
+0	    696.1485		6.840555e-12	   0.9899313
+1	    3855.607		1.366476e-11	   0.1788539
+2	    5243.989		2.145665e-11	3.153133e-05
+3	    1057.244		2.030074e-11	 0.004821683
+4	    4132.896		2.131906e-11	0.0009238965
+5	   -3072.415		1.319298e-11	   -0.224319
+6	    7752.874		 2.13321e-11	0.0006640452
+7	    2677.487		1.259396e-11	   0.2588437
+8	    -5726.89		1.542589e-11	  -0.1203637
+9	    2433.962		2.147312e-11	1.787826e-05
+10	    9505.703		2.147312e-11	-5.638966e-07
+11	    8033.367		1.646321e-11	  0.08579479
+12	   -3978.128		1.241804e-11	  -0.1745668
+13	   -1298.401		5.793758e-12	  -0.5309228
+14	    2281.008		2.147312e-11	4.686379e-06
+15	    -2361.53		2.147312e-11	-6.799567e-06
+
+
+
+*index_cost_acceptances = 323, *current_cost_temperature = 5.395182e-09
+*accepted_to_generated_ratio = 8.588852e-05, *number_invalid... = 0
+*number_generated = 130000, *number_accepted = 446
+best...->cost =     2.197479, last...->cost =     2.197479
+index_v  best...->parameter current_parameter_temp	tangent
+0	    696.1485		3.604483e-12	   0.9899313
+1	    3855.607		1.231193e-11	   0.1788539
+2	    5243.989		2.146983e-11	3.153133e-05
+3	    1057.244		2.079831e-11	 0.004821683
+4	    4132.896		2.131906e-11	0.0009238965
+5	   -3072.415		1.125172e-11	   -0.224319
+6	    7752.874		2.135823e-11	0.0006640452
+7	    2677.487		1.047353e-11	   0.2588437
+8	    -5726.89		1.429181e-11	  -0.1203637
+9	    2433.962		2.147312e-11	1.787826e-05
+10	    9505.703		2.147312e-11	-5.638966e-07
+11	    8033.367		1.567321e-11	  0.08579479
+12	   -3978.128		1.202552e-11	  -0.1745668
+13	   -1298.401		4.873177e-12	  -0.5309228
+14	    2281.008		2.147312e-11	4.686379e-06
+15	    -2361.53		2.147312e-11	-6.799567e-06
+
+
+
+*index_cost_acceptances = 322, *current_cost_temperature = 5.415884e-09
+*accepted_to_generated_ratio = 4.620432e-05, *number_invalid... = 0
+*number_generated = 140000, *number_accepted = 446
+best...->cost =     2.197479, last...->cost =     2.197479
+index_v  best...->parameter current_parameter_temp	tangent
+0	    696.1485		2.256807e-12	   0.9899313
+1	    3855.607		1.189267e-11	   0.1788539
+2	    5243.989		2.146983e-11	3.153133e-05
+3	    1057.244		2.081397e-11	 0.004821683
+4	    4132.896		2.131906e-11	0.0009238965
+5	   -3072.415		1.059893e-11	   -0.224319
+6	    7752.874		2.135823e-11	0.0006640452
+7	    2677.487		9.715333e-12	   0.2588437
+8	    -5726.89		1.401162e-11	  -0.1203637
+9	    2433.962		2.147312e-11	1.787826e-05
+10	    9505.703		2.147312e-11	-5.638966e-07
+11	    8033.367		1.551349e-11	  0.08579479
+12	   -3978.128		1.189523e-11	  -0.1745668
+13	   -1298.401		4.362119e-12	  -0.5309228
+14	    2281.008		2.147312e-11	4.686379e-06
+15	    -2361.53		2.147312e-11	-6.799567e-06
+
+
+
+*index_cost_acceptances = 321, *current_cost_temperature = 5.436726e-09
+*accepted_to_generated_ratio = 3.160257e-05, *number_invalid... = 0
+*number_generated = 150000, *number_accepted = 446
+best...->cost =     2.197479, last...->cost =     2.197479
+index_v  best...->parameter current_parameter_temp	tangent
+0	    696.1485		1.557877e-12	   0.9899313
+1	    3855.607		1.175211e-11	   0.1788539
+2	    5243.989		2.146983e-11	3.153133e-05
+3	    1057.244		2.081397e-11	 0.004821683
+4	    4132.896		2.131906e-11	0.0009238965
+5	   -3072.415		1.035252e-11	   -0.224319
+6	    7752.874		2.135823e-11	0.0006640452
+7	    2677.487		9.407496e-12	   0.2588437
+8	    -5726.89		1.393882e-11	  -0.1203637
+9	    2433.962		2.147312e-11	1.787826e-05
+10	    9505.703		2.147312e-11	-5.638966e-07
+11	    8033.367		 1.54803e-11	  0.08579479
+12	   -3978.128		1.185188e-11	  -0.1745668
+13	   -1298.401		4.054486e-12	  -0.5309228
+14	    2281.008		2.147312e-11	4.686379e-06
+15	    -2361.53		2.147312e-11	-6.799567e-06
+
+
+
+*index_cost_acceptances = 321, *current_cost_temperature =  5.45771e-09
+*accepted_to_generated_ratio = 2.401364e-05, *number_invalid... = 0
+*number_generated = 160000, *number_accepted = 446
+best...->cost =     2.197479, last...->cost =     2.197479
+index_v  best...->parameter current_parameter_temp	tangent
+0	    696.1485		 2.96664e-13	   0.9899313
+1	    3855.607		 1.17046e-11	   0.1788539
+2	    5243.989		2.146983e-11	3.153133e-05
+3	    1057.244		2.081397e-11	 0.004821683
+4	    4132.896		2.131906e-11	0.0009238965
+5	   -3072.415		1.025589e-11	   -0.224319
+6	    7752.874		2.135823e-11	0.0006640452
+7	    2677.487		 9.27611e-12	   0.2588437
+8	    -5726.89		1.391907e-11	  -0.1203637
+9	    2433.962		2.147312e-11	1.787826e-05
+10	    9505.703		2.147312e-11	-5.638966e-07
+11	    8033.367		1.547446e-11	  0.08579479
+12	   -3978.128		1.183664e-11	  -0.1745668
+13	   -1298.401		3.859647e-12	  -0.5309228
+14	    2281.008		2.147312e-11	4.686379e-06
+15	    -2361.53		2.147312e-11	-6.799567e-06
+
+curvature[0][0] =      1.42211
+
+curvature[1][0] =   -0.2568316 	 = curvature[0][1]
+curvature[1][1] =   0.04640786
+
+curvature[2][0] =   -0.1887875 	 = curvature[0][2]
+curvature[2][1] =  -0.03412101 	 = curvature[1][2]
+curvature[2][2] =   0.02508261
+
+curvature[3][0] = 5.519126e-05 	 = curvature[0][3]
+curvature[3][1] = 8.927389e-06 	 = curvature[1][3]
+curvature[3][2] = 5.624288e-07 	 = curvature[2][3]
+curvature[3][3] =    0.6212564
+
+curvature[4][0] = 2.113779e-05 	 = curvature[0][4]
+curvature[4][1] = 3.802783e-06 	 = curvature[1][4]
+curvature[4][2] = 4.921443e-09 	 = curvature[2][4]
+curvature[4][3] = -0.001168114 	 = curvature[3][4]
+curvature[4][4] =   0.04087632
+
+curvature[5][0] =    0.3223006 	 = curvature[0][5]
+curvature[5][1] =   0.05819293 	 = curvature[1][5]
+curvature[5][2] =   0.04277663 	 = curvature[2][5]
+curvature[5][3] =    0.2137457 	 = curvature[3][5]
+curvature[5][4] = 0.0002944939 	 = curvature[4][5]
+curvature[5][5] =   0.07301105
+
+curvature[6][0] = 3.173422e-05 	 = curvature[0][6]
+curvature[6][1] = 5.595447e-06 	 = curvature[1][6]
+curvature[6][2] = 7.075023e-08 	 = curvature[2][6]
+curvature[6][3] = -0.0006226875 	 = curvature[3][6]
+curvature[6][4] = -0.0001186894 	 = curvature[4][6]
+curvature[6][5] =   0.02893393 	 = curvature[5][6]
+curvature[6][6] =   0.01161401
+
+curvature[7][0] =   -0.3698398 	 = curvature[0][7]
+curvature[7][1] =  -0.06677637 	 = curvature[1][7]
+curvature[7][2] =  -0.04909105 	 = curvature[2][7]
+curvature[7][3] =   -0.2452975 	 = curvature[3][7]
+curvature[7][4] = -0.0003379257 	 = curvature[4][7]
+curvature[7][5] =   0.08426035 	 = curvature[5][7]
+curvature[7][6] =  -0.03338793 	 = curvature[6][7]
+curvature[7][7] =   0.09738936
+
+curvature[8][0] =    0.1729108 	 = curvature[0][8]
+curvature[8][1] =   0.03121992 	 = curvature[1][8]
+curvature[8][2] =    0.0228268 	 = curvature[2][8]
+curvature[8][3] = 0.0008363481 	 = curvature[3][8]
+curvature[8][4] = -2.573232e-06 	 = curvature[4][8]
+curvature[8][5] =  -0.03917817 	 = curvature[5][8]
+curvature[8][6] = -3.983826e-06 	 = curvature[6][8]
+curvature[8][7] =   0.04495693 	 = curvature[7][8]
+curvature[8][8] =   0.02101792
+
+curvature[9][0] =   -0.4067442 	 = curvature[0][9]
+curvature[9][1] = 3.774872e-06 	 = curvature[1][9]
+curvature[9][2] = 2.468235e-08 	 = curvature[2][9]
+curvature[9][3] = 6.952559e-09 	 = curvature[3][9]
+curvature[9][4] = 6.013596e-09 	 = curvature[4][9]
+curvature[9][5] =   0.09216255 	 = curvature[5][9]
+curvature[9][6] = -4.798388e-09 	 = curvature[6][9]
+curvature[9][7] =   -0.1057671 	 = curvature[7][9]
+curvature[9][8] =   0.04945316 	 = curvature[8][9]
+curvature[9][9] =    0.1163571
+
+curvature[10][0] =    -0.104148 	 = curvature[0][10]
+curvature[10][1] = 1.752464e-06 	 = curvature[1][10]
+curvature[10][2] = 7.621897e-05 	 = curvature[2][10]
+curvature[10][3] = 4.623491e-07 	 = curvature[3][10]
+curvature[10][4] = -2.313061e-09 	 = curvature[4][10]
+curvature[10][5] =   0.02359848 	 = curvature[5][10]
+curvature[10][6] = 6.445802e-08 	 = curvature[6][10]
+curvature[10][7] =  -0.02708195 	 = curvature[7][10]
+curvature[10][8] =   0.01259283 	 = curvature[8][10]
+curvature[10][9] = -3.108897e-08 	 = curvature[9][10]
+curvature[10][10] =  0.007628446
+
+curvature[11][0] =    -0.123266 	 = curvature[0][11]
+curvature[11][1] =  -0.02194242 	 = curvature[1][11]
+curvature[11][2] =  -0.01636203 	 = curvature[2][11]
+curvature[11][3] = -0.0005962432 	 = curvature[3][11]
+curvature[11][4] = -0.000112632 	 = curvature[4][11]
+curvature[11][5] =   0.02792964 	 = curvature[5][11]
+curvature[11][6] = 2.735629e-06 	 = curvature[6][11]
+curvature[11][7] =  -0.03222594 	 = curvature[7][11]
+curvature[11][8] =   0.01498396 	 = curvature[8][11]
+curvature[11][9] = 1.837062e-06 	 = curvature[9][11]
+curvature[11][10] = 8.113576e-07 	 = curvature[10][11]
+curvature[11][11] =   0.01081875
+
+curvature[12][0] =    0.2489212 	 = curvature[0][12]
+curvature[12][1] =   0.04494424 	 = curvature[1][12]
+curvature[12][2] =   0.03304435 	 = curvature[2][12]
+curvature[12][3] =    0.1651163 	 = curvature[3][12]
+curvature[12][4] = -3.958205e-06 	 = curvature[4][12]
+curvature[12][5] =   -0.0564009 	 = curvature[5][12]
+curvature[12][6] =   0.02251658 	 = curvature[6][12]
+curvature[12][7] =   0.06519812 	 = curvature[7][12]
+curvature[12][8] =  -0.03025807 	 = curvature[8][12]
+curvature[12][9] =   0.07119468 	 = curvature[9][12]
+curvature[12][10] =   0.01822949 	 = curvature[10][12]
+curvature[12][11] =   0.02157082 	 = curvature[11][12]
+curvature[12][12] =   0.04388192
+
+curvature[13][0] =    0.7626617 	 = curvature[0][13]
+curvature[13][1] =    0.1377022 	 = curvature[1][13]
+curvature[13][2] =     0.101244 	 = curvature[2][13]
+curvature[13][3] =    0.5021749 	 = curvature[3][13]
+curvature[13][4] = -1.139666e-05 	 = curvature[4][13]
+curvature[13][5] =   -0.1728041 	 = curvature[5][13]
+curvature[13][6] =   0.06848061 	 = curvature[6][13]
+curvature[13][7] =    0.1982925 	 = curvature[7][13]
+curvature[13][8] =  -0.09270754 	 = curvature[8][13]
+curvature[13][9] =    0.2181309 	 = curvature[9][13]
+curvature[13][10] =   0.05585301 	 = curvature[10][13]
+curvature[13][11] =   0.06609007 	 = curvature[11][13]
+curvature[13][12] =   -0.1334611 	 = curvature[12][13]
+curvature[13][13] =    0.4089046
+
+curvature[14][0] =  2.29865e-06 	 = curvature[0][14]
+curvature[14][1] = 4.460314e-07 	 = curvature[1][14]
+curvature[14][2] = -2.644489e-08 	 = curvature[2][14]
+curvature[14][3] = 4.181091e-07 	 = curvature[3][14]
+curvature[14][4] = 3.065022e-08 	 = curvature[4][14]
+curvature[14][5] = -5.231441e-07 	 = curvature[5][14]
+curvature[14][6] = 5.558694e-08 	 = curvature[6][14]
+curvature[14][7] = 6.586449e-07 	 = curvature[7][14]
+curvature[14][8] = -2.717103e-07 	 = curvature[8][14]
+curvature[14][9] = -1.173662e-08 	 = curvature[9][14]
+curvature[14][10] = 1.014439e-08 	 = curvature[10][14]
+curvature[14][11] = 1.946175e-07 	 = curvature[11][14]
+curvature[14][12] = -4.940903e-07 	 = curvature[12][14]
+curvature[14][13] = -1.268142e-06 	 = curvature[13][14]
+curvature[14][14] =    0.1324912
+
+curvature[15][0] = -3.176533e-06 	 = curvature[0][15]
+curvature[15][1] = -5.702234e-07 	 = curvature[1][15]
+curvature[15][2] = -2.95295e-09 	 = curvature[2][15]
+curvature[15][3] =  0.002044312 	 = curvature[3][15]
+curvature[15][4] = -4.289515e-09 	 = curvature[4][15]
+curvature[15][5] = 7.213894e-07 	 = curvature[5][15]
+curvature[15][6] = 7.878241e-09 	 = curvature[6][15]
+curvature[15][7] =    0.1090111 	 = curvature[7][15]
+curvature[15][8] = 3.910369e-07 	 = curvature[8][15]
+curvature[15][9] = 1.128634e-08 	 = curvature[9][15]
+curvature[15][10] = -2.026065e-08 	 = curvature[10][15]
+curvature[15][11] = -2.460497e-07 	 = curvature[11][15]
+curvature[15][12] =  -0.07392147 	 = curvature[12][15]
+curvature[15][13] =   -0.2248213 	 = curvature[13][15]
+curvature[15][14] = -9.951676e-09 	 = curvature[14][15]
+curvature[15][15] =     0.124525
+
+
+
+ COST_REPEATING exit_status = 3
+ Locate_Cost = 5, calculating curvatures while exiting asa ()
+final_cost = best_generated_state->cost = 2.197479    
+*number_accepted at best_generated_state->cost = 446
+*number_generated at best_generated_state->cost = 118358
+
+
+
