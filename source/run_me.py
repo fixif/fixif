@@ -12,10 +12,10 @@
 import sys
 
 # Adding source folders to PYTHONPATH
-sys.path.append("./source/class")
-sys.path.append("./source/func_math")
-sys.path.append("./source/func_run")
-sys.path.append("./source/meth")
+sys.path.append("./class")
+sys.path.append("./func_math")
+sys.path.append("./func_run")
+sys.path.append("./meth")
 
 # TEMP
 # Manual override
