@@ -11,6 +11,14 @@
 
 from func_opt_management import load_global_options
 
+import sys
+
+# Adding source folders to PYTHONPATH
+sys.path.append("./source/class")
+sys.path.append("./source/func_math")
+sys.path.append("./source/func_run")
+sys.path.append("./source/meth")
+
 # TEMP
 # Manual override
 is_run_as_cli = False
