@@ -9,8 +9,6 @@
 # Parse arguments and catch errors
 # https://docs.python.org/2/library/argparse.html
 
-from func_opt_management import load_global_options
-
 import sys
 
 # Adding source folders to PYTHONPATH
