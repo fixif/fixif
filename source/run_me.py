@@ -11,7 +11,11 @@
 
 from func_opt_management import load_global_options
 
+# TEMP
+# Manual override
 is_run_as_cli = False
+is_run_as_webapp = False
+is_run_as_standalone = True
 
 # Parse command line args
 
