@@ -25,7 +25,7 @@ if (__name__ == "__main__"):
 elif is_run_as_cli:
     print("FiPoGen running in CLI mode (parameters as CL")
     load_global_options("CLI")
-elif is_run_as_webapp
+elif is_run_as_webapp:
     # Print nothing, debug
     print("FiPoGen runnin in webapp mode, waiting for parameters input in web UI")
     load_global_options("webapp")
