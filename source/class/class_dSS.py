@@ -16,9 +16,8 @@
 
 from numpy                import matrix as mat
 # Math functions
-from math                 import sqrt
-from numpy                import dot, eye, pi, cos, sin
-from numpy.random         import rand, randn
+#from math                 import sqrt
+
 # Linear Algebra
 from numpy.linalg         import inv, det, solve
 from numpy.linalg.linalg  import LinAlgError
@@ -70,7 +69,7 @@ class dSS(object):
       It also checks the concordance of the matrices' size
       """
 
-      # A
+      # Afrom numpy import dot, eye, pi, cos, sin
       a1, a2 = self.A.shape
     
       if a1 != a2:
