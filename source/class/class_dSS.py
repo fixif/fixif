@@ -48,6 +48,7 @@ class dSS(object):
     """
     Construction of a discrete state space
     """
+    
     self._A = mat(A)  # User input
     self._B = mat(B)
     self._C = mat(C)
@@ -62,7 +63,7 @@ class dSS(object):
 
     # Define read-only properties (all)
     
-
+    #======================================================================================#
     def __check_dimensions__(self):
       """
       Computes the number of inputs and outputs.
@@ -98,7 +99,7 @@ class dSS(object):
 
       return n, inputs, outputs
 
-      
+    #======================================================================================#
     def __str__(self):
       """
       Display the state-space
@@ -106,12 +107,12 @@ class dSS(object):
         
       str_mat = "State Space\nA=" + repr(self._A) + "\nB=" + repr(self._B) + "\nC=" + repr(self._C) + "\nD=" + repr(self._D) + "\n"
 
-      if (self._Wc != None or self._Wo != None): 
+      if ((self._Wc != None) or (self._Wo != None)): 
         str_obs = "Wc = " + repr(self._Wc) + "\nWo = " + repr(self._Wo) + "\n"
       else:
         str_obs = "Wc and Wo not defined\n"
       
-      if (self._norm_H1 != None or self._norm_H2 != None or self._norm_Hinf != None):
+      if ((self._norm_H1 != None) or (self._norm_H2 != None) or (self._norm_Hinf != None)):
         str_norm = "norm_H1 = " + repr(self._norm_H1) + "\nnorm_H2 = " + repr(self._norm_H2) + "\nnorm_Hinf = " + repr(self._norm_Hinf)
       else:
         str_norm = "norm_H1, norm_H2 and norm_Hinf not defined"
@@ -120,7 +121,7 @@ class dSS(object):
     
       return str_repr_dss
 
-
+    #======================================================================================#
     def __repr__(self):
       return str(self)
   
@@ -137,4 +138,11 @@ class dSS(object):
     def Wc():
       return Wc   
     
-
+    def norm_H1():
+      return norm_H1
+  
+    def norm_H2():
+      return norm_H2
+  
+    def norm_Hinf():
+      return norm_Hinf
