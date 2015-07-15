@@ -1,9 +1,7 @@
+from dSS_class import dSS
+
 from numpy                import dot, eye, pi, cos, sin
 from numpy.random         import rand, randn
-
-
-
-from class_dSS import dSS
 
 # Random state-space
 def random_dSS(n=None, p=1, q=1):
