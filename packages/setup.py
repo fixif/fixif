@@ -6,7 +6,7 @@ setup(
     author='Thibault Hilaire',
     author_email='thibault.hilaire@lip6.fr',
     packages=['dSS', 'SIF'],
-    scripts=[],
+    scripts=['fipogen_run', 'fipogen_test'],
 #    url='http://pypi.python.org/pypi/pyFWR/',
     license='LICENSE.txt',
     description='Finite Word-length Realization toolbox.',
