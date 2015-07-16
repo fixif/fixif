@@ -57,6 +57,9 @@ class dSS(object):
     self._Wo, self._Wc = None 
     self._norm_h2, self._WCPG = None
 
+    # Choose method used to solve Lyapunov eq. gfor observers calculation
+    self._W_method = "linalg" # 'slycot'
+
     # Define properties
     
     @property
@@ -64,36 +67,84 @@ class dSS(object):
       return _A(self)
     
     @propertyfined 
-    def B(self)
+    def B(self):
       return _B(self)
     .pdf
     @property
-    def C(self)
+    def C(self):
       return _C(self)
     
     @property
-    def D(self).pdf
+    def D(self):
       return _D(self)
     
     @property
-    def n(self)
+    def n(self):
       return _n(self)
     .pdf
     @property
-    def p(self)
+    def p(self):
       return _p(self)
     
     @property
-    def q(self)
+    def q(self):
       return _q(self)
     
-    #Observers Wo and Wc
+    # Observers Wo and Wc
+    # Method : solve the Lyapunov equation
+    # Tools : different tools available
     
     @property
-    def Wo(self)
+    def Wo(self):
+      
+      if (self._Wo == None):
+	
+        if (self._W_method == "linalg"): # scipy intrinsic function
+          try:
+	  
+	  
+        elif (self._W_method == "slycot"): # call Slycot function sb03md
+          try:
+            X,scale,sep,ferr,w = slycot.sb03md(self.n, -self._C.transpose()*self._C, self._A.transpose(), eye(self.n,self.n), dico='D', trana='T')
+          except ValueError, ve:
+
+          if ve.info < 0:
+            e = ValueError(ve.message)
+            e.info = ve.info
+          else:
+            e = ValueError("The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+            e.info = ve.info
+          raise e  
+
+          self._Wo = mat(X)
+      
+      return _Wo(self)
     
-      return Wo
+    @property
+    def Wc(self):
+      if self._W_method == "linalg" # scipy intrinsic function
+        try:
+	  
+      elif self._W_method == "slycot" # call Slycot function sb03md
+        try:
+          #X,scale,sep,ferr,w = slycot.sb03md( self.n, -self._B*self._B.transpose(), copy(self._A), eye(self.n,self.n), dico='D', trana='T')
+          X,scale,sep,ferr,w = slycot.sb03md( self.n, -self._B*self._B.transpose(), self._A, eye(self.n,self.n), dico='D', trana='T')
+        except ValueError, ve:
+
+        if ve.info < 0:
+          e = ValueError(ve.message)
+          e.info = ve.info
+        else:
+          e = ValueError("The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+          e.info = ve.info
+        raise e  
+
+        self._Wo = mat(X)
+      
+      return _Wo(self)
     
+    
+      return _Wc
     
     @property
     def norm_h2(self)
@@ -102,9 +153,6 @@ class dSS(object):
     @property
     def WCPG(self)
       return _WCPG(self)
-    
-    @property
-    def 
     
     
     #======================================================================================#
