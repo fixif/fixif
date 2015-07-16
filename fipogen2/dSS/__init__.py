@@ -5,4 +5,4 @@
 
 # List of files for from dSS import *
 
-__all__ = ["class_dSS", "decorators", "random_dSS"]
+__all__ = ["dSS", "decorators", "random_dSS"]
