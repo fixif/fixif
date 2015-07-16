@@ -58,12 +58,14 @@ class dSS(object):
     self._p = None
     self._q = None
     
-    (self._n, self._p, self._q) = self.check_dimensions()  # Verify coherence and return dimensions
+    (self._n, self._p, self._q) = self.__check_dimensions__()  # Verify coherence and return dimensions
 
     # Initialize observers and norms
     
-    self._Wo, self._Wc = None 
-    self._norm_h2, self._WCPG = None
+    self._Wo      = None
+    self._Wc      = None 
+    self._norm_h2 = None
+    self._WCPG    = None
 
     # Choose method used to solve Lyapunov eq. gfor observers calculation
     self._W_method = "linalg" # "slycot"
@@ -222,35 +224,36 @@ class dSS(object):
       return _WCPG(self)
     
   #======================================================================================#
-  def check_dimensions(self):
+  def __check_dimensions__(self):
     """
     Computes the number of inputs and outputs.
     It also checks the concordance of the matrices' size
     """
 
     # A
-    a1, a2 = self.A.shape
+    a1, a2 = self._A.shape
     
     if a1 != a2:
       raise ValueError, 'A is not a square matrix'
     n = a1
   
     # B
-    b1, b2 = self.B.shape
+    b1, b2 = self._B.shape
     
     if b1 != n:
       raise ValueError, 'A and B should have the same number of rows'
     inputs = b2
 
     # C
-    c1, c2 = self.C.shape
+    c1, c2 = self._C.shape
     
     if c2 != n:
       raise ValueError, 'A and C should have the same number of columns'
     outputs = c1
 
     # D
-    d1, d2 = self.D.shape
+    d1, d2 = self._D.shape
+    
     if (d1 != outputs or d2 != inputs):
       raise ValueError, 'D should be consistant with C and B'
 
@@ -267,25 +270,27 @@ class dSS(object):
 
     # Observers Wo, Wc
     if (self._Wc != None): 
-      str_mat += "Wc = " + repr(self._Wc) + " "
+      str_mat += "Wc = " + repr(self._Wc) + "\n"
     else:
-      str_mat += "Wc not computed "
+      str_mat += "Wc not computed" + "\n"
 	
     if (self._Wo != None):
 	  str_mat += "Wo = " + repr(self._Wo) + "\n"
     else:
-	  str_mat += "Wo not computed\n"
+	  str_mat += "Wo not computed" + "\n"
+      
+    #str_mat += "\n"
       
     # "Norms" hmyDSS = class_dSS.dSS(sq_m,sq_m,sq_m,sq_m)2 and WCPG
     if (self._norm_h2 != None):
-	  str_mat += "\nnorm_h2 = " + repr(self._norm_h2) + " "
+	  str_mat += "\nnorm_h2 = " + repr(self._norm_h2) + "\n"
     else:
-      str_mat += "\nnorm_h2 not computed "
+      str_mat += "\nnorm_h2 not computed" + "\n"
         
-    if (self._wc != None):
-      str_mat += "\nWCPG = " + repr(self._WCPG)
+    if (self._Wc != None):
+      str_mat += "\nWCPG = " + repr(self._WCPG) + "\n"
     else:
-      str_mat += "WCPG not computed"
+      str_mat += "WCPG not computed" + "\n"
     
     return str_mat
 
