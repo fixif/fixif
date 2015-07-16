@@ -43,6 +43,11 @@ class dSS(object):
   - Observers Wo and Wc
   - H2-norm (norm_h2) and Worst Case Peak Gain (WCPG) 
   """
+
+  # Choose method used to solve Lyapunov eq. gfor observers calculation
+  # WARNING : this is a CLASS PROPERTY
+  # MOdifying it will propagate modification to all instanciated objects of the class
+  _W_method = "linalg" # "slycot"
   
   def __init__(self, A, B, C, D):
     """
@@ -66,9 +71,6 @@ class dSS(object):
     self._Wc      = None 
     self._norm_h2 = None
     self._WCPG    = None
-
-    # Choose method used to solve Lyapunov eq. gfor observers calculation
-    self._W_method = "linalg" # "slycot"
 
     # Properties
     
