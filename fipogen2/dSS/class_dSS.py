@@ -6,12 +6,12 @@
 # Refactoring Joachim Kruithof
 # 2015 LIP6
 
+from decorators           import ReadOnlyCachedAttribute
+
 from numpy                import matrix as mat
 
-from numpy.linalg         import inv, det, solve
-from numpy.linalg.linalg  import LinAlgError
-
-from decorators           import ReadOnlyCachedAttribute
+from numpy.linalg               import inv, det, solve
+from numpy.linalg.linalg        import LinAlgError
 from scipy.linalg._expm_frechet import vec
 
 # import slycot # lin eq solver
@@ -22,7 +22,7 @@ __email__   = "fipogen@lip6.fr"
 __license__ = "CECILL-C"
 __version__ = "0.0.1"  # Modify this to increment with git scripting
 
-class dSS(object):
+class dSS:
   """
   The dSS class describes a discrete state space realization
      ---
@@ -35,7 +35,9 @@ class dSS(object):
 
   n,p,q are the dimensions of the state-space (number of states, inputs and outputs, respectively)
   
-  Additional data (available at calculation's cost)
+  Additional data available, computed once 
+  
+  dSS.Wo, dcc.Wc, dSS.norm_h2, dSS.WCPG
   
   - Observers Wo and Wc
   - H2-norm (norm_h2) and Worst Case Peak Gain (WCPG) 
@@ -94,6 +96,10 @@ class dSS(object):
     # Observers Wo and Wc
     # Method : solve the Lyapunov equation
     
+    #======================================================================================#      
+    # Observers calculation
+    #======================================================================================#
+    
     @property
     def Wo(self):
       
@@ -105,6 +111,8 @@ class dSS(object):
 	        X = scipy.linalg.solve_lyapunov(a)
           except ValueError, ve:
               
+
+
             if (ve.info < 0):
               e = ValueError(ve.message)
               e.info = ve.info
@@ -177,13 +185,37 @@ class dSS(object):
 
       return _Wc(self)
     
+    #======================================================================================#      
+    # Norms calculation
+    #======================================================================================#
     
     @property
-    def norm_h2(self)
+    def norm_h2(self):
+      """
+      Compute the H2-norm of the system
+      """
+    
+      
+      if (self.norm_h2 == None):
+    
+        res = None
+          
+        try:
+          M = self.C * W * self.C.transpose() + self.D * self.D.transpose()
+        except:
+          res =  np.inf
+        else:
+          res = sqrt(float(M.trace()))
+    
+        self._norm_h2 = res
+    
       return _norm_h2(self)
     
     @property
-    def WCPG(self)
+    def WCPG(self):
+      """
+      Returns the Worst Case Peak Gain of the state space
+      """
       return _WCPG(self)
     
     
@@ -258,9 +290,7 @@ class dSS(object):
     def __repr__(self):
       return str(self)
     
-    #======================================================================================#      
-    # Observers calculation
-    #======================================================================================#
+    
     
     #======================================================================================#
 
