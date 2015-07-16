@@ -23,7 +23,7 @@ What does /bin contain ?
  Can I run demos ?
 -----------------
 
-A demo is a parameter file to run a complete experiment without user interaction
+A demo is a parameter file to run a complete experiment without user interaction. See examples folder
 
 Can I run tests ?
 -----------------
