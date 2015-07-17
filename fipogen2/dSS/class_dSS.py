@@ -3,8 +3,6 @@
 # Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
-from decorators           import ReadOnlyCachedAttribute
-
 from numpy                import matrix as mat
 from numpy                import inf, shape
 
@@ -169,7 +167,6 @@ class dSS(object):
       
     return
 
-  @classmethod
   def calc_Wc(self):
       
     """
