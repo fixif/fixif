@@ -1,6 +1,6 @@
 # coding=utf8
 
-# Object and "methods" for a discrete state Space
+# Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
 from decorators           import ReadOnlyCachedAttribute
@@ -34,12 +34,12 @@ class dSS(object):
 
   n,p,q are the dimensions of the state-space (number of states, inputs and outputs, respectively)
   
-  Additional data available, computed once 
+  Additional data available, computed once when asked for :
   
-  dSS.Wo, dcc.Wc, dSS.norm_h2, dSS.WCPG
+  dSS.Wo, dSS.Wc, dSS.norm_h2, dSS.WCPG
   
-  - Observers Wo and Wc
-  - H2-norm (norm_h2) and Worst Case Peak Gain (WCPG) 
+  - Observers : Wo and Wc
+  - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) 
   """
   
   def __init__(self, A, B, C, D):
@@ -327,7 +327,7 @@ class dSS(object):
     
     #======================================================================================#
   def __doc__(self):
-    return "Class for discrete state-space object and aux functions"
+    return "Class for discrete state-space, and aux functions"
   
   # def _latex_(self):
     # #TODO
