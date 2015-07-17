@@ -1,0 +1,6 @@
+This doc gives a cheatsheet to generate to project
+
+- pack the project
+
+- generate the doc
+
