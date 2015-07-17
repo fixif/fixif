@@ -1,9 +1,6 @@
 # coding=utf8
 
-# Object and methods for a discrete state Space
-
-# Original code Thibault Hilaire
-# Refactoring Joachim Kruithof
+# Object and "methods" for a discrete state Space
 # 2015 LIP6
 
 from decorators           import ReadOnlyCachedAttribute
@@ -24,6 +21,7 @@ __license__ = "CECILL-C"
 __version__ = "0.0.1"  # Modify this to increment with git scripting
 
 class dSS(object):
+    
   """
   The dSS class describes a discrete state space realization
      ---
@@ -45,6 +43,7 @@ class dSS(object):
   """
   
   def __init__(self, A, B, C, D):
+      
     """
     Construction of a discrete state space
     """
@@ -73,8 +72,6 @@ class dSS(object):
     
     self._norm_h2 = None
     self._WCPG = None
-
-    print "self._norm_h2 = "+str(self._norm_h2)
 
   # Properties
     
@@ -133,10 +130,10 @@ class dSS(object):
   def calc_Wo(self):
       
     """
-    Compute observer #1 of the system with one of available methods
+    Compute observer Wo with one of available methods
     """
     
-    if (self._W_method == "linalg"):  # scipy intrinsic function
+    if (self._W_method == "linalg"):  # scipy intrinsic
             
       try:
 	    X = scipy.linalg.solve_lyapunov(a)
@@ -153,7 +150,7 @@ class dSS(object):
       else:
         self._Wo = X
             
-    elif (self._W_method == "slycot"):  # call Slycot function sb03md
+    elif (self._W_method == "slycot"):  # Slycot function sb03md
             
       try:
         X, scale, sep, ferr, w = slycot.sb03md(self.n, -self._C.transpose() * self._C, self._A.transpose(), eye(self.n, self.n), dico='D', trana='T')
@@ -176,12 +173,10 @@ class dSS(object):
   def calc_Wc(self):
       
     """
-    Compute observer #2 of the system with one of available methods
+    Compute observer Wc with one of available methods
     """
-        
-   # if (self._Wc == None):
           
-    if (self._W_method == "linalg"):  # scipy intrinsic function
+    if (self._W_method == "linalg"):  # scipy intrinsic
         
       try:
 	    X = scipy.linalg.solve_lyapunov()
@@ -199,7 +194,7 @@ class dSS(object):
           self._Wc = X
 
         
-    elif (self._W_method == "slycot"):  # call Slycot function sb03md
+    elif (self._W_method == "slycot"):  # Slycot function sb03md
         
       try:
             # X,scale,sep,ferr,w = slycot.sb03md( self.n, -self._B*self._B.transpose(), copy(self._A), eye(self.n,self.n), dico='D', trana='T')
@@ -246,8 +241,9 @@ class dSS(object):
   def calc_WCPG(self):
         
     """
-    Returns the Worst Case Peak Gain of the state space
+    Compute the Worst Case Peak Gain of the state space
     """
+    
     #STUB
     if (self._WCPG == None): self._WCPG = 0
     
@@ -255,9 +251,10 @@ class dSS(object):
     
   #======================================================================================#
   def __check_dimensions__(self):
+      
     """
     Computes the number of inputs and outputs.
-    It also checks the concordance of the matrices' size
+    Check for concordance of the matrixes' size
     """
 
     # A
@@ -292,13 +289,14 @@ class dSS(object):
 
   #======================================================================================#
   def __str__(self):
+      
     """
     Display the state-space
     """
     
     str_mat = "State Space\nA=" + repr(self._A) + "\nB=" + repr(self._B) + "\nC=" + repr(self._C) + "\nD=" + repr(self._D) + "\n\n"
 
-    str_mat += "Method used to compute observers : " + self._W_method + "\n"
+    str_mat += "Path used to compute observers : " + self._W_method + "\n"
 
     # Observers Wo, Wc
     if (self._Wc != None): 
@@ -326,8 +324,6 @@ class dSS(object):
     #======================================================================================#
   def __repr__(self):
     return str(self)
-    
-    
     
     #======================================================================================#
   def __doc__(self):
