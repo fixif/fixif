@@ -1,6 +1,12 @@
 This doc gives a cheatsheet to generate to project
 
-- pack the project
+- pack the modules as tar file
 
 - generate the doc
+
+go to ./doc/source folder then make html, make latex, make latexpdf ... use
+
+make help
+make html
+make latexpdf
 
