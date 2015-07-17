@@ -53,10 +53,6 @@ class dSS(object):
     
     # Initialize state space dimensions from user input
     
-    self._n = None
-    self._p = None
-    self._q = None
-    
     (self._n, self._p, self._q) = self.__check_dimensions__()  # Verify coherence, set dimensions
 
     # Initialize observers
@@ -129,12 +125,17 @@ class dSS(object):
       
     """
     Compute observer Wo with one of available methods
+    
+    Using intrinsic solve.
+    
+    A^T * Wo * A + C^T * C = Wo
+    
     """
     
     if (self._W_method == "linalg"):  # scipy intrinsic
             
       try:
-	    X = scipy.linalg.solve_lyapunov(a)
+	    X = scipy.linalg.solve_discrete_lyapunov(self._A, self._C.transpose() * self._C)
       except ValueError, ve:
               
         if (ve.info < 0):
@@ -171,12 +172,15 @@ class dSS(object):
       
     """
     Compute observer Wc with one of available methods
+    
+    A * Wc * A^T + B * B^T = Wc
+    
     """
           
     if (self._W_method == "linalg"):  # scipy intrinsic
         
       try:
-	    X = scipy.linalg.solve_lyapunov()
+	    X = scipy.linalg.solve_discrete_lyapunov(self._A.transpose(), self._B * self._B.transpose())
       except ValueError, ve:
         
         if (ve.info < 0):
@@ -216,7 +220,7 @@ class dSS(object):
   #======================================================================================#
     
 
-  def calc_h2(cls):
+  def calc_h2(self):
       
     """
     Compute the H2-norm of the system
@@ -225,13 +229,13 @@ class dSS(object):
     res = None
           
     try:
-      M = cls.C * W * cls.C.transpose() + cls.D * cls.D.transpose()
+      M = self.C * self.Wc * self.C.transpose() + self.D * self.D.transpose()
     except:
       res = inf
     else:
-      res = sqrt(float(M.trace()))
+      res = sqrt(M.trace())
     
-    cls._norm_h2 = res
+    self._norm_h2 = res
     
     return
     
