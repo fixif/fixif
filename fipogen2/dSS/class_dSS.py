@@ -9,16 +9,16 @@
 from decorators           import ReadOnlyCachedAttribute
 
 from numpy                import matrix as mat
-from numpy                import shape
+from numpy                import inf, shape
 
 from numpy.linalg               import inv, det, solve
 from numpy.linalg.linalg        import LinAlgError
 
-
-# import slycot # lin eq solver
+#IFDEF SLYCOT
+#import slycot # lin eq solver
 
 # Module description
-__author__ = "Thibault Hilaire, FiPoGen Team"
+__author__ = "FiPoGen Team"
 __email__ = "fipogen@lip6.fr"
 __license__ = "CECILL-C"
 __version__ = "0.0.1"  # Modify this to increment with git scripting
@@ -43,12 +43,6 @@ class dSS(object):
   - Observers Wo and Wc
   - H2-norm (norm_h2) and Worst Case Peak Gain (WCPG) 
   """
-
-  # Choose method used to solve Lyapunov eq. gfor observers calculation
-  # WARNING : this is a CLASS PROPERTY
-  # Modifying it will propagate modification to all instanciated objects of the class
-  
-  self._W_method = "linalg"  # "slycot"
   
   def __init__(self, A, B, C, D):
     """
@@ -60,20 +54,29 @@ class dSS(object):
     self._C = C
     self._D = D
     
+    # Initialize state space dimensions from user input
+    
     self._n = None
     self._p = None
     self._q = None
     
-    (self._n, self._p, self._q) = self.__check_dimensions__()  # Verify coherence and return dimensions
+    (self._n, self._p, self._q) = self.__check_dimensions__()  # Verify coherence, set dimensions
 
-    # Initialize observers and norms
+    # Initialize observers
+    
+    self._W_method = "linalg"  # "slycot"
     
     self._Wo = None
     self._Wc = None 
+    
+    # Initialize norms
+    
     self._norm_h2 = None
     self._WCPG = None
 
-    # Properties
+    print "self._norm_h2 = "+str(self._norm_h2)
+
+  # Properties
     
   @property
   def A(self):
@@ -102,137 +105,153 @@ class dSS(object):
   @property
   def q(self):
     return _q(self)
+
+  @property
+  def Wo(self):
+    if (self._Wo == None): self.calc_Wo()
+    return self._Wo
+
+  @property
+  def Wc(self):
+    if (self._Wc == None): self.calc_Wc()
+    return self._Wc
+
+  @property
+  def norm_h2(self):
+    if (self._norm_h2 == None): self.calc_h2()
+    return self._norm_h2
+
+  @property
+  def WCPG(self):
+    if (self._WCPG == None): self.calc_WCPG()
+    return self._WCPG
     
   #======================================================================================#      
   # Observers (Wo, Wc) calculation : solve Lyapunov equation
   #======================================================================================#
     
-  @property
-  def Wo(self):
+  def calc_Wo(self):
       
     """
     Compute observer #1 of the system with one of available methods
     """
-      
-    if (self._Wo == None):
     
-      if (self._W_method == "linalg"):  # scipy intrinsic function
+    if (self._W_method == "linalg"):  # scipy intrinsic function
             
-        try:
-	      X = scipy.linalg.solve_lyapunov(a)
-        except ValueError, ve:
+      try:
+	    X = scipy.linalg.solve_lyapunov(a)
+      except ValueError, ve:
               
-          if (ve.info < 0):
-            e = ValueError(ve.message)
-            e.info = ve.info
-          else:
-            e = ValueError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
-            e.info = ve.info
-            raise e     
+        if (ve.info < 0):
+          e = ValueError(ve.message)
+          e.info = ve.info
+        else:
+          e = ValueError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
+          e.info = ve.info
+          raise e     
           
-        else:
-          self._Wo = X
+      else:
+        self._Wo = X
             
-      elif (self._W_method == "slycot"):  # call Slycot function sb03md
+    elif (self._W_method == "slycot"):  # call Slycot function sb03md
             
-        try:
-          X, scale, sep, ferr, w = slycot.sb03md(self.n, -self._C.transpose() * self._C, self._A.transpose(), eye(self.n, self.n), dico='D', trana='T')
-        except ValueError, ve:
+      try:
+        X, scale, sep, ferr, w = slycot.sb03md(self.n, -self._C.transpose() * self._C, self._A.transpose(), eye(self.n, self.n), dico='D', trana='T')
+      except ValueError, ve:
 
-          if (ve.info < 0):
-            e = ValueError(ve.message)
-            e.info = ve.info
-          else:
-            e = ValueError("The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
-            e.info = ve.info
-            raise e  
-
+        if (ve.info < 0):
+          e = ValueError(ve.message)
+          e.info = ve.info
         else:
-          self._Wo = mat(X)
+          e = ValueError("The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+          e.info = ve.info
+          raise e  
+
+      else:
+        self._Wo = mat(X)
       
-    return _Wo(self)
+    return
 
-  @property
-  def Wc(self):
+  @classmethod
+  def calc_Wc(self):
       
     """
     Compute observer #2 of the system with one of available methods
     """
         
-    if (self._Wc == None):
+   # if (self._Wc == None):
           
-      if (self._W_method == "linalg"):  # scipy intrinsic function
+    if (self._W_method == "linalg"):  # scipy intrinsic function
         
-        try:
-	      X = scipy.linalg.solve_lyapunov()
-        except ValueError, ve:
+      try:
+	    X = scipy.linalg.solve_lyapunov()
+      except ValueError, ve:
         
-          if (ve.info < 0):
-            e = ValueError(ve.message)
-            e.info = ve.info
-          else:
-            e = ValueError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
-            e.info = ve.info
-            raise e     
-          
+        if (ve.info < 0):
+          e = ValueError(ve.message)
+          e.info = ve.info
         else:
+          e = ValueError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
+          e.info = ve.info
+          raise e     
+          
+      else:
           self._Wc = X
 
         
-      elif (self._W_method == "slycot"):  # call Slycot function sb03md
+    elif (self._W_method == "slycot"):  # call Slycot function sb03md
         
-        try:
+      try:
             # X,scale,sep,ferr,w = slycot.sb03md( self.n, -self._B*self._B.transpose(), copy(self._A), eye(self.n,self.n), dico='D', trana='T')
-          X, scale, sep, ferr, w = slycot.sb03md(self.n, -self._B * self._B.transpose(), self._A, eye(self.n, self.n), dico='D', trana='T')
-        except ValueError, ve:
+        X, scale, sep, ferr, w = slycot.sb03md(self.n, -self._B * self._B.transpose(), self._A, eye(self.n, self.n), dico='D', trana='T')
+      except ValueError, ve:
 
-          if ve.info < 0:
-            e = ValueError(ve.message)
-            e.info = ve.info
-          else:
-            e = ValueError("The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
-            e.info = ve.info
-            raise e
-        
+        if ve.info < 0:
+          e = ValueError(ve.message)
+          e.info = ve.info
         else:
-          self._Wc = mat(X)
+          e = ValueError("The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+          e.info = ve.info
+          raise e
+        
+      else:
+        self._Wc = mat(X)
 
-    return _Wc(self)
+    return
+  
+  #======================================================================================#      
+  # Norms calculation
+  #======================================================================================#
+    
 
-    
-    #======================================================================================#      
-    # Norms calculation
-    #======================================================================================#
-    
-  @property
-  def norm_h2(self):
+  def calc_h2(cls):
+      
     """
     Compute the H2-norm of the system
     """
 
-    if (self.norm_h2 == None):
-        
-      res = None
+    res = None
           
-      try:
-        M = self.C * W * self.C.transpose() + self.D * self.D.transpose()
-      except:
-        res = np.inf
-      else:
-        res = sqrt(float(M.trace()))
+    try:
+      M = cls.C * W * cls.C.transpose() + cls.D * cls.D.transpose()
+    except:
+      res = inf
+    else:
+      res = sqrt(float(M.trace()))
     
-        self._norm_h2 = res
+    cls._norm_h2 = res
     
-    return _norm_h2(self)
+    return
     
-  @property
-  def WCPG(self):
+  def calc_WCPG(self):
         
     """
     Returns the Worst Case Peak Gain of the state space
     """
-      
-    return _WCPG(self)
+    #STUB
+    if (self._WCPG == None): self._WCPG = 0
+    
+    return self._WCPG
     
   #======================================================================================#
   def __check_dimensions__(self):
@@ -276,8 +295,10 @@ class dSS(object):
     """
     Display the state-space
     """
-        
-    str_mat = "State Space\nA=" + repr(self._A) + "\nB=" + repr(self._B) + "\nC=" + repr(self._C) + "\nD=" + repr(self._D) + "\n"
+    
+    str_mat = "State Space\nA=" + repr(self._A) + "\nB=" + repr(self._B) + "\nC=" + repr(self._C) + "\nD=" + repr(self._D) + "\n\n"
+
+    str_mat += "Method used to compute observers : " + self._W_method + "\n"
 
     # Observers Wo, Wc
     if (self._Wc != None): 
@@ -290,9 +311,6 @@ class dSS(object):
     else:
 	  str_mat += "Wo not computed" + "\n"
       
-    # str_mat += "\n"
-      
-    # "Norms" hmyDSS = class_dSS.dSS(sq_m,sq_m,sq_m,sq_m)2 and WCPG
     if (self._norm_h2 != None):
 	  str_mat += "\nnorm_h2 = " + repr(self._norm_h2) + "\n"
     else:
