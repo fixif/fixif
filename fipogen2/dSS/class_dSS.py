@@ -265,8 +265,9 @@ class dSS(object):
     res = 0
     
     try:
-      from i in range(1, self._nit_WCPG)
+      for i in range(1, self._nit_WCPG):
         res += numpy.absolute(self._C * matrix_power(A, i) * B)
+        #res += numpy.absolute(self._C * A**i * B)
     except:
       raise ValueError, 'Impossible to compute WCPG at rank i = ' + str(i) + "\n"
     else:
