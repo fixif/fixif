@@ -262,11 +262,11 @@ class dSS(object):
   #======================================================================================#
   def calc_DC_gain(self):
       
-      """
-      Compute the DC-gain of the filter
+    """
+    Compute the DC-gain of the filter
       
-      FORMULA TODO
-      """
+    FORMULA TODO
+    """
     self._DC_gain = 0
     return self._DC_gain  
       
