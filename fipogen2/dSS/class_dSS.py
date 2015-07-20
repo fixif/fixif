@@ -4,9 +4,9 @@
 # 2015 LIP6
 
 from numpy                import matrix as mat
-from numpy                import inf, shape
+from numpy                import inf, shape, identity, absolute
 
-from numpy.linalg               import inv, det, solve
+from numpy.linalg               import inv, det, solve, matrix_power
 from numpy.linalg.linalg        import LinAlgError
 
 #IFDEF SLYCOT
@@ -66,10 +66,13 @@ class dSS(object):
     
     self._norm_h2 = None
     self._WCPG = None
+    self._nit_WCPG = 500
     
     # Other criterions,values
     
     self._DC_gain = None
+
+    
 
   # Properties
     
@@ -125,7 +128,9 @@ class dSS(object):
   def DC_gain(self):
     if (self._DC_gain == None): self.calc_DC_gain()
     return self._DC_gain
-    
+
+  
+
   #======================================================================================#      
   # Observers (Wo, Wc) calculation : solve Lyapunov equation
   #======================================================================================#
@@ -145,13 +150,13 @@ class dSS(object):
             
       try:
 	    X = scipy.linalg.solve_discrete_lyapunov(self._A, self._C.transpose() * self._C)
-      except ValueError, ve:
+      except LinAlgError, ve:
               
         if (ve.info < 0):
-          e = ValueError(ve.message)
+          e = LinAlgError(ve.message)
           e.info = ve.info
         else:
-          e = ValueError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
+          e = LinAlgError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
           e.info = ve.info
           raise e     
           
@@ -190,13 +195,13 @@ class dSS(object):
         
       try:
 	    X = scipy.linalg.solve_discrete_lyapunov(self._A.transpose(), self._B * self._B.transpose())
-      except ValueError, ve:
+      except LinAlgError, ve:
         
         if (ve.info < 0):
-          e = ValueError(ve.message)
+          e = LinAlgError(ve.message)
           e.info = ve.info
         else:
-          e = ValueError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
+          e = LinAlgError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
           e.info = ve.info
           raise e     
           
@@ -238,9 +243,10 @@ class dSS(object):
     res = None
           
     try:
-      M = self.C * self.Wc * self.C.transpose() + self.D * self.D.transpose()
+      M = self._C * self._Wc * self._C.transpose() + self._D * self._D.transpose()
     except:
       res = inf
+      raise ValueError, "Impossible to compute H2-norm of current discrete state space. Default value is 'inf'" 
     else:
       res = sqrt(M.trace())
     
@@ -248,15 +254,24 @@ class dSS(object):
     
     return
     
-  def calc_WCPG(self):
+  def calc_WCPG(self,n_it):
         
     """
     Compute the Worst Case Peak Gain of the state space
+    
+    <<H>> delta_equal |D| + \sum{k=0}^\infty \abs{C * A^k * B}
     """
     
-    #STUB
-    #if (self._WCPG == None): self._WCPG = 0
+    res = 0
     
+    try:
+      from i in range(1, self._nit_WCPG)
+        res += numpy.absolute(self._C * matrix_power(A, i) * B)
+    except:
+      raise ValueError, 'Impossible to compute WCPG at rank i = ' + str(i) + "\n"
+    else:
+      self._WCPG = res + absolute(D)
+  
     return self._WCPG
 
   #======================================================================================#
@@ -264,10 +279,16 @@ class dSS(object):
       
     """
     Compute the DC-gain of the filter
-      
-    FORMULA TODO
+
+    <H> = C * (I_n - A)^(-1) * B + D
+
     """
-    self._DC_gain = 0
+    
+    try:
+      self._DC_gain = self._C * inv(identity(self._n) - self._A) * self._B + self._D
+    except:
+      raise ValueError, 'Impossible to compute DC-gain from current discrete state space'
+    
     return self._DC_gain  
       
   #======================================================================================#
@@ -347,8 +368,12 @@ class dSS(object):
     return str(self)
     
     #======================================================================================#
+  @property
   def __doc__(self):
-    return "Class for discrete state-space, and aux functions"
+    return self.doc()
+
+  #def __doc__(self):
+  #  return "Class for discrete state-space, and aux functions"
   
   # def _latex_(self):
     # #TODO
