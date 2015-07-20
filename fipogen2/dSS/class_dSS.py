@@ -66,6 +66,10 @@ class dSS(object):
     
     self._norm_h2 = None
     self._WCPG = None
+    
+    # Other criterions,values
+    
+    self._DC_gain = None
 
   # Properties
     
@@ -116,6 +120,11 @@ class dSS(object):
   def WCPG(self):
     if (self._WCPG == None): self.calc_WCPG()
     return self._WCPG
+
+  @property
+  def DC_gain(self):
+    if (self._DC_gain == None): self.calc_DC_gain()
+    return self._DC_gain
     
   #======================================================================================#      
   # Observers (Wo, Wc) calculation : solve Lyapunov equation
@@ -246,10 +255,21 @@ class dSS(object):
     """
     
     #STUB
-    if (self._WCPG == None): self._WCPG = 0
+    #if (self._WCPG == None): self._WCPG = 0
     
     return self._WCPG
-    
+
+  #======================================================================================#
+  def calc_DC_gain(self):
+      
+      """
+      Compute the DC-gain of the filter
+      
+      FORMULA TODO
+      """
+    self._DC_gain = 0
+    return self._DC_gain  
+      
   #======================================================================================#
   def __check_dimensions__(self):
       
@@ -283,7 +303,7 @@ class dSS(object):
     d1, d2 = self._D.shape
     
     if (d1 != outputs or d2 != inputs):
-      raise ValueError, 'D should be consistant with C and B'
+      raise ValueError, 'D should be consistent with C and B'
 
     return n, inputs, outputs
 

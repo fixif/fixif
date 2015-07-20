@@ -9,9 +9,26 @@ Welcome to FiPoGen's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 9
+
+.. ne marche pas
+.. autodoc/modules.rst
+.. autodoc/dSS.rst
+.. autodoc/dSS.test.rst
 
 
+.. Data structures 
+.. ===============
+
+.. automodule:: dSS
+   :members:
+   :undoc-members:
+   :private-members:
+
+.. automodule:: SIF
+   :members:
+   :undoc-members:
+   :private-members:
 
 Indices and tables
 ==================
