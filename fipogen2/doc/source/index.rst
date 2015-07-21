@@ -1,34 +1,17 @@
 .. FiPoGen documentation master file, created by
-   sphinx-quickstart on Fri Jul 17 16:32:53 2015.
+   sphinx-quickstart on Mon Jul 20 23:41:40 2015.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 Welcome to FiPoGen's documentation!
 ===================================
 
-Contents:
 
-.. toctree::
-   :maxdepth: 9
-
-.. ne marche pas
-.. autodoc/modules.rst
-.. autodoc/dSS.rst
-.. autodoc/dSS.test.rst
+Blablabla
 
 
-.. Data structures 
-.. ===============
-
-.. automodule:: dSS
-   :members:
-   :undoc-members:
-   :private-members:
-
-.. automodule:: SIF
-   :members:
-   :undoc-members:
-   :private-members:
+.. automodule:: fipogen.LTI.dSS
+	:members:
 
 Indices and tables
 ==================

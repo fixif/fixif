@@ -1,4 +1,4 @@
-from dSS import dSS
+#from dSS import dSS
 
 from numpy                import dot, eye, pi, cos, sin
 from numpy.random         import rand, randn
