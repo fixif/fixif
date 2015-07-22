@@ -7,7 +7,7 @@ Welcome to FiPoGen's documentation!
 ===================================
 
 
-Blablabla
+**TODO convert all DOC from tex version by Thibault**
 
 
 .. automodule:: LTI.dSS
