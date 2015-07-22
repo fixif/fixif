@@ -10,8 +10,9 @@ Welcome to FiPoGen's documentation!
 Blablabla
 
 
-.. automodule:: fipogen.LTI.dSS
-	:members:
+.. automodule:: LTI.dSS
+  :members:
+  :undoc-members:
 
 Indices and tables
 ==================
