@@ -32,20 +32,37 @@ class dSS(object):
        A state space system is defined as
        
     .. math::
-       A \\in \\mathbb{R}^{n \\times n}, \\ B \\in \\mathbb{R}^{n \\times p}, \\ C \\in \\mathbb{R}^{q \\times n} \\text{ and } D \\in \\mathbb{R}^{q \\times p}   
-
-    and
-
+    
+         A \\in \\mathbb{R}^{n \\times n}, \\ B \\in \\mathbb{R}^{n \\times p}, \\ C \\in \\mathbb{R}^{q \\times n} \\text{ and } D \\in \\mathbb{R}^{q \\times p}   
+       
     .. math::
        :nowrap:
        
-       \\begin{equation*}
-       \\left\\lbrace\\begin{aligned}
-       X(k+1) &= AX(k) + BU(k) \\\\
-       Y(k)   &= CX(k) + DU(k)
-       \\end{aligned}\\right.
-       \\end{equation*}
+         \\begin{equation*}
+         \\text{and }\\left\\lbrace\\begin{aligned}
+         X(k+1) &= AX(k) + BU(k) \\\\
+         Y(k)   &= CX(k) + DU(k)
+         \\end{aligned}\\right.
+         \\end{equation*}
 
+    **Dimensions of the state space :**
+       
+    .. math::
+       :align: left
+       
+         n,p,q \\in \\mathbb{N}
+         
+    ==  ==================
+    n   number of states
+    p   number of inputs
+    q   number of outputs
+    ==  ==================
+
+       Additional data available, computed once when asked for :
+       dSS.Wo, dSS.Wc, dSS.norm_h2, dSS.WCPG
+    
+       - Observers : Wo and Wc
+       - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) (see doc for each)
     """
 
     def __init__(self, A, B, C, D):
