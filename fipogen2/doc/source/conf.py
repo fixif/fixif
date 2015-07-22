@@ -221,7 +221,8 @@ latex_elements = {
 #'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-#'preamble': '',
+# JoaK : NEEDED TO RENDER MATHBB
+'preamble': '\usepackage{amsmath,amssymb}\n',
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',
