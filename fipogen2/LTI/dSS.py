@@ -28,23 +28,11 @@ class dSS(object):
 
     """
     The dSS class describes a discrete state space realization
-       ---
-       A state space system is defined as :math: A\in\mathbb{R}^{n \times n}, B\in\mathbb{R}^{n \times p}, C\in\mathbb{R}^{q \times n} and C\in\mathbb{q \times p}, and
-
-    .. math::
-
-    \left\lbrace\begin{array}{rcl}
-    X(k+1) &=& AX(k) + BU(k) \\
-    Y(k) &=& CX(k) + DU(k)
-
-    n,p,q are the dimensions of the state-space (number of states, inputs and outputs, respectively)
-
-    Additional data available, computed once when asked for :
-
-    dSS.Wo, dSS.Wc, dSS.norm_h2, dSS.WCPG
-
-    - Observers : Wo and Wc
-    - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) 
+       
+       A state space system is defined as
+       
+    .. math::   
+       A \mathbb{A}
     """
 
     def __init__(self, A, B, C, D):
@@ -266,7 +254,9 @@ class dSS(object):
         """
         Compute the Worst Case Peak Gain of the state space
 
-        <<H>> delta_equal |D| + \sum{k=0}^\infty \abs{C * A^k * B}
+        .. math::
+
+        <<H>> delta_equal |D| + \\sum{k=0}^\\infty \\abs{C * A^k * B}
         
         Using algorithm developed in paper :
         
