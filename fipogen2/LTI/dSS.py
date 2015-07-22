@@ -31,8 +31,21 @@ class dSS(object):
        
        A state space system is defined as
        
-    .. math::   
-       A \mathbb{A}
+    .. math::
+       A \\in \\mathbb{R}^{n \\times n}, \\ B \\in \\mathbb{R}^{n \\times p}, \\ C \\in \\mathbb{R}^{q \\times n} \\text{ and } D \\in \\mathbb{R}^{q \\times p}   
+
+    and
+
+    .. math::
+       :nowrap:
+       
+       \\begin{equation*}
+       \\left\\lbrace\\begin{aligned}
+       X(k+1) &= AX(k) + BU(k) \\\\
+       Y(k)   &= CX(k) + DU(k)
+       \\end{aligned}\\right.
+       \\end{equation*}
+
     """
 
     def __init__(self, A, B, C, D):
