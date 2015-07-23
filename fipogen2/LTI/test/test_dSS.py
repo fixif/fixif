@@ -3,7 +3,7 @@
 
 import unittest
 
-from numpy import matrix as mat
+from numpy import array
 from numpy.linalg import norm
 from numpy.testing import assert_array_almost_equal
 from random import seed
@@ -40,10 +40,10 @@ class test_dSS( unittest.TestCase):
   # test non consistency of matrixes  
   def test_construction(self):
 
-    self.assertRaises( ValueError, dSS, mat("1 2; 3 4; 5 6"), mat(1), mat(2), mat(3) )
-    self.assertRaises( ValueError, dSS, mat("1 2; 3 4"), mat(1), mat(2), mat(3))
-    self.assertRaises( ValueError, dSS, mat("1 2; 3 4"), mat("1;2"), mat(2), mat(3))
-    self.assertRaises( ValueError, dSS, mat("1 2; 3 4"), mat("1;2"), mat("1 2; 1 2"), mat(3) )    
+    self.assertRaises( ValueError, dSS, array([[1,2], [3,4], [5,6]]), array(1), array(2), array(3) )
+    self.assertRaises( ValueError, dSS, array([[1,2], [3,4]]), array(1), array(2), array(3))
+    self.assertRaises( ValueError, dSS, array([[1,2], [3,4]]), array([1,2]), array(2), array(3) )
+    self.assertRaises( ValueError, dSS, array([[1,2], [3,4]]), array([1,2]), array([[1,2],[1,2]]), array(3) )    
 
   def test_Gramians(self):
     

@@ -5,20 +5,12 @@
 # Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
-from numpy                import matrix as mat
 from numpy                import inf, shape, identity, absolute, dot
 
 from numpy.linalg               import inv, det, solve
 from numpy.linalg.linalg        import LinAlgError
 
-# Imports for random_dSS
-from numpy                import dot, eye, pi, cos, sin
-from numpy.random         import rand, randn
-
 from scipy.linalg         import solve_discrete_lyapunov
-
-#IFDEF SLYCOT
-#import slycot # lin eq solver
 
 # Module description
 __author__ = "FiPoGen Team"
@@ -73,7 +65,7 @@ class dSS(object):
         Construction of a discrete state space
         """
 
-        self._A = A  # User input, numpy matrixes
+        self._A = A  # User input
         self._B = B
         self._C = C
         self._D = D
@@ -155,7 +147,7 @@ class dSS(object):
 
 
     #======================================================================================#      
-    # Observers (Wo, Wc) calculation : solve Lyapunov equation
+    # Observers (Wo, Wc) calculation
     #======================================================================================#
 
     def calc_Wo(self):
@@ -170,9 +162,8 @@ class dSS(object):
         """
 
         try:
-            #,method='bilinear'
             X = solve_discrete_lyapunov(self._A, self._C.transpose() * self._C)
-            self._Wo = mat(X)
+            self._Wo = X
             
         except LinAlgError, ve:
 
@@ -199,7 +190,7 @@ class dSS(object):
         try:
             
             X = solve_discrete_lyapunov(self._A.transpose(), self._B * self._B.transpose())
-            self._Wc = mat(X)
+            self._Wc = X
             
         except LinAlgError, ve:
 
@@ -211,12 +202,9 @@ class dSS(object):
                 e.info = ve.info
                 raise e
                
-
-
     #======================================================================================#      
     # Norms calculation
     #======================================================================================#
-
 
     def calc_h2(self):
 
@@ -243,6 +231,7 @@ class dSS(object):
 
         return
 
+    #======================================================================================#
     def calc_WCPG(self,n_it):
 
         """
@@ -286,7 +275,6 @@ class dSS(object):
         .. math::
 
            \\langle H \\rangle = C * (I_n - A)^{-1} * B + D
-
         """
 
         try:
@@ -368,11 +356,11 @@ class dSS(object):
 
         return str_mat
 
-        #======================================================================================#
+    #======================================================================================#
     def __repr__(self):
         return str(self)
 
-        #======================================================================================#
+
 
     #def __doc__(self):
     #  return "Class for discrete state-space, and aux functions"
@@ -380,117 +368,3 @@ class dSS(object):
     # def _latex_(self):
         # #TODO
         # return ""
-        
-  # Random state-space
-# def random_dSS(n=None, p=1, q=1):
-#   """Generate a n-th order random stable state-space, with p inputs and q outputs
-#   
-#   copy/Adapted from control-python library
-#   """
-#   
-#   if n == None:
-#     n = random.randint(5, 10)
-# 
-#   # Probability of repeating a previous root.
-#   pRepeat = 0.05
-#   # Probability of choosing a real root.  Note that when choosing a complex
-#   # root, the conjugate gets chosen as well.  So the expected proportion of
-#   # real roots is pReal / (pReal + 2 * (1 - pReal)).
-#   pReal = 0.6
-#   # Probability that an element in B or C will not be masked out.
-#   pBCmask = 0.8
-#   # Probability that an element in D will not be masked out.
-#   pDmask = 0.3
-#   # Probability that D = 0.
-#   pDzero = 0.2
-#         
-#   # Check for valid input arguments.
-#   if n < 1 or n % 1:
-#       raise ValueError(("states must be a positive integer.  #states = %g." % n))
-#   if p < 1 or p % 1:
-#     raise ValueError(("inputs must be a positive integer.  #inputs = %g." % p))
-#   if q < 1 or q % 1:
-#     raise ValueError(("outputs must be a positive integer.  #outputs = %g." % q))
-#         
-#   # Make some poles for A.  Preallocate a complex array.
-#   poles = np.zeros(n) + np.zeros(n) * 0.j
-#   i = 0
-#         
-#   while i < n:
-#     if rand() < pRepeat and i != 0 and i != n - 1:
-#       # Small chance of copying poles, if we're not at the first or last
-#       # element.
-#       if poles[i - 1].imag == 0:
-#         # Copy previous real pole.
-#         poles[i] = poles[i - 1]
-#         i += 1
-#       else:
-#         # Copy previous complex conjugate pair of poles.
-#         poles[i:i + 2] = poles[i - 2:i]
-#         i += 2
-#     elif rand() < pReal or i == n - 1:
-#       # No-oscillation pole.
-#       poles[i] = 2. * rand() - 1.
-#       i += 1
-#     else:
-#       # Complex conjugate pair of oscillating poles.
-#       mag = rand()
-#       phase = 2. * pi * rand()
-#       poles[i] = complex(mag * cos(phase), mag * sin(phase))
-#       poles[i + 1] = complex(poles[i].real, -poles[i].imag)
-#       i += 2
-# 
-#   # Now put the poles in A as real blocks on the diagonal.
-#   A = np.zeros((n, n))
-#   i = 0
-#   while i < n:
-#     if poles[i].imag == 0:
-#       A[i, i] = poles[i].real
-#       i += 1
-#     else:
-#       A[i, i] = A[i + 1, i + 1] = poles[i].real
-#       A[i, i + 1] = poles[i].imag
-#       A[i + 1, i] = -poles[i].imag
-#       i += 2
-#   # Finally, apply a transformation so that A is not block-diagonal.
-#   while True:
-#     T = randn(n, n)
-#     try:
-#       A = dot(solve(T, A), T)  # A = T \ A * T
-#       break
-#     except LinAlgError:
-#       # In the unlikely event that T is rank-deficient, iterate again.
-#       pass
-# 
-#   # Make the remaining matrices.
-#   B = randn(n, p)
-#   C = randn(q, n)
-#   D = randn(q, p)
-# 
-#   # Make masks to zero out some of the elements.
-#   while True:
-#     Bmask = rand(n, p) < pBCmask 
-#     if not Bmask.all():  # Retry if we get all zeros.
-#       break
-#   
-#   while True:
-#     Cmask = rand(q, n) < pBCmask
-#     if not Cmask.all():  # Retry if we get all zeros.
-#       break
-#   
-#   if rand() < pDzero:
-#     Dmask = np.zeros((q, p))
-#   else:
-#     while True:
-#       Dmask = rand(q, p) < pDmask
-#       if not Dmask.all():  # Retry if we get all zeros.
-#         break
-#   
-# 
-#   # Apply masks.
-#   B = B * Bmask
-#   C = C * Cmask
-#   D = D * Dmask
-# 
-#   return dSS(A, B, C, D)
-  
