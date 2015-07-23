@@ -15,6 +15,8 @@ from numpy.linalg.linalg        import LinAlgError
 from numpy                import dot, eye, pi, cos, sin
 from numpy.random         import rand, randn
 
+from scipy.linalg         import solve_discrete_lyapunov
+
 #IFDEF SLYCOT
 #import slycot # lin eq solver
 
@@ -103,31 +105,31 @@ class dSS(object):
 
     @property
     def A(self):
-        return _A(self)
+        return self._A
 
     @property
     def B(self):
-        return _B(self)
+        return self._B
 
     @property
     def C(self):
-        return _C(self)
+        return self._C
 
     @property
     def D(self):
-        return _D(self)
+        return self._D
 
     @property
     def n(self):
-        return _n(self)
+        return self._n
 
     @property
     def p(self):
-        return _p(self)
+        return self._p
 
     @property
     def q(self):
-        return _q(self)
+        return self._q
 
     @property
     def Wo(self):
@@ -163,18 +165,18 @@ class dSS(object):
     def calc_Wo(self):
 
         """
-        Compute observer Wo with one of available methods
+        Compute observer :math:`W_o` using ``scipy.linalg.solve_discrete_lyapunov``
 
-        Using intrinsic solve.
-
-        A^T * Wo * A + C^T * C = Wo
+        .. math::
+        
+           A^T * W_o * A + C^T * C = W_o
 
         """
 
         if (self._W_method == "linalg"):  # scipy intrinsic
 
             try:
-                X = scipy.linalg.solve_discrete_lyapunov(self._A, self._C.transpose() * self._C)
+                X = solve_discrete_lyapunov(self._A, self._C.transpose() * self._C)
             except LinAlgError, ve:
 
                 if (ve.info < 0):
@@ -210,16 +212,18 @@ class dSS(object):
     def calc_Wc(self):
 
         """
-        Compute observer Wc with one of available methods
+        Compute observer :math:`W_c` using ``scipy.linalg.solve_discrete_lyapunov``
 
-        A * Wc * A^T + B * B^T = Wc
+        .. math::
+
+           A * W_c * A^T + B * B^T = W_c
 
         """
 
         if (self._W_method == "linalg"):  # scipy intrinsic
 
             try:
-                X = scipy.linalg.solve_discrete_lyapunov(self._A.transpose(), self._B * self._B.transpose())
+                X = solve_discrete_lyapunov(self._A.transpose(), self._B * self._B.transpose())
             except LinAlgError, ve:
 
                 if (ve.info < 0):
@@ -263,6 +267,11 @@ class dSS(object):
 
         """
         Compute the H2-norm of the system
+        
+        .. math::
+        
+           \\langle \\langle H \\rangle \\rangle = \\sqrt{tr ( C*W_c * C^T + D*D^T )}
+        
         """
 
         res = None
@@ -286,11 +295,15 @@ class dSS(object):
 
         .. math::
 
-        <<H>> delta_equal |D| + \\sum{k=0}^\\infty \\abs{C * A^k * B}
+           \\langle \\langle H \\rangle \\rangle \\triangleq |D| + \\sum_{k=0}^\\infty |C * A^k * B|
         
         Using algorithm developed in paper :
         
-        TODO citation Lozanova & al.
+        [CIT001]_
+        
+        .. [CIT001]
+        
+           Lozanova & al., calculation of WCPG
         
         """
         #Method not precise
@@ -315,7 +328,9 @@ class dSS(object):
         """
         Compute the DC-gain of the filter
 
-        <H> = C * (I_n - A)^(-1) * B + D
+        .. math::
+
+           \\langle H \\rangle = C * (I_n - A)^{-1} * B + D
 
         """
 

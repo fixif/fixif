@@ -1,7 +1,9 @@
-#from dSS import dSS
+from LTI.dSS import dSS
 
-from numpy                import dot, eye, pi, cos, sin
+from numpy                import zeros, dot, eye, pi, cos, sin
 from numpy.random         import rand, randn
+
+from numpy.linalg         import solve, LinAlgError
 
 # Random state-space
 def random_dSS(n=None, p=1, q=1):
@@ -35,7 +37,7 @@ def random_dSS(n=None, p=1, q=1):
         raise ValueError(("outputs must be a positive integer.  #outputs = %g." % q))
                 
     # Make some poles for A.  Preallocate a complex array.
-    poles = np.zeros(n) + np.zeros(n) * 0.j
+    poles = zeros(n) + zeros(n) * 0.j
     i = 0
                 
     while i < n:
@@ -63,7 +65,7 @@ def random_dSS(n=None, p=1, q=1):
             i += 2
 
     # Now put the poles in A as real blocks on the diagonal.
-    A = np.zeros((n, n))
+    A = zeros((n, n))
     i = 0
     while i < n:
         if poles[i].imag == 0:
@@ -101,7 +103,7 @@ def random_dSS(n=None, p=1, q=1):
             break
     
     if rand() < pDzero:
-        Dmask = np.zeros((q, p))
+        Dmask = zeros((q, p))
     else:
         while True:
             Dmask = rand(q, p) < pDmask
