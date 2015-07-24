@@ -18,7 +18,7 @@ from copy                 import copy
 from slycot               import sb03md
 
 #WCPG calculation needs mpmath
-import mpmath import mp
+from mpmath import mp
 
 # Module description
 __author__ = "FiPoGen Team"
@@ -324,6 +324,10 @@ class dSS(object):
            Lozanova & al., calculation of WCPG
         
         """
+        
+        c_WCPG = mp.matrix(self._n, self._n)
+        
+
         
         # Convert numpy matrixes to mpmath matrix
         
