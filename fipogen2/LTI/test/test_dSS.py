@@ -47,17 +47,29 @@ class test_dSS( unittest.TestCase):
 
   def test_Gramians(self):
 
-    #for n,p,q in zip( [3,5,10], [3,3, 1], [3, 13, 1]):
-    
-    # tests for 'linalg' method
-    # with linalg we expect a 3-digit accuracy (BAD)
-
     is_bugOverride = True # no repr for matrixes in assert_array_almost_equal, numpy 15
     
-    ndigit_accuracy_linalg = 1
+    def _repr_bug_override():
+          
+      print '----------'
+      print 'test   # ' + str(nloc)       
+      print 'method = ' + S._W_method + "\n"
+      print 'n      = ' + str(n) + "\n"
+      print '--- Wc ---'
+      print 'LHS = ' + repr(S.A*S.Wc*S.A.transpose() + S.B*S.B.transpose())
+      print 'RHS = ' + repr(S.Wc)
+      print '----------'
+      print '\n'
+      print '--- Wo ---'
+      print 'LHS = ' + repr(S.A.transpose()*S.Wo*S.A + S.C.transpose()*S.C)
+      print 'RHS = ' + repr(S.Wo)
+      print '----------'
+      print '\n'
+    
+    ndigit_accuracy_linalg  = 1
     ndigit_accuracy_slycot1 = 7
 
-    nloc = 1
+    nloc = 0
     
     for i in range(50):
         
@@ -65,37 +77,16 @@ class test_dSS( unittest.TestCase):
       p = randint(2,15)
       q = randint(2,15) 
       S = random_dSS(n,p,q)
-
-      # TODO : we should print debug info only when there is an exception triggered.
-      # dive into that later 
-
-      if is_bugOverride:
-          
-          print '----------'
-          print 'test # ' + str(nloc)       
-          print 'method = ' + S._W_method + "\n"
-          print 'n      = ' + str(n) + "\n"
-          print '--- Wc ---'
-          print 'LHS = ' + repr(S.A*S.Wc*S.A.transpose() + S.B*S.B.transpose())
-          print 'RHS = ' + repr(S.Wc)
-          print '----------'
-          print '\n'
-          print '--- Wo ---'
-          print 'LHS = ' + repr(S.A.transpose()*S.Wo*S.A + S.C.transpose()*S.C)
-          print 'RHS = ' + repr(S.Wo)
-          print '----------'
-          print '\n'
-      
       
       # manually rearm _W_method parameter
       S._W_method = 'linalg'
 
       nloc += 1
       
+      if is_bugOverride:_repr_bug_override()
+      
       assert_array_almost_equal( S.A*S.Wc*S.A.transpose() + S.B*S.B.transpose(), S.Wc, ndigit_accuracy_linalg )
       assert_array_almost_equal( S.A.transpose()*S.Wo*S.A + S.C.transpose()*S.C, S.Wo, ndigit_accuracy_linalg )
-
-
 
     # test for 'slycot1' method
     # with slycot we expect a 8-digit accuracy
@@ -106,17 +97,16 @@ class test_dSS( unittest.TestCase):
       p = randint(2,15)
       q = randint(2,15) 
       S = random_dSS(n,p,q)
-      
-      print 'n=',n
-      
+            
       #manually rearm _W_method parameter
       S._W_method = 'slycot1'
       
       nloc += 1
       
+      if is_bugOverride:_repr_bug_override()
+      
       assert_array_almost_equal( S.A*S.Wc*S.A.transpose() + S.B*S.B.transpose(), S.Wc, ndigit_accuracy_slycot1 )
       assert_array_almost_equal( S.A.transpose()*S.Wo*S.A + S.C.transpose()*S.C, S.Wo, ndigit_accuracy_slycot1 )
-
 
   def test_random(self):
     

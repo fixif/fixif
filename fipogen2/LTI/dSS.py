@@ -17,6 +17,9 @@ from scipy.linalg         import solve_discrete_lyapunov
 from copy                 import copy
 from slycot               import sb03md
 
+#WCPG calculation needs mpmath
+import mpmath import mp
+
 # Module description
 __author__ = "FiPoGen Team"
 __email__ = "fipogen@lip6.fr"
@@ -85,14 +88,20 @@ class dSS(object):
         self._Wo = None
         self._Wc = None 
 
-        # Initialize norms
+        # Initialize norm
 
         self._norm_h2 = None
-        self._WCPG = None
 
         # Other criterions,values
 
         self._DC_gain = None
+        
+        # WCPG
+        self._WCPG = None
+        
+        # set precision for mpmath
+        mp.dps = 64
+        
 
 
 
@@ -128,12 +137,12 @@ class dSS(object):
 
     @property
     def Wo(self):
-        if (self._Wo is None): self._calc_W('Wo', self._W_method)
+        if (self._Wo is None): self.calc_W('Wo', self._W_method)
         return self._Wo
 
     @property
     def Wc(self):
-        if (self._Wc is None): self._calc_W('Wc', self._W_method)
+        if (self._Wc is None): self.calc_W('Wc', self._W_method)
         return self._Wc
 
     @property
@@ -157,11 +166,22 @@ class dSS(object):
     # Observers (Wo, Wc) calculation
     #======================================================================================#
 
-    def _calc_W(self, Woc, meth):
+    def calc_W(self, Woc, meth):
 
         """
-        Compute observers :math:`Wo` and :math:`Wc` using different methods, 
-        giving result with different precision
+        Computes observers :math:`Wo` and :math:`Wc` as :
+
+        :math:`W_o` is solution of equation :
+
+        .. math::
+        
+           A^T * W_o * A + C^T * C = W_o
+           
+        :math:`W_c` is solution of equation :
+        
+        .. math::
+
+           A * W_c * A^T + B * B^T = W_c
         
         Available methods :
         
@@ -169,35 +189,32 @@ class dSS(object):
         1 digit precision with bilinear algorithm for big matrixes (really bad). 
         not good enough with usual python data types
         
-        - ``slycot1`` : using ``slycot`` lib with func ``sb03md``, like in matlab and pydare
+        - ``slycot1`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
+        see http://slicot.org/objects/software/shared/libindex.html
         
-        Define state space from random data
+        ..Example::
         
-        >>mydSS = random_dSS
-        >>mydSS._calc_W('Wo','linalg')
-        >>mydSS._calc_W('Wo','slycot1')
-        
-        >>mydSS._calc_W('Wc','linalg')
-        >>mydSS._calc_W('Wc','slycot1')     
+          >>>mydSS = random_dSS() ## define a new state space from random data
+          >>>mydSS.calc_W('Wo','linalg') # use numpy
+          >>>mydSS.calc_W('Wo','slycot1') # use slycot
+          >>>mydSS.calc_W('Wc','linalg')
+          >>>mydSS.calc_W('Wc','slycot1')    
 
-        :math:`Wo` is solution of equation :
-
-        .. math::
+        .. warning::
         
-           A^T * W_o * A + C^T * C = W_o
+           solve_discrete_lyapunov does not work as intended, see http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
+           Precision is not good (4 digits, failed tests)
            
-        :math:`Wc` is solution of equation :
+        .. todo::
         
-        .. math::
-
-           A * W_c * A^T + B * B^T = W_c
+           - octave routine in http://octave.sourceforge.net/control/function/dlyap.html uses another function from slicot
+           - scilab routine https://www.scilab.org/product/man/linmeq.html uses slicot too
 
         """
         
-        # WARNING / solve_discrete_lyapunov does not work as intended
-        # see http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
+        # WARNING / 
         
-        # Precision is not good (4 digits, failed tests)
+        # 
         
         # DEVNOTE / We could try to use mpmath in the current function as a test bench for gain in precision using multiprecision
         # data types
@@ -229,8 +246,6 @@ class dSS(object):
               raise e
 
         # Solve the Lyapunov equation by calling the Slycot function sb03md
-        # Like in matlab and pydare
-        # sohould give a good result, without using mpmath
         # If we don't use "copy" in the call, the result is plain false
           
         elif (self._W_method == 'slycot1'):
@@ -309,6 +324,14 @@ class dSS(object):
            Lozanova & al., calculation of WCPG
         
         """
+        
+        # Convert numpy matrixes to mpmath matrix
+        
+        A = array2mp(self._A)
+        B = array2mp(self._B)
+        C = array2mp(self._C)
+        D = array2mp(self._D)
+        
         # Method not precise
         # res = 0
 
@@ -321,9 +344,7 @@ class dSS(object):
         # else:
         #    self._WCPG = res + absolute(D)
 
-        #
-
-        return self._WCPG
+        self._WCPG = mparray2npfloat(c_WCPG)
 
     #======================================================================================#
     def calc_DC_gain(self):
@@ -419,7 +440,9 @@ class dSS(object):
     def __repr__(self):
         return str(self)
 
-
+    if __name__ == "__main__":
+        import doctest
+        doctest.testmod()
 
     # def __doc__(self):
     #  return "Class for discrete state-space, and aux functions"
