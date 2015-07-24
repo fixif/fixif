@@ -5,12 +5,17 @@
 # Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
-from numpy                import inf, shape, identity, absolute, dot
+from numpy                import inf, shape, identity, absolute, dot, eye
+from numpy                import matrix as mat
 
-from numpy.linalg               import inv, det, solve
-from numpy.linalg.linalg        import LinAlgError
+from numpy.linalg         import inv, det, solve
+from numpy.linalg.linalg  import LinAlgError
 
 from scipy.linalg         import solve_discrete_lyapunov
+
+# slycot method for observers Wo and Wc
+from copy                 import copy
+from slycot               import sb03md
 
 # Module description
 __author__ = "FiPoGen Team"
@@ -65,16 +70,18 @@ class dSS(object):
         Construction of a discrete state space
         """
 
-        self._A = A  # User input
-        self._B = B
-        self._C = C
-        self._D = D
+        self._A = mat(A)  # User input
+        self._B = mat(B)
+        self._C = mat(C)
+        self._D = mat(D)
 
         # Initialize state space dimensions from user input
 
         (self._n, self._p, self._q) = self.__check_dimensions__()  # Verify coherence, set dimensions
-
-        # Initialize observers
+        
+        # Initialize observers and method for computation of those
+        
+        self._W_method = 'slycot1'  # linalg, slycot1
         self._Wo = None
         self._Wc = None 
 
@@ -121,27 +128,27 @@ class dSS(object):
 
     @property
     def Wo(self):
-        if (self._Wo == None): self.calc_Wo()
+        if (self._Wo is None): self._calc_W('Wo', self._W_method)
         return self._Wo
 
     @property
     def Wc(self):
-        if (self._Wc == None): self.calc_Wc()
+        if (self._Wc is None): self._calc_W('Wc', self._W_method)
         return self._Wc
 
     @property
     def norm_h2(self):
-        if (self._norm_h2 == None): self.calc_h2()
+        if (self._norm_h2 is None): self.calc_h2()
         return self._norm_h2
 
     @property
     def WCPG(self):
-        if (self._WCPG == None): self.calc_WCPG()
+        if (self._WCPG is None): self.calc_WCPG()
         return self._WCPG
 
     @property
     def DC_gain(self):
-        if (self._DC_gain == None): self.calc_DC_gain()
+        if (self._DC_gain is None): self.calc_DC_gain()
         return self._DC_gain
 
 
@@ -150,57 +157,109 @@ class dSS(object):
     # Observers (Wo, Wc) calculation
     #======================================================================================#
 
-    def calc_Wo(self):
+    def _calc_W(self, Woc, meth):
 
         """
-        Compute observer :math:`W_o` using ``scipy.linalg.solve_discrete_lyapunov``
+        Compute observers :math:`Wo` and :math:`Wc` using different methods, 
+        giving result with different precision
+        
+        Available methods :
+        
+        - ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
+        1 digit precision with bilinear algorithm for big matrixes (really bad). 
+        not good enough with usual python data types
+        
+        - ``slycot1`` : using ``slycot`` lib with func ``sb03md``, like in matlab and pydare
+        
+        Define state space from random data
+        
+        >>mydSS = random_dSS
+        >>mydSS._calc_W('Wo','linalg')
+        >>mydSS._calc_W('Wo','slycot1')
+        
+        >>mydSS._calc_W('Wc','linalg')
+        >>mydSS._calc_W('Wc','slycot1')     
+
+        :math:`Wo` is solution of equation :
 
         .. math::
         
            A^T * W_o * A + C^T * C = W_o
-
-        """
-
-        try:
-            X = solve_discrete_lyapunov(self._A, self._C.transpose() * self._C)
-            self._Wo = X
-            
-        except LinAlgError, ve:
-
-            if (ve.info < 0):
-                e = LinAlgError(ve.message)
-                e.info = ve.info
-            else:
-                e = LinAlgError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
-                e.info = ve.info
-                raise e
-
-
-    def calc_Wc(self):
-
-        """
-        Compute observer :math:`W_c` using ``scipy.linalg.solve_discrete_lyapunov``
-
+           
+        :math:`Wc` is solution of equation :
+        
         .. math::
 
            A * W_c * A^T + B * B^T = W_c
 
         """
-
-        try:
+        
+        # WARNING / solve_discrete_lyapunov does not work as intended
+        # see http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
+        
+        # Precision is not good (4 digits, failed tests)
+        
+        # DEVNOTE / We could try to use mpmath in the current function as a test bench for gain in precision using multiprecision
+        # data types
+        
+        if (self._W_method == 'linalg'):
             
-            X = solve_discrete_lyapunov(self._A.transpose(), self._B * self._B.transpose())
-            self._Wc = X
+          try:
+              
+              if (Woc == 'Wo'):
+                  
+                X = solve_discrete_lyapunov(self._A.transpose(), self._C.transpose() * self._C)
+                self._Wo = mat(X)
+                
+              elif (Woc == 'Wc'):
+                  
+                X = solve_discrete_lyapunov(self._A, self._B * self._B.transpose())
+                self._Wc = mat(X)
+                
+              else: raise "unknown Woc for W calculation"
             
-        except LinAlgError, ve:
+          except LinAlgError, ve:
 
-            if (ve.info < 0):
-                e = LinAlgError(ve.message)
-                e.info = ve.info 
-            else:
-                e = LinAlgError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
+              if (ve.info < 0):
+                  e = LinAlgError(ve.message)
+                  e.info = ve.info
+              else:
+                  e = LinAlgError(Woc + " : " + "scipy Linalg failed to compute eigenvalues of Lyapunov equation")
+                  e.info = ve.info
+              raise e
+
+        # Solve the Lyapunov equation by calling the Slycot function sb03md
+        # Like in matlab and pydare
+        # sohould give a good result, without using mpmath
+        # If we don't use "copy" in the call, the result is plain false
+          
+        elif (self._W_method == 'slycot1'):
+            
+            try:
+                if (Woc == 'Wo'):
+                    
+                  X, scale, sep, ferr, w = sb03md(self.n, -self._C.transpose() * self._C, copy(self._A.transpose()), eye(self.n, self.n), dico='D', trana='T')
+                  self._Wo = mat(X)
+                  
+                elif (Woc == 'Wc'):
+                    
+                  X, scale, sep, ferr, w = sb03md(self.n, -self._B * self._B.transpose(), copy(self._A), eye(self.n, self.n), dico='D', trana='T')
+                  self._Wc = mat(X)
+                  
+                else: raise "unknown Woc for W calculation"
+                
+            except ValueError, ve:
+                
+              if ve.info < 0:
+                e = ValueError(ve.message)
                 e.info = ve.info
-                raise e
+              else:
+                e = ValueError(Woc + " : " + "The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+                e.info = ve.info
+              raise e
+        
+        else: raise "unknown _W_method to calculate observers"
+
                
     #======================================================================================#      
     # Norms calculation
@@ -232,7 +291,7 @@ class dSS(object):
         return
 
     #======================================================================================#
-    def calc_WCPG(self,n_it):
+    def calc_WCPG(self, n_it):
 
         """
         Compute the Worst Case Peak Gain of the state space
@@ -250,16 +309,16 @@ class dSS(object):
            Lozanova & al., calculation of WCPG
         
         """
-        #Method not precise
-        #res = 0
+        # Method not precise
+        # res = 0
 
-        #try:
+        # try:
         #    for i in range(1, self._nit_WCPG):
         #        res += numpy.absolute(self._C * matrix_power(A, i) * B)
         #        #res += numpy.absolute(self._C * A**i * B)
-        #except:
+        # except:
         #    raise ValueError, 'Impossible to compute WCPG at rank i = ' + str(i) + "\n"
-        #else:
+        # else:
         #    self._WCPG = res + absolute(D)
 
         #
@@ -362,7 +421,7 @@ class dSS(object):
 
 
 
-    #def __doc__(self):
+    # def __doc__(self):
     #  return "Class for discrete state-space, and aux functions"
 
     # def _latex_(self):
