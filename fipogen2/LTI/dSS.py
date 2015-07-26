@@ -28,24 +28,21 @@ __version__ = "0.0.1"  # Modify this to increment with git scripting
 
 class dSS(object):
 
-    """
+    r"""
     The dSS class describes a discrete state space realization
        
-       A state space system is defined as
-       
+     A state space system :math:`(A,B,C,D)` is defined by 
+      
     .. math::
-    
-         A \\in \\mathbb{R}^{n \\times n}, \\ B \\in \\mathbb{R}^{n \\times p}, \\ C \\in \\mathbb{R}^{q \\times n} \\text{ and } D \\in \\mathbb{R}^{q \\times p}   
        
-    .. math::
-       :nowrap:
-       
-         \\begin{equation*}
-         \\text{and }\\left\\lbrace\\begin{aligned}
-         X(k+1) &= AX(k) + BU(k) \\\\
+        \left\lbrace\begin{aligned}
+         X(k+1) &= AX(k) + BU(k) \\
          Y(k)   &= CX(k) + DU(k)
-         \\end{aligned}\\right.
-         \\end{equation*}
+         \end{aligned}\right.
+
+
+    with :math:`A \in \mathbb{R}^{n \times n}, B \in \mathbb{R}^{n \times p}, C \in \mathbb{R}^{q \times n} \text{ and } D \in \mathbb{R}^{q \times p}`. 
+    
 
     **Dimensions of the state space :**
        
@@ -282,12 +279,12 @@ class dSS(object):
 
     def calc_h2(self):
 
-        """
+        r"""
         Compute the H2-norm of the system
         
         .. math::
         
-           \\langle \\langle H \\rangle \\rangle = \\sqrt{tr ( C*W_c * C^T + D*D^T )}
+           \langle \langle H \rangle \rangle = \sqrt{tr ( C*W_c * C^T + D*D^T )}
         
         """
 
@@ -308,12 +305,12 @@ class dSS(object):
     #======================================================================================#
     def calc_WCPG(self, n_it):
 
-        """
+        r"""
         Compute the Worst Case Peak Gain of the state space
 
         .. math::
 
-           \\langle \\langle H \\rangle \\rangle \\triangleq |D| + \\sum_{k=0}^\\infty |C * A^k * B|
+           \langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
         
         Using algorithm developed in paper :
         
@@ -353,12 +350,12 @@ class dSS(object):
     #======================================================================================#
     def calc_DC_gain(self):
 
-        """
+        r"""
         Compute the DC-gain of the filter
 
         .. math::
 
-           \\langle H \\rangle = C * (I_n - A)^{-1} * B + D
+           \langle H \rangle = C * (I_n - A)^{-1} * B + D
         """
 
         try:
