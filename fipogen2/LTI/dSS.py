@@ -49,7 +49,7 @@ class dSS(object):
     .. math::
        :align: left
        
-         n,p,q \\in \\mathbb{N}
+         n,p,q \in \mathbb{N}
          
     ==  ==================
     n   number of states
