@@ -7,7 +7,7 @@ from numpy import array
 from numpy.linalg import norm
 from numpy.testing import assert_allclose
 from numpy.random import seed
-
+from sys import exc_info		# to keep trace of trace stack
 #from pyFWR.dSS import dSS, random_dSS
 
 from LTI.dSS import dSS
@@ -31,7 +31,7 @@ Test with %s
 %s = %s
 -------------------------------------------""" % (strMethod, strActual, repr(actual), strDesired, repr(desired)) )
 		msgH.append(str(e))
-		msgH.append(e)	# add the AssertionError itself at the end of the list
+		msgH.append(exc_info())	# add the AssertionError itself at the end of the list
 
 
 class test_dSS( unittest.TestCase):
@@ -100,7 +100,8 @@ class test_dSS( unittest.TestCase):
 		
 		if msgH:
 			print '\n'.join(msgH[:-1])
-			raise msgH[-1]
+			#raise AssertionError from msgH[-1]
+			raise msgH[-1][0], msgH[-1][1], msgH[-1][2]
 
 		def test_random(self):
 	
