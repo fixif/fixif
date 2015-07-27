@@ -318,28 +318,28 @@ class dSS(object):
         
         """
         
-        def cast2uint64(val): # uint64_t type in C
+        #def cast2uint64(val): # uint64_t type in C
           
-            cast_val = val.astype(uint64)
+        #    cast_val = val.astype(uint64)
           
-            return cast_val
+        #    return cast_val
       
-        def flatten2float64(matrix): # long type int C
+        #def flatten2float64(matrix): # long type int C
             
-            flat_mat = matrix.astype(float64, casting='safe').flatten()
+        #    flat_mat = matrix.astype(float64, casting='safe').flatten()
             
-            return flat_mat
+        #    return flat_mat
         
         # Prepare array for result
         
-        c_WCPG = mp.matrix(self._n, self._n)
+        #c_WCPG = mp.matrix(self._n, self._n)
         
         # Convert array dimensions to uint64
         #n = self._n.np.astype(uint64)
         
-        n = cast2uint64(self._n)
-        p = cast2uint64(self._p)
-        q = cast2uint64(self._q)
+        #n = cast2uint64(self._n)
+        #p = cast2uint64(self._p)
+        #q = cast2uint64(self._q)
         
         # Convert numpy matrixes to mpmath matrix
         
@@ -350,14 +350,14 @@ class dSS(object):
         
         # create matrix for result
         
-        loc_WCPG = flatten2float64(mp.matrix(self._n,self._n))
+        #loc_WCPG = flatten2float64(mp.matrix(self._n,self._n))
 
         # convert matrix to 1D array
         
-        A = flatten2float64(self._A)
-        B = flatten2float64(self._B)
-        C = flatten2float64(self._C)
-        D = flatten2float64(self._D)
+        #A = flatten2float64(self._A)
+        #B = flatten2float64(self._B)
+        #C = flatten2float64(self._C)
+        #D = flatten2float64(self._D)
         
         
 
@@ -367,8 +367,6 @@ class dSS(object):
         #A = self._A.astype(float64, casting='safe').flatten()
 
 
-
-        
         # Method not precise
         # res = 0
 
@@ -381,7 +379,9 @@ class dSS(object):
         # else:
         #    self._WCPG = res + absolute(D)
 
-        self._WCPG = mparray2npfloat(c_WCPG)
+        #self._WCPG = mparray2npfloat(c_WCPG)
+        
+        
 
     #======================================================================================#
     def calc_DC_gain(self):

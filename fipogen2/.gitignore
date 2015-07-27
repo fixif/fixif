@@ -31,3 +31,10 @@ pip-delete-this-directory.txt
 
 # Sphinx documentation
 doc/build/
+
+#Eclipse project parameters
+.project
+.pydevproject
+
+#?
+.settings
