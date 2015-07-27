@@ -209,10 +209,6 @@ class dSS(object):
 
         """
         
-        # WARNING / 
-        
-        # 
-        
         # DEVNOTE / We could try to use mpmath in the current function as a test bench for gain in precision using multiprecision
         # data types
         
