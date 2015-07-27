@@ -52,6 +52,11 @@ static PyObject *pyWCPG(PyObject *self, PyObject *args)
   PyObject *W_obj, *A_obj, *B_obj, *C_obj, *D_obj ;
   uint64_t n, p, q ;
   
+  /* buffer for dimension of *W (n*n matrix) */
+  
+  int dims[2] ;
+  dims[0] = dims[1] = n ;
+  
   /* Parse incoming tuple */
   
   if (!PyArg_ParseTuple(args, "dd000", &W_obj, &A_obj, &B_obj, &C_obj, &D_obj, n, p, q)
@@ -106,10 +111,11 @@ if (W == NULL || A == NULL || B == NULL || C == NULL || D == NULL) {
   
   /* Build the output tuple */
   
-  PyObject 
+  /* W is an n*n matrix */
+  /* http://docs.scipy.org/doc/numpy/reference/c-api.dtype.html */
   
-  PyObject
+  PyObject *Wobj = PyArray_SimpleNewFromData(2, dims, NPY_DOUBLE, *W)
   
-  PyObject
+  return ;
   
 }
