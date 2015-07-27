@@ -30,4 +30,4 @@ pip-delete-this-directory.txt
 
 
 # Sphinx documentation
-docs/build/
+doc/build/
