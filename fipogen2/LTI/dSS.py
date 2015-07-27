@@ -5,7 +5,7 @@
 # Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
-from numpy                import inf, shape, identity, absolute, dot, eye
+from numpy                import inf, shape, identity, absolute, dot, eye#, astype
 from numpy                import matrix as mat
 
 from numpy.linalg         import inv, det, solve
@@ -209,10 +209,6 @@ class dSS(object):
 
         """
         
-        # WARNING / 
-        
-        # 
-        
         # DEVNOTE / We could try to use mpmath in the current function as a test bench for gain in precision using multiprecision
         # data types
         
@@ -322,16 +318,56 @@ class dSS(object):
         
         """
         
+        def cast2uint64(val): # uint64_t type in C
+          
+            cast_val = val.astype(uint64)
+          
+            return cast_val
+      
+        def flatten2float64(matrix): # long type int C
+            
+            flat_mat = matrix.astype(float64, casting='safe').flatten()
+            
+            return flat_mat
+        
+        # Prepare array for result
+        
         c_WCPG = mp.matrix(self._n, self._n)
         
-
+        # Convert array dimensions to uint64
+        #n = self._n.np.astype(uint64)
+        
+        n = cast2uint64(self._n)
+        p = cast2uint64(self._p)
+        q = cast2uint64(self._q)
         
         # Convert numpy matrixes to mpmath matrix
         
-        A = array2mp(self._A)
-        B = array2mp(self._B)
-        C = array2mp(self._C)
-        D = array2mp(self._D)
+        #A = array2mp(self._A)
+        #B = array2mp(self._B)
+        #C = array2mp(self._C)
+        #D = array2mp(self._D)
+        
+        # create matrix for result
+        
+        loc_WCPG = flatten2float64(mp.matrix(self._n,self._n))
+
+        # convert matrix to 1D array
+        
+        A = flatten2float64(self._A)
+        B = flatten2float64(self._B)
+        C = flatten2float64(self._C)
+        D = flatten2float64(self._D)
+        
+        
+
+        
+        # CALL WCPG IN DOUBLE PRECISION
+        
+        #A = self._A.astype(float64, casting='safe').flatten()
+
+
+
         
         # Method not precise
         # res = 0
