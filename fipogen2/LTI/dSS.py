@@ -5,7 +5,7 @@
 # Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
-from numpy                import inf, shape, identity, absolute, dot, eye, astype
+from numpy                import inf, shape, identity, absolute, dot, eye#, astype
 from numpy                import matrix as mat
 
 from numpy.linalg         import inv, det, solve
@@ -349,6 +349,7 @@ class dSS(object):
         #D = array2mp(self._D)
         
         # create matrix for result
+        
         loc_WCPG = flatten2float64(mp.matrix(self._n,self._n))
 
         # convert matrix to 1D array
