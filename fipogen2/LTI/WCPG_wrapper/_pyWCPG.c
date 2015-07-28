@@ -1,7 +1,12 @@
 #include <Python.h>
-// If we want to interact with python matrixes (maybe later)
-//#include <numpy/arrayobject.h>
-#include "wcpg.h"
+#include <numpy/arrayobject.h>
+
+//extern int WCPG_ABCD(double W, double A, double B, double C, double D, uint64_t n, uint64_t p, uint64_t q);
+#include "libwcpg.h"
+
+#include <dlfcn.h>
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 // Best tuto
 // http://dan.iel.fm/posts/python-c-extensions/
@@ -24,11 +29,14 @@ Input: \
 Output: \
 	integer value equal to 1 if WCPG computation is successful and 0 otherwise." ;
 
-static PyMethodDef module_methods[] = 
-{
-   {"pyWCPG", mp_calc_pyWCPG, METH_VARARGS, pyWCPG_docstring}
+static PyObject *WCPG_pyWCPG(PyObject *self, PyObject *args) ;
+	
+
+
+static PyMethodDef module_methods[] = {
+   {"pyWCPG", WCPG_pyWCPG, METH_VARARGS, pyWCPG_docstring},
    {NULL, NULL, 0, NULL}
-}
+} ;
 
 PyMODINIT_FUNC init_pyWCPG(void)
 {
@@ -39,65 +47,90 @@ PyMODINIT_FUNC init_pyWCPG(void)
   
   /* Load other needed stuff from python here*/
   /*Ex : load 'numpy' functionality*/
-  /*import_array() ;*/
+  import_array() ;
   
-}
+} ;
 
 // This is the function that we're going to call in the python code
 
-static PyObject *pyWCPG(PyObject *self, PyObject *args)
+static PyObject *WCPG_pyWCPG(PyObject *self, PyObject *args)
 {
 //int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);
   
   PyObject *W_obj, *A_obj, *B_obj, *C_obj, *D_obj ;
   uint64_t n, p, q ;
   
-  /* buffer for dimension of *W (n*n matrix) */
-  
-  int dims[2] ;
-  dims[0] = dims[1] = n ;
-  
   /* Parse incoming tuple */
   
-  if (!PyArg_ParseTuple(args, "dd000", &W_obj, &A_obj, &B_obj, &C_obj, &D_obj, n, p, q)
+  if (!PyArg_ParseTuple(args, "dd000", &W_obj, &A_obj, &B_obj, &C_obj, &D_obj, n, p, q))
+  {
     return NULL;
-  
+  }
+
   /* Interpret objects part of the tuple */
   /* W, A, B, C, D*/
   
-  PyObject *W = PyArray_FROM_OTF(W_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
-  PyObject *A = PyArray_FROM_OTF(A_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
-  PyObject *B = PyArray_FROM_OTF(B_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
-  PyObject *C = PyArray_FROM_OTF(C_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
-  PyObject *D = PyArray_FROM_OTF(D_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
+  PyObject *W_loc = PyArray_FROM_OTF(W_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
   
-if (W == NULL || A == NULL || B == NULL || C == NULL || D == NULL) {
+  PyObject *A_loc = PyArray_FROM_OTF(A_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
+  PyObject *B_loc = PyArray_FROM_OTF(B_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
+  PyObject *C_loc = PyArray_FROM_OTF(C_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
+  PyObject *D_loc = PyArray_FROM_OTF(D_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
   
-  Py_XDECREF(W) ;
-  Py_XDECREF(A) ;
-  Py_XDECREF(B) ;
-  Py_XDECREF(C) ;
-  Py_XDECREF(D) ;
+if (W_loc == NULL || A_loc == NULL || B_loc == NULL || C_loc == NULL || D_loc == NULL) {
+  
+  Py_XDECREF(W_loc) ;
+  
+  Py_XDECREF(A_loc) ;
+  Py_XDECREF(B_loc) ;
+  Py_XDECREF(C_loc) ;
+  Py_XDECREF(D_loc) ;
   
   return NULL ;
   
-}
+} ;
   
 /* Get pointers to the data as C-types */
 
-  double *W = (double*)PyArray_DATA(W) ;
+  double *W = (double*)PyArray_DATA(W_loc) ;
   
-  double *A = (double*)PyArray_DATA(A) ;
-  double *B = (double*)PyArray_DATA(B) ;
-  double *C = (double*)PyArray_DATA(C) ;
-  double *D = (double*)PyArray_DATA(D) ;
+  double *A = (double*)PyArray_DATA(A_loc) ;
+  double *B = (double*)PyArray_DATA(B_loc) ;
+  double *C = (double*)PyArray_DATA(C_loc) ;
+  double *D = (double*)PyArray_DATA(D_loc) ;
 
-/* Call C func */
-
-//WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);
-
-  WCPG_ABCD(*W, *A, *B, *C, *D, n, p, q);
-
+  /*Open .so and use*/
+  
+  void *handle ;
+  char *error ;
+  
+  //handle = dlopen("./libWCPG.so.0.0.9", RTLD_LAZY) ;
+  handle = dlopen("./libWCPG.so.0.0.9", RTLD_GLOBAL) ;
+  
+  if (!handle) {
+   fprintf(stderr, "%s\n", dlerror()) ;
+   exit(EXIT_FAILURE) ;
+  } ;
+  
+  dlerror(); // clear any existing error, see http://linux.die.net/man/3/dlopen
+  
+  *(void **) (&WCPG_ABCD) = dlsym(handle, "WCPG_ABCD") ;
+  
+  if ((error = dlerror()) != NULL) {
+   fprintf(stderr, "%s\n", dlerror()) ;
+   exit(EXIT_FAILURE) ; 
+  } ;
+  
+  /*=========================================*/
+  
+  //WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);
+  
+  (*WCPG_ABCD)(*W, *A, *B, *C, *D, n, p, q) ;
+  
+  /*=========================================*/
+  
+  dlclose(handle) ;
+  
   /*clean all vars not result, python-side*/
   
   Py_DECREF(A) ;
@@ -105,17 +138,27 @@ if (W == NULL || A == NULL || B == NULL || C == NULL || D == NULL) {
   Py_DECREF(C) ;
   Py_DECREF(D) ;
   
-  Py_DECREF(n) ;
-  Py_DECREF(p) ;
-  Py_DECREF(q) ;
+  // Not needed because those are not python objects (?)
+
+  //Py_DECREF(p) ;
+  //Py_DECREF(q) ;
   
   /* Build the output tuple */
   
   /* W is an n*n matrix */
   /* http://docs.scipy.org/doc/numpy/reference/c-api.dtype.html */
   
-  PyObject *Wobj = PyArray_SimpleNewFromData(2, dims, NPY_DOUBLE, *W)
+  /* Dimension of array W n*n*/
+  npy_intp dims[2] ;
+  dims[0] = n ;
+  dims[1] = n ;
   
-  return ;
+  //Py_DECREF(n) ;
+  
+  PyObject *Wobj = PyArray_SimpleNewFromData(2, dims, NPY_DOUBLE, W) ;
+  
+  exit(EXIT_SUCCESS) ;
+  
+  return Wobj;
   
 }
