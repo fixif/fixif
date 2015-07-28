@@ -20,6 +20,8 @@ from slycot               import sb03md
 #WCPG calculation needs mpmath
 from mpmath import mp
 
+import _pyWCPG
+
 # Module description
 __author__ = "FiPoGen Team"
 __email__ = "fipogen@lip6.fr"
