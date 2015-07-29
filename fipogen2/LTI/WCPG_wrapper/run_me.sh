@@ -2,6 +2,10 @@
 
 # Compile python wrapper using distutils
 clear
+
+#set LD_LIBRARY_PATH
+LD_LIBRARY_PATH='/usr/local/lib/'
+
 python setup.py build_ext --inplace
 
 #--libraries ./libwcpg.so.0.0.9
@@ -16,11 +20,12 @@ if [[ $? = "0" ]] ; then
   if [[ $1 = "d" ]] ; then
     echo 'Testing that WCPG_ABCD is there'
     echo '=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*'
-    nm -g libwcpg.so.0.0.9|grep 'ABCD'
+    nm -g /usr/local/lib/libwcpg.so|grep 'ABCD'
     echo '=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*'
     nm -g _pyWCPG.so|grep 'ABCD'
     echo '=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*'
-    ldd _pyWCPG.so
+    ldd -d _pyWCPG.so
+    readelf -d _pyWCPG.so
     #rm _pyWCPG.so
   fi
   
