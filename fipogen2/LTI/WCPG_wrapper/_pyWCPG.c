@@ -105,7 +105,7 @@ if (W_loc == NULL || A_loc == NULL || B_loc == NULL || C_loc == NULL || D_loc ==
   char *error ;
   
   //handle = dlopen("./libWCPG.so.0.0.9", RTLD_LAZY) ;
-  handle = dlopen("./libWCPG.so.0.0.9", RTLD_GLOBAL) ;
+  handle = dlopen("libwcpg.so", RTLD_GLOBAL | RTLD_LAZY) ;
   
   if (!handle) {
    fprintf(stderr, "%s\n", dlerror()) ;
