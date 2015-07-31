@@ -152,12 +152,12 @@ class test_dSS( unittest.TestCase):
 
 	 		return w
 		 	
-		nit = 250
-  		rel_tol_wcpg = 10**-12
+		nit = 1000
+  		rel_tol_wcpg = 10**-5
   		nloc = 0
   		
   		for i in range(50):
-  			print "\n\n\n\n\n"
+
 			nloc +=1
 			n = randint(2,5)
 			p = randint(2,5)
@@ -177,16 +177,18 @@ class test_dSS( unittest.TestCase):
 			if (d): print "D :" + str(sum(isnan(S.D))) + " NaN inside, python side"
 
 			wcpg = calc_wcpg_approx(S, nit)
+			S.WCPG
+			
 			print "=== WCPG approx ==="
 			print str(wcpg)
-			print "=== A ==="			
-			print S.A
-			print "=== B ==="			
-			print S.B
-			print "=== C ==="			
-			print S.C
-			print "=== D ==="			
-			print S.D
+# 			print "=== A ==="			
+# 			print S.A
+# 			print "=== B ==="			
+# 			print S.B
+# 			print "=== C ==="			
+# 			print S.C
+# 			print "=== D ==="			
+# 			print S.D
 			print "=== WCPG dprec  ==="
 			print str(S.WCPG)
 			
