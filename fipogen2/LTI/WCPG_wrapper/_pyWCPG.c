@@ -31,8 +31,6 @@ Output: \
 
 static PyObject *WCPG_pyWCPG(PyObject *self, PyObject *args) ;
 	
-
-
 static PyMethodDef module_methods[] = {
    {"pyWCPG", WCPG_pyWCPG, METH_VARARGS, pyWCPG_docstring},
    {NULL, NULL, 0, NULL}
@@ -42,8 +40,9 @@ PyMODINIT_FUNC init_pyWCPG(void)
 {
   PyObject *m = Py_InitModule3("_pyWCPG", module_methods, module_docstring);
   
-  if (m == NULL)
+  if (m == NULL){
     return;
+  };
   
   /* Load other needed stuff from python here*/
   /*Ex : load 'numpy' functionality*/
@@ -58,11 +57,12 @@ static PyObject *WCPG_pyWCPG(PyObject *self, PyObject *args)
 //int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);
   
   PyObject *W_obj, *A_obj, *B_obj, *C_obj, *D_obj ;
-  uint64_t n, p, q ;
+  
+  int n, p, q = 0;
   
   /* Parse incoming tuple */
   
-  if (!PyArg_ParseTuple(args, "dd000", &W_obj, &A_obj, &B_obj, &C_obj, &D_obj, n, p, q))
+  if (!PyArg_ParseTuple(args, "OOOOOiii", &W_obj, &A_obj, &B_obj, &C_obj, &D_obj, &n, &p, &q))
   {
     return NULL;
   }
@@ -70,7 +70,7 @@ static PyObject *WCPG_pyWCPG(PyObject *self, PyObject *args)
   /* Interpret objects part of the tuple */
   /* W, A, B, C, D*/
   
-  PyObject *W_loc = PyArray_FROM_OTF(W_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
+  PyObject *W_loc = PyArray_FROM_OTF(W_obj, NPY_DOUBLE, NPY_IN_ARRAY) ; // NP_INOUT_ARRAY
   
   PyObject *A_loc = PyArray_FROM_OTF(A_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
   PyObject *B_loc = PyArray_FROM_OTF(B_obj, NPY_DOUBLE, NPY_IN_ARRAY) ;
@@ -89,10 +89,14 @@ if (W_loc == NULL || A_loc == NULL || B_loc == NULL || C_loc == NULL || D_loc ==
   return NULL ;
   
 } ;
+
+ // Create new array W with good size
+
+  double W[q*p] ;
   
 /* Get pointers to the data as C-types */
 
-  double *W = (double*)PyArray_DATA(W_loc) ;
+  //double *W = (double*)PyArray_DATA(W_loc) ;
   
   double *A = (double*)PyArray_DATA(A_loc) ;
   double *B = (double*)PyArray_DATA(B_loc) ;
@@ -103,6 +107,7 @@ if (W_loc == NULL || A_loc == NULL || B_loc == NULL || C_loc == NULL || D_loc ==
   
   void *handle ;
   char *error ;
+  int  (*WCPG_ABCD)(double*, double*, double*, double*, double*, uint64_t, uint64_t, uint64_t) ;
   
   //handle = dlopen("./libWCPG.so.0.0.9", RTLD_LAZY) ;
   handle = dlopen("libwcpg.so", RTLD_GLOBAL | RTLD_LAZY) ;
@@ -121,27 +126,42 @@ if (W_loc == NULL || A_loc == NULL || B_loc == NULL || C_loc == NULL || D_loc ==
    exit(EXIT_FAILURE) ; 
   } ;
   
-  /*=========================================*/
+  int loc_n, loc_p, loc_q ;
+  
+  
+  
+  loc_n = (uint64_t)n ;
+  loc_p = (uint64_t)p ;
+  loc_q = (uint64_t)q ;
   
   //WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);
   
-  (*WCPG_ABCD)(*W, *A, *B, *C, *D, n, p, q) ;
-  
-  /*=========================================*/
+  (*WCPG_ABCD)(W, A, B, C, D, loc_n, loc_p, loc_q) ;
   
   dlclose(handle) ;
   
-  /*clean all vars not result, python-side*/
+    int i, j, k ;
   
-  Py_DECREF(A) ;
-  Py_DECREF(B) ;
-  Py_DECREF(C) ;
-  Py_DECREF(D) ;
+//   fprintf(stdout,"A= \n");
+//   fprintf(stdout, "%f ",A[i]);
   
-  // Not needed because those are not python objects (?)
-
-  //Py_DECREF(p) ;
-  //Py_DECREF(q) ;
+  i = 0 ;
+  j = 0 ;
+  k = 0 ;
+  
+  
+  // Reshape the array, 2d array, not a list.
+  
+  double tmp_tab[q][p] ;
+  
+  for (i=0 ; i<q ; i++)
+  {
+    k = q*i ;
+    for (j=0 ; j<p ; j++)
+    {
+      tmp_tab[i][j] = W[k+j];
+    }
+  }
   
   /* Build the output tuple */
   
@@ -150,14 +170,153 @@ if (W_loc == NULL || A_loc == NULL || B_loc == NULL || C_loc == NULL || D_loc ==
   
   /* Dimension of array W n*n*/
   npy_intp dims[2] ;
-  dims[0] = n ;
-  dims[1] = n ;
-  
-  //Py_DECREF(n) ;
-  
+  dims[0] = q ;
+  dims[1] = p ;
+
   PyObject *Wobj = PyArray_SimpleNewFromData(2, dims, NPY_DOUBLE, W) ;
   
-  exit(EXIT_SUCCESS) ;
+  Py_INCREF(Wobj) ;
+  
+  /* DEBUG */
+  
+  fprintf(stdout, "====================================== \n");
+  fprintf(stdout, "n = %i \n", n);
+  fprintf(stdout, "q = %i \n",(int)dims[0]) ;
+  fprintf(stdout, "p = %i \n",(int)dims[1]) ;
+  fprintf(stdout, "====================================== \n");
+  
+
+  
+  /*==============================================*/
+  
+  fprintf(stdout,"A = \n");
+  
+  for (i=0; i<n ; i++)
+  {
+    
+    k = n*i ;
+    
+    for (j=0; j<n ; j++)
+    {
+      fprintf(stdout, "%f ",A[k+j]);
+    }
+    
+    fprintf(stdout, "\n");
+    
+  }
+
+    /*==============================================*/
+  
+  fprintf(stdout,"B = \n");
+  
+  for (i=0; i<n ; i++)
+  {
+    
+    k = n*i ;
+    
+    for (j=0; j<p ; j++)
+    {
+      fprintf(stdout, "%f ",B[k+j]);
+    }
+    
+    fprintf(stdout, "\n");
+    
+  }
+  
+    /*==============================================*/
+  
+  fprintf(stdout,"C = \n");
+  
+  for (i=0; i<q ; i++)
+  {
+    
+    k = q*i ;
+    
+    for (j=0; j<n ; j++)
+    {
+      fprintf(stdout, "%f ",C[k+j]);
+    }
+    
+    fprintf(stdout, "\n");
+    
+  }
+  
+    /*==============================================*/
+  
+  fprintf(stdout,"D = \n");
+  
+  for (i=0; i<q ; i++)
+  {
+    
+    k = q*i ;
+    
+    for (j=0; j<p ; j++)
+    {
+      fprintf(stdout, "%f ",D[k+j]);
+    }
+    
+    fprintf(stdout, "\n");
+    
+  }
+  
+    /*==============================================*/
+    
+  fprintf(stdout,"W = \n");
+  
+  for (i=0; i<q ; i++)
+  {
+    
+    k = q*i ;
+    
+    for (j=0; j<p ; j++)
+    {
+      fprintf(stdout, "%f ",W[k+j]);
+    }
+
+    fprintf(stdout, "\n");
+    
+  }    
+  
+//   for (i=0; i<n*n; i++){
+//     
+//       j += 1 ;
+//   
+//       if (j%q >= 1)
+//       {
+// 	fprintf(stdout, "\n");
+// 	j=0;
+//       }
+//       
+//       fprintf(stdout, "%f ",A[i]);
+//   }
+  
+//   fprintf(stdout, "\n");
+//   
+//     fprintf(stdout,"W= \n");
+//   for (i=0; i<p*q; i++)
+//       fprintf(stdout, "%f ",W[i]);
+//   fprintf(stdout, "\n");
+  
+
+  
+ // Py_DECREF(n) ;
+ // Py_DECREF(p) ;
+ // Py_DECREF(q) ;
+  
+    /*clean all vars not result, python-side*/
+  
+  Py_DECREF(A_loc) ;
+  Py_DECREF(B_loc) ;
+  Py_DECREF(C_loc) ;
+  Py_DECREF(D_loc) ;
+  Py_DECREF(W_loc) ;
+  
+  
+  // Not needed because those are not python objects (?)
+
+  //Py_DECREF(p) ;
+  //Py_DECREF(q) ;
+  
   
   return Wobj;
   
