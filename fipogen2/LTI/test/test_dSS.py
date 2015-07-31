@@ -3,7 +3,7 @@
 
 import unittest
 from random import randint
-from numpy import array
+from numpy import array, zeros, absolute,eye, isnan, logical_and
 from numpy.linalg import norm
 from numpy.testing import assert_allclose
 from numpy.random import seed
@@ -12,6 +12,7 @@ from sys import exc_info		# to keep trace of trace stack
 
 from LTI.dSS import dSS
 from LTI.random_dSS import random_dSS
+#from __builtin__ import None
 
 
 def my_assert_relativeclose( msgH, actual, desired, rtol, strActual, strDesired, strMethod):
@@ -33,8 +34,10 @@ Test with %s
 		msgH.append(str(e))
 		msgH.append(exc_info())	# add the AssertionError itself at the end of the list
 
+msgH = []	# message handler (list of AssertionError messages)
 
 class test_dSS( unittest.TestCase):
+
 
 	"""
 	Test class for dSS class
@@ -53,7 +56,6 @@ class test_dSS( unittest.TestCase):
 		relative_tolerance_linalg  = 10**-5
 		relative_tolerance_slycot1 = 10**-5
 		nloc = 0	# test number
-		msgH = []	# message handler (list of AssertionError messages)
 
 		for i in range(50):
 			nloc +=1
@@ -79,6 +81,9 @@ class test_dSS( unittest.TestCase):
 								strDesired = 'Wo',
 								strMethod = 'linalg (test #%d)'%nloc )
 
+			# JoK : We have to explicitely remove Wo and Wc from S so that those are calculated again
+			S._Wo = None
+			S._Wc = None
 			# test for 'slycot1' method
 			# with slycot we expect a 8-digit accuracy		
 			S._W_method = 'slycot1'	  
@@ -103,23 +108,95 @@ class test_dSS( unittest.TestCase):
 			#raise AssertionError from msgH[-1]
 			raise msgH[-1][0], msgH[-1][1], msgH[-1][2]
 
-		def test_random(self):
+	def test_random(self):
 	
-			for i in range(50):
-				n = randint(2,20)
-				p = randint(2,15)
-				q = randint(2,15)  
+		for i in range(50):
+			n = randint(2,20)
+			p = randint(2,15)
+			q = randint(2,15)  
 				
-				S = random_dSS(n,p,q)
-				self.assertEqual(S.n,n)
-				self.assertEqual(S.p,p)
-				self.assertEqual(S.q,q)
-				self.assertEqual(S.A.shape, (n,n))
-				self.assertEqual(S.B.shape, (n,p))
-				self.assertEqual(S.C.shape, (q,n))
-				self.assertEqual(S.D.shape, (q,p))
+			S = random_dSS(n,p,q)
+			self.assertEqual(S.n,n)
+			self.assertEqual(S.p,p)
+			self.assertEqual(S.q,q)
+			self.assertEqual(S.A.shape, (n,n))
+			self.assertEqual(S.B.shape, (n,p))
+			self.assertEqual(S.C.shape, (q,n))
+			self.assertEqual(S.D.shape, (q,p))
   
+  
+  	def test_wcpg(self):			
+  			
+  		def calc_wcpg_approx(S, nit):
+  			
+  			w = zeros((S.q,S.p))
+  			res = zeros((S.q,S.p))
+  			powerA = eye(S.n,S.n)
+  			
+  			for i in range(0, nit):
+					#res += numpy.absolute(self._C * matrix_power(A, i) * B)
 
+				res += absolute(S.C * powerA * S.B)
+				powerA = powerA*S.A
+  			
+  			w = res + absolute(S.D)
+  			
+#   			try:
+# 		  		for i in range(1, nit):
+# 					#res += numpy.absolute(self._C * matrix_power(A, i) * B)
+# 					res += absolute(S.C * S.A**i * S.B)
+# 			except:
+# 				raise ValueError, 'Impossible to compute WCPG at rank i = ' + str(i) + "\n"
+# 	 		else:
+# 				 w = res + absolute(S.D)
+
+	 		return w
+		 	
+		nit = 250
+  		rel_tol_wcpg = 10**-12
+  		nloc = 0
+  		
+  		for i in range(50):
+  			print "\n\n\n\n\n"
+			nloc +=1
+			n = randint(2,5)
+			p = randint(2,5)
+			q = randint(2,5) 
+			S = random_dSS(n,p,q)
+
+			print "NaN check : indian food is not good for you ! \n"
+			# Python overreacts on this when mixed with test (if), so let's decouple
+			a = isnan(S.A).any()
+			b = isnan(S.B).any()
+			c = isnan(S.C).any()
+			d = isnan(S.D).any()
+			
+			if (a): print "A :" + str(sum(isnan(S.A))) + " NaN inside, python side"
+			if (b): print "B :" + str(sum(isnan(S.B))) + " NaN inside, python side"
+			if (c): print "C :" + str(sum(isnan(S.C))) + " NaN inside, python side"
+			if (d): print "D :" + str(sum(isnan(S.D))) + " NaN inside, python side"
+
+			wcpg = calc_wcpg_approx(S, nit)
+			print "=== WCPG approx ==="
+			print str(wcpg)
+			print "=== A ==="			
+			print S.A
+			print "=== B ==="			
+			print S.B
+			print "=== C ==="			
+			print S.C
+			print "=== D ==="			
+			print S.D
+			print "=== WCPG dprec  ==="
+			print str(S.WCPG)
+			
+			my_assert_relativeclose( msgH,
+									array(S.WCPG),
+									array(wcpg),
+									rtol = rel_tol_wcpg,
+									strActual = "WCPG dprec",
+									strDesired = "WCPG approx",
+									strMethod ="compare methods")
 
 #if __name__ == '__main__':
 #  sys.path.insert(0, os.path.abspath('./../../'))

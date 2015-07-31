@@ -5,7 +5,7 @@
 # Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
-from numpy                import inf, shape, identity, absolute, dot, eye#, astype
+from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray  # , astype
 from numpy                import matrix as mat
 
 from numpy.linalg         import inv, det, solve
@@ -17,7 +17,7 @@ from scipy.linalg         import solve_discrete_lyapunov
 from copy                 import copy
 from slycot               import sb03md
 
-#WCPG calculation needs mpmath
+# WCPG calculation needs mpmath
 from mpmath import mp
 
 import _pyWCPG
@@ -186,7 +186,7 @@ class dSS(object):
         
         - ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
         1 digit precision with bilinear algorithm for big matrixes (really bad). 
-        not good enough with usual python data types
+        not good emodifiednough with usual python data types
         
         - ``slycot1`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
         see http://slicot.org/objects/software/shared/libindex.html
@@ -300,8 +300,12 @@ class dSS(object):
 
         return
 
+
+
+	 
+
     #======================================================================================#
-    def calc_WCPG(self, n_it):
+    def calc_WCPG(self):
 
         r"""
         Compute the Worst Case Peak Gain of the state space
@@ -320,13 +324,26 @@ class dSS(object):
         
         """
         
-        #def cast2uint64(val): # uint64_t type in C
+        # We need to have the W object before call
+        
+        W = array((self._q, self._p))
+		   
+		# W is a dummy array
+		   
+        # asfarray
+        
+        # WCPG_ABCD(W, self._A, self._B, self._C, self._D, self._n, self._p, self._q)
+        Wt = _pyWCPG.pyWCPG(W, array(self._A), array(self._B), array(self._C), array(self._D), self._n, self._p, self._q)
+        
+        self._WCPG = Wt
+        
+        # def cast2uint64(val): # uint64_t type in C
           
         #    cast_val = val.astype(uint64)
           
         #    return cast_val
       
-        #def flatten2float64(matrix): # long type int C
+        # def flatten2float64(matrix): # long type int C
             
         #    flat_mat = matrix.astype(float64, casting='safe').flatten()
             
@@ -334,39 +351,39 @@ class dSS(object):
         
         # Prepare array for result
         
-        #c_WCPG = mp.matrix(self._n, self._n)
+        # c_WCPG = mp.matrix(self._n, self._n)
         
         # Convert array dimensions to uint64
-        #n = self._n.np.astype(uint64)
+        # n = self._n.np.astype(uint64)
         
-        #n = cast2uint64(self._n)
-        #p = cast2uint64(self._p)
-        #q = cast2uint64(self._q)
+        # n = cast2uint64(self._n)
+        # p = cast2uint64(self._p)
+        # q = cast2uint64(self._q)
         
         # Convert numpy matrixes to mpmath matrix
         
-        #A = array2mp(self._A)
-        #B = array2mp(self._B)
-        #C = array2mp(self._C)
-        #D = array2mp(self._D)
+        # A = array2mp(self._A)
+        # B = array2mp(self._B)
+        # C = array2mp(self._C)
+        # D = array2mp(self._D)
         
         # create matrix for result
         
-        #loc_WCPG = flatten2float64(mp.matrix(self._n,self._n))
+        # loc_WCPG = flatten2float64(mp.matrix(self._n,self._n))
 
         # convert matrix to 1D array
         
-        #A = flatten2float64(self._A)
-        #B = flatten2float64(self._B)
-        #C = flatten2float64(self._C)
-        #D = flatten2float64(self._D)
+        # A = flatten2float64(self._A)
+        # B = flatten2float64(self._B)
+        # C = flatten2float64(self._C)
+        # D = flatten2float64(self._D)
         
         
 
         
         # CALL WCPG IN DOUBLE PRECISION
         
-        #A = self._A.astype(float64, casting='safe').flatten()
+        # A = self._A.astype(float64, casting='safe').flatten()
 
 
         # Method not precise
@@ -381,7 +398,7 @@ class dSS(object):
         # else:
         #    self._WCPG = res + absolute(D)
 
-        #self._WCPG = mparray2npfloat(c_WCPG)
+        # self._WCPG = mparray2npfloat(c_WCPG)
         
         
 
