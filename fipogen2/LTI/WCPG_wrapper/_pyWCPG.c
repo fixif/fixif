@@ -12,7 +12,17 @@ static char module_docstring[] =
    "This module uses WCPG prog by A. Lozanova to compute WCPG with double precision or arbitrary precision (FUTURE)" ;
    
 static char pyWCPG_docstring[] =
-   "func docstring" ;
+   "For an LTI filter given in its State-Space representation {A,B,C,D}, \
+where A is n*n, B is n*q, C is p*n and D is p*q real matrix the function \
+returns integer value indicating if WCPG was successfully computed. \
+In p*q matrix W the Worst-Case peak gain is stored if algorithm successfully exited. \
+Input: \
+	A, B, C, D - pointers for double arrays representing filter in state-space realization \
+	n, p, q - order of filter, number of inputs and number of outputs respectively \
+	W (output) - if function succeeds, on the output will hold the p*q size WCPG matrix of the filter {A,B,C,D} \
+				space for W is assumed to be preallocated outside the function \
+Output: \
+	integer value equal to 1 if WCPG computation is successful and 0 otherwise." ;
 
 static PyObject *WCPG_pyWCPG(PyObject *self, PyObject *args) ;
 	
