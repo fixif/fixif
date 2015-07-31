@@ -5,7 +5,8 @@
 # Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
-from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray  # , astype
+from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
+from numpy.ctypeslib import as_array
 from numpy                import matrix as mat
 
 from numpy.linalg         import inv, det, solve
@@ -324,17 +325,11 @@ class dSS(object):
         
         """
         
-        # We need to have the W object before call
-        
-        W = array((self._q, self._p))
-		   
-		# W is a dummy array
-		   
-        # asfarray
-        
-        # WCPG_ABCD(W, self._A, self._B, self._C, self._D, self._n, self._p, self._q)
-        Wt = _pyWCPG.pyWCPG(W, array(self._A), array(self._B), array(self._C), array(self._D), self._n, self._p, self._q)
-        
+        # W is a dummy array
+        W = ones((self._q, self._p))
+     
+        Wt = _pyWCPG.pyWCPG(array(W), array(self._A), array(self._B), array(self._C), array(self._D), self._n, self._p, self._q)
+
         self._WCPG = Wt
         
         # def cast2uint64(val): # uint64_t type in C
