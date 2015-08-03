@@ -324,78 +324,8 @@ class dSS(object):
            Lozanova & al., calculation of WCPG
         
         """
-        
-        # W is a dummy array
-        W = ones((self._q, self._p))
-     
-        Wt = _pyWCPG.pyWCPG(array(W), array(self._A), array(self._B), array(self._C), array(self._D), self._n, self._p, self._q)
-
-        self._WCPG = Wt
-        
-        # def cast2uint64(val): # uint64_t type in C
           
-        #    cast_val = val.astype(uint64)
-          
-        #    return cast_val
-      
-        # def flatten2float64(matrix): # long type int C
-            
-        #    flat_mat = matrix.astype(float64, casting='safe').flatten()
-            
-        #    return flat_mat
-        
-        # Prepare array for result
-        
-        # c_WCPG = mp.matrix(self._n, self._n)
-        
-        # Convert array dimensions to uint64
-        # n = self._n.np.astype(uint64)
-        
-        # n = cast2uint64(self._n)
-        # p = cast2uint64(self._p)
-        # q = cast2uint64(self._q)
-        
-        # Convert numpy matrixes to mpmath matrix
-        
-        # A = array2mp(self._A)
-        # B = array2mp(self._B)
-        # C = array2mp(self._C)
-        # D = array2mp(self._D)
-        
-        # create matrix for result
-        
-        # loc_WCPG = flatten2float64(mp.matrix(self._n,self._n))
-
-        # convert matrix to 1D array
-        
-        # A = flatten2float64(self._A)
-        # B = flatten2float64(self._B)
-        # C = flatten2float64(self._C)
-        # D = flatten2float64(self._D)
-        
-        
-
-        
-        # CALL WCPG IN DOUBLE PRECISION
-        
-        # A = self._A.astype(float64, casting='safe').flatten()
-
-
-        # Method not precise
-        # res = 0
-
-        # try:
-        #    for i in range(1, self._nit_WCPG):
-        #        res += numpy.absolute(self._C * matrix_power(A, i) * B)
-        #        #res += numpy.absolute(self._C * A**i * B)
-        # except:
-        #    raise ValueError, 'Impossible to compute WCPG at rank i = ' + str(i) + "\n"
-        # else:
-        #    self._WCPG = res + absolute(D)
-
-        # self._WCPG = mparray2npfloat(c_WCPG)
-        
-        
+        self._WCPG = _pyWCPG.pyWCPG(array(self._A), array(self._B), array(self._C), array(self._D), self._n, self._p, self._q)
 
     #======================================================================================#
     def calc_DC_gain(self):
