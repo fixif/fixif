@@ -55,7 +55,8 @@ class SIF(object):
    	# Define all the fields of struct as empty
    	# here we only define, not calculations.
    	
-   	@property
+   	self._id = '' ;
+   	
    	(self._J,
    	self._K,
    	self._L,
@@ -68,14 +69,14 @@ class SIF(object):
    	self._S) = None ;
    	
    	# dimensions all set to zero
-   	@property
+
    	(self._l,
    	self._m,
    	self._n,
    	self._p) = 0 ;
    
     # cannot build big boy Z without info about JtoS
-    @property
+
     self._Z = None ;
    
     #initialize delta JtoS
@@ -88,21 +89,62 @@ class SIF(object):
     self._dP,
     self._dQ,
     self._dR,
-    self._dS) = None
+    self._dS) = None ;
    
    # define properties to be able to extract all matrixes as a tuple
    @property
    # check that the user can get it (i.e. all matrixes exist)
-   is_SIFmat_exists = !(self._J is None & self._K is None & self._L is None & self._M is None & self._N is None & self._O is None & self._P is None & self._Q is None & self._R is None & self._S is None)
+
+   is_SIFmat_exists = !(self._J is None & 
+					    self._K is None & 
+					    self._L is None & 
+					    self._M is None & 
+					    self._N is None & 
+					    self._O is None & 
+					    self._P is None & 
+					    self._Q is None & 
+					    self._R is None & 
+					    self._S is None) ;
+
    if is_SIFmat_exists:
-    self._allmat = [self._J, self._K, self._L, self._M, self._N, self._O, self._P, self._Q, self._R, self._S] ;
+    self._allmat = [self._J, 
+				    self._K, 
+				    self._L, 
+				    self._M, 
+				    self._N, 
+				    self._O, 
+				    self._P, 
+				    self._Q, 
+				    self._R, 
+				    self._S] ;
    else raise('Cannot output matrix tuple, at least one matrix is undefined')
    @property
-   is_alldelta_exists = !(self._dJ is None & self._dK is None & self._dL is None & self._dM is None & self._dN is None & self._dO is None & self._dP is None & self._dQ is None & self._dR is None & self._dS is None)
+
+   is_alldelta_exists = !(self._dJ is None & 
+						  self._dK is None & 
+						  self._dL is None & 
+						  self._dM is None & 
+						  self._dN is None & 
+						  self._dO is None & 
+						  self._dP is None & 
+						  self._dQ is None & 
+						  self._dR is None & 
+						  self._dS is None) ;
+
    if is_alldelta_exits:
-    self._alldelta = [self._dJ, self._dK, self._dL, self._dM, self._dN, self._dO, self._dP, self._dQ, self._dR, self._dS] ;
+    self._alldelta = [self._dJ, 
+					  self._dK, 
+					  self._dL, 
+					  self._dM, 
+					  self._dN, 
+					  self._dO, 
+					  self._dP, 
+					  self._dQ, 
+					  self._dR, 
+					  self._dS] ;
    else raise('Cannot output sensitivity tuple, at least one matrix is undefined')
    # define AZ, BZ, CZ, DZ
+   
    self._AZ, self._BZ, self._CZ, self._DZ = None
    
    
