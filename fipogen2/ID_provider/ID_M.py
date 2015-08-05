@@ -89,7 +89,9 @@ class Id_manage(object):
     i_ona = idx_refdata.get('obj_name')
     i_nid = idx_refdata.get('next_id')
     
-    
+    refdata[i_cls].append(key) # classname
+    refdata[i_obi].append(cur_idx)
+    refdata[i_ona].append(obj)
     
     self.oindex += 1
     
