@@ -4,6 +4,7 @@
 import unittest
 from random import randint
 from numpy import array, zeros, absolute,eye, isnan, logical_and
+from numpy import matrix as mat
 from numpy.linalg import norm
 from numpy.testing import assert_allclose
 from numpy.random import seed
@@ -129,9 +130,9 @@ class test_dSS( unittest.TestCase):
   			
   		def calc_wcpg_approx(S, nit):
   			
-  			w = zeros((S.q,S.p))
-  			res = zeros((S.q,S.p))
-  			powerA = eye(S.n,S.n)
+  			w = mat(zeros((S.q,S.p)))
+  			res = mat(zeros((S.q,S.p)))
+  			powerA = mat(eye(S.n,S.n))
   			
   			for i in range(0, nit):
 					#res += numpy.absolute(self._C * matrix_power(A, i) * B)
@@ -155,6 +156,8 @@ class test_dSS( unittest.TestCase):
 		nit = 1000
   		rel_tol_wcpg = 10**-5
   		nloc = 0
+  		
+  		seed(1)
   		
   		for i in range(50):
 
@@ -181,14 +184,14 @@ class test_dSS( unittest.TestCase):
 			
 			print "=== WCPG approx ==="
 			print str(wcpg)
-# 			print "=== A ==="			
-# 			print S.A
-# 			print "=== B ==="			
-# 			print S.B
-# 			print "=== C ==="			
-# 			print S.C
-# 			print "=== D ==="			
-# 			print S.D
+ 			print "=== A ==="			
+ 			print S.A
+ 			print "=== B ==="			
+ 			print S.B
+ 			print "=== C ==="			
+ 			print S.C
+ 			print "=== D ==="			
+ 			print S.D
 			print "=== WCPG dprec  ==="
 			print str(S.WCPG)
 			
