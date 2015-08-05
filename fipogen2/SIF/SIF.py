@@ -22,7 +22,6 @@ class SIF(object):
    # - source_dSS ; method
    
    if method == '_blank': # define a blank structure that gonna be filled
-   	
    	  _init_blank()
    elif method == 'manual' # default method, when used by user (CLI)
    
@@ -55,6 +54,7 @@ class SIF(object):
    	# Define all the fields of struct as empty
    	# here we only define, not calculations.
    	
+   	self._name = '' ;
    	self._id = '' ;
    	
    	(self._J,
@@ -117,6 +117,7 @@ class SIF(object):
 				    self._Q, 
 				    self._R, 
 				    self._S] ;
+				    
    else raise('Cannot output matrix tuple, at least one matrix is undefined')
    @property
 
@@ -146,6 +147,12 @@ class SIF(object):
    # define AZ, BZ, CZ, DZ
    
    self._AZ, self._BZ, self._CZ, self._DZ = None
+   
+   # Get an ID, then create a name from it
+   
+   prefix = "SIF_" ;
+   
+   
    
    
    # CALL DEFINITION ( python : #args !)
