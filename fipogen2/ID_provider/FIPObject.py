@@ -5,49 +5,81 @@
 #
 
 class FIPObject(object):
+	
 	"""
 	This metaclass enables logging history of objects relative to events we consider important,
 	relative to our goal.
+	
 	It contains functions to tag objects, one table per object.
+	
 	It tracks objects relative to a father/son model with the following events :
+	
 	- creation
 	- transformation (from 1 obj gives another, can be of same or different subclass (relative to FiPObject)
+	
+	Class variables used as triggers :
+	
+	- is_log_on : event log system
+	- is_trk_on : ???
+	- is_idx_on : global index on (???)
+	
+	Other class variables
+	
+	-idx_data : index data
+	- idx_n_subclass : number of FipObject subclasses indexed by reference system
+	
 	"""
-	is_log_on = True ; # logging feature for objects
-	is_trk_on = True ; # track objects
-	is_idx_on = True ; # Global index
+	
+	is_log_on = True ; # global logging switch
+	is_trk_on = True ; # global tracking switch
+	is_idx_on = True ; # global index switch
 	
 	# global index tracked instances, to each class.__name__ its index
-	idx_subclass = {} ; # dictionary of calling subclasses
-	idx_n_subclass = 0 ; # 0 classes indexed,
-	idx_data = [] ; # global index
-	log_data = [] ;
+	
+	idx_subclass = {} ;  # dictionary of FipObject subclasses
+	idx_n_subclass = 0 ; # number of FipObject subclasses indexed
+	idx_data = [] ;      # global index
+	log_data = [] ;      # global log
 	
 	idx_data_fields = {'classname':0, 'obj_id':1, 'obj_name':2, 'obj_':3, 'free_id':4} ;# Can be augmented, but statically
-	idx_data_type   = ['list','list','list','list','int']
+	idx_data_type   = ['list', 'list', 'list', 'list', 'int'] ;
 	
 	trk_data_fields = {'classname':0, 'obj_id':1, 'obj_name':2, 'father':3, 'offsprings':4} ;
-	trk_data_type   = ['str','int','str','obj','list'] ;
+	trk_data_type   = ['str', 'int', 'str', 'obj', 'list'] ;
 	
 	log_data_fields = {'e_type':0, 'e_desc':1, 'e_src':2, 'e_opt':3} ; # 'create' from 'e_desc/import' of object 'e_o_src'
-	log_data_type   = ['str','str','str','str'] ;
+	log_data_type   = ['str', 'str', 'str', 'str'] ;
 	
 	def _init_idx_data(self, idx_n_subclass):
 		
+		"""
+		This function initializes the global index data (idx_data is a FipObject class variable)
+		"""
+		
 		idx_data[idx_n_subclass] = [] ;
-		for i in range(0,idx_data_fields.len()-1):
+		
+		for i in range(0, len(idx_data_fields.values())-1):
+			
 			idx_data[idx_n_subclass].append([]) ;
 
-		for i in range(0,idx_data_fields.len()-1):
+        # Init idx_data based on 
+        # - idx_data_fields
+        # - idx_data_type
+        
+		for i in range(0, len(idx_data_fields.values())-1):
 			
 			if idx_data_type[i] == 'str':
 			    idx_data[idx_n_subclass][i].append('') ;
+			    
 			elif idx_data_type[i] == 'int':
 			    idx_data[idx_n_subclass][i].append(-1) ;# normal tracknum should always be >=0
+			    
 			elif idx_data_type[i] == 'obj': 
 			    idx_data[idx_n_subclass][i].append(None) ;
+			    
 			elif idx_data_type[i] == 'list': 
 			    idx_data[idx_n_subclass][i].append([]) ;
+			    
 			else:
 				raise('FIPObject : unknown idx_data_type') ;
 
@@ -55,16 +87,20 @@ class FIPObject(object):
 		
 	def _init_trk_data(self):
 		
-		for i in range(0,trk_data_fields.len()-1):
+		for i in range(0, len(trk_data_fields.values())-1):
 		
 			if trk_data_type[i] == 'str': ;
 			    self.trk_data.append('') ;
+			    
 			elif trk_data_type[i] == 'int' ;
-			    self.trk_data.append(-1) ;# normal tracknum should always be >=0
+			    self.trk_data.append(-1) ;# normal tracknum should always be >=0 ;
+			    
 			elif trk_data_type[i] == 'obj': ;
 			    self.trk_data.append(None) ;
+			    
 			elif trk_data_type[i] == 'list': ;
 			    self.trk_data.append([]) ;
+			    
 			else 
 				raise('FIPObject : unknown trk_data_type') ;
 	
@@ -72,16 +108,21 @@ class FIPObject(object):
 		
 		if is_idx_on:
 		
-			tgt_classname = target_obj.__class__.__name__ ;
+			tgt_classname = target_obj.__class__.__name__ ; # verify that name subspace is correctly defined so that no name conflict is possible ?
 		
-			if !idx_subclass.has_key(tgt_classname): 			# CREATE new index for never encountered class
+			if !idx_subclass.has_key(tgt_classname): 			# CREATE new index for first class encounter
+				
 				idx_subclass[tgt_classname] = idx_n_subclass ;
 				_init_idx_data(self, idx_n_subclass) ;
 				idx_n_subclass += 1 ;
 		
 		if is_trk_on:
 			
+			# if no event has happened before (possible ???)
+			
 			_init_trk_data(self) ; # CREATE TRACKING DATA
+			
+			# WorkMarker
 	
 	def _set_track_data_obj(self, target_obj, father):
 
