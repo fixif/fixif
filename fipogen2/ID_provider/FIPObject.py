@@ -29,7 +29,7 @@ class FIPObject(object):
 	trk_data_fields = {'classname':0, 'obj_id':1, 'obj_name':2, 'father':3, 'offsprings':4} ;
 	trk_data_type   = ['str','int','str','obj','list'] ;
 	
-	log_data_fields = {'e_type':0, 'e_desc':1, 'e_o_src':2, 'e_opt':3} ; # 'create' from 'e_desc/import' of object 'e_o_src'
+	log_data_fields = {'e_type':0, 'e_desc':1, 'e_src':2, 'e_opt':3} ; # 'create' from 'e_desc/import' of object 'e_o_src'
 	log_data_type   = ['str','str','str','str'] ;
 	
 	def _init_idx_data(self, idx_n_subclass):
@@ -110,12 +110,18 @@ class FIPObject(object):
 				_set_track_data_idx(self, target_obj, father)
 			
 
-	def _get_free_id(self, target_obj, father):
+# 	def _get_free_id(self, target_obj, father):
+# 		
+# 		idx_subclass[target_obj.__name__][trk_data_fields['obj_id']] = idx_data[idx_subclass[target_obj.__name__]][idx_data_fields['free_id']]
+# 		
+# 		idx_data[idx_subclass[target_obj.__name__]][idx_data_fields['free_id']] += 1 ;
+	
+	def _init_local_log(self, target_obj, father):
+		"""
+		Local log is defined as a list of lists that should be read from left to right
+		"""
 		
-		idx_subclass[target_obj.__name__][trk_data_fields['obj_id']] = idx_data[idx_subclass[target_obj.__name__]][idx_data_fields['free_id']]
-		
-		idx_data[idx_subclass[target_obj.__name__]][idx_data_fields['free_id']] += 1 ;
-		
+	def _init_glob_log(self, target_obj, father):	
 		
 	def send_event(self, **kwargs): # should be e_type = 'create',''
 		"""
@@ -126,7 +132,9 @@ class FIPObject(object):
 		"""
 		for key, val in kwargs.items()
 		    if log_data_fields.has(key):
+		    	# Fill global event log
 		    	
+		    	# Fill local event log
 		    else raise('Event sender is ill-mannered : I cannot handle //'+ str(key) + '// type');
 		# Fill history of obj
 		
