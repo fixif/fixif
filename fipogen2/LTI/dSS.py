@@ -6,7 +6,7 @@
 # 2015 LIP6
 
 #To enable obj tracking, must be a subclass of FIPObject
-from FIPObject            import FIPObject
+from TRK.FIPObject        import FIPObject
 
 from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
 #from numpy.ctypeslib      import as_array
@@ -78,7 +78,7 @@ class dSS(FIPObject):
         """
 
         #Init superclass
-        super(dSS, self).__init__()
+        super(dSS, self).__init__(self.__class__.__name__)
 
         self._A = mat(A)  # User input
         self._B = mat(B)
