@@ -151,7 +151,7 @@ class FIPObject(object):
         
         idx_data[self.__name__][idx_data_fields['obj_']] = self ;
     
-    def __init__(self, target_obj):
+    def __init__(self):
 
         """
         Create index for subclass obj instances at FipObject class level
@@ -162,11 +162,9 @@ class FIPObject(object):
         # individual obj labels can be defined without global index,
         # global index cannot be defined if there's no individual obj instance label
 
-        tgt_classname = target_obj.__class__.__name__ ;  #  verify that name subspace is correctly defined so that no name conflict is possible ?
+        tgt_classname = self.__class__.__name__ ;  #  verify that name subspace is correctly defined so that no name conflict is possible ?
         
         if is_trk_on:
-            
-            # Init tracking label
         
             if not(idx_subclass.has_key(tgt_classname)):  # CREATE new index for first class encounter
                 
@@ -181,10 +179,9 @@ class FIPObject(object):
             _set_idx_obj_data(self) ;
             
             # Label object
-            
             _init_trk_data(self) ;
+            
             # set_trk_data needs idx_subclass initialized correctly ;
-            #
             _set_trk_data(self) ;
 
             
@@ -219,7 +216,7 @@ class FIPObject(object):
         Local log is defined as a list of lists that should be read from left to right
         """
         
-    def _init_glob_log(self, target_obj, father):    
+    #def _init_glob_log(self, target_obj, father):    
         
     def send_event(self, **kwargs):  # should be e_type = 'create',''
         """
@@ -228,12 +225,13 @@ class FIPObject(object):
         Log data is not sorting things by class type because it is not an object tracker
         It should reflect what the user / the computer did do
         """
-        for key, val in kwargs.items()
+        for key, val in kwargs.items():
             if log_data_fields.has(key):
                 # Fill global event log
-                
+                pass ;
                 # Fill local event log
-            else raise('Event sender is ill-mannered : I cannot handle //' + str(key) + '// type');
+            else:
+            	raise('Event sender is ill-mannered : I cannot handle //' + str(key) + '// type');
         # Fill history of obj
         
         # Fill history of father
@@ -241,6 +239,6 @@ class FIPObject(object):
     def get_history(self):    
         # Fill local history
 
-        
+        pass ;
         
         # Classe connue de nos services ?

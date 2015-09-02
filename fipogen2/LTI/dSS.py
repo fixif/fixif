@@ -5,8 +5,11 @@
 # Object and "methods" for a Discrete State Space
 # 2015 LIP6
 
+#To enable obj tracking, must be a subclass of FIPObject
+from FIPObject            import FIPObject
+
 from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
-from numpy.ctypeslib import as_array
+#from numpy.ctypeslib      import as_array
 from numpy                import matrix as mat
 
 from numpy.linalg         import inv, det, solve
@@ -21,6 +24,7 @@ from slycot               import sb03md
 # WCPG calculation needs mpmath
 from mpmath import mp
 
+# WCPG C func wrapped in python
 import _pyWCPG
 
 # Module description
@@ -29,7 +33,7 @@ __email__ = "fipogen@lip6.fr"
 __license__ = "CECILL-C"
 __version__ = "0.0.1"  # Modify this to increment with git scripting
 
-class dSS(object):
+class dSS(FIPObject):
 
     r"""
     The dSS class describes a discrete state space realization
@@ -72,6 +76,9 @@ class dSS(object):
         """
         Construction of a discrete state space
         """
+
+        #Init superclass
+        super(dSS, self).__init__()
 
         self._A = mat(A)  # User input
         self._B = mat(B)
