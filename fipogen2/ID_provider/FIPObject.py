@@ -44,13 +44,11 @@ class FIPObject(object):
 	
 	idx_data = [[]] ;    # global index
 	log_data = [] ;      # global log
+
+	idx_n_subclass = 0 ; # number of FipObject subclasses indexed
 	
 	idx_subclass = {} ;  # dictionary of FipObject subclasses
-	idx_n_subclass = 0 ; # number of FipObject subclasses indexed
-  
-	
-	# classname is already contained in the upper dictionary which references data in global index
-	
+
 	idx_data_fields = {'obj_id':0, 'obj_name':2, 'obj_':3, 'free_id':4} ;
 	idx_data_type   = ['list', 'list', 'list', 'int'] ;
 	
@@ -63,7 +61,7 @@ class FIPObject(object):
 	def _init_idx_subclass_data(self):
 		
 		"""
-		This function initializes the global index data (idx_data is a FipObject class variable)
+		Initializes global index data (idx_data) at FipObject superclass level
 		"""
 		
 		idx_data[idx_n_subclass] = [[] for k in range(0, len(idx_data_fields.values())-1)] ;
@@ -91,6 +89,10 @@ class FIPObject(object):
 		
 	def _init_trk_obj_data(self):
 		
+		"""
+		Initialize the tracking label at instance level (trk_data)
+		"""
+		
 		for i in range(0, len(trk_data_fields.values())-1):
 		
 			if trk_data_type[i] == 'str':
@@ -109,6 +111,10 @@ class FIPObject(object):
 			    raise('FIPObject : unknown trk_data_type') ;
 	
 	def _set_trk_obj_data(self, father_obj):
+		
+		"""
+		Fill the tracking label with relevant information at instance level (creation of instance)
+		"""
 		
 	    self.trk_data[trk_data_fields['classname']] = self.__name__ ; # not __class__.__name__, we are looking for subclass type
 		
@@ -134,16 +140,24 @@ class FIPObject(object):
 	
     def _set_idx_obj_data(self):
     	
+    	"""
+    	Fill the global index data relative to current instance at FipObject class level
+    	"""
+    	
         idx_data[self.__name__][idx_data_fields['obj_id']] = idx_data[self.__name__][idx_data_fields['free_id']] ;
         idx_data[self.__name__][idx_data_fields['free_id']] += 1 ;
         
         idx_data[self.__name__][idx_data_fields['obj_name']] = self.__name__ + '_' + str(idx_data[self.__name__][idx_data_fields['obj_id']]) ;
         
         idx_data[self.__name__][idx_data_fields['obj_']] = self ;
-        
-        
 	
 	def __init__(self, target_obj):
+
+        """
+        Create index for subclass obj instances at FipObject class level
+        Init tracking label at instance level
+        TODO : write event in logger upon call
+        """
 
         # individual obj labels can be defined without global index,
         # global index cannot be defined if there's no individual obj instance label
