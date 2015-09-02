@@ -9,7 +9,6 @@ from numpy.linalg import norm
 from numpy.testing import assert_allclose
 from numpy.random import seed
 from sys import exc_info		# to keep trace of trace stack
-#from pyFWR.dSS import dSS, random_dSS
 
 from LTI.dSS import dSS
 from LTI.random_dSS import random_dSS
