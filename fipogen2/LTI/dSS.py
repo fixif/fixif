@@ -35,7 +35,7 @@ __version__ = "0.0.1"  # Modify this to increment with git scripting
 
 class dSS(FIPObject):
 
-    r"""
+    """
     The dSS class describes a discrete state space realization
        
      A state space system :math:`(A,B,C,D)` is defined by 
@@ -71,14 +71,14 @@ class dSS(FIPObject):
        - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) (see doc for each)
     """
 
-    def __init__(self, A, B, C, D):
+    def __init__(self, A, B, C, D, event=('new','dSS','user'), father_obj=None):
 
         """
         Construction of a discrete state space
         """
 
-        #Init superclass
-        super(dSS, self).__init__(self.__class__.__name__)
+        #Init superclass, pass parameters to superclass too
+        super(dSS, self).__init__(self.__class__.__name__, event, father_obj)
 
         self._A = mat(A)  # User input
         self._B = mat(B)

@@ -8,7 +8,13 @@
 class FIPObject(object):
     
     """
-    This metaclass enables logging history of objects relative to events we consider important,
+    This superclass enables a tracking and logging system for subclasses of FIPObject
+    
+    - track label at instance level (self.trk_data)
+    - index of tracked subclasses (FIPObject.idx_subclass), and for each of those subclasses, an
+    - index of tracked instances (FIPObject.)
+    
+    logging history of objects relative to events we consider important,
     relative to our goal.
     
     It contains functions to tag objects, one table per object.
@@ -34,12 +40,25 @@ class FIPObject(object):
     FIPObject
     - trk_data can be considered as a label for the object. It contains all the information relative to the object.
     
-    {TODO  : use nametuples to simplify code}
+    TODO  : 
+    
+    make FIPObject a metaclass so that the event tuple can be dynamically created according to log_data_fields
+    
+    use nametuples to simplify code
+    
+    INFO
+    
+    Using true class variables
+    --------------------------
+    http://stackoverflow.com/questions/3434581/accessing-a-classs-variable-in-python
     
     """
     
     is_log_on = True ;  # global logging switch
     is_trk_on = True ;  # global tracking switch
+    
+    is_print_obj_label = False ; # DEBUG : Print obj label when created
+    is_print_event = False ; # DEBUG : Print each event
     
     # global index tracked instances, to each class.__name__ its index
     
@@ -104,49 +123,47 @@ class FIPObject(object):
             else:
                 raise('FIPObject : unknown self.trk_data_type') ;
     
-    def _set_trk_obj_data(self, tgt_subclassname, father_obj):
+    def _set_trk_obj_data(self, tgt_subclassname, father_obj=None):
         
         """
         Fill the tracking label with relevant information at instance level (creation of instance)
         """
         
-        self.trk_data[self.trk_data_fields['subclassname']] = tgt_subclassname ;  # not __class__.__name__, we are looking for subclass type
+        self.trk_data[FIPObject.trk_data_fields['subclassname']] = tgt_subclassname ;
+        
+        self.trk_data[FIPObject.trk_data_fields['father']] = father_obj ;
         
         if father_obj:
-            
-            self.trk_data[self.trk_data_fields['father']] = father_obj ;
-            # Register object as offspring of cais_lling father
-            father_obj.trk_data[self.trk_data_fields['offsprings']].append(self) ;
-            
-        else:
-            
-            self.trk_data[self.trk_data_fields['father']] = None ;
+            # Register object as offspring of father_obj
+            father_obj.trk_data[FIPObject.trk_data_fields['offsprings']].append(self) ;
 
-
-        self.trk_data[self.trk_data_fields['obj_id']] = self.idx_data[idx_subclass[tgt_subclassname]][self.idx_data_fields['free_id']] ;
+        self.trk_data[FIPObject.trk_data_fields['obj_id']] = FIPObject.idx_data[FIPObject.idx_subclass[tgt_subclassname]][FIPObject.idx_data_fields['free_id']] ;
         # Increment free_id for current subclass
-        self.idx_data[idx_subclass[tgt_subclassname]][self.idx_data_fields['free_id']] += 1 ;
+        FIPObject.idx_data[FIPObject.idx_subclass[tgt_subclassname]][FIPObject.idx_data_fields['free_id']] += 1 ;
         
-        # The name of an object instance in python does not respect namespaces convention, 
-        # so we build a name from scratch, which is not the name of the object instance
+        # The name of object instances in python does not respect namespaces convention, 
+        # so we build a name from scratch, which is *not* the instance name
         
-        self.trk_data[self.trk_data_fields['obj_name']] = self.trk_data[self.trk_data_fields['subclassname']] + '_' + self.trk_data[self.trk_data_fields['obj_id']] ;
+        self.trk_data[FIPObject.trk_data_fields['obj_name']] = self.trk_data[FIPObject.trk_data_fields['subclassname']] + '_' + self.trk_data[FIPObject.trk_data_fields['obj_id']] ;
+    
+        if FIPObject.is_print_obj_label:
+            self._repr_obj_label(self) ;
     
     def _set_idx_obj_data(self, tgt_subclassname):
         
         """
-        Fill the global index data relative to current instance at FipObject class level
+        Fill the global (class-level) index data relative to current instance at FipObject class level
         """
 
-        FIPObject.idx_data[self.idx_subclass[tgt_subclassname]][self.idx_data_fields['obj_id']].append(self.idx_data[self.idx_subclass[tgt_subclassname]][self.idx_data_fields['free_id']]) ;
+        FIPObject.idx_data[FIPObject.idx_subclass[tgt_subclassname]][FIPObject.idx_data_fields['obj_id']].append(FIPObject.idx_data[FIPObject.idx_subclass[tgt_subclassname]][FIPObject.idx_data_fields['free_id']]) ;
 
-        FIPObject.idx_data[self.idx_subclass[tgt_subclassname]][self.idx_data_fields['free_id']] += 1 ;
+        FIPObject.idx_data[FIPObject.idx_subclass[tgt_subclassname]][FIPObject.idx_data_fields['free_id']] += 1 ;
         
-        FIPObject.idx_data[self.idx_subclass[tgt_subclassname]][self.idx_data_fields['obj_name']].append(tgt_subclassname + '_' + str(self.idx_data[self.idx_subclass[tgt_subclassname]][self.idx_data_fields['obj_id']])) ;
+        FIPObject.idx_data[FIPObject.idx_subclass[tgt_subclassname]][FIPObject.idx_data_fields['obj_name']].append(tgt_subclassname + '_' + str(FIPObject.idx_data[FIPObject.idx_subclass[tgt_subclassname]][FIPObject.idx_data_fields['obj_id']])) ;
         # Pointer to mutable obj, (obj is mutable, so no duplication of obj)
-        FIPObject.idx_data[self.idx_subclass[tgt_subclassname]][self.idx_data_fields['obj_']].append(self) ;
+        FIPObject.idx_data[FIPObject.idx_subclass[tgt_subclassname]][FIPObject.idx_data_fields['obj_']].append(self) ;
     
-    def __init__(self, tgt_subclassname):
+    def __init__(self, tgt_subclassname, ):
 
         """
         Create index for subclass obj instances at FIPObject class level
@@ -180,15 +197,17 @@ class FIPObject(object):
 
         # idx_subclass[target_obj.__name__][self.trk_data_fields['offsprings']] only iterated on "create from" events
 
+        else:
+            pass ;
     
     def _init_local_log(self, target_obj, father):
-    	
+        
         """
         Local log numbers defined as a list of lists that should be read from left to right
         """  
         
     def send_event(self, **kwargs):  # should be e_type = 'create',''
-    	
+        
         """
         This function must be called whenever an event happens.
         Called by init send_event('create',)
@@ -202,7 +221,7 @@ class FIPObject(object):
                 pass ;
                 # Fill local event log
             else:
-            	raise('Event sender is ill-mannered : I cannot handle //' + str(key) + '// type');
+                raise('Event sender is ill-mannered : I cannot handle //' + str(key) + '// type');
         # Fill history of obj
         
         # Fill history of father
@@ -215,59 +234,113 @@ class FIPObject(object):
         
         # Classe connue de nos services ?
     
-    @staticmethod    
-    def _repr_index(self):
-    	
-    	"""
-    	Print the current index for all objects in all subclasses
-    	TODO : pythonify correctly with __repr__
-    	"""
-    	
-    	pass ;
+    @classmethod    
+    def _repr_index(cls, tgt_classname='all'):
+        
+        """
+        Print the current index for all objects in all subclasses
+        TODO : pythonify correctly with __repr__
+        
+        OUR id is NOT id() from python.
+        
+        Why ? Try this
+        
+        >a=[1];
+        >id(a);
+        >a = None ;
+        >id(a) ; # ID has changed
+        >del(a) ;
+        >id(a) ; # Gives error (unexistent object)
+        """
+        # {1:>20}
+        fmt = '{0:5} | {1:>20} |';
+
+        print "================================== \n" ;
+        print str(FIPObject.idx_n_subclass) + "subclasses of FIPObject indexed : \n" ;
+        
+        if tgt_classname == 'all':
+        	
+            for i in range(0,FIPObject.idx_n_subclass):
+					
+		    	print "================================== \n"
+                print "Subclass " + str(i) + "\n" ;
+                print FIPObject.idx_subclass[i] + " : " + " instances indexed \n"
+                print str(FIPObject.idx_data[i][FIPObject.idx_data_fields['free_id']]) + " is the next free id \n"
+		    	print "================================== \n"                
+            
+                # TODO can be made more generic by tapping directly into idx_data_fields but we cannot show
+                # an object property to have the "name" of the object
+            
+                print fmt.format('obj_id','obj_name') + "\n"
+                
+                for j in (range(0, FIPObject.idx_data[FIPObject.idx_subclass[i]][FIPObject.idx_data_fields['free_id']])):
+                
+                    print fmt.format(FIPObject.idx_data[FIPObject.idx_subclass[i]][FIPObject.idx_data_fields['obj_id']][j], FIPObject.idx_data[FIPObject.idx_subclass[i]][FIPObject.idx_data_fields['obj_name']][j]) + "\n"
+        
+        pass ;
     
-    def repr_instance_label(self):
-    	
-    	"""
-    	TODO
-    	Query/Print label for current instance
-    	"""
-    	
-    	pass ;
+    def _repr_obj_label(self):
+        
+        """
+        __repr__ of trk_data for a FIPObject instance 
+        """
+        
+        fmt_ = '{0:5} | {1:>20} | {1:>20} |' ;
+        
+        if self.trk_data[FIPObject.trk_data_fields['father']] is not None:
+        	str_father_id = self.trk_data[FIPObject.trk_data_fields['father']].trk_data[FIPObject.trk_data_fields['obj_id']] ;
+        else:
+        	str_father_id = "None";
+        
+        # Build str list of offsprings id
+        
+        str_offspring_id_list = [] ;
+        
+        for offspring_obj in self.trk_data[FIPObject.trk_data_fields['offsprings']]:
+        	str_offspring_id_list.append(offspring_obj.trk_data[FIPObject.trk_data_fields['obj_id']])
+        	
+        	#WORK_MARKER
+        
+        print "================ \n" ;
+        print fmt.format('obj_subclass','obj_id','obj_name','father_id','offsprings_id') + "\n";
+        print fmt.format(self.trk_data)
+		print "================ \n" ;        
+        
     
     def repr_global_log(self):
-    	
-    	"""
-    	TODO
-    	Print a log of all events, time-ordered
-    	"""
-    	
-    	pass ;
+        
+        """
+        TODO
+        Print a log of all events, time-ordered
+        """
+        
+        pass ;
     
     def repr_inst_log(self):
-    	
-    	"""
-    	TODO
-    	Print a log of events for current instance of FIPObject
-    	"""
-    	
-    	pass ;
+        
+        """
+        TODO
+        Print a log of events for current instance of FIPObject
+        """
+        
+        pass ;
     
     def _del_idx_obj_data(self):
-    	"""
-    	Delete 
-    	"""
-    	# we don't try to get the freed id for another tracked object
-    	
+        """
+        Delete 
+        """
+        # we don't try to get the freed id for another tracked object
+        
     
     def __del__(self):
-    	
-    	"""
-    	The obj destructor must be modified if we want to remove tracking of object when it doesn't exist any more
-    	We remove the entry of the destructerd object in the index	
-    	"""
-    	#register destruction in event log
-    	self.send_event(('','',''))
-    	# remove object from global index
+        
+        """
+        The obj destructor must be modified if we want to remove tracking of object when it doesn't exist any more
+        We remove the entry of the destructerd object in the index    
+        """
+        #register destruction in event log
+        self.send_event(('','',''))
+        # remove object from global index
         self._del_idx_obj_data(self) ;
         del self ;
         
