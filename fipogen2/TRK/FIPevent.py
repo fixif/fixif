@@ -1,3 +1,5 @@
+from time import time
+
 class FIPevent(object):
 	
 	"""
@@ -26,6 +28,8 @@ class FIPevent(object):
 		if 
 		
 	def log_event(self):
+		
+		event_timestamp = time()
 		
 		"""
 		Put the event in global log
