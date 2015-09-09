@@ -25,17 +25,23 @@ class FIPevent(object):
 	
 	def __init__(self, **kwargs):
 		
-		if 
+		pass;
+		
+		#if e_type
 		
 	def log_event(self):
 		
 		event_timestamp = time()
+		
+		pass;
 		
 		"""
 		Put the event in global log
 		"""
 	
 	def __repr__(self):
+		
+		pass;
 		
 		"""
 		Output human-readable string from event

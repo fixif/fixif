@@ -71,13 +71,17 @@ class dSS(FIPObject):
        - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) (see doc for each)
     """
 
-    def __init__(self, A, B, C, D, event=('new','dSS','user'), father_obj=None):
+    def __init__(self, A, B, C, D, event=('new', 'dSS', 'user'), father_obj=None): # cannot use dSS.__class__.__name__ here. http://stackoverflow.com/questions/14513019/python-get-class-name
 
         """
         Construction of a discrete state space
         """
 
-        #Init superclass, pass parameters to superclass too
+        # Event definition for superclass event logger : event is given by calling routine
+        # default event is new, from user input (see __init__)
+        # father_obj is None if created from user input
+        
+        #Init superclass, pass parameters to superclass
         super(dSS, self).__init__(self.__class__.__name__, event, father_obj)
 
         self._A = mat(A)  # User input
