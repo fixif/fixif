@@ -52,13 +52,8 @@ class FIPObject(object):
         # append first event in stack
         self.obj_events.append(FIPObjEvent.FIPObjEvent(event, FIPObject.global_obj_event_num))
         
-        #increase global event counter at FIPObject level
+        #increase global event counter at FIPObject class level
         FIPObject.global_obj_event_num += 1
-        
-        
-        # Append event to object log
-        
-        # Append event to global log (with simple_log)
         
         if FIPObject.is_debug_print: print(FIPObject)
         

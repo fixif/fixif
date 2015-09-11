@@ -23,17 +23,16 @@ class FIPObjEvent(object):
     #e_src_func = '' # should be programmer_defined, correctly otherwise needs introspect module
     #e_src_subclass = '' # should be programmer_defined, otherwise needs wiseness (multiple inheritance)
     
-    def __init__(self, **event, global_obj_event_num):
-        
-        #syntaxe : (type= , subtype=, source=, subsource=, func= , subclass= )
-        
-        #unpack args
-        e_type      = event.get(type,'')
-        e_subtype   = event.get(subtype,'')
-        e_source    = event.get(source,'')
-        e_subsource = event.get(subsource,'')
-        e_func      = event.get(func,'')
-        e_subclass  = event.get(subclass,'')
+    def __init__(self, global_obj_event_num, **event_spec):
+         
+        #syntax for event spec : (e_type= , e_subtype=, e_source=, e_subsource='', e_func= , e_subclass )
+
+        e_type      = event_spec[e_type]
+        e_subtype   = event_spec[e_subtype]
+        e_source    = event_spec[e_source]
+        e_subsource = event_spec.get('e_subsource','') # optional, do not trip if not specified
+        e_func      = event_spec[e_func]
+        e_subclass  = event_spec[e_subclass]
         
         # check if event is known
         # src_func and src_subclass we rely on user here so no check
@@ -41,13 +40,12 @@ class FIPObjEvent(object):
         
         if (e_type not in dict_e_type.keys()):
             raise "FIPObjEvent : unknown event type"
-            if (e_subtype not in dict_e_type[e_type]):
-                raise "FIPObjEvent : unknown event subtype"
-               
+        if (e_subtype not in dict_e_type[e_type]):
+            raise "FIPObjEvent : unknown event subtype"
         if (e_source not in dict_e_source.keys()):
             raise "FIPObjEvent : unknown source"
-            if (e_subsource not in dict_e_source[e_source]) 
-                raise "FIPObjEvent : unknown subsource"
+        if (e_subsource not in dict_e_source[e_source]):
+            raise "FIPObjEvent : unknown subsource"
 
         # timestamp event
 		self.e_timestamp = time()
