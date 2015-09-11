@@ -1,3 +1,5 @@
+#coding=utf8
+
 from time import time
 
 class FIPObjEvent(object):
@@ -14,62 +16,76 @@ class FIPObjEvent(object):
     """
     # Definition of available events
     
-    set_e_type = {'create'}
+    dict_e_type = {'create':{'new','convert'}} # set inside a dict to give all possible subtypes =-]
     
-    set_obj_origin = {'user_input', 'external', 'func'}
+    dict_e_source = {'user_input':{''}, 'external':{'simulink', 'py_file'}, 'func':{''}} # same struct
     
-    set_create_origin = {'new', 'convert'}
+    #e_src_func = '' # should be programmer_defined, correctly otherwise needs introspect module
+    #e_src_subclass = '' # should be programmer_defined, otherwise needs wiseness (multiple inheritance)
     
-    set_ext_obj_origin = {'simulink', 'py_file'}
-    
-    e_src_func = '' # should be programmer_defined, correctly otherwise needs introspect module
-    e_src_subclass = '' # should be programmer_defined, otherwise needs wiseness (multiple inheritance)
-    
-    def __init__(self, (e_type, e_obj_origin, e_create_origin, e_ext_obj_origin=''), global_obj_event_num):
+    def __init__(self, **event, global_obj_event_num):
+        
+        #syntaxe : (type= , subtype=, source=, subsource=, func= , subclass= )
+        
+        #unpack args
+        e_type      = event.get(type,'')
+        e_subtype   = event.get(subtype,'')
+        e_source    = event.get(source,'')
+        e_subsource = event.get(subsource,'')
+        e_func      = event.get(func,'')
+        e_subclass  = event.get(subclass,'')
         
         # check if event is known
-        if (e_type not in set_e_type): # if not(e_type in set / if e_type not in set
+        # src_func and src_subclass we rely on user here so no check
+        # all cases where user specifies shit for event is taken into account, hopefully
+        
+        if (e_type not in dict_e_type.keys()):
             raise "FIPObjEvent : unknown event type"
-        elif (e_obj_origin not in set_obj_origin):
-            raise "FIPObjEvent : unknown object origin"
-        elif (e_create_origin not in set_create_origin):
-            raise "FIPObjEvent : unknown origin of object"
-        
-        if (e_obj_origin == 'external') and (e_ext_obj_origin not in set_ext_obj_origin):
-            raise "FIPObjEvent : unknown external origin for object"
+            if (e_subtype not in dict_e_type[e_type]):
+                raise "FIPObjEvent : unknown event subtype"
+               
+        if (e_source not in dict_e_source.keys()):
+            raise "FIPObjEvent : unknown source"
+            if (e_subsource not in dict_e_source[e_source]) 
+                raise "FIPObjEvent : unknown subsource"
+
+        # timestamp event
+		self.e_timestamp = time()
             
-        self.obj_event_num = global_obj_event_num
-        self.e_timestamp = time()
+        self.e_glob_num = global_obj_event_num # var at FIPObject class level, incremented at FIPObject class level
+
         self.e_type = e_type
-        self.e_obj_origin = 
-        self.e_create_origin = e_create_origin
+        self.e_subtype = e_subtype
+        self.e_source = e_source
+        self.e_subsource = e_subsource
         
-        if e_type == 'convert':
-            self.e_obj_origin = e_obj_origin
-            
-            if e_obj_origin == '':
+        self.e_func = e_func
+        self.e_subclass = e_subclass
 
     def __repr__(self):
         
         str_repr = ''
         
-        fmt = '{0:5} {1:10} {2:10} {3:10}'
+        fmt = '{0:20} | {1:15} | {2:15} | {3:15} | {4:15} | {5:15}\n'
+
+        str_repr += fmt.format('time', 'glob_e_num', 'e_type', 'e_subtype', 'e_source', 'e_subsource')
+        str_repr += fmt.format(str(self.e_timestamp), str(self.obj_event_num), self.e_type, self.e_subtype, self.e_source, self.e_subsource)
 
         return str_repr
        
-    def _human_readable_repr(self):
-    	
-    	fmt_num = '{0:5}' # up to 9999 events
-    	
-    	str_hr = ''
-    	
-    	str_hr += fmt.format(str(self.obj_event_num))
-    	
-    	if self.e_type == 'create':
-    		str_hr += 'Object created from '
-    		if self.e_obj_origin == 'user_input': # interface chaise/clavier (error-prone)
-    			str_hr += 'user input '
-    		elif self.e_obj_origin == 'external' # simulink, text file
-    		    str_hr += 'external source : '
-    		elif self.e_obj_origin == 'func'
-    		    str_hr += 'function : ' # typically random_dSS
+    def _human_readable_repr(self): # should be __str__ ??? THIB
+        
+        fmt_num = '{0:5}' # up to 99999 events
+        
+        str_hr = ''
+        
+        str_hr += fmt.format(str(self.obj_event_num))
+        
+        if self.e_type == 'create':
+            str_hr += 'Object created from '
+            if self.e_subtype == 'user_input': # interface chaise/clavier (error-prone)
+                str_hr += 'user input '
+            elif self.e_obj_origin == 'external' # simulink, text file
+                str_hr += 'external source : '
+            elif self.e_obj_origin == 'func'
+                str_hr += 'function : ' # typically random_dSS

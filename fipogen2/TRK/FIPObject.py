@@ -43,18 +43,16 @@ class FIPObject(object):
         #Create label
         self.trk_label = FIPLabel.FIPLabel(tgt_subclassname, father_obj)
         
-        #print self.trk_info.trk_label
-        # why does that not work
-        #print self.trk_info
-        
         # Add instance to instance index
         FIPObject.idx_subclass.setdefault(tgt_subclassname, []).append(self)
         
+        # create event stack
         self.obj_events = []
         
-        # stack creation event on instance event list
-        
+        # append first event in stack
         self.obj_events.append(FIPObjEvent.FIPObjEvent(event, FIPObject.global_obj_event_num))
+        
+        #increase global event counter at FIPObject level
         FIPObject.global_obj_event_num += 1
         
         
@@ -64,3 +62,13 @@ class FIPObject(object):
         
         if FIPObject.is_debug_print: print(FIPObject)
         
+    def repr_obj_event_stack(self):
+    	
+    	str_obj_event_stack = ''
+    	
+    	for obj_event in self.obj_events:
+    		str_obj_event_stack += str()
+        pass
+    
+    
+    
