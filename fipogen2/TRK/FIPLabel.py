@@ -61,18 +61,18 @@ class FIPLabel(object):
         self.obj_id = id(self)
         
         # set obj num : init classvariable if not, assign value in label, increment class variable
-        FIPLabel.free_num.setdefault(self.trk_label.obj_subclass, 0)
-        self.trk_label.obj_num = FIPLabel.free_num[self.trk_label.obj_subclass]
-        FIPLabel.free_num[self.trk_label.obj_subclass] += 1
+        FIPLabel.free_num.setdefault(self.obj_subclass, 0)
+        self.obj_num = FIPLabel.free_num[self.obj_subclass]
+        FIPLabel.free_num[self.obj_subclass] += 1
 
-        self.trk_label.obj_name = self.trk_label.obj_subclass + "_" + str(self.trk_label.obj_num)
+        self.obj_name = self.obj_subclass + "_" + str(self.obj_num)
         
-        self.trk_label.obj_father = father
+        self.obj_father = father
         
         if father is not None:
-            father.trk_label.offsprings.append(self)
+            father.trk_label.obj_offsprings.append(self)
         
-        self.trk_label.obj_offsprings = []
+        self.obj_offsprings = []
     
         if FIPLabel.is_debug_print: print(FIPLabel)
 
@@ -81,7 +81,7 @@ class FIPLabel(object):
         
         # stub as obj only contains trk_label as of now
         
-        return __repr__(self.trk_info.trk_label)
+        return __repr__(self)
         
 
         
