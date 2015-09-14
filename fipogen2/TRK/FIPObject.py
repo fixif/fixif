@@ -40,6 +40,8 @@ class FIPObject(object):
    
     def __init__(self, tgt_subclassname, father_obj, **event_spec):
         
+        print "Calling FIPObject __init__"
+        
         #Create label
         self.trk_label = FIPLabel.FIPLabel(tgt_subclassname, father_obj)
         
