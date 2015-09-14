@@ -71,18 +71,36 @@ class dSS(FIPObject):
        - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) (see doc for each)
     """
 
-    def __init__(self, A, B, C, D, event=('new', 'dSS', 'user'), father_obj=None): # cannot use dSS.__class__.__name__ here. http://stackoverflow.com/questions/14513019/python-get-class-name
+    def __init__(self, A, B, C, D, father_obj=None, **event_spec): # cannot use dSS.__class__.__name__ here. http://stackoverflow.com/questions/14513019/python-get-class-name
 
         """
         Construction of a discrete state space
+        
+        Partial event spec : a part of the event is automatically defined from where we are.
+        
         """
+
+        # Build event based on provided info.
+        # default event : dSS instance created from user interface
+        
+        my_e_type      = event_spec.get('e_type', 'create')
+        my_e_subtype   = event_spec.get('e_subtype', 'new')      
+        my_e_subclass  = event_spec.get('e_subclass', 'dSS')
+        my_e_source    = event_spec.get('e_source', 'user_input')
+        my_e_subsource = event_spec.get('e_subsource', 'dSS.__init__') # optional, could also be ''
+        my_e_desc      = event_spec.get('e_desc', '')
+
+        dSS_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc}
 
         # Event definition for superclass event logger : event is given by calling routine
         # default event is new, from user input (see __init__)
         # father_obj is None if created from user input
         
         #Init superclass, pass parameters to superclass
-        super(dSS, self).__init__(self.__class__.__name__, event, father_obj)
+        # shit doesnt work
+        #super(dSS, self).__init__(self.__class__.__name__, father_obj, dSS_event)
+
+        FIPObject.__init__(self, self.__class__.__name__, father_obj, dSS_event)
 
         self._A = mat(A)  # User input
         self._B = mat(B)

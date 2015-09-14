@@ -28,7 +28,7 @@ class FIPObject(object):
         str_repr += sep
         
         for str_subclass in FIPObject.idx_subclass.keys():
-            str_repr += str_subclass + ' : ' + str(len(FIPObject.idx_subclass[str_subclass])) + " objects indexed\n"
+            str_repr += str_subclass + ' : ' + str(len(FIPObject.idx_subclass[str_subclass])) + " objects indexed \n"
             str_repr += sep
              
             for obj in FIPObject.idx_subclass[str_subclass]:
@@ -38,7 +38,7 @@ class FIPObject(object):
    
         return str_repr
    
-    def __init__(self, tgt_subclassname, event, father_obj = None):
+    def __init__(self, tgt_subclassname, father_obj, **event_spec):
         
         #Create label
         self.trk_label = FIPLabel.FIPLabel(tgt_subclassname, father_obj)
@@ -46,11 +46,11 @@ class FIPObject(object):
         # Add instance to index of labeled instances for programmer_defined tgt_subclass
         FIPObject.idx_subclass.setdefault(tgt_subclassname, []).append(self)
         
-        # create event stack
+        # create event stack for instance
         self.obj_events = []
         
         # append first event in stack
-        self.obj_events.append(FIPObjEvent.FIPObjEvent(event, FIPObject.global_obj_event_num))
+        self.obj_events.append(FIPObjEvent.FIPObjEvent(FIPObject.global_obj_event_num, event_spec))
         
         #increase global event counter at FIPObject class level
         FIPObject.global_obj_event_num += 1
