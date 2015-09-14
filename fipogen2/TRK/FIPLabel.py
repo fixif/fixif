@@ -55,7 +55,9 @@ class FIPLabel(object):
             str_allbaseclass.append(str_baseclass.__name__)
 
         self.obj_class = ' '.join(str_allbaseclass)
-        self.obj_subclass = tgt_subclass
+        
+        self.obj_subclass = tgt_subclass # corresponds to the tracked subclass
+        
         self.obj_id = id(self)
         
         # set obj num : init classvariable if not, assign value in label, increment class variable
@@ -79,7 +81,7 @@ class FIPLabel(object):
         
         # stub as obj only contains trk_label as of now
         
-        return str(self.trk_info.trk_label)
+        return __repr__(self.trk_info.trk_label)
         
 
         

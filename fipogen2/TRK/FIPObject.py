@@ -32,7 +32,7 @@ class FIPObject(object):
             str_repr += sep
              
             for obj in FIPObject.idx_subclass[str_subclass]:
-                str_repr += obj.trk_info.trk_label['obj_name'] + "\n"
+                str_repr += obj.trk_info.trk_label.obj_name + "\n"
         
             str_repr += sep
    
@@ -43,7 +43,7 @@ class FIPObject(object):
         #Create label
         self.trk_label = FIPLabel.FIPLabel(tgt_subclassname, father_obj)
         
-        # Add instance to instance index
+        # Add instance to index of labeled instances for programmer_defined tgt_subclass
         FIPObject.idx_subclass.setdefault(tgt_subclassname, []).append(self)
         
         # create event stack
@@ -61,9 +61,21 @@ class FIPObject(object):
     	
     	str_obj_event_stack = ''
     	
+    	# call repr of FIPObjEvent with is_print_labels = True once only
+    	
+    	str_obj_event_stack += self.obj_events[0].__repr__(is_repr_label = True)
+    	
+    	for obj_event in self.obj_events[1:]:
+    		str_obj_event_stack += str(obj_event)
+
+        return str_obj_event_stack
+    
+    def repr_hr_obj_event_stack(self):
+    	
+    	str_hr_obj_event_stack = ''
+    	
     	for obj_event in self.obj_events:
-    		str_obj_event_stack += str()
-        pass
-    
-    
+    	    str_hr_obj_event_stack += str(self.obj_event)
+    	
+    	return str_hr_obj_event_stack
     
