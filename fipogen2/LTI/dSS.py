@@ -98,6 +98,13 @@ class dSS(FIPObject):
         
         #Init superclass, pass parameters to superclass
         # shit doesnt work
+        
+        #OK print self.__class__.__name__
+        
+        #OK print type(self.__class__.__name__)
+        
+        #OK print father_obj
+        
         #super(dSS, self).__init__(self.__class__.__name__, father_obj, dSS_event)
 
         FIPObject.__init__(self, self.__class__.__name__, father_obj, dSS_event)
