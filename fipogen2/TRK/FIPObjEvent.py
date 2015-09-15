@@ -77,11 +77,11 @@ class FIPObjEvent(object):
         
         # all cases where user specifies shit for event are taken into account, hopefully
         
-        if (e_type not in FIPObjEvent.dict_e_type.keys()):
+        if (e_type not in FIPObjEvent.dict_e_type):
             raise "FIPObjEvent : unknown event type"
         if (e_subtype not in FIPObjEvent.dict_e_type[e_type]):
             raise "FIPObjEvent : unknown event subtype"
-        if (e_source not in FIPObjEvent.dict_e_source.keys()):
+        if (e_source not in FIPObjEvent.dict_e_source):
             raise "FIPObjEvent : unknown source"
            
         # if e_source == 'user_input' or e_source == 'func' 
@@ -107,7 +107,7 @@ class FIPObjEvent(object):
 
         self.e_desc = e_desc
 
-        self.e_glob_num = global_obj_event_num
+        #self.e_glob_num = global_obj_event_num
 
     def __repr__(self, is_repr_label = False):
         

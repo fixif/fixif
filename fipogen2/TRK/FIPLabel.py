@@ -4,6 +4,9 @@ class FIPLabel(object):
     
     """
     This class is used to label objects, that can be indexed in a FIPindex
+    
+    TODO DOC
+    
     """
     
     is_debug_print = True # print label at end of __init__
@@ -37,7 +40,7 @@ class FIPLabel(object):
             for offspring_obj in self.obj_offsprings:
                str_list_offsprings.append(offspring_obj.obj_name)
         else: 
-            str_list_offsprings.append('None')
+            str_list_offsprings.append('No offspring')
         
         str_repr += fmt.format('obj_offsprings', str_list_offsprings[0])
         

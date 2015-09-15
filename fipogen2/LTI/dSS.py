@@ -95,6 +95,7 @@ class dSS(FIPObject):
         my_father_obj = father_obj
         
         #Init superclass
+        # TODO: check if self.__class__.__name__ needed or can the superclass get it (in case of simple inheritance)
         FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **dSS_event)
 
         self._A = mat(A)  # User input
