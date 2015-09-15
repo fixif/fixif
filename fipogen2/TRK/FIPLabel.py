@@ -24,8 +24,8 @@ class FIPLabel(object):
         str_repr += fmt.format('obj_name', str(self.obj_name))
         
         
-        if self.trk_label['obj_father'] is not None:
-            father_name = self.trk_label.obj_father.trk_label.obj_name
+        if self.obj_father is not None:
+            father_name = self.obj_father.obj_name
         else:
             father_name = 'None'
             
@@ -33,9 +33,9 @@ class FIPLabel(object):
         
         str_list_offsprings = []
         
-        if self.trk_label['obj_offsprings']:
-            for offspring_obj in self.trk_label.obj_offsprings:
-               str_list_offsprings.append(offspring_obj.trk_label.obj_name)
+        if self.obj_offsprings:
+            for offspring_obj in self.obj_offsprings:
+               str_list_offsprings.append(offspring_obj.obj_name)
         else: 
             str_list_offsprings.append('None')
         
@@ -48,7 +48,6 @@ class FIPLabel(object):
     
     def __init__(self, tgt_subclass, father = None):
         
-        self.trk_label = {}
         str_allbaseclass = []
         
         for str_baseclass in self.__class__.__bases__:
@@ -70,16 +69,14 @@ class FIPLabel(object):
         self.obj_father = father
         
         if father is not None:
-            father.trk_label.obj_offsprings.append(self)
+            father.obj_offsprings.append(self)
         
         self.obj_offsprings = []
     
-        if FIPLabel.is_debug_print: print(FIPLabel)
+        if FIPLabel.is_debug_print: print(FIPLabel.__repr__(self))
 
         
     def __str__(self):
-        
-        # stub as obj only contains trk_label as of now
         
         return __repr__(self)
         

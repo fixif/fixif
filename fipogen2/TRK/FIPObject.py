@@ -32,15 +32,13 @@ class FIPObject(object):
             str_repr += sep
              
             for obj in FIPObject.idx_subclass[str_subclass]:
-                str_repr += obj.trk_info.trk_label.obj_name + "\n"
+                str_repr += obj.trk_label.obj_name + "\n"
         
             str_repr += sep
    
         return str_repr
    
     def __init__(self, tgt_subclassname, father_obj, **event_spec):
-        
-        print "Calling FIPObject __init__"
         
         #Create label
         self.trk_label = FIPLabel.FIPLabel(tgt_subclassname, father_obj)
@@ -52,12 +50,15 @@ class FIPObject(object):
         self.obj_events = []
         
         # append first event in stack
-        self.obj_events.append(FIPObjEvent.FIPObjEvent(FIPObject.global_obj_event_num, event_spec))
+        self.obj_events.append(FIPObjEvent.FIPObjEvent(FIPObject.global_obj_event_num, self.trk_label.obj_name, **event_spec))
         
         #increase global event counter at FIPObject class level
         FIPObject.global_obj_event_num += 1
         
-        if FIPObject.is_debug_print: print(FIPObject)
+        if FIPObject.is_debug_print: 
+        	print(FIPObject.__repr__(self))
+        	print(FIPObject.repr_obj_event_stack(self))
+        	print(FIPObject.repr_hr_obj_event_stack(self))
         
     def repr_obj_event_stack(self):
     	
@@ -77,7 +78,7 @@ class FIPObject(object):
     	str_hr_obj_event_stack = ''
     	
     	for obj_event in self.obj_events:
-    	    str_hr_obj_event_stack += str(self.obj_event)
+    	    str_hr_obj_event_stack += obj_event._human_readable_repr()
     	
     	return str_hr_obj_event_stack
     

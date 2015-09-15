@@ -15,7 +15,7 @@ class FIPObjEvent(object):
     
     Syntax of events :
     
-    (e_type='', e_subtype='', e_source='', e_subsource='', e_func='', '_subclass='')
+    (e_type='', e_subtype='', e_source='', e_subsource='', 'e_subclass='')
     
     Mandatory args (e_type, e_subtype, e_source, e_subsource) are verified against :
     
@@ -61,27 +61,27 @@ class FIPObjEvent(object):
     
     dict_e_source = {'user_input':{''}, 'external':{'simulink', 'file'}, 'func':{''}} # same struct
     
-    def __init__(self, global_obj_event_num, **event_spec):
+    def __init__(self, global_obj_event_num, e_obj_name, **event_spec):
          
         #syntax for event spec : (e_type= , e_subtype=, e_source=, e_subsource='', e_subclass, e_desc (opt) )
 
-        e_type      = event_spec[e_type]
-        e_subtype   = event_spec[e_subtype]
+        e_type      = event_spec['e_type']
+        e_subtype   = event_spec['e_subtype']
         
-        e_source    = event_spec[e_source]
+        e_source    = event_spec['e_source']
         e_subsource = event_spec.get('e_subsource','') # optional, do not trip if not specified
 
-        e_subclass  = event_spec[e_subclass]
+        e_subclass  = event_spec['e_subclass']
         
         e_desc = event_spec.get('e_desc','') # optional, not checked
         
         # all cases where user specifies shit for event are taken into account, hopefully
         
-        if (e_type not in dict_e_type.keys()):
+        if (e_type not in FIPObjEvent.dict_e_type.keys()):
             raise "FIPObjEvent : unknown event type"
-        if (e_subtype not in dict_e_type[e_type]):
+        if (e_subtype not in FIPObjEvent.dict_e_type[e_type]):
             raise "FIPObjEvent : unknown event subtype"
-        if (e_source not in dict_e_source.keys()):
+        if (e_source not in FIPObjEvent.dict_e_source.keys()):
             raise "FIPObjEvent : unknown source"
            
         # if e_source == 'user_input' or e_source == 'func' 
@@ -93,6 +93,8 @@ class FIPObjEvent(object):
 
         # timestamp event
         self.e_timestamp = time()
+        
+        self.e_obj_name = e_obj_name
             
         self.e_glob_num = global_obj_event_num # var at FIPObject class level, incremented at FIPObject class level
 
@@ -101,22 +103,23 @@ class FIPObjEvent(object):
         self.e_source = e_source
         self.e_subsource = e_subsource
         
-        self.e_func = e_func
         self.e_subclass = e_subclass
 
         self.e_desc = e_desc
+
+        self.e_glob_num = global_obj_event_num
 
     def __repr__(self, is_repr_label = False):
         
         str_repr = ''
         
-        fmt = '{0:20} | {1:15} | {2:15} | {3:15} | {4:15} | {5:15} | {6:15} \n'
+        fmt = '{0:20} | {1:15} | {2:15} | {3:15} | {4:15} | {5:15} | {6:15} | {7:15} \n'
 
         if is_repr_label:
 
-            str_repr += fmt.format('time', 'glob_e_num', 'e_type', 'e_subtype', 'e_source', 'e_subsource', 'e_desc')
+            str_repr += fmt.format('time', 'obj_name', 'glob_e_num', 'e_type', 'e_subtype', 'e_source', 'e_subsource', 'e_desc')
         
-        str_repr += fmt.format(str(self.e_timestamp), str(self.obj_event_num), self.e_type, self.e_subtype, self.e_source, self.e_subsource, self.e_desc)
+        str_repr += fmt.format(str(self.e_timestamp), self.e_obj_name, str(self.e_glob_num), self.e_type, self.e_subtype, self.e_source, self.e_subsource, self.e_desc)
 
         return str_repr
      
@@ -126,9 +129,11 @@ class FIPObjEvent(object):
         
         fmt_num = '{0:5}' # up to 99999 events
         
-        str_hr = ''
+        str_hr = 'Event '
         
-        str_hr += fmt.format(str(self.obj_event_num))
+        str_hr += fmt_num.format(self.e_glob_num)
+        
+        str_hr += " : "
         
         if self.e_type == 'create':
             
@@ -137,13 +142,13 @@ class FIPObjEvent(object):
             
             if self.e_subtype == 'new':
                 
-                str_hr += 'New '
+                str_hr += ' New '
                 
             elif self.e_subtype == 'convert':
                 
                 str_hr += 'Converted '
                 
-            str_hr += 'object created from '
+            str_hr += 'object ' + self.e_obj_name +' created from '
             
             if self.e_source == 'user_input': 
                 

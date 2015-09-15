@@ -83,8 +83,6 @@ class dSS(FIPObject):
         # Build event based on provided info.
         # default event : dSS instance created from user interface
         
-        print "Calling dSS __init__"
-        
         my_e_type      = event_spec.get('e_type', 'create')
         my_e_subtype   = event_spec.get('e_subtype', 'new')      
         my_e_subclass  = event_spec.get('e_subclass', 'dSS')
@@ -92,26 +90,12 @@ class dSS(FIPObject):
         my_e_subsource = event_spec.get('e_subsource', 'dSS.__init__') # optional, could also be ''
         my_e_desc      = event_spec.get('e_desc', '')
 
-        dSS_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc}
+        dSS_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
 
         my_father_obj = father_obj
-
-        # Event definition for superclass event logger : event is given by calling routine
-        # default event is new, from user input (see __init__)
-        # father_obj is None if created from user input
         
-        #Init superclass, pass parameters to superclass
-        # shit doesnt work
-        
-        #OK print self.__class__.__name__
-        
-        #OK print type(self.__class__.__name__)
-        
-        #OK print father_obj
-        
-        #super(dSS, self).__init__(self.__class__.__name__, father_obj, dSS_event)
-
-        FIPObject.__init__(self, self.__class__.__name__, my_father_obj, dSS_event)
+        #Init superclass
+        FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **dSS_event)
 
         self._A = mat(A)  # User input
         self._B = mat(B)
