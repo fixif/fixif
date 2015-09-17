@@ -1,7 +1,7 @@
 #coding=utf8
 
-import FIPLabel
-import FIPObjEvent
+from FIPLabel import FIPLabel
+from FIPObjEvent import FIPObjEvent
 
 class FIPObject(object):
     
@@ -13,12 +13,12 @@ class FIPObject(object):
     
     idx_subclass = {}
 
-    # assign a global log number to all events regardless
-    # of subclass to enable global log repr
-    global_obj_event_num = 0
-
     def __repr__(self):
-        
+    	
+    	"""
+    	Outputs the index of indexed objects of all subclasses indexed by superclass FIPObject
+    	"""
+    	
         str_repr = ''
         
         sep = '---\n'
@@ -41,26 +41,29 @@ class FIPObject(object):
     def __init__(self, tgt_subclassname, father_obj, **event_spec):
         
         #Create label
-        self.trk_label = FIPLabel.FIPLabel(tgt_subclassname, father_obj)
+        self.trk_label = FIPLabel(tgt_subclassname, father_obj)
         
         # Add instance to index of labeled instances for programmer_defined tgt_subclass
         FIPObject.idx_subclass.setdefault(tgt_subclassname, []).append(self)
         
-        # create event stack for instance
+        # create event stack of FIPObject instance
         self.obj_events = []
         
-        # append first event in stack
-        self.obj_events.append(FIPObjEvent.FIPObjEvent(FIPObject.global_obj_event_num, self.trk_label.obj_name, **event_spec))
-        
-        #increase global event counter at FIPObject class level
-        FIPObject.global_obj_event_num += 1
+        # Init event stack and add event
+        FIPObject.stack_event(self, self.trk_label.obj_name, **event_spec)
         
         if FIPObject.is_debug_print: 
         	print(FIPObject.__repr__(self))
         	print(FIPObject.repr_obj_event_stack(self))
         	print(FIPObject.repr_hr_obj_event_stack(self))
-        
+    
+    
     def repr_obj_event_stack(self):
+    	
+    	"""
+    	Outputs string of the event stack of a FIPObject instance
+    	"""
+    	
     	
     	str_obj_event_stack = ''
     	
@@ -75,10 +78,38 @@ class FIPObject(object):
     
     def repr_hr_obj_event_stack(self):
     	
+    	"""
+    	Get a human readable string of the event stack of a FIPObject instance
+    	"""
+    	
     	str_hr_obj_event_stack = ''
     	
     	for obj_event in self.obj_events:
     	    str_hr_obj_event_stack += obj_event._human_readable_repr()
     	
     	return str_hr_obj_event_stack
+    
+    def stack_event(self, obj_name, **event_spec):
+    	
+    	"""
+    	Add new event to FIPObject instance. 
+    	We call it stack because it remembers the order in which the events came
+    	"""
+    	
+    	
+    	self.obj_events.append(FIPObjEvent(obj_name, **event_spec))
+    	
+    def build_global_event_stack(self, tgt_subclass, order='time'):
+    	
+    	"""
+    	Returns an ordered list of all events relative to an indexed subclass
+    	
+    	Accepts the following arguments :
+    	
+    	tgt_subclass is an array of indexed classes 
+    	
+    	"""
+    	
+    	pass
+    
     

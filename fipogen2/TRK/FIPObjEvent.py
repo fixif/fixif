@@ -55,60 +55,55 @@ class FIPObjEvent(object):
     
     """
     
+    # global event log number regardless
+    # of subclass, to enable global log output ordered correctly
+    global_obj_event_num = 0
+    
     # Definition of available events
     
     dict_e_type = {'create':{'new','convert'}} # set inside a dict to give all possible subtypes =-]
     
-    dict_e_source = {'user_input':{''}, 'external':{'simulink', 'file'}, 'func':{''}} # same struct
-    
-    def __init__(self, global_obj_event_num, e_obj_name, **event_spec):
-         
-        #syntax for event spec : (e_type= , e_subtype=, e_source=, e_subsource='', e_subclass, e_desc (opt) )
+    dict_e_source = {'user_input':{''}, 'external':{'simulink', 'file'}, 'func':{''}} # same struct  
 
-        e_type      = event_spec['e_type']
-        e_subtype   = event_spec['e_subtype']
-        
-        e_source    = event_spec['e_source']
-        e_subsource = event_spec.get('e_subsource','') # optional, do not trip if not specified
+    def __init__(self, obj_name, **event_spec):
+		
+		"""
+		Define event based on programmer input, but we add some salt too (timestamp, global_obj_event_num
+		"""
+		
+		# timestamp event
+		self.e_timestamp = time()
 
-        e_subclass  = event_spec['e_subclass']
-        
-        e_desc = event_spec.get('e_desc','') # optional, not checked
-        
-        # all cases where user specifies shit for event are taken into account, hopefully
-        
-        if (e_type not in FIPObjEvent.dict_e_type):
-            raise "FIPObjEvent : unknown event type"
-        if (e_subtype not in FIPObjEvent.dict_e_type[e_type]):
-            raise "FIPObjEvent : unknown event subtype"
-        if (e_source not in FIPObjEvent.dict_e_source):
-            raise "FIPObjEvent : unknown source"
-           
-        # if e_source == 'user_input' or e_source == 'func' 
-        # we don't verify subsource, should be wisely programmer_defined
-        
-        if (e_source == 'external'):
-            if (e_subsource not in dict_e_source['external']):
-                raise "FIPObjEvent : unknown external subsource"
+		self.e_obj_name = obj_name # object should already be tagged with trk_label
+		self.e_glob_num = FIPObjEvent.global_obj_event_num # var at FIPObject class level, incremented at FIPObject class level
 
-        # timestamp event
-        self.e_timestamp = time()
+		# increment global event number
+		FIPObjEvent.global_obj_event_num += 1
+
+		self.e_type	  = event_spec['e_type']
+		self.e_subtype   = event_spec['e_subtype']
+		
+		self.e_source	= event_spec['e_source']
+		self.e_subsource = event_spec.get('e_subsource','') # optional, do not trip if not specified
+
+		self.e_subclass  = event_spec['e_subclass']
+		
+		self.e_desc = event_spec.get('e_desc','') # optional, not checked, do not trip if not specified
+		
+		if (self.e_type not in FIPObjEvent.dict_e_type):
+			raise "FIPObjEvent : unknown event type"
+		if (self.e_subtype not in FIPObjEvent.dict_e_type[self.e_type]):
+			raise "FIPObjEvent : unknown event subtype"
+		if (self.e_source not in FIPObjEvent.dict_e_source):
+			raise "FIPObjEvent : unknown source"
+		   
+		# if e_source == 'user_input' or e_source == 'func' 
+		# we don't verify subsource, should be wisely programmer_defined
+		
+		if (self.e_source == 'external'):
+			if (self.e_subsource not in dict_e_source['external']):
+				raise "FIPObjEvent : unknown external subsource"
         
-        self.e_obj_name = e_obj_name
-            
-        self.e_glob_num = global_obj_event_num # var at FIPObject class level, incremented at FIPObject class level
-
-        self.e_type = e_type
-        self.e_subtype = e_subtype
-        self.e_source = e_source
-        self.e_subsource = e_subsource
-        
-        self.e_subclass = e_subclass
-
-        self.e_desc = e_desc
-
-        #self.e_glob_num = global_obj_event_num
-
     def __repr__(self, is_repr_label = False):
         
         str_repr = ''
@@ -126,6 +121,10 @@ class FIPObjEvent(object):
     # PROBLEM when representing a stack of events
        
     def _human_readable_repr(self): # should be __str__ ??? THIB
+        
+        """
+        Output a human-readable sentence from event
+        """
         
         fmt_num = '{0:5}' # up to 99999 events
         
@@ -173,4 +172,7 @@ class FIPObjEvent(object):
                 str += 'function ' + self.e_subsource # typically random_dSS, conversion function, ...
                 
         return str_hr
+       
+
+       
                 
