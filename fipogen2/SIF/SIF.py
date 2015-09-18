@@ -54,6 +54,9 @@ class SIF(FIPObject):
    
    'AZ, BZ, CZ, DZ' are deduced accordingly
    
+   TODO:with current routine SIF can only be defined from JtoS
+   we should be able to define it from Z and cut the matrix to get JtoS (thib ? mandatory ?)
+   
    """
    
    def __init__(self, delta_eps, JtoS=None,
@@ -111,6 +114,17 @@ class SIF(FIPObject):
 		self._dQ,
 		self._dR,
 		self._dS = [_nonTrivial(X, delta_eps) for X in JtoS]
+		
+	    # AZ, BZ, CZ, DZ
+		
+		inv_J = self._J**(-1)
+		
+		self._AZ = self._K * inv_J * self._M + self._P
+        self._BZ = self._K * inv_J * self._N + self._Q
+        self._CZ = self._L * inv_J * self._M + self._R
+        self._DZ = self._L * inv_J * self._N + self._S
+        
+        
    
     def __check_set_dimensions__(self):
     	
