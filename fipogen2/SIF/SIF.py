@@ -6,17 +6,11 @@
 import numpy as np
 
 class SIF(FIPObject):
-	
- """
- This object represents a discrete state space in Special Implicit Form
- """
- 
- def __init__(self, **event_spec): # one option JtoS, delta_epsilon 
-   
+    
    """
    Special Implicit Form (formely FWR, Finite Wordlength Realization)
    
-   'l','m','n','p' : dimensions of the realization, checked with __check_dimensions__
+   'l','m','n','p' : dimensions of the realization, set from JtoS, and checked with __check_set_dimensions__
    
    - 'l' intermediate variables
    
@@ -58,68 +52,105 @@ class SIF(FIPObject):
    we should be able to define it from Z and cut the matrix to get JtoS (thib ? mandatory ?)
    
    """
+   @staticmethod
+   def _isTrivial(x, eps):
+   	
+       """
+       Checks if a parameter is trivial based on the following definition
+       
+       ::math`x` is trivial if :
+       
+       .. math::
+           x ~ 0
+           x ~ 1
+           x ~ -1
+           
+       With ::math`\epsilon` as threshold, the criterions are
+       
+       .. math::
+           |x| < \epsilon
+           |x - 1| < \epsilon
+           |x + 1| < \epsilon
+           
+       return value is boolean
+       """
+       
+       return (abs(x) < eps) or (abs(x-1) < eps) or (abs(x+1) < eps)
+   
+   @staticmethod
+   def _nonTrivial(X):
+   	
+   	   """
+   	   Check all coefficients of a matrix for triviality relative to _isTrivial definition
+   	   """
+   	   
+   	   return np.vectorize( lambda x:)
    
    def __init__(self, delta_eps, JtoS=None,
-			                     dJtodS=None, 	          
-			                     Z=None,
-			                     dZ=None, father_obj=None, **event_spec): # name can be specified in e_desc
+                                 dJtodS=None,               
+                                 Z=None,
+                                 dZ=None, father_obj=None, **event_spec): # name can be specified in e_desc
 
-    # Define default event if not specified
-    # default event : SIF instance created from user interface
-		
-	    my_e_type	   = event_spec.get('e_type', 'create')
-	    my_e_subtype   = event_spec.get('e_subtype', 'new')	  
-		my_e_subclass  = event_spec.get('e_subclass', 'SIF')
-		my_e_source	   = event_spec.get('e_source', 'user_input')
-		my_e_subsource = event_spec.get('e_subsource', 'SIF.__init__') # optional, could also be ''
-		my_e_desc	   = event_spec.get('e_desc', '')
+        # Define default event if not specified
+        # default event : SIF instance created from user interface
+        
+        my_e_type       = event_spec.get('e_type', 'create')
+        my_e_subtype   = event_spec.get('e_subtype', 'new')      
+        my_e_subclass  = event_spec.get('e_subclass', 'SIF')
+        my_e_source       = event_spec.get('e_source', 'user_input')
+        my_e_subsource = event_spec.get('e_subsource', 'SIF.__init__') # optional, could also be ''
+        my_e_desc       = event_spec.get('e_desc', '')
 
-		SIF_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
+        SIF_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
 
-		my_father_obj = father_obj
-		
-		#Init superclass
+        my_father_obj = father_obj
+        
+        #Init superclass
 
-		FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **SIF_event)
+        FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **SIF_event)
 
         self._J,
-    	self._K,
-    	self._L,
-		self._M,
-		self._N,
-		self._P,
-		self._Q,
-		self._R,
-		self._S = [np.matrix(X) for X in JtoS]
+        self._K,
+        self._L,
+        self._M,
+        self._N,
+        self._P,
+        self._Q,
+        self._R,
+        self._S = [np.matrix(X) for X in JtoS]
 
-    	# set and check sizes
-   		self._l,
-   		self._m,
-   		self._n,
-   		self._p = self.__check_set_dimensions__()
-   	   	
-   		# build Z from JtoS
-   		self._Z = np.bmat([[-self._J, self._M, self._N], 
-						   [ self._K, self._P, self._Q], 
-						   [ self._L, self._R, self._S]])
-   	
-   		# dJ to dS
-    	self._dJ,
-    	self._dK,
-		self._dL,
-		self._dM,
-		self._dN,
-		self._dO,
-		self._dP,
-		self._dQ,
-		self._dR,
-		self._dS = [_nonTrivial(X, delta_eps) for X in JtoS]
-		
-	    # AZ, BZ, CZ, DZ
-		
-		inv_J = self._J**(-1)
-		
-		self._AZ = self._K * inv_J * self._M + self._P
+        # set and check sizes
+        self._l,
+        self._m,
+        self._n,
+        self._p = self.__check_set_dimensions__()
+              
+        # build Z from JtoS
+        self._Z = np.bmat([[-self._J, self._M, self._N], 
+                           [ self._K, self._P, self._Q], 
+                           [ self._L, self._R, self._S]])
+       
+        # dJ to dS : TODO remove, not useful
+        self._dJ,
+        self._dK,
+        self._dL,
+        self._dM,
+        self._dN,
+        self._dO,
+        self._dP,
+        self._dQ,
+        self._dR,
+        self._dS = [_nonTrivial(X, delta_eps) for X in JtoS]
+        
+        # dZ TODO: ADD, useful
+        
+        
+        
+        # AZ, BZ, CZ, DZ
+        
+        inv_J = np.inverse(self._J)
+        
+        self._AZ = self._K * inv_J * self._M + self._P
         self._BZ = self._K * inv_J * self._N + self._Q
         self._CZ = self._L * inv_J * self._M + self._R
         self._DZ = self._L * inv_J * self._N + self._S
@@ -127,7 +158,7 @@ class SIF(FIPObject):
         
    
     def __check_set_dimensions__(self):
-    	
+        
         """
         Computes the size 'l,m,n,p' of SIF
         Check size of matrixes 'J' to 'S'
@@ -140,104 +171,98 @@ class SIF(FIPObject):
         #list_mat  = [self._J, self._K, self._L, self._M, self._N, self._P, self._Q, self._R, self._S]
         #list_size = [(l,l),   (n,l),   (p,l),   (l,n),   (l,m),   (n,n),   (n,m),   (p,n),   (p,m) ]
 
-		# P (n,n)
-		# define n from matrix p
-		
-		s1,s2 = self._P.shape
-		
-		if (s1 != s2):
-			raise ValueError, 'P should be a square matrix'
-		else:
-		    n = s1 # set n from P
+        # P (n,n)
+        s1,s2 = self._P.shape
+        
+        if (s1 != s2):
+            raise ValueError, 'P should be a square matrix'
+        else:
+            n = s1 # set n from P
         
         # J (l,l)
-        
         s1,s2 = self._J.shape
         
         if (s1 != s2):
             raise ValueError, 'J should be a square matrix'
         else:
-        	l = s1 # set l from J
+            l = s1 # set l from J
         
         # K (n,l)
-        
         s1,s2 = self._K.shape
         
         if (s1 != n) or (s2 != l):
-        	raise ValueError, 'Dimensions of matrix K not coherent with dimensions of P and/or J'
+            raise ValueError, 'Dimensions of matrix K not coherent with dimensions of P and/or J'
 
         # L (p,l)
-        
         s1,s2 = self._L.shape
         
         if (s2 != l):
-        	raise ValueError, 'Dimension 2 of matrix L not coherent with dimension of J'
+            raise ValueError, 'Dimension 2 of matrix L not coherent with dimension of J'
         else:
-        	p = s1 # set p from L
+            p = s1 # set p from L
         
         # M (l,n)
         
-		s1,s2 = self._M.shape
+        s1,s2 = self._M.shape
         
         if (s1 != l) or (s2 != n):
-        	raise ValueError, 'Dimensions of matrix M not coherent with dimensions of P and/or J'
+            raise ValueError, 'Dimensions of matrix M not coherent with dimensions of P and/or J'
         
         # N (l,m)
-        
         s1,s2 = self._N.shape
         
         if (s1 != l):
-        	raise ValueError, 'Dimension 1 of matrix N not coherent with dimensions of J'
+            raise ValueError, 'Dimension 1 of matrix N not coherent with dimensions of J'
         else:
-        	m = s2 # set m from N
+            m = s2 # set m from N
         
         # Q (n,m)
-        
         s1,s2 = self._Q.shape
         
         if (s1 != n) or (s2 != m):
-        	raise ValueError, 'Dimensions of Q not coherent with dimensions of P and/or N'
+            raise ValueError, 'Dimensions of Q not coherent with dimensions of P and/or N'
         
         # R (p,n)
         
         s1,s2 = self._R.shape
         
         if (s1 != p) or (s2 != n):
-        	raise ValueError, 'Dimensions of R not coherent with dimensions of L and/or P'
+            raise ValueError, 'Dimensions of R not coherent with dimensions of L and/or P'
         
         # S (p,m)
-        
         s1,s2 = self._S.shape
         
         if (s1 != p) or(s2 != m):
-        	raise ValueError, 'Dimensions of S not compatible with dimensions of L and/or N'
+            raise ValueError, 'Dimensions of S not compatible with dimensions of L and/or N'
 
         return(l,m,n,p)
        
     @property
     def size(self):
-       	
-       	"""
-       	Return size of realization
-       	"""
-       	   
+           
+           """
+           Return size of realization
+           """
+              
         return (self._l, self._m, self._n, self._p)
           
     def __str__(self):
-    	
-    	def plural(n):
-    		
-    	    if (n > 1):
-    		    str='s'
-    	    else:
-    		    str=''
-    		
-    	    return str
-    	
-    	str = "Realization " + self.trk_info[0].e_desc + " : \n"
-    	str += "m = " + str(self._m) + "input"  + plural(m) + "\n"
-    	str += "p = " + str(self._p) + "output" + plural(p) + "\n"
-    	str += "n = " + str(self._n) + "state"  + plural(n) + "\n"
-    	str += "l = " + str(self._l) + "intermediate variable" + plural(l) + "\n"
-    	
-    	return str
+        
+        def plural(n):
+            
+            if (n > 1):
+                str='s'
+            else:
+                str=''
+            
+            return str
+        
+        str = "Realization " + self.trk_info[0].e_desc + " : \n"
+        str += "m = " + str(self._m) + "input"  + plural(m) + "\n"
+        str += "p = " + str(self._p) + "output" + plural(p) + "\n"
+        str += "n = " + str(self._n) + "state"  + plural(n) + "\n"
+        str += "l = " + str(self._l) + "intermediate variable" + plural(l) + "\n"
+        
+        #TODO show matrix Z (see matlab display method for FWR object)
+        
+        return str
