@@ -221,6 +221,8 @@ latex_elements = {
 
 # Additional stuff for the LaTeX preamble.
 #'preamble': '',
+# JoAk : needs to render math !
+'preamble': '\usepackage{amsmath,amssymb}\n',
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',

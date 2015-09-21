@@ -20,26 +20,27 @@ Insert first non-docstring part of doc here.
   
 .. automodule:: TRK.FIPObjLabel
   :members:
-  :undoc-members:
-  :special-members:
+..  :undoc-members:
+..  :special-members:
   
 .. automodule:: TRK.FIPObjEvent
   :members:
-  :undoc-members:
-  :special-members:
+..  :undoc-members:
+..  :special-members:
   
 .. automodule:: LTI.dSS
   :members:
-  :undoc-members:
-  :special-members:
+..  :undoc-members:
+..  :special-members:
   
 .. automodule:: LTI.random_dSS
   :members:
+  :exclude-member: randn
   
 .. automodule:: LTI.pyWCPG
   :members:
-  :undoc-members:
-  :special-members:
+..  :undoc-members:
+..  :special-members:
 
 Indices and tables
 ==================
