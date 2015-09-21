@@ -5,53 +5,63 @@ from time import time
 class FIPObjEvent(object):
     
     """
-    This class defines an event that can be logged and output
-    We define two different kinds of events
     
-    - Object tracking events
-    - User-defined events
+    This class defines an object event that is logged and stacked at instance level
     
-    The events are logged at subclass level, get a global event number to organize global log, and timestamped
+    Objects get a global event number and a timestamp
     
     Syntax of events :
     
-    (e_type='', e_subtype='', e_source='', e_subsource='', 'e_subclass='')
+    ``(e_type, e_subtype, e_source, e_subsource, e_subclass, e_desc)``
     
-    Mandatory args (e_type, e_subtype, e_source, e_subsource) are verified against :
+    Mandatory args ``(e_type, e_subtype, e_source, e_subsource)`` are verified against :
     
-    - dict_e_type : contains event type and subtype 
-    - dict_e_source : contains event source and subsource
+    - ``dict_e_type``  which contains event type and subtype 
+    - ``dict_e_source``  which contains event source and subsource
     
-    - e_type = 'create' (new obj instance)
+    * ``e_type`` : 
     
-        - e_subtype = - 'new'     (new instance from scratch)
-                      - 'convert' (new instance from existing instance of same or different subclass)
-                   
-    - e_source = - 'user_input' (source of new obj is python interactive prompt or python script)
-                 - 'external' (new obj from external source defined in e_subsource)
-                 - 'func' (internal FIPOGEN function, programmer_defined)
-                 
-        - e_subsource = - if (e_source == 'user_input'): don't define it
-                        - if (e_source == 'external'): defined as 'simulink' or 'file'
-                        - if (e_source == 'func'): e_subsource is originating function, programmer_defined
+        - ``create`` (new obj instance)
     
-    - e-desc optional parameter, contains
-    
-        - if 'e_source' = 'external', 'e_desc' contains filename
+    * ``e_subtype`` : 
         
+      + For ``e_type = create``
+        
+        - ``new``     new instance from scratch)
+        - ``convert`` new instance from existing instance of same or different subclass
+                   
+    * ``e_source`` : 
+        
+      + For ``e_type = create``
+                 
+        - ``user_input`` source of new obj is python interactive prompt or python script
+        - ``external`` new obj from external source defined in e_subsource
+        - ``func`` internal FIPOGEN function, programmer_defined
+                 
+    * ``e_subsource`` : 
+    
+	  + For ``e_type = create``    
+    
+        - if ``(e_source == 'user_input')``  don't define it
+        - if ``(e_source == external)``  defined as ``simulink`` or ``file``
+        - if ``(e_source == ``func)``  ``e_subsource`` is originating function, programmer_defined
+    
+    * ``e_desc`` : optional parameter, contains
+
+        - if ``e_source = external``, ``e_desc`` contains filename
         - can be used as custom note but not recommended.
     
     Example event : new instance of dSS subclass from user input
     
-    (e_type='create', e_subtype='new', e_source='user_input', e_subclass='dSS')
+    ``(e_type='create', e_subtype='new', e_source='user_input', e_subclass='dSS')``
     
     Example event : new instance from simulink file
     
-    (e_type='create', e_subtype='new', e_source='external', e_subsource='simulink', e_desc='myfile.xyz', e_subclass='dSS')
+    ``(e_type='create', e_subtype='new', e_source='external', e_subsource='simulink', e_desc='myfile.xyz', e_subclass='dSS')``
     
     Example event : new instance from converted dSS obj into ???
     
-    (e_type='create', e_subtype='convert', e_source='func', e_subsource='func_name', e_subclass='bzzz')
+    ``(e_type='create', e_subtype='convert', e_source='func', e_subsource='func_name', e_subclass='bzzz')``
     
     """
     
@@ -68,7 +78,9 @@ class FIPObjEvent(object):
     def __init__(self, obj_name, **event_spec):
 		
 		"""
+		
 		Define event based on programmer input, but we add some salt too (timestamp, global_obj_event_num
+		
 		"""
 		
 		# timestamp event
@@ -123,7 +135,9 @@ class FIPObjEvent(object):
     def _human_readable_repr(self): # should be __str__ ??? THIB
         
         """
+        
         Output a human-readable sentence from event
+        
         """
         
         fmt_num = '{0:5}' # up to 99999 events
