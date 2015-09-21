@@ -35,14 +35,14 @@ __version__ = "0.0.1"  # Modify this to increment with git scripting
 
 class dSS(FIPObject):
 
-    """
+    r"""
     The dSS class describes a discrete state space realization
        
      A state space system :math:`(A,B,C,D)` is defined by 
       
     .. math::
        
-        \left\lbrace\begin{aligned}
+        \left\lbrace \begin{aligned}
          X(k+1) &= AX(k) + BU(k) \\
          Y(k)   &= CX(k) + DU(k)
          \end{aligned}\right.
@@ -54,7 +54,7 @@ class dSS(FIPObject):
     **Dimensions of the state space :**
        
     .. math::
-       :align: left
+        :align: left
        
          n,p,q \in \mathbb{N}
          
@@ -194,7 +194,7 @@ class dSS(FIPObject):
     def calc_W(self, Woc, meth):
 
         """
-        Computes observers :math:`Wo` and :math:`Wc` as :
+        Computes observers :math:`W_o` or :math:`W_c` (using 'Woc' parameter) with method 'meth' :
 
         :math:`W_o` is solution of equation :
 
@@ -212,8 +212,8 @@ class dSS(FIPObject):
         
         - ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
         1 digit precision with bilinear algorithm for big matrixes (really bad). 
-        not good emodifiednough with usual python data types
-        
+        not good enough with usual python data types
+
         - ``slycot1`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
         see http://slicot.org/objects/software/shared/libindex.html
         
