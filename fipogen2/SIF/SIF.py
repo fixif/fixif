@@ -7,86 +7,90 @@ import numpy as np
 
 class SIF(FIPObject):
     
-   """
-   Special Implicit Form (formely FWR, Finite Wordlength Realization)
+    """
+    Special Implicit Form (formely FWR, Finite Wordlength Realization)
    
-   'l','m','n','p' : dimensions of the realization, set from JtoS, and checked with __check_set_dimensions__
+    'l','m','n','p' : dimensions of the realization, set from JtoS, and checked with __check_set_dimensions__
    
-   - 'l' intermediate variables
+    - 'l' intermediate variables
    
-   - 'm' inputs
-   - 'p' outputs
+    - 'm' inputs
+    - 'p' outputs
    
-   - 'n' states
+    - 'n' states
    
-   'J, K, L, M, N, P, Q, R, S' matrices 'J' to 'S' (excluding 'O')
+    'J, K, L, M, N, P, Q, R, S' matrices 'J' to 'S' (excluding 'O')
    
-   'Z' is a big matrix regrouping all matrixes from 'J' to 'S' (11)
+    'Z' is a big matrix regrouping all matrixes from 'J' to 'S' (11)
    
-   'dJ, dK, dL, dM, dN, dP, dQ, dR, dS' are matrixes ::math`\delta J` to ::math`\delta S` (21)
+    'dJ, dK, dL, dM, dN, dP, dQ, dR, dS' are matrixes :math:`\delta J` to :math:`\delta S` (21)
    
-   thoses matrixes represent exactly implemented parameters :
+    thoses matrixes represent exactly implemented parameters :
    
-   .. math::
+    .. math::
    
-       \delta(Z)_{ij} \left\lbrace\begin{aligned}
+        \delta(Z)_{ij} \left\lbrace\begin{aligned}
                                  0 if Z_{ij} \pm 2, p \in \mathbb{Z}\\
                                  1 otherwise
                                   \end{aligned}\right.
    
-   'dZ' is ::math`\delta Z`
+    'dZ' is :math:`\delta Z`
    
-   'AZ, BZ, CZ, DZ' matrixes ::math`A_Z, B_Z, C_Z, D_Z` (eq(7) and (8))
+    'AZ, BZ, CZ, DZ' matrixes :math:`A_Z, B_Z, C_Z, D_Z` (eq(7) and (8))
    
-   When a SIF object is created, it is *not* possible to change its dimensions 'l,m,n,p' nor fields 'AZ,BZ,CZ,DZ'
+    When a SIF object is created, it is *not* possible to change its dimensions 'l,m,n,p' nor fields 'AZ,BZ,CZ,DZ'
+    
+    JOJO : Fields 'Z, dZ' are constructed from 'J' to 'S' and 'dJ' to 'dS' respectively, so those are
    
-   JOJO : Fields 'Z, dZ' are constructed from 'J' to 'S' and 'dJ' to 'dS' respectively, so those are
+    Fields 'Z, dZ' are redundant with fields 'J ... S' but they can both be useful
    
-   Fields 'Z, dZ' are redundant with fields 'J ... S' but they can both be useful
+    Changing 'Z' automatically changes fields 'J' to 'S' and reciprocally, 'dZ' changes 'dJ' to 'dS' respectively.
    
-   Changing 'Z' automatically changes fields 'J' to 'S' and reciprocally, 'dZ' changes 'dJ' to 'dS' respectively.
+    'AZ, BZ, CZ, DZ' are deduced accordingly
    
-   'AZ, BZ, CZ, DZ' are deduced accordingly
-   
-   TODO:with current routine SIF can only be defined from JtoS
-   we should be able to define it from Z and cut the matrix to get JtoS (thib ? mandatory ?)
+    TODO:with current routine SIF can only be defined from JtoS
+    we should be able to define it from Z and cut the matrix to get JtoS (thib ? mandatory ?)
    
    """
-   @staticmethod
-   def _isTrivial(x, eps):
-   	
-       """
-       Checks if a parameter is trivial based on the following definition
-       
-       ::math`x` is trivial if :
-       
-       .. math::
-           x ~ 0
-           x ~ 1
-           x ~ -1
-           
-       With ::math`\epsilon` as threshold, the criterions are
-       
-       .. math::
-           |x| < \epsilon
-           |x - 1| < \epsilon
-           |x + 1| < \epsilon
-           
-       return value is boolean
-       """
-       
-       return (abs(x) < eps) or (abs(x-1) < eps) or (abs(x+1) < eps)
    
-   @staticmethod
-   def _nonTrivial(X):
-   	
-   	   """
-   	   Check all coefficients of a matrix for triviality relative to _isTrivial definition
-   	   """
-   	   
-   	   return np.vectorize( lambda x:)
+    @staticmethod
+    def _isTrivial(x, eps):
+       
+        """
+        _isTrivial(x, epsilon)
+       
+        Checks if a parameter is trivial based on the following definition
+       
+        :math:`x` is trivial if :
+       
+        .. math::
+            x ~ 0
+            x ~ 1
+            x ~ -1
+           
+        With :math:`\epsilon` as threshold, the criterions are
+       
+        .. math::
+       
+            |x| < \epsilon
+            |x - 1| < \epsilon
+            |x + 1| < \epsilon
+           
+        return value is boolean
+        """
+       
+        return (abs(x) < eps) or (abs(x-1) < eps) or (abs(x+1) < eps)
    
-   def __init__(self, delta_eps, JtoS=None,
+    @staticmethod
+    def _nonTrivial(X, eps=1.e-8):
+       
+        """
+        Check all coefficients of a matrix for triviality relative to _isTrivial definition
+        """
+          
+        return np.vectorize(lambda x:int(not _isTrivial(x, eps))) (X)
+   
+    def __init__(self, delta_eps, JtoS=None,
                                  dJtodS=None,               
                                  Z=None,
                                  dZ=None, father_obj=None, **event_spec): # name can be specified in e_desc
@@ -94,12 +98,12 @@ class SIF(FIPObject):
         # Define default event if not specified
         # default event : SIF instance created from user interface
         
-        my_e_type       = event_spec.get('e_type', 'create')
+        my_e_type      = event_spec.get('e_type', 'create')
         my_e_subtype   = event_spec.get('e_subtype', 'new')      
         my_e_subclass  = event_spec.get('e_subclass', 'SIF')
-        my_e_source       = event_spec.get('e_source', 'user_input')
+        my_e_source    = event_spec.get('e_source', 'user_input')
         my_e_subsource = event_spec.get('e_subsource', 'SIF.__init__') # optional, could also be ''
-        my_e_desc       = event_spec.get('e_desc', '')
+        my_e_desc      = event_spec.get('e_desc', '')
 
         SIF_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
 
@@ -131,19 +135,20 @@ class SIF(FIPObject):
                            [ self._L, self._R, self._S]])
        
         # dJ to dS : TODO remove, not useful
-        self._dJ,
-        self._dK,
-        self._dL,
-        self._dM,
-        self._dN,
-        self._dO,
-        self._dP,
-        self._dQ,
-        self._dR,
-        self._dS = [_nonTrivial(X, delta_eps) for X in JtoS]
+        #self._dJ,
+        #self._dK,
+        #self._dL,
+        #self._dM,
+        #self._dN,
+        #self._dO,
+        #self._dP,
+        #self._dQ,
+        #self._dR,
+        #self._dS = [_nonTrivial(X, delta_eps) for X in JtoS]
         
         # dZ TODO: ADD, useful
-        
+        # build dZ from Z
+        self._dZ = [_nonTrivial(self._Z, delta_eps)]
         
         
         # AZ, BZ, CZ, DZ
@@ -154,7 +159,33 @@ class SIF(FIPObject):
         self._BZ = self._K * inv_J * self._N + self._Q
         self._CZ = self._L * inv_J * self._M + self._R
         self._DZ = self._L * inv_J * self._N + self._S
+
+    def _build_dZ(self):
         
+        """
+        Build dZ from Z
+        
+        During the quantization process, :math:`Z` is perturbed to become :math:`Z + r_Z \times \Delta` where
+        
+        .. math:
+        
+            r_Z \triangleq \left\lbrace\begin{aligned}
+                                 W_Z \text{for fixed-point representation,}\\
+                                 2 \eta_Z \times W_Z \text{for floating-point representation,}
+                                  \end{aligned}\right.
+                                  
+        and :math:`\eta_Z` is such that
+        
+        .. math:
+        
+            \left( \eta_Z \right)_{i,j} \left\lbrace\begin{aligned}
+                                        \text{the largest absolute value of} \\
+                                        \text{the block in which} Z_{i,j} \text{resides.}
+                                        \end{aligned}\right.
+                                        
+        """
+        
+        pass
         
    
     def __check_set_dimensions__(self):
@@ -240,9 +271,9 @@ class SIF(FIPObject):
     @property
     def size(self):
            
-           """
-           Return size of realization
-           """
+        """
+        Return size of realization
+        """
               
         return (self._l, self._m, self._n, self._p)
           
