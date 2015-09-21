@@ -3,9 +3,16 @@
 class FIPLabel(object):
     
     """
+    
     This class is used to label objects, that can be indexed in a FIPindex
     
-    TODO DOC
+    A label contains the following parts :
+    
+    - ``obj_class`` : master class of the object (surely == ``FIPObject``
+    - ``obj_subclass`` : subclass of instance (programmer defined, in case of multiple inheritance)
+    - ``obj_id`` : ``id(obj)``
+    - ``obj_num`` : number of object relative to all instances of ``obj_subclass`` in global index
+    - ``obj_name`` : name made with ``obj_num`` and ``obj_subclass`` (example : ``dSS_0``)
     
     """
     

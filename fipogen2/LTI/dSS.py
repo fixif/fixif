@@ -36,6 +36,7 @@ __version__ = "0.0.1"  # Modify this to increment with git scripting
 class dSS(FIPObject):
 
     r"""
+    
     The dSS class describes a discrete state space realization
        
      A state space system :math:`(A,B,C,D)` is defined by 
@@ -69,14 +70,20 @@ class dSS(FIPObject):
     
        - Observers : Wo and Wc
        - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) (see doc for each)
+       
     """
 
     def __init__(self, A, B, C, D, father_obj=None, **event_spec): # cannot use dSS.__class__.__name__ here. http://stackoverflow.com/questions/14513019/python-get-class-name
 
         """
+        
         Construction of a discrete state space
         
-        Partial event spec : a part of the event is automatically defined from where we are.
+        .. TODO
+        
+          force docstring to appear in doc because calling spec is important
+          
+          add special section to document event_spec and examples
         
         """
 
@@ -194,6 +201,7 @@ class dSS(FIPObject):
     def calc_W(self, Woc, meth):
 
         """
+        
         Computes observers :math:`W_o` or :math:`W_c` (using 'Woc' parameter) with method 'meth' :
 
         :math:`W_o` is solution of equation :
@@ -304,6 +312,7 @@ class dSS(FIPObject):
     def calc_h2(self):
 
         r"""
+        
         Compute the H2-norm of the system
         
         .. math::
@@ -334,6 +343,7 @@ class dSS(FIPObject):
     def calc_WCPG(self):
 
         r"""
+        
         Compute the Worst Case Peak Gain of the state space
 
         .. math::
@@ -356,11 +366,13 @@ class dSS(FIPObject):
     def calc_DC_gain(self):
 
         r"""
+        
         Compute the DC-gain of the filter
 
         .. math::
 
            \langle H \rangle = C * (I_n - A)^{-1} * B + D
+           
         """
 
         try:
@@ -374,8 +386,10 @@ class dSS(FIPObject):
     def __check_dimensions__(self):
 
         """
+        
         Computes the number of inputs and outputs.
         Check for concordance of the matrixes' size
+        
         """
 
         # A
@@ -412,7 +426,9 @@ class dSS(FIPObject):
     def __str__(self):
 
         """
+        
         Display the state-space
+        
         """
 
         str_mat = "State Space\nA=" + repr(self._A) + "\nB=" + repr(self._B) + "\nC=" + repr(self._C) + "\nD=" + repr(self._D) + "\n\n"
