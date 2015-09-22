@@ -1,7 +1,18 @@
 #coding=utf8
 
-# This class describes the SIF object
-# 2015 LIP6
+"""
+This class describes the SIF object
+"""
+
+__author__ = "Thibault Hilaire, Joachim Kruithof"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__["Thibault Hilaire", "Joachim Kruithof"]
+
+__license__ = "CECILL-C"
+__version__ = "1.0a"
+__maintainer__ = "Joachim Kruithof"
+__email__ = "joachim.kruithopf@lip6.fr"
+__status__ = "Beta"
 
 import numpy as np
 
@@ -85,15 +96,24 @@ class SIF(FIPObject):
     def _nonTrivial(X, eps=1.e-8):
        
         """
+        
         Check all coefficients of a matrix for triviality relative to _isTrivial definition
+        
+        Build a matrix filled with the following values depending on triviality of coefficients :
+        
+        - trivial, returned coefficient is 0
+        
+        - not trivial, returned coefficent is 1
+        
+        NOTE JOA : mask for coefficients ???
+        
         """
           
         return np.vectorize(lambda x:int(not _isTrivial(x, eps))) (X)
    
     def __init__(self, delta_eps, JtoS=None,
                                  dJtodS=None,               
-                                 Z=None,
-                                 dZ=None, father_obj=None, **event_spec): # name can be specified in e_desc
+                                 father_obj=None, **event_spec): # name can be specified in e_desc
 
         # Define default event if not specified
         # default event : SIF instance created from user interface
@@ -133,34 +153,32 @@ class SIF(FIPObject):
         self._Z = np.bmat([[-self._J, self._M, self._N], 
                            [ self._K, self._P, self._Q], 
                            [ self._L, self._R, self._S]])
-       
-        # dJ to dS : TODO remove, not useful
-        #self._dJ,
-        #self._dK,
-        #self._dL,
-        #self._dM,
-        #self._dN,
-        #self._dO,
-        #self._dP,
-        #self._dQ,
-        #self._dR,
-        #self._dS = [_nonTrivial(X, delta_eps) for X in JtoS]
         
         # dZ TODO: ADD, useful
         # build dZ from Z
-        self._dZ = [_nonTrivial(self._Z, delta_eps)]
+        #self._dZ = [_nonTrivial(self._Z, delta_eps)]
         
+        self._dZ = self._build_dZ()
         
         # AZ, BZ, CZ, DZ
         
+        self._AZ,
+        self._BZ,
+        self._CZ,
+        self._DZ = self._build_AZtoDZ()
+    
+    def _build_AZtoDZ(self):
+        
         inv_J = np.inverse(self._J)
         
-        self._AZ = self._K * inv_J * self._M + self._P
-        self._BZ = self._K * inv_J * self._N + self._Q
-        self._CZ = self._L * inv_J * self._M + self._R
-        self._DZ = self._L * inv_J * self._N + self._S
-
-    def _build_dZ(self):
+        AZ = self._K * inv_J * self._M + self._P
+        BZ = self._K * inv_J * self._N + self._Q
+        CZ = self._L * inv_J * self._M + self._R
+        DZ = self._L * inv_J * self._N + self._S
+        
+        return (AZ, BZ, CZ, DZ)
+    
+    def _build_dZ(self, eps=1.e-8):
         
         """
         Build dZ from Z
@@ -185,7 +203,9 @@ class SIF(FIPObject):
                                         
         """
         
-        pass
+        dZ = _nonTrivial(self._Z, eps)
+        
+        return dZ
         
    
     def __check_set_dimensions__(self):
@@ -266,7 +286,7 @@ class SIF(FIPObject):
         if (s1 != p) or(s2 != m):
             raise ValueError, 'Dimensions of S not compatible with dimensions of L and/or N'
 
-        return(l,m,n,p)
+        return (l,m,n,p)
        
     @property
     def size(self):

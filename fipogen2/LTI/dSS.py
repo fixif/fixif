@@ -1,9 +1,20 @@
 # coding=utf8
 
-"""Blablabla"""
+# Reference file header
 
-# Object and "methods" for a Discrete State Space
-# 2015 LIP6
+"""
+This file contains Object and methods for a Discrete State Space
+"""
+
+__author__ = "Thibault Hilaire, Joachim Kruithof"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__["Thibault Hilaire", "Joachim Kruithof", "Anastasia Lozanova"]
+
+__license__ = "CECILL-C"
+__version__ = "1.0a"
+__maintainer__ = "Joachim Kruithof"
+__email__ = "joachim.kruithopf@lip6.fr"
+__status__ = "Beta"
 
 #To enable obj tracking, must be a subclass of FIPObject
 from TRK.FIPObject        import FIPObject

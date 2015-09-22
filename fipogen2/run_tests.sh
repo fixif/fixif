@@ -17,3 +17,8 @@ if [ "$1" = "FIPObject" ] ;
 then
   python -m unittest FIPObject.test.test_FIPObject ;
 fi
+
+if [ "$1" = "SIF" ] ;
+then
+  python -m unittest SIF.test.test_SIF ;
+fi

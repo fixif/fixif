@@ -1,3 +1,19 @@
+#coding=utf8
+
+"""
+This file contains a function to generate random Discrete State Spaces
+"""
+
+__author__ = "control-python, Thibault Hilaire, Joachim Kruithof"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__["control-python", "Thibault Hilaire", "Joachim Kruithof"]
+
+__license__ = "CECILL-C"
+__version__ = "1.0a"
+__maintainer__ = "Joachim Kruithof"
+__email__ = "joachim.kruithopf@lip6.fr"
+__status__ = "Beta"
+
 from LTI.dSS import dSS
 
 from numpy                import zeros, dot, eye, pi, cos, sin

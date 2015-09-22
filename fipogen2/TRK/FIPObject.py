@@ -1,5 +1,19 @@
 #coding=utf8
 
+"""
+This file contains label superclass for FIPObject
+"""
+
+__author__ = "Joachim Kruithof"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__["Joachim Kruithof"]
+
+__license__ = "CECILL-C"
+__version__ = "1.0a"
+__maintainer__ = "Joachim Kruithof"
+__email__ = "joachim.kruithopf@lip6.fr"
+__status__ = "Beta"
+
 from FIPLabel import FIPLabel
 from FIPObjEvent import FIPObjEvent
 

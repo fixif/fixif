@@ -1,5 +1,18 @@
 #coding=utf8
-# This file contains tests for the dSS functions & class
+
+"""
+This file contains tests for the dSS functions & class
+"""
+
+__author__ = "Thibault Hilaire, Joachim Kruithof"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__["Thibault Hilaire", "Joachim Kruithof"]
+
+__license__ = "CECILL-C"
+__version__ = "1.0a"
+__maintainer__ = "Joachim Kruithof"
+__email__ = "joachim.kruithopf@lip6.fr"
+__status__ = "Beta"
 
 import unittest
 from random import randint
