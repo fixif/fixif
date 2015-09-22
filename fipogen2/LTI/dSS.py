@@ -8,7 +8,7 @@ This file contains Object and methods for a Discrete State Space
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
-__credits__["Thibault Hilaire", "Joachim Kruithof", "Anastasia Lozanova"]
+__credits__ = ["Thibault Hilaire", "Joachim Kruithof", "Anastasia Lozanova"]
 
 __license__ = "CECILL-C"
 __version__ = "1.0a"

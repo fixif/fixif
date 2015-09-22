@@ -6,7 +6,7 @@ This file contains tests for the dSS functions & class
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
-__credits__["Thibault Hilaire", "Joachim Kruithof"]
+__credits__ = ["Thibault Hilaire", "Joachim Kruithof"]
 
 __license__ = "CECILL-C"
 __version__ = "1.0a"

@@ -6,7 +6,7 @@ This file contains event class for FIPObjects
 
 __author__ = "Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
-__credits__["Joachim Kruithof"]
+__credits__ = ["Joachim Kruithof"]
 
 __license__ = "CECILL-C"
 __version__ = "1.0a"

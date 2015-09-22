@@ -6,7 +6,7 @@ This class describes the SIF object
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
-__credits__["Thibault Hilaire", "Joachim Kruithof"]
+__credits__ = ["Thibault Hilaire", "Joachim Kruithof"]
 
 __license__ = "CECILL-C"
 __version__ = "1.0a"
@@ -14,6 +14,7 @@ __maintainer__ = "Joachim Kruithof"
 __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
+from FIPObject import FIPObject
 import numpy as np
 
 class SIF(FIPObject):
@@ -130,7 +131,6 @@ class SIF(FIPObject):
         my_father_obj = father_obj
         
         #Init superclass
-
         FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **SIF_event)
 
         self._J,
