@@ -29,7 +29,9 @@ from LTI.random_dSS import random_dSS
 
 
 def my_assert_relativeclose( msgH, actual, desired, rtol, strActual, strDesired, strMethod):
+  
 	"""
+	
 	Params:
 		msgH: messageHandler : list of messages produced when an AssertionError occurs (plus the last AssertionError itself)
 	
@@ -51,13 +53,16 @@ msgH = []	# message handler (list of AssertionError messages)
 
 class test_dSS( unittest.TestCase):
 
-
 	"""
 	Test class for dSS class
 	"""
 
-	# test non consistency of matrixes  
 	def test_construction(self):
+	  
+		"""
+		Test non-consistency of matrixes
+		"""
+	  
 		self.assertRaises( ValueError, dSS, [[1,2], [3,4], [5,6]], 1, 2, 3 )
 		self.assertRaises( ValueError, dSS, [[1,2], [3,4]], 1, 2, 3)
 		self.assertRaises( ValueError, dSS, [[1,2], [3,4]], [1,2], 2, 3 )
@@ -65,12 +70,23 @@ class test_dSS( unittest.TestCase):
 
 	
 	def test_Gramians(self):
+	  
+		"""
+		Test calculation of :math:`W_o` and :math:`W_c` with different methods, namely
+	  
+		- python intrinsic ``linalg``
+		- ``slycot`` method from xxx
+	  
+		"""
 	
 		relative_tolerance_linalg  = 10**-5
 		relative_tolerance_slycot1 = 10**-5
-		nloc = 0	# test number
+		
+		# test number
+		nloc = 0	
 
 		for i in range(50):
+		  
 			nloc +=1
 			n = randint(2,40)
 			p = randint(2,15)
@@ -94,11 +110,13 @@ class test_dSS( unittest.TestCase):
 								strDesired = 'Wo',
 								strMethod = 'linalg (test #%d)'%nloc )
 
-			# JoK : We have to explicitely remove Wo and Wc from S so that those are calculated again
+			# We have to explicitely remove Wo and Wc from S so that those are calculated again
 			S._Wo = None
 			S._Wc = None
+			
 			# test for 'slycot1' method
-			# with slycot we expect a 8-digit accuracy		
+			# with slycot we expect a 8-digit accuracy
+			
 			S._W_method = 'slycot1'	  
 			my_assert_relativeclose( msgH,
 								array(S.A*S.Wc*S.A.transpose() + S.B*S.B.transpose()), 
@@ -117,6 +135,7 @@ class test_dSS( unittest.TestCase):
 								strMethod = 'slycot1 (test #%d)'%nloc )
 		
 		if msgH:
+		  
 			print '\n'.join(msgH[:-1])
 			#raise AssertionError from msgH[-1]
 			raise msgH[-1][0], msgH[-1][1], msgH[-1][2]
@@ -138,7 +157,11 @@ class test_dSS( unittest.TestCase):
 			self.assertEqual(S.D.shape, (q,p))
   
   
-  	def test_wcpg(self):			
+  	def test_wcpg(self):
+	  
+		"""
+		Test Worst Case Peak Gain calculation
+		"""
   			
   		def calc_wcpg_approx(S, nit):
   			
@@ -179,7 +202,8 @@ class test_dSS( unittest.TestCase):
 			q = randint(2,5) 
 			S = random_dSS(n,p,q)
 
-			print "NaN check : indian food is not good for you ! \n"
+			print "NaN check"
+			
 			# Python overreacts on this when mixed with test (if), so let's decouple
 			a = isnan(S.A).any()
 			b = isnan(S.B).any()

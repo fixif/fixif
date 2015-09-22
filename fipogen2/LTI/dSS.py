@@ -38,12 +38,6 @@ from mpmath import mp
 # WCPG C func wrapped in python
 import _pyWCPG
 
-# Module description
-__author__ = "FiPoGen Team"
-__email__ = "fipogen@lip6.fr"
-__license__ = "CECILL-C"
-__version__ = "0.0.1"  # Modify this to increment with git scripting
-
 class dSS(FIPObject):
 
     r"""

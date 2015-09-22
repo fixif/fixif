@@ -14,7 +14,7 @@ __maintainer__ = "Joachim Kruithof"
 __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
-from FIPObject import FIPObject
+from TRK.FIPObject import FIPObject
 import numpy as np
 
 class SIF(FIPObject):
@@ -110,11 +110,9 @@ class SIF(FIPObject):
         
         """
           
-        return np.vectorize(lambda x:int(not _isTrivial(x, eps))) (X)
+        return np.vectorize(lambda x:int(not SIF._isTrivial(x, eps))) (X)
    
-    def __init__(self, delta_eps, JtoS=None,
-                                 dJtodS=None,               
-                                 father_obj=None, **event_spec): # name can be specified in e_desc
+    def __init__(self, JtoS, delta_eps=1.e-8, father_obj=None, **event_spec): # name can be specified in e_desc
 
         # Define default event if not specified
         # default event : SIF instance created from user interface
@@ -133,28 +131,17 @@ class SIF(FIPObject):
         #Init superclass
         FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **SIF_event)
 
-        self._J,
-        self._K,
-        self._L,
-        self._M,
-        self._N,
-        self._P,
-        self._Q,
-        self._R,
-        self._S = [np.matrix(X) for X in JtoS]
+        self._J, self._K, self._L, self._M, self._N, self._P, self._Q, self._R, self._S = [np.matrix(X) for X in JtoS]
 
         # set and check sizes
-        self._l,
-        self._m,
-        self._n,
-        self._p = self.__check_set_dimensions__()
+        self._l, self._m, self._n, self._p = self.__check_set_dimensions__()
               
         # build Z from JtoS
         self._Z = np.bmat([[-self._J, self._M, self._N], 
                            [ self._K, self._P, self._Q], 
                            [ self._L, self._R, self._S]])
         
-        # dZ TODO: ADD, useful
+
         # build dZ from Z
         #self._dZ = [_nonTrivial(self._Z, delta_eps)]
         
@@ -162,14 +149,11 @@ class SIF(FIPObject):
         
         # AZ, BZ, CZ, DZ
         
-        self._AZ,
-        self._BZ,
-        self._CZ,
-        self._DZ = self._build_AZtoDZ()
+        self._AZ, self._BZ, self._CZ, self._DZ = self._build_AZtoDZ()
     
     def _build_AZtoDZ(self):
         
-        inv_J = np.inverse(self._J)
+        inv_J = np.linalg.inv(self._J)
         
         AZ = self._K * inv_J * self._M + self._P
         BZ = self._K * inv_J * self._N + self._Q
@@ -203,7 +187,7 @@ class SIF(FIPObject):
                                         
         """
         
-        dZ = _nonTrivial(self._Z, eps)
+        dZ = SIF._nonTrivial(self._Z, eps)
         
         return dZ
         
@@ -214,10 +198,6 @@ class SIF(FIPObject):
         Computes the size 'l,m,n,p' of SIF
         Check size of matrixes 'J' to 'S'
         """
-        
-        l,m,n,p = 0 # set all dimensions to zero
-        
-        s1,s2 = 0 # temp sizes
         
         #list_mat  = [self._J, self._K, self._L, self._M, self._N, self._P, self._Q, self._R, self._S]
         #list_size = [(l,l),   (n,l),   (p,l),   (l,n),   (l,m),   (n,n),   (n,m),   (p,n),   (p,m) ]
