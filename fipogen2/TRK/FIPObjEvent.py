@@ -197,7 +197,7 @@ class FIPObjEvent(object):
                 
             elif self.e_source == 'func':
                 
-                str += 'function ' + self.e_subsource # typically random_dSS, conversion function, ...
+                str_hr += 'function ' + self.e_subsource # typically random_dSS, conversion function, ...
                 
         return str_hr
        

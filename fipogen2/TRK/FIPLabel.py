@@ -48,8 +48,8 @@ class FIPLabel(object):
         str_repr += fmt.format('obj_name', str(self.obj_name))
         
         
-        if self.obj_father is not None:
-            father_name = self.obj_father.obj_name
+        if self.obj_father is not None:     
+            father_name = self.obj_father.trk_label.obj_name
         else:
             father_name = 'None'
             
@@ -93,7 +93,6 @@ class FIPLabel(object):
         self.obj_father = father
         
         if father is not None:
-	    print father
             father.trk_label.obj_offsprings.append(self)
         
         self.obj_offsprings = []
