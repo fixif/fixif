@@ -7,11 +7,11 @@ using a workflow defined in the manual's example
 """
 # scripts cannot use relative imports
 import sys,os
-sys.path.insert(0, os.path.abspath('./../'))
+sys.path.insert(0, os.path.abspath('./'))
 
 from numpy import matrix as mat
-from LTI.dSS import dSS
-import SIF, SIF.Structures
+
+from SIF import State_Space
 
 
 def main():
