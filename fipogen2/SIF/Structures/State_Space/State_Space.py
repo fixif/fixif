@@ -1,5 +1,5 @@
-from ..SIF import SIF #...
-from ..LTI import dSS
+from ...SIF import SIF
+from ....LTI import LTI
 
 class State_Space(dSS):
 
@@ -23,15 +23,7 @@ class State_Space(dSS):
         """
     
         # Convert event : we generate a SIF from dSS
-        
-        my_e_type      = 'create'
-        my_e_subtype   = 'convert'    
-        my_e_subclass  = 'SIF'
-        my_e_source    = 'func'
-        my_e_subsource = 'dSS.toSIF'
-        my_e_desc      = ''
-
-        toSIF_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
+        toSIF_event = {'e_type':'create', 'e_subtype':'convert', 'e_source':'func', 'e_subsource':'State_Space.toSIF', 'e_desc':'', 'e_subclass':'State_Space'}
 
         toSIF_father_obj = self
         

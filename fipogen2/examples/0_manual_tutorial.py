@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath('./../'))
 
 from numpy import matrix as mat
 from LTI.dSS import dSS
-
+import SIF, SIF.Structures
 
 
 def main():
@@ -33,9 +33,9 @@ def main():
     C = mat([0.28261, 0.13244, 0.15183])
     D = mat([0.0031689])
     
-    mydSS = dSS(A,B,C,D)
+    myState_Space = State_Space(A,B,C,D)
     
-    mySIF = mydSS.toSIF()
+    mySIF = myState_Space.toSIF()
 
 
 if __name__ == '__main__':

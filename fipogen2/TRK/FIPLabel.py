@@ -93,7 +93,8 @@ class FIPLabel(object):
         self.obj_father = father
         
         if father is not None:
-            father.obj_offsprings.append(self)
+	    print father
+            father.trk_label.obj_offsprings.append(self)
         
         self.obj_offsprings = []
     
