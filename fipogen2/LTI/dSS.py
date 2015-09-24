@@ -22,6 +22,7 @@ from TRK.FIPObject        import FIPObject
 from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
 #from numpy.ctypeslib      import as_array
 from numpy                import matrix as mat
+from numpy                import eye, zeros
 
 from numpy.linalg         import inv, det, solve
 from numpy.linalg.linalg  import LinAlgError
@@ -37,6 +38,8 @@ from mpmath import mp
 
 # WCPG C func wrapped in python
 import _pyWCPG
+
+from SIF.SIF import SIF # conversion to SIF in toSIF function
 
 class dSS(FIPObject):
 
@@ -385,7 +388,7 @@ class dSS(FIPObject):
         except:
             raise ValueError, 'Impossible to compute DC-gain from current discrete state space'
 
-        return self._DC_gain  
+        return self._DC_gain
 
     #======================================================================================#
     def __check_dimensions__(self):
