@@ -288,12 +288,16 @@ class SIF(FIPObject):
             
             return str
         
-        str = "Realization " + self.trk_info[0].e_desc + " : \n"
-        str += "m = " + str(self._m) + "input"  + plural(m) + "\n"
-        str += "p = " + str(self._p) + "output" + plural(p) + "\n"
-        str += "n = " + str(self._n) + "state"  + plural(n) + "\n"
-        str += "l = " + str(self._l) + "intermediate variable" + plural(l) + "\n"
+        mystr = "Realization " + self.obj_events[0].e_desc + " : \n"
+        mystr += "m = " + str(self._m) + " input"  + plural(self._m) + "\n"
+        mystr += "p = " + str(self._p) + " output" + plural(self._p) + "\n"
+        mystr += "n = " + str(self._n) + " state"  + plural(self._n) + "\n"
+        mystr += "l = " + str(self._l) + " intermediate variable" + plural(self._l) + "\n"
+        
+        mystr += "Z = \n"+ str(self._Z) + "\n"
+        
+        mystr += "dZ = \n" + str(self._dZ) + "\n"
         
         #TODO show matrix Z (see matlab display method for FWR object)
         
-        return str
+        return mystr
