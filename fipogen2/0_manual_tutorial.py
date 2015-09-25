@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('./'))
 from numpy import matrix as mat
 
 from SIF import State_Space
-
+from LTI import TF
 
 def main():
   
@@ -37,6 +37,14 @@ def main():
     
     mySIF = myState_Space.toSIF()
 
+    print(str(mySIF))
+    
+    num = mat([0.125, 0.243, 2.67, 4.72])
+    den = mat([0.321, 0.546, 7.56473, 9.786750])
+
+    myTF = TF(num,den)
+    
+    print(str(myTF))
 
 if __name__ == '__main__':
     main()
