@@ -5,6 +5,7 @@
 from TRK.FIPObject import FIPObject
 
 from numpy import nditer
+from numpy import matrix as mat
 
 class TF(FIPObject):
   
@@ -34,34 +35,35 @@ class TF(FIPObject):
         my_father_obj = father_obj
       
         FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **TF_event)
-        
-        if (num.shape[0] is not 1) or (den.shape[0] is not 1):
-	    raise('TF : num and den should be 1D matrixes')
-        
-        self._num = num
-        self._den = den
 
+        self._num = mat(num)
+        self._den = mat(den)
+        
+        if (self._num.shape[0] is not 1) or (self._den.shape[0] is not 1):
+            raise('TF : num and den should be 1D matrixes')
+        
     def __str__(self):
        
         str_num = ''
+        str_den = ''
+        
         elno = 0
         
         for el in nditer(self._num):
-	    str_num += str(el) + " s^" + str(elno) + " + "
-	    elno += 1
+            str_num += str(el) + " s^" + str(elno) + " + "
+            elno += 1
        
         str_num = str_num[0:-3]
        
-        str_den = ''
         elno = 0
         
         for el in nditer(self._den):
-	    str_den += str(el) + " s^" + str(elno) + " + "
-	    elno += 1
+            str_den += str(el) + " s^" + str(elno) + " + "
+            elno += 1
        
         str_den = str_den[0:-3]
        
-        fraclen = max(len(str_num),len(str_den))
+        fraclen = max(len(str_num), len(str_den))
         
         fmt = '{0:7} {1:^' + str(fraclen) + '} \n'
        
