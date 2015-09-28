@@ -7,13 +7,13 @@ from LTI import TF
 from numpy import zeros, all, poly
 from numpy.linalg import cond
 
-class RhoDFIIt(TF):
+class RhoDFIIt(SIF):
     
-    def __init__(self, num, den, father_obj = None, **event_spec):
+    def __init__(self, num, den, gamma, isGammaExact = None, delta = None, isDeltaExact = None, father_obj = None, **event_spec):
         
         #create default event if no event given
         my_e_type      = event_spec.get('e_type', 'create')
-        my_e_subtype   = event_spec.get('e_subtype', 'new')      
+        my_e_subtype   = event_spec.get('e_subtype', 'convert')      
         my_e_subclass  = event_spec.get('e_subclass', 'RhoDFIIt')
         my_e_source    = event_spec.get('e_source', 'user_input')
         my_e_subsource = event_spec.get('e_subsource', 'RhoDFIIt.__init__') # optional, could also be ''
@@ -21,14 +21,7 @@ class RhoDFIIt(TF):
 
         RhoDFIIt_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
 
-        my_father_obj = father_obj
-        
-        # call super
-        TF.__init__(self, num, den, my_father_obj, **RhoDFIIt_event)
-        
-        pass
-        
-    def toSIF(self, gamma, isGammaExact = None, delta = None, isDeltaExact = None):
+        RhoDFIIt_father_obj = father_obj
         
         if not isGammaExact:
             isGammaExact = True   
@@ -40,8 +33,8 @@ class RhoDFIIt(TF):
             isDeltaExact = False
             
         # Normalize num and den vs. first coefficient
-        Va = num/num[0]
-        Vb = den/den[0]
+        Va = den/den[0]
+        Vb = num/den[0]
         
         # Compare #column (#lines is 1 ?)
         p1 = Va.shape[1] - 1
@@ -64,5 +57,20 @@ class RhoDFIIt(TF):
         
         for i in range(p-1,-1,-1):
             Tbar[i,range(i,p+2)] = poly(gamma[1, range(i,p+1)])# if we use matlab-like syntax, namely i:p+1 there's no check on matrix boundary (if p+1 exceeds boundary we got a result)
-            
+        
+        #check for ill-conditioned matrix (relaxed check)
+        cond_limit = 1.e20
+        
+        my_cond = cond(Tbar,2)/cond(Tbar,-2) # (larger / smaller) singular value like cond() of MATLAB
+        
+        if (my_cond > cond_limit):
+        	raise('Cannot compute matrix inverse') 
+        
+        
+        
+        # Init super with results
+        
+        Jtos = 1
+        
+        SIF.__init__(JtoS)
         
