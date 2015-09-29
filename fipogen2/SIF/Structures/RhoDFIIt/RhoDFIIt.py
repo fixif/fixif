@@ -4,8 +4,8 @@
 
 from SIF import SIF
 from LTI import TF
-from numpy import zeros, all, poly
-from numpy.linalg import cond
+from numpy import zeros, all, poly, matrix
+from numpy.linalg import cond, inv, transpose, diag
 
 class RhoDFIIt(SIF):
     
@@ -25,16 +25,19 @@ class RhoDFIIt(SIF):
         
         if not isGammaExact:
             isGammaExact = True   
-                 
+          
+        # warning if we don't use matrixes transpose is not going to work correctly 
+                
         if not delta:
-            delta = zeros(gamma.shape)
+            delta = matrix(zeros(gamma.shape))
             
         if not isDeltaExact:
             isDeltaExact = False
             
-        # Normalize num and den vs. first coefficient
-        Va = den/den[0]
-        Vb = num/den[0]
+        Va = transpose(matrix(den))/den[0]
+        Vb = transpose(matrix(num))/den[0]
+        
+        gamma = matrix(gamma)
         
         # Compare #column (#lines is 1 ?)
         p1 = Va.shape[1] - 1
@@ -48,6 +51,7 @@ class RhoDFIIt(SIF):
         p = p1
         
         # Step 1 : build Valapha_bar, Vbeta_bar
+        # =====================================
         # by considering Delta_k = 1 for all k
         
         # Build Tbar
@@ -55,8 +59,8 @@ class RhoDFIIt(SIF):
         Tbar = zeros((p+1,p+1))
         Tbar[p,p] = 1
         
-        for i in range(p-1,-1,-1):
-            Tbar[i,range(i,p+2)] = poly(gamma[1, range(i,p+1)])# if we use matlab-like syntax, namely i:p+1 there's no check on matrix boundary (if p+1 exceeds boundary we got a result)
+        for i in range(p-1,-1,0):
+            Tbar[i,range(i,p)] = poly(gamma[1, range(i,p+1)])# if we use matlab-like syntax, namely i:p+1 there's no check on matrix boundary (if p+1 exceeds boundary we got a result)
         
         #check for ill-conditioned matrix (relaxed check)
         cond_limit = 1.e20
@@ -65,6 +69,25 @@ class RhoDFIIt(SIF):
         
         if (my_cond > cond_limit):
         	raise('Cannot compute matrix inverse') 
+        
+        #Valpha_bar, Vbeta_bar
+        Valpha_bar = dot(transpose(inv(Tbar)), Va)
+        Vbeta_bar  = dot(transpose(inv(Tbar)), Vb)
+        
+        # Equivalent state space (Abar, Bbar, Cbar, Dbar)
+        
+        A_0 = diag(matrix(ones((p-1,1))),1)
+        A_0[0:,0] = - Valpha_bar[1:]
+        
+        Abar = diag(gamma) + A_0
+        
+        Bbar = Vbeta_bar[1:] - Vbeta_bar[0]*Valpha_bar[1:]
+        
+        Cbar = matrix(zeros((1,p)))
+        Cbar[0,0] = 1
+        
+        Dbar = Vbeta_bar[0]
+        
         
         
         
