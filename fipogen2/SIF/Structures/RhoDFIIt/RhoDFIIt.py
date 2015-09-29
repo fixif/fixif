@@ -88,6 +88,8 @@ class RhoDFIIt(SIF):
         
         Dbar = Vbeta_bar[0]
         
+        # Step 2 : L2-scaling
+        
         
         
         
