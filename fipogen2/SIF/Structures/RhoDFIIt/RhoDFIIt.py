@@ -3,8 +3,8 @@
 # This class contains routine to convert to FWR
 
 from SIF import SIF
-from LTI import TF
-from numpy import zeros, all, poly, matrix
+from LTI import TF, dSS
+from numpy import zeros, all, poly, matrix, sqrt, prod
 from numpy.linalg import cond, inv, transpose, diag
 
 class RhoDFIIt(SIF):
@@ -59,7 +59,7 @@ class RhoDFIIt(SIF):
         Tbar = zeros((p+1,p+1))
         Tbar[p,p] = 1
         
-        for i in range(p-1,-1,0):
+        for i in range(p-1,-1,-1):
             Tbar[i,range(i,p)] = poly(gamma[1, range(i,p+1)])# if we use matlab-like syntax, namely i:p+1 there's no check on matrix boundary (if p+1 exceeds boundary we got a result)
         
         #check for ill-conditioned matrix (relaxed check)
@@ -90,9 +90,65 @@ class RhoDFIIt(SIF):
         
         # Step 2 : L2-scaling
         
+        # compute delta (leading to a l2-scaled realization) 
+        # when delta is not given (or null)
+        
+        Sbar = dSS(Abar, Bbar, Cbar, Dbar)
+        Wc = Sbar.Wc
+        
+        def F2(x):
+        	return log2(x)-floor(log2(x))
+        
+        if (delta == matrix(zeros(gamma.shape))):
+        	
+        	delta[0] = sqrt(Wc[0,0])
+        	
+        	for i in range(1,p+1):
+        		delta[i] = sqrt( Wc[i,i] / Wc[i-1,i-1] )* 2^(F2(sqrt(Wc[i-1,i-1])) - F2(sqrt(Wc[i,i])) )
+        		
+        # compute Valpha and Vbeta
+        
+        Tbar = matrix(zeros((p+1,p+1)))
+        
+        Tbar[p,p] = 1
+        
+        for i in range(p-1,-1,-1):
+        	Tbar[i, range(i,p+2)] = poly( gamma[range(i,p+1)] / prod(delta[range(i,p+1)]))
+        	
+        Ka = prod(delta[:])
+        
+        Valpha = dot(transpose(inv(dot(Ka,Tbar))),Va)
+        Vbeta = dot(transpose(inv(dot(Ka, Tbar))), Vb)
+        
+        # equivalent l2-scaled state space
+        
+        d = zeros((p,1))
+        
+        for i in range(0,p):
+        	d[i] = inv(prod(delta(range(0, i))))
+
+        Tsc = diag(d)
+        
+        A = dot(dot(Tsc, Abar),inv(Tsc))
+        B = dot(Tsc, Bbar)
+        C = dot(Cbar, inv(Tsc))
+        D = Dbar  # can also be computed from Valpha and Vbeta
+        
+        S = State_Space(A,B,C,D) # TODO add special event
+        
+        A0 = diag(ones((p-1,1)),1)
+        
+        A0[:,0] = -Valpha[1:]
+        
+        # Step 3
+        # build SIF
+               
+        R2 = S.toSIF()
+        
+        # WP ??
         
         
-        
+               
         # Init super with results
         
         Jtos = 1
