@@ -1,0 +1,4 @@
+FN = example
+
+$(FN).pdf: $(FN).tex
+	pdflatex $(FN)

@@ -1,0 +1,10 @@
+%==============================================================================
+\section{Echéancier}
+%==============================================================================
+
+\begin{frame} \FT{Echéancier}
+	%\hspace{4cm} \vspace{1cm}
+	\begin{center}
+	\FIGW{1.0}{echeancier}
+	\end{center}
+\end{frame}

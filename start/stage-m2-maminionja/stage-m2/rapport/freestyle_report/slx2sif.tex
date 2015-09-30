@@ -1,0 +1,67 @@
+\chapter{Génération de la Forme Implicite Spécialisé à partir du diagramme de Blocs Simulink}
+
+\section{L'idée}
+L'objectif ici est de déduire les 9 matrices (J, K, L, M, N, P, Q, R, S) du S.I.F à partir d'un schéma-blocs représentant un système linéaire, de manière automatique.
+
+\section{Le diagramme de bloc Matlab/Simulink}
+Un diagramme de bloc ou schéma-bloc est une représentation graphique simplifié d'un système plus ou moins complexe. Il est composé de blocs connectés par des lignes qui montre l'interaction entre-eux.
+Il permet d'exprimer la structure et le flux d'un système pour juste montrer le concept sans entrer dans les détails d'implémentation.
+
+[exemple de schéma-bloc]
+
+
+Dans Simulink, on a 2 formats pour stocker les schéma-blocs:
+MDL : ancienne format
+SLX : nouvelle format de fichier, à partir de la r2012a de Matlab
+
+
+Av : C'est un standard dans l'industrie.
+Pb: C'est un nouveau format très peu documenté.
+
+
+\section{Méthode pour déduire le SIF à partir d'un Diagramme de Blocs}
+[ faire la liste en diagramme]
+ - Décompresser le fichier SLX pour extraire le fichier \emph{blocdiagram.xml}
+ - Parser le fichier pour extraire la liste des blocs et la liste des lignes ( qui indiques les inter-connexions)
+ - Aplatir le design s'il y a des sous-systèmes
+ - Identifier les blocs en entrée de chaque bloc, cela donne l'équation au niveau de chaque bloc
+ - regrouper si possible les blocs sommes 
+ - Identifier les équations avec celles du SIF et donc les coefficients formeront les matrices du SIF
+ - Rendre triangulaire inférieure la matrice J et réorganiser les matrices concernées : M, N, K, L
+ 
+Explications:
+Ce qu'on a:
+\begin{itemize}
+\item Chaque bloc simulink est identifié par un numéro unique appelé \textbf{\emph{SID}}
+\end{itemize}
+
+
+Ce que l'on met comme hypothèse:
+\begin{itemize}
+\item chaque bloc est labellisé par $t, x, u, y$ suivit du SID [example] 
+\end{itemize}
+
+
+
+\section{Implémentation - le module SLX2SIF}
+
+Il suffit de lui donner un fichier Simulink au format SLX, contenant le schéma-bloc pour un système linéaire, et il donne en sortie les matrices du SIF avec les variables liées $(t, x, u, y)$.
+
+[schéma]
+
+\subsection{Les caractéristiques du module}
+Pour l'état actuel de notre module, on peut traiter 6 types de blocs Simulinnk:
+\begin{itemize}
+\item Gain
+\item Delay
+\item Sum
+\item SubSystem
+\item Inport
+\item Outport
+\end{itemize}
+
+[ tableau : blocs - attributs ]
+
+Il peut traiter :
+ - des systèmes MIMO
+ - les sous-systèmes

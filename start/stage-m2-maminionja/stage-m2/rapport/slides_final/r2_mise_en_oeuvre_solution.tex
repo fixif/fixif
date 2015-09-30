@@ -1,0 +1,84 @@
+%==============================================================================
+\section{Mise en \oe{}uvre}
+%==============================================================================
+\hspace*{2cm}
+\frame{\tableofcontents[currentsection]}
+%________________________________________________________________________________________
+\begin{frame} \FT{Environnement de dev et d'expérimentation}
+\begin{itemize}
+\item Gnu/\textbf{Linux} 2.6
+\item \textbf{Python 2.7} avec zipfile, lxml.etree, math, scipy.io, numpy, pickle, shutil  
+\item FiPoGen, AMPL/Bonmin
+\item Stratus (lib arith, modules stratus, packages stratus)
+\item \textbf{Git} pour la gestion de version
+\item Matlab/Simulink
+\item GHDL pour la simulation VHDL
+\item Quartus pour voir la NetList RTL
+\end{itemize}
+\end{frame}
+
+%____________________________________________________________
+\begin{frame} \FT{Le flot à développer }
+    \BI
+	\o Schéma du flot à développer
+	\begin{flushleft}
+	\begin{center}
+	\FIGW{0.9}{tool}
+	\end{center}		
+	\end{flushleft}
+	\smallskip	
+	\o \textbf{les tâches} spécifiques au stage:
+		\BI 
+		\o Concevoir le \textbf{module "SLX to SIF"}
+		%qui permet à FiPoGen d'importer des diagrammes Simulink
+		\o Développer le \textbf{module "oSoP to VHDL"} à l'aide de Stratus
+		%pour génerer l'architecture matérielle correspondant au graphe de calcul généré par FiPoGen.
+		\o \textbf{Intégrer} ces modules avec FiPoGen pour former un outil de conception commun entre les 2 équipes
+		\EI
+	\EI
+\note{
+	En addition, on peut exploiter les interactions possibles entre les 2 outils.
+}
+\end{frame}
+
+%________________________________________________________________________________________
+\begin{frame} \FT{Développement du module SLX2SIF }
+	\begin{center}
+	\only<1>{\FIGW{1.0}{"df20"}}
+	\only<2>{\FIGW{1.0}{"df21"}}
+	\only<3>{\FIGW{1.0}{"df22"}}
+	\only<4>{\FIGW{1.0}{"df23"}}
+	\only<5>{\FIGW{1.0}{"df24"}}
+	\only<6>{\FIGW{1.0}{"df2"}}
+	\end{center}
+\begin{itemize}
+	\pause
+	\item Extraire la liste des blocs et la liste des lignes
+	\pause
+	\item Aplatir le design s'il y a des sous-systèmes
+	\pause
+	\item Labelliser chaque blocs
+	\pause
+	\item Établir l'équation au niveau de chaque bloc, regrouper les sommes
+	\pause
+	\item Déduire le SIF, rendre la matrice J triangulaire
+\end{itemize}
+\end{frame}
+
+%________________________________________________________________________________________
+\begin{frame} \FT{Développement du module oSoP2VHD}
+\begin{itemize}
+\item \textbf{Principes : } Parcourir l'oSoP et instancier le générateur Stratus correspondant à chaque opérateur
+	\bigskip	
+	\begin{center}
+	\FIGW{1.0}{osop-vhd-build}
+	\end{center}
+\end{itemize}
+\end{frame}
+
+%________________________________________________________________________________________
+\begin{frame} \FT{Intégration : le flot complet}
+	\begin{center}
+	\FIGW{1.0}{fxp_synth_tool}
+	\end{center}
+\end{frame}

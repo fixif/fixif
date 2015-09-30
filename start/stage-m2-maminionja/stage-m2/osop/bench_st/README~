@@ -1,0 +1,9 @@
+power  Internal         Switching           Leakage            Total
+
+--------------------------------------------------------------------
+Les oSoP sont stockés dans des fichiers pkl (c’est une empreinte mémoire python). Pour chaque osop du fichier pkl, on le traduit en stratus puis on effectue la synthèse avec synopsys (dc_shell). Le script bench.py lance tout, synth.sh gère tout ce qu’il faut pour lancer la synthèse (connexion à distance, recopie des fichiers vhd, récupération des fichiers résultats…) et enfin le fichier synth.tcl est le script de synthèse pour dc_shell. Il y a un fichier env.sh qui positionne correctement l’environnement.
+
+Changer le type d'additionneur
+---------------------------------------------------------
+/users/outil/arith/latest/lib/fixed adder.ripple.Ripple
+cell.SetAdd(adder.ripple.Ripple)

@@ -1,0 +1,12 @@
+all : adder_tb
+
+adder.
+
+
+
+
+------------------------------
+ghdl -a -v adder.vhdl
+ghdl -a -v adder_tb.vhdl
+ghdl -e -v adder_tb
+ghdl -r adder_tb --vcd=adder.vcd

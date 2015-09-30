@@ -1,0 +1,19 @@
+060515-J1
+- https://github.com/steventen/Simulink-Model-Parsing-Tools
+- http://www.crummy.com/software/BeautifulSoup/bs4/doc/#navigating-the-tree : python lib for XML parsing
+- https://www.python.org/doc/
+- http://zone.ni.com/reference/en-XX/help/371325F-01/lvdfdtconcepts/dfd_structure_graph/ : digital filter
+
+-----------
+MDL file
+http://www.cmi.ac.in/~rajarshi/academics/Final%20Semester%20Project%20Report.pdf : page 45
+
+------------
+ROAD MAP
+S1 : prise en main du sujet, python
+S2 : comprendre la structure MDL, SLX, SIF
+
+
+------------
+INFO
+
