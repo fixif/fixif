@@ -1,0 +1,83 @@
+%==============================================================================
+\section{Procédure de recette}
+%==============================================================================
+
+\begin{frame} \FT{Procédure de recette}
+    \BI
+	\o Au niveau \textbf{développement}~:\\
+	 utiliser des tests unitaires.
+	Tous les tests devront passer
+	\smallskip
+	\o Au niveau des \textbf{fonctionnalités}~:\\ On testera par des exemples déjà traités par les 2 équipes
+	\smallskip
+	\o Au niveau de la \textbf{chaine complète}~:\\
+	\smallskip
+	\begin{center}
+	\FIGW{0.6}{tool_valid}
+	\end{center} 
+    \EI
+	\note{
+	validation chaine complète:A partir d'un diagramme de blocs en simulink, on devrait avoir un code VHDL correspondant qui réalise la même opération en virgule fixe.
+	Les mêmes jeux de test sur la simulation Simulink et la simulation du code vhdl issu de l'outil devrait donner à peut près le même résultat.
+	}
+\end{frame} 
+%_________________________________________
+\begin{frame} \FT{Procédure de recette}
+Pour la partie \textbf{diagramme Simulink vers SIF}~:
+	\smallskip
+	\BI
+	\o Essentiellement \textbf{par comparaison} au résultat d'interprétation manuelle
+	\o Comparaison au résultat pour le filtre LWDF déjà été fait "manuellement" par un membre de l'équipe PEQUAN\\
+		On doit avoir le \textbf{même résultat}
+	\o Petits diagrammes simulink  pour tester les fonctionnalités internes
+	\EI
+\note{
+	un example parametrable en matlab:LWDF 
+	}
+\end{frame}
+%________________________________________
+\begin{frame} \FT{Procédure de recette}
+Pour la partie utilisant Stratus~: \textbf{oSoP vers VHDL}
+	\smallskip
+	\BI
+	\o FiPoGen peut générer un \textbf{code C} virgule fixe correspondant à l'oSoP
+	\o Nous, on génère du code \textbf{VHDL} à partir de l'oSoP
+	\o On verifiera par \textbf{double simulation}~:\\
+		On génère aléatoirement les mêmes stimulus pour les 2 codes puis on lance les 2 simulations, ce qui devrait nous donner le même résultat.
+	\EI
+\end{frame} 
+
+%_________________________________________________________________________________________________________________________________________________
+% Au niveau de la chaine complète:
+% A partir d'un diagramme de blocs en simulink, on devrait avoir un code VHDL correspondant qui réalise la même opération en virgule fixe.
+% Si le temps le permet (on aura le flot complet), on verifiera par "co-simulation" avec Matlab. si tout est OK, on devrait avoir le même résultat 
+% de simulation à une petite erreur prêt.
+
+
+% Au niveau des fonctionnalités
+% On testera avec des exemples déjà traités par les 2 équipes ou des ex bien connus.
+% 
+% Pour la partie diagramme Simulink vers SIF:
+% La validation se fait essentiellement par comparaison au résultat d'interprétation manuelle.
+% un example parametrable en matlab(LWDF) a déjà été fait "manuellement" par un membre de l'équipe PEQUAN
+% On doit avoir le même résultat 
+% 
+% Le test des fonctionnalités internes se fait par des petits diagrammes simulink
+%
+%
+% Pour la partie Stratus: oSoP vers VHDL
+% FiPoGen peut générer un code C virgule fixe correspondant à l'oSoP
+% Nous, on génère du code VHDL à partir de l'oSoP
+% donc, on verifiera par co-simulation 
+% On génère aléatoirement les mêmes stimulus pour les 2 codes puis on lance les 2 simulations, ce qui devrait nous donner le même résultat.
+%
+% On pourra aussi verifier manuellement en inspectant les netlists, pour des diagrammes assez petits
+
+% Au niveau du développement
+% Ecrire des tests unitaires pour les méthodes essentiels.
+% ( Le Génie logiciel encourage de faire des tests unitaires, même pour un petit projet)
+% Tous les tests devront passer.
+
+
+
+ 

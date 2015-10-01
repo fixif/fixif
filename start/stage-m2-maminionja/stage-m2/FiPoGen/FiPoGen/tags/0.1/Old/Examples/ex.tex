@@ -1,0 +1,288 @@
+
+
+
+\documentclass{article}
+
+\usepackage{algorithm2e}
+\usepackage[latin1]{inputenc}
+\usepackage[francais]{babel}
+
+\begin{document}
+
+
+On part du filtre
+{\small
+$$h(z)= \frac{ 0.002540781151 +  0.010163124603z^{-1} +  0.015244686905z^{-2} +   0.010163124603z^{-3} +  0.002540781150z^{-4}}{1 + -2.644023719349z^{-1} +  2.779011479606z^{-2} + -1.345585149455z^{-3} +  0.251249887610z^{-4}}$$}
+
+On part sur 16 bits (signés) pour l'entrée $u$, la sortie $y$ et les états $xn$ et les variables intermédiaires $T$. Les coeffs sont sur 16 bits et les additions sont faites sur 32 bits (avec une troncature finale pour remettre le résultat sur 16).\\
+L'entrée et la sortie ont 11 bits de partie fractionnaire.
+
+\section{Forme directe 1}
+
+\begin{algorithm}[h]
+	\caption{R1q}
+	\KwIn{$u$: real}
+	\KwOut{$y$: real}
+	\KwData{$xn$: array [1..8] of reals}
+	\KwData{$T$: array [1..1] of reals}
+	\SetAlgoLined
+	\Begin{
+	\tcp{\emph{Intermediate variables}}
+	$T_{1}  \leftarrow -0.251249*xn_{1}\
+ + 1.34559*xn_{2}\
+ + -2.77901*xn_{3}\
+ + 2.64403*xn_{4}\
+ + 0.00254079*xn_{5}\
+ + 0.0101632*xn_{6}\
+ + 0.0152447*xn_{7}\
+ + 0.0101632*xn_{8}\
+ + 0.00254079*u     $\;
+	\tcp{\emph{States}}
+	$xn_{1} \leftarrow xn_{2}$\;
+	$xn_{2} \leftarrow xn_{3}$\;
+	$xn_{3} \leftarrow xn_{4}$\;
+	$xn_{4} \leftarrow T_{1} $\;
+	$xn_{5} \leftarrow xn_{6}$\;
+	$xn_{6} \leftarrow xn_{7}$\;
+	$xn_{7} \leftarrow xn_{8}$\;
+	$xn_{8} \leftarrow u     $\;
+	\tcp{\emph{Outputs}}
+	$y      \leftarrow T_{1} $\;
+	
+}
+\end{algorithm}
+
+Les $xn$ et $T$ ont 11 bits de partie fractionnaire.
+
+\section{Forme d'état équilibrée}
+
+
+\begin{algorithm}[h]
+	\caption{R2q}
+	\KwIn{$u$: real}
+	\KwOut{$y$: real}
+	\KwData{$xn, xnp$: array [1..4] of reals}
+	\SetAlgoLined
+	\Begin{
+	\tcp{\emph{Intermediate variables}}
+	$xnp_{1} \leftarrow 0.907343*xn_{1}\
+ + -0.286862*xn_{2}\
+ + 0.0328294*xn_{3}\
+ + -0.0159101*xn_{4}\
+ + -0.336379*u     $\;
+	$xnp_{2} \leftarrow 0.286863*xn_{1}\
+ + 0.738796*xn_{2}\
+ + 0.2983*xn_{3}\
+ + -0.0363151*xn_{4}\
+ + 0.369545*u     $\;
+	$xnp_{3} \leftarrow 0.0328294*xn_{1}\
+ + -0.298299*xn_{2}\
+ + 0.570736*xn_{3}\
+ + 0.230422*xn_{4}\
+ + 0.206615*u     $\;
+	$xnp_{4} \leftarrow 0.0159102*xn_{1}\
+ + -0.0363151*xn_{2}\
+ + -0.230421*xn_{3}\
+ + 0.42715*xn_{4}\
+ + 0.0489591*u     $\;
+	\tcp{\emph{Outputs}}
+	$y       \leftarrow -0.336379*xn_{1}\
+ + -0.369544*xn_{2}\
+ + 0.206615*xn_{3}\
+ + -0.048959*xn_{4}\
+ + 0.00254079*u     $\;
+
+	\tcp{\emph{Permutations}}
+	$xn \leftarrow xnp$\;	
+}
+\end{algorithm}
+
+$xn_1$,$xnp_1$, $xn_2$ et $xnp_2$ ont 10 bits de partie fractionnaire, $xn_3$ et $xnp_3$ ont 11 bits de partie fractionnaire et $xn_4$ et $xnp_4$ ont 12 bits de partie fractionnaire, 
+
+
+
+\section{$\rho$DFIIt}
+
+\begin{algorithm}[h]
+	\caption{R3q}
+	\KwIn{$u$: real}
+	\KwOut{$y$: real}
+	\KwData{$xn$: array [1..4] of reals}
+	\KwData{$T$: array [1..4] of reals}
+	\SetAlgoLined
+	\Begin{
+	\tcp{\emph{Intermediate variables}}
+	$T_{1}  \leftarrow 0.03125*xn_{1}\
+ + 0.00254079*u     $\;
+	$T_{2}  \leftarrow 0.03125*xn_{2}$\;
+	$T_{3}  \leftarrow 0.03125*xn_{3}$\;
+	$T_{4}  \leftarrow 0.03125*xn_{4}$\;
+	\tcp{\emph{States}}
+	$xn_{1} \leftarrow 16.8464*T_{1} \
+ + T_{2} \
+ + 0.89365*xn_{1}\
+ + 0.49739*u     $\;
+	$xn_{2} \leftarrow -702.948*T_{1} \
+ + T_{3} \
+ + 0.0578914*xn_{2}\
+ + 31.3233*u     $\;
+	$xn_{3} \leftarrow 825.015*T_{1} \
+ + T_{4} \
+ + 0.352869*xn_{3}\
+ + 1349.02*u     $\;
+	$xn_{4} \leftarrow -10705.6*T_{1} \
+ + 0.813167*xn_{4}\
+ + 28795.1*u     $\;
+	\tcp{\emph{Outputs}}
+	$y      \leftarrow T_{1} $\;
+	
+}
+\end{algorithm}
+
+$xn_1$, $xn_2$, $xn_3$ et $xn_4$ ont respectivement 6, 2, -2 et -6 bits de partie fractionnaire.
+$T_1$, $T_2$, $T_3$ et $T_4$ ont respectivement 11,7,3 et -1 bits de partie fractionnaire.
+
+
+
+\end{document}
+
+\section{les mêmes en virgule fixe (sans décalages intermédiaires au cours des accumulations, Roundoff Before Multiplication)}
+
+\begin{algorithm}[h]
+	\caption{R1q}
+	\KwIn{$u$: 16 bits integer}
+	\KwOut{$y$: 16 bits integer}
+	\KwData{$xn$: array [1..8] of 16 bits integers}
+	\KwData{$T$: array [1..1] of 16 bits integers}
+	\KwData{$Acc$: 32 bits integer}
+	\SetAlgoLined
+	\Begin{
+	\tcp{\emph{Intermediate variables}}
+	$Acc \leftarrow (xn(1) * -2058)$\;
+	$Acc \leftarrow Acc + (xn(2) * 11023)$\;
+	$Acc \leftarrow Acc + (xn(3) * -22766)$\;
+	$Acc \leftarrow Acc + (xn(4) * 21660)$\;
+	$Acc \leftarrow Acc + (xn(5) * 21)$\;
+	$Acc \leftarrow Acc + (xn(6) * 83)$\;
+	$Acc \leftarrow Acc + (xn(7) * 125)$\;
+	$Acc \leftarrow Acc + (xn(8) * 83)$\;
+	$Acc \leftarrow Acc + (u     * 21)$\;
+	$T_{1} \leftarrow (Acc >> 13)$\;
+	\tcp{\emph{States}}
+	$Acc \leftarrow xn(2)$\;
+	$xn(1) \leftarrow Acc$\;
+	$Acc \leftarrow xn(3)$\;
+	$xn(2) \leftarrow Acc$\;
+	$Acc \leftarrow xn(4)$\;
+	$xn(3) \leftarrow Acc$\;
+	$Acc \leftarrow T_{1}$\;
+	$xn(4) \leftarrow Acc$\;
+	$Acc \leftarrow xn(6)$\;
+	$xn(5) \leftarrow Acc$\;
+	$Acc \leftarrow xn(7)$\;
+	$xn(6) \leftarrow Acc$\;
+	$Acc \leftarrow xn(8)$\;
+	$xn(7) \leftarrow Acc$\;
+	$Acc \leftarrow u$\;
+	$xn(8) \leftarrow Acc$\;
+	\tcp{\emph{Outputs}}
+	$Acc \leftarrow T_{1}$\;
+	$y     \leftarrow Acc$\;
+	
+}
+\end{algorithm}
+
+
+\begin{algorithm}[h]
+	\caption{R2q}
+	\KwIn{$u$: 16 bits integer}
+	\KwOut{$y$: 16 bits integer}
+	\KwData{$xn, xnp$: array [1..4] of 16 bits integers}
+	\KwData{$Acc$: 32 bits integer}
+	\SetAlgoLined
+	\Begin{
+	\tcp{\emph{Intermediate variables}}
+	$Acc \leftarrow (xn(1) * 29732)$\;
+	$Acc \leftarrow Acc + (xn(2) * -9400)$\;
+	$Acc \leftarrow Acc + (xn(3) * 538)$\;
+	$Acc \leftarrow Acc + (xn(4) * -130)$\;
+	$Acc \leftarrow Acc + (u     * -5511)$\;
+	$xnp(1) \leftarrow (Acc >> 15)$\;
+	$Acc \leftarrow (xn(1) * 9400)$\;
+	$Acc \leftarrow Acc + (xn(2) * 24209)$\;
+	$Acc \leftarrow Acc + (xn(3) * 4887)$\;
+	$Acc \leftarrow Acc + (xn(4) * -297)$\;
+	$Acc \leftarrow Acc + (u     * 6055)$\;
+	$xnp(2) \leftarrow (Acc >> 15)$\;
+	$Acc \leftarrow (xn(1) * 2152)$\;
+	$Acc \leftarrow Acc + (xn(2) * -19549)$\;
+	$Acc \leftarrow Acc + (xn(3) * 18702)$\;
+	$Acc \leftarrow Acc + (xn(4) * 3775)$\;
+	$Acc \leftarrow Acc + (u     * 6770)$\;
+	$xnp(3) \leftarrow (Acc >> 15)$\;
+	$Acc \leftarrow (xn(1) * 4171)$\;
+	$Acc \leftarrow Acc + (xn(2) * -9520)$\;
+	$Acc \leftarrow Acc + (xn(3) * -30202)$\;
+	$Acc \leftarrow Acc + (xn(4) * 27994)$\;
+	$Acc \leftarrow Acc + (u     * 6417)$\;
+	$xnp(4) \leftarrow (Acc >> 16)$\;
+	\tcp{\emph{Outputs}}
+	$Acc \leftarrow (xn(1) * -22045)$\;
+	$Acc \leftarrow Acc + (xn(2) * -24218)$\;
+	$Acc \leftarrow Acc + (xn(3) * 6770)$\;
+	$Acc \leftarrow Acc + (xn(4) * -802)$\;
+	$Acc \leftarrow Acc + (u     * 83)$\;
+	$y      \leftarrow (Acc >> 15)$\;
+
+	\tcp{\emph{Permutations}}
+	$xn \leftarrow xnp$\;	
+}
+\end{algorithm}
+
+\begin{algorithm}[h]
+	\caption{R3q}
+	\KwIn{$u$: 16 bits integer}
+	\KwOut{$y$: 16 bits integer}
+	\KwData{$xn$: array [1..4] of 16 bits integers}
+	\KwData{$T$: array [1..4] of 16 bits integers}
+	\KwData{$Acc$: 32 bits integer}
+	\SetAlgoLined
+	\Begin{
+	\tcp{\emph{Intermediate variables}}
+	$Acc \leftarrow (xn(1) << 14)$\;
+	$Acc \leftarrow Acc + (u     * 42)$\;
+	$T_{1} \leftarrow (Acc >> 14)$\;
+	$Acc \leftarrow xn(2)$\;
+	$T_{2} \leftarrow Acc$\;
+	$Acc \leftarrow xn(3)$\;
+	$T_{3} \leftarrow Acc$\;
+	$Acc \leftarrow xn(4)$\;
+	$T_{4} \leftarrow Acc$\;
+	\tcp{\emph{States}}
+	$Acc \leftarrow (T_{1} * 17251)$\;
+	$Acc \leftarrow Acc + (T_{2} << 14)$\;
+	$Acc \leftarrow Acc + (xn(1) * 29283)$\;
+	$Acc \leftarrow Acc + (u     * 509)$\;
+	$xn(1) \leftarrow (Acc >> 15)$\;
+	$Acc \leftarrow (T_{1} * -22494)$\;
+	$Acc \leftarrow Acc + (T_{3} << 13)$\;
+	$Acc \leftarrow Acc + (xn(2) * 948)$\;
+	$Acc \leftarrow Acc + (u     * 1002)$\;
+	$xn(2) \leftarrow (Acc >> 14)$\;
+	$Acc \leftarrow (T_{1} * 3300)$\;
+	$Acc \leftarrow Acc + (T_{4} << 14)$\;
+	$Acc \leftarrow Acc + (xn(3) * 11563)$\;
+	$Acc \leftarrow Acc + (u     * 5396)$\;
+	$xn(3) \leftarrow (Acc >> 15)$\;
+	$Acc \leftarrow (T_{1} * -2676)$\;
+	$Acc \leftarrow Acc + (xn(4) * 26646)$\;
+	$Acc \leftarrow Acc + (u     * 7199)$\;
+	$xn(4) \leftarrow (Acc >> 15)$\;
+	\tcp{\emph{Outputs}}
+	$Acc \leftarrow T_{1}$\;
+	$y     \leftarrow Acc$\;
+	
+}
+\end{algorithm}
+
+\end{document}

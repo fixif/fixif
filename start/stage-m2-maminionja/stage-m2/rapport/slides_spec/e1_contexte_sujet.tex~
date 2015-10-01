@@ -1,0 +1,97 @@
+%==============================================================================
+\section{Contexte et Sujet}
+%==============================================================================
+
+\begin{frame} \FT{Pourquoi ce stage ?}
+    \BI
+    \o Le stage fait partie du projet \textbf{FxPSynthesis} - Action initiative du LIP6
+       \BI
+       \o Collaboration entre les 2 équipes CIAN et PEQUAN
+       \o Développement d'un \textbf{outil commun pour la conception de circuits}
+       \o Dans la thématique Systèmes embarqués
+       \o Un flot complet - accélerer le développement d'application 
+       \EI
+	\smallskip
+    \o Les participants:
+		\BI
+		\o \textbf{CIAN} ( Circuits Intégés Analogiques et Numériques) \\ \hspace{1cm}Dpt Système sur Puce
+		\o \textbf{PEQUAN} (Performance et Qualité des Algorithmes Numériques) \\ \hspace{1cm}Dpt Calcul Scientifique
+		\EI
+    \EI
+\note{
+	Ce stage est lié au projet FxPSynthesis, qui est un projet Action initiative du LIP6.
+	Ce projet est le fruit d'une collaboration entre les 2 équipes CIAN et PEQUAN du laboratoire, 
+	dans l'objectif de développer un outil commun dans le domaine de la conception de circuits mixtes A/N.
+	Il s'inscrit dans une thématique "Systèmes embarqués".
+	Ainsi, cet outil pourra être utilisé pour accélerer le developpement d'applications (l'outil gérera un flot complet de conception)
+}
+\end{frame} 
+%_____________________________________________________________________________
+\begin{frame} \FT{Le sujet }
+    \BI
+    \o \textbf{Objectif}: avoir un \textcolor{green}{outil} de synthèse de haut-niveau pour les filtres linéaires, en utilisant l'arithmétique virgule fixe 
+	\vspace{0.7cm}
+	%\smallskip
+	\begin{center}
+	\FIGW{0.8}{flot}
+	\end{center}			
+	\EI
+\end{frame}	
+\begin{frame} \FT{Le sujet }
+	\BI
+	    \o \textbf{Etat de l'art}:
+		\BI
+			\o des outils de synthèse de filtres existe déjà, ex: FDAtool de Matlab 
+			\o par simulations/raffinements - pas très performants.
+		\EI
+		\smallskip
+		\o \textbf{Le projet} permet de développer un outil performant commun entre les 2 équipes.\\
+	\smallskip
+	\'A notre disposition, on a:
+		\BI 
+		\o \textbf{FiPoGen}: un outil qui permet de transformer un algo en du code virgule fixe déjà spécifié 
+		\o \textbf{Stratus}: qui permet de décrire des composants matériels à l'aide de ces générateurs paramétrables	
+		\EI 
+    \EI
+\note{
+	Le stage consiste à développer un outil permettant la conception haut niveau de circuits utilisant l'arithmétique virgule fixe.
+	Le but est de rapprocher et de compléter les 2 outils FiPoGen et Stratus développé respectivement par les 2 équipes PEQUAN et CIAN.
+	FipoGen permet de transformer un algo en du code virgule fixe déjà spécifié
+	Stratus permet de décrire des composants matériels à l'aide de ces générateurs paramétrables	
+	Mis ensemble, les 2 formeront une suite dans un flot de conception.
+
+	(Figure flot de conception)
+	
+	(Certes, des outils commerciales existent déjà comme DSP System Toolbox (FDAtool), HDL Coder de Matlab, mais ...)
+	
+	}
+\end{frame}
+%____________________________________________________________________________________
+\begin{frame} \FT{Le sujet }
+    \BI
+	\o Schéma de l'outil à développer
+	\begin{flushleft}
+	\begin{center}
+	\FIGW{0.9}{tool}
+	\end{center}		
+	\end{flushleft}
+	\smallskip	
+	\o \textbf{les tâches} spécifiques au stage:
+		\BI 
+		\o Concevoir le module "SLX to SIF"
+		%qui permet à FiPoGen d'importer des diagrammes Simulink
+		\o Développer le module "oSoP to VHDL" à l'aide de Stratus
+		%pour génerer l'architecture matérielle correspondant au graphe de calcul généré par FiPoGen.
+		\o Intégrer ces modules aux outils existant
+		\EI
+	\EI
+\note{
+	En addition, on peut exploiter les interactions possibles entre les 2 outils.
+}
+\end{frame}
+
+%______________________________________________________________________________________________________________________
+ 
+
+
+ 

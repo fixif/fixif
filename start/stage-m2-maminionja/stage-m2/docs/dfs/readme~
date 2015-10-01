@@ -1,0 +1,18 @@
+Deep First Search
+This algo will be used to make J matrix of SIF to be lower triangular
+link given by Anastasia Lozanova Volkova
+anastasia.volkova@lip6.fr 
+----------------------------------------------
+
+https://www.cs.usfca.edu/~galles/visualization/DFS.html —DFS animation
+
+https://www.cs.usfca.edu/~galles/visualization/TopoSortDFS.html - Topological sort animation
+
+https://gist.github.com/kachayev/5910538 - python code
+
+https://www.youtube.com/watch?v=rSCR8r2aNA8
+
+http://www.geeksforgeeks.org/topological-sorting/ - C++ code
+
+
+

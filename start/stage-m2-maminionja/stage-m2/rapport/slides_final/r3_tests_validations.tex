@@ -1,0 +1,58 @@
+%==============================================================================
+\section{Tests et Validations}
+%==============================================================================
+\hspace*{2cm}
+\frame{\tableofcontents[currentsection]}
+%________________________________________
+\begin{frame} \FT{Validation du module SLX2SIF }
+	\begin{itemize}
+	\item Validation sur les 2 types de structures de d'adaptateur pour LWDF
+	\begin{center}
+	\FIGW{0.7}{adapteur_sif_.png}
+	\end{center}
+	\item Validation sur un exemple de LWDF de 5è ordre (EUSIPCO15)
+	\begin{center}
+	\FIGW{0.7}{lwdf_butter5L.png}
+	\end{center}
+	\end{itemize}
+	\textbf{LWDF} : Lattice Wave Digital Filter
+\end{frame}
+
+\begin{frame} \FT{Validation du module SLX2SIF}
+Les fonctionnalités internes vérifiés sont : 
+\begin{itemize}
+\item Récupération des paramètres des blocs
+	\begin{itemize}
+	\item Gain (Gain)
+	\item DelayLength (Delay)
+	\item Inputs (Sum)
+	\end{itemize}
+\item Traitement des sous-systèmes (SubSystem)
+\item Groupement des additions 
+\item Établissement de l'équation pour chaque bloc
+\end{itemize}
+\bigskip
+\hspace{2cm}\textbf{\textcolor{red}{On a les mêmes matrices à la sortie}}  \\
+\end{frame}
+
+
+\begin{frame} \FT{Validation de la génération de la liste oSoP }
+	On a \textbf{automatisé} la génération de la liste d'oSoP
+	\begin{center}
+	\FIGW{1.0}{losop_all.png}
+	\end{center}
+\end{frame}
+
+\begin{frame} \FT{ Validation du module SIF2VHDL}
+	\begin{center}
+	\FIGW{0.6}{vhd_valid}
+	\end{center}
+	\hspace{2cm} Les 2 codes génèrent les même sorties
+\end{frame}
+
+\begin{frame} \FT{ Exemple de génération de circuit}
+	\begin{center}
+	\FIGW{1.0}{circuit}
+	\end{center}
+	\hspace{2cm} Validation visuelle du circuit
+\end{frame}

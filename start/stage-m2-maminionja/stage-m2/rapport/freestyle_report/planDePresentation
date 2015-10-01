@@ -1,0 +1,23 @@
+PLAN DE PRESENTATION
+
+1.Rappel du sujet (Spécification)
+ - Contexte
+ - Problème à Résoudre
+ - la manière choisie pour le résoudre
+
+2.Mise en oeuvre de la solution
+ - Environnement de dev & d'expérimentation ( Machine et outil, FiPoGen, Stratus, les packages python)
+ - Développement du module SLX2SIF + résultats
+ - Génération de la description HW pour un oSoP + résultats
+ - Développer une application permettant de générer automatiquement la liste des oSoP à partir d'un schéma bloc, en utilisant FiPoGen
+ - Utilisation de Stratus pour Générer le circuit complet à partir de la liste des oSoP 
+
+3.Les tests de validation
+ ( description + résultats)
+
+4.Analyse des Résultats
+ ( interprétation et comparaison avec d'autres résulats ( attendus ou autres réalisations) )
+
+5.Conclusions et Perspectives
+ - Apport du travail de stage
+ - Perspectives
