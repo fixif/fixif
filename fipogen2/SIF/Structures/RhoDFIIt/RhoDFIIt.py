@@ -145,6 +145,11 @@ class RhoDFIIt(SIF):
                
         R2 = S.toSIF()
         
+        if isGammaExact:
+        	
+        	for i in range(1,p+1):
+        		R2._dP[] # TODO/PROBLEM
+        
         # WP ??
         
         
