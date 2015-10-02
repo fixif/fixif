@@ -94,7 +94,7 @@ class SIF(FIPObject):
         return (abs(x) < eps) or (abs(x-1) < eps) or (abs(x+1) < eps)
    
     @staticmethod
-    def _nonTrivial(X, eps=1.e-8):
+    def _nonTrivial(X, eps):
        
         """
         
@@ -112,6 +112,21 @@ class SIF(FIPObject):
           
         return np.vectorize(lambda x:int(not SIF._isTrivial(x, eps))) (X)
    
+    @staticmethod
+    def _build_Z_or_dZ(9matrix):
+			
+		"""
+		build Z or dZ depending on provided matrix tuple
+		"""
+			
+		J, K, L, M, N, P, Q, R, S = [np.matrix(X) for X in 9matrix]
+			
+		return np.bmat([[-J, M, N], 
+						[ K, P, Q], 
+						[ L, R, S]])   
+    
+    
+    
     def __init__(self, JtoS, delta_eps=1.e-8, father_obj=None, **event_spec): # name can be specified in e_desc
 
         # Define default event if not specified
@@ -135,62 +150,66 @@ class SIF(FIPObject):
 
         # set and check sizes
         self._l, self._m, self._n, self._p = self.__check_set_dimensions__()
-              
-        # build Z from JtoS
-        self._Z = np.bmat([[-self._J, self._M, self._N], 
-                           [ self._K, self._P, self._Q], 
-                           [ self._L, self._R, self._S]])
         
+        self._Z = _build_Z_or_dZ(JtoS)
 
-        # build dZ from Z
-        #self._dZ = [_nonTrivial(self._Z, delta_eps)]
-        
-        self._dZ = self._build_dZ()
+        def _build_dX(X, eps=1.e-8):
+            
+	    	"""
+		    Build dZ from Z
+		
+		    During the quantization process, :math:`Z` is perturbed to become :math:`Z + r_Z \times \Delta` where
+		
+    		.. math:
+		
+		    	r_Z \triangleq \left\lbrace\begin{aligned}
+	    							 W_Z \text{for fixed-point representation,}\\
+			    					 2 \eta_Z \times W_Z \text{for floating-point representation,}
+				    				  \end{aligned}\right.
+								  
+		    and :math:`\eta_Z` is such that
+		
+    		.. math:
+		
+	    		\left( \eta_Z \right)_{i,j} \left\lbrace\begin{aligned}
+		    								\text{the largest absolute value of} \\
+			    							\text{the block in which} Z_{i,j} \text{resides.}
+				    						\end{aligned}\right.
+										
+    		"""
+            
+            return SIF._nonTrivial(X, eps)
+
+        # Initial version of dZ from Z
+        self._dZ = _build_dX(self._Z)
+
+        # build dJ to dS because we may need those afterwards (modification)
+        self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS = [_build_dX(X) for X in JtoS]
+
         
         # AZ, BZ, CZ, DZ
+        def _build_AZtoDZ(self):
         
+            inv_J = np.linalg.inv(self._J)
+        
+            AZ = self._K * inv_J * self._M + self._P
+            BZ = self._K * inv_J * self._N + self._Q
+            CZ = self._L * inv_J * self._M + self._R
+            DZ = self._L * inv_J * self._N + self._S
+        
+            return (AZ, BZ, CZ, DZ)
+
         self._AZ, self._BZ, self._CZ, self._DZ = self._build_AZtoDZ()
-    
-    def _build_AZtoDZ(self):
-        
-        inv_J = np.linalg.inv(self._J)
-        
-        AZ = self._K * inv_J * self._M + self._P
-        BZ = self._K * inv_J * self._N + self._Q
-        CZ = self._L * inv_J * self._M + self._R
-        DZ = self._L * inv_J * self._N + self._S
-        
-        return (AZ, BZ, CZ, DZ)
-    
-    def _build_dZ(self, eps=1.e-8):
-        
-        """
-        Build dZ from Z
-        
-        During the quantization process, :math:`Z` is perturbed to become :math:`Z + r_Z \times \Delta` where
-        
-        .. math:
-        
-            r_Z \triangleq \left\lbrace\begin{aligned}
-                                 W_Z \text{for fixed-point representation,}\\
-                                 2 \eta_Z \times W_Z \text{for floating-point representation,}
-                                  \end{aligned}\right.
-                                  
-        and :math:`\eta_Z` is such that
-        
-        .. math:
-        
-            \left( \eta_Z \right)_{i,j} \left\lbrace\begin{aligned}
-                                        \text{the largest absolute value of} \\
-                                        \text{the block in which} Z_{i,j} \text{resides.}
-                                        \end{aligned}\right.
-                                        
-        """
-        
-        dZ = SIF._nonTrivial(self._Z, eps)
-        
-        return dZ
-        
+   
+   	def _refresh_dZ():
+			
+		"""
+		- rebuild dZ if some matrix from dJ to dS has changed (manual use as of 02/10/2015)
+		"""
+		
+		dJtodS = self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS
+		
+		self._dZ = _build_Z_or_dZ(dJtodS)
    
     def __check_set_dimensions__(self):
         
