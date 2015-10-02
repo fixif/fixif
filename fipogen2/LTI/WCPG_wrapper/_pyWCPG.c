@@ -2,7 +2,15 @@
   It should be extended in the future to wrap the WCPG arbitrary precision function.
   
   Joachim Kruithof
-  LIP6 - 2015 */
+  LIP6 - 2015 
+  
+  See
+  
+  http://dan.iel.fm/posts/python-c-extensions/
+  http://stackoverflow.com/questions/27829946/extend-python-with-c-return-numpy-array-gives-garbage
+  http://docs.scipy.org/doc/numpy/reference/c-api.dtype.html
+  
+  */
 
 #include <Python.h>
 #include <numpy/arrayobject.h>
