@@ -1,4 +1,0 @@
-le dossier "mfixed_point" contient les fonctionnalités de FipoGen
-nécessaire pour la manipulation des oSoP (ordered Sum of Product)
--------------------------------------------------------------------------
-le dossier "bench_st" contient des oSoP, leur conversion en VHDL, leur synthese ainsi que l'estimation des performances
