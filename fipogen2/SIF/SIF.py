@@ -113,21 +113,68 @@ class SIF(FIPObject):
         return np.vectorize(lambda x:int(not SIF._isTrivial(x, eps))) (X)
    
     @staticmethod
-    def _build_Z_or_dZ(9matrix):
+    def _build_Z_or_dZ(my9matrix):
+            
+        """
+        build Z or dZ depending on provided matrix tuple
+        """
+            
+        J, K, L, M, N, P, Q, R, S = [np.matrix(X) for X in my9matrix]
+            
+        return np.bmat([[-J, M, N], 
+                        [ K, P, Q], 
+                        [ L, R, S]])   
+    
+    def _build_dX(X, eps=1.e-8):
+            
+        """
+        Build dZ from Z
+        
+        During the quantization process, :math:`Z` is perturbed to become :math:`Z + r_Z \times \Delta` where
+        
+        .. math:
+        
+            r_Z \triangleq \left\lbrace\begin{aligned}
+                                 W_Z \text{for fixed-point representation,}\\
+                             2 \eta_Z \times W_Z \text{for floating-point representation,}
+                                  \end{aligned}\right.
+                                  
+        and :math:`\eta_Z` is such that
+        
+        .. math:
+        
+            \left( \eta_Z \right)_{i,j} \left\lbrace\begin{aligned}
+                                        \text{the largest absolute value of} \\
+                                        \text{the block in which} Z_{i,j} \text{resides.}
+                                        \end{aligned}\right.
+                                        
+        """
+            
+        return SIF._nonTrivial(X, eps)
+    
+    # AZ, BZ, CZ, DZ
+    def _build_AZtoDZ(self):
+        
+        inv_J = np.linalg.inv(self._J)
+        
+        AZ = self._K * inv_J * self._M + self._P
+        BZ = self._K * inv_J * self._N + self._Q
+        CZ = self._L * inv_J * self._M + self._R
+        DZ = self._L * inv_J * self._N + self._S
+        
+        return (AZ, BZ, CZ, DZ)
+    
+    def _refresh_dZ(self):
 			
 		"""
-		build Z or dZ depending on provided matrix tuple
+		- rebuild dZ if some matrix from dJ to dS has changed (manual use as of 02/10/2015)
 		"""
-			
-		J, K, L, M, N, P, Q, R, S = [np.matrix(X) for X in 9matrix]
-			
-		return np.bmat([[-J, M, N], 
-						[ K, P, Q], 
-						[ L, R, S]])   
+		
+		dJtodS = self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS
+		
+		self._dZ = _build_Z_or_dZ(dJtodS)
     
-    
-    
-    def __init__(self, JtoS, delta_eps=1.e-8, father_obj=None, **event_spec): # name can be specified in e_desc
+    def __init__(self, JtoS, eps=1.e-8, father_obj=None, **event_spec): # name can be specified in e_desc
 
         # Define default event if not specified
         # default event : SIF instance created from user interface
@@ -153,68 +200,19 @@ class SIF(FIPObject):
         
         self._Z = _build_Z_or_dZ(JtoS)
 
-        def _build_dX(X, eps=1.e-8):
-            
-	    	"""
-		    Build dZ from Z
-		
-		    During the quantization process, :math:`Z` is perturbed to become :math:`Z + r_Z \times \Delta` where
-		
-    		.. math:
-		
-		    	r_Z \triangleq \left\lbrace\begin{aligned}
-	    							 W_Z \text{for fixed-point representation,}\\
-			    					 2 \eta_Z \times W_Z \text{for floating-point representation,}
-				    				  \end{aligned}\right.
-								  
-		    and :math:`\eta_Z` is such that
-		
-    		.. math:
-		
-	    		\left( \eta_Z \right)_{i,j} \left\lbrace\begin{aligned}
-		    								\text{the largest absolute value of} \\
-			    							\text{the block in which} Z_{i,j} \text{resides.}
-				    						\end{aligned}\right.
-										
-    		"""
-            
-            return SIF._nonTrivial(X, eps)
-
         # Initial version of dZ from Z
         self._dZ = _build_dX(self._Z)
 
         # build dJ to dS because we may need those afterwards (modification)
-        self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS = [_build_dX(X) for X in JtoS]
-
-        
-        # AZ, BZ, CZ, DZ
-        def _build_AZtoDZ(self):
-        
-            inv_J = np.linalg.inv(self._J)
-        
-            AZ = self._K * inv_J * self._M + self._P
-            BZ = self._K * inv_J * self._N + self._Q
-            CZ = self._L * inv_J * self._M + self._R
-            DZ = self._L * inv_J * self._N + self._S
-        
-            return (AZ, BZ, CZ, DZ)
+        self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS = [_build_dX(X, eps) for X in JtoS]
 
         self._AZ, self._BZ, self._CZ, self._DZ = self._build_AZtoDZ()
-   
-   	def _refresh_dZ():
-			
-		"""
-		- rebuild dZ if some matrix from dJ to dS has changed (manual use as of 02/10/2015)
-		"""
-		
-		dJtodS = self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS
-		
-		self._dZ = _build_Z_or_dZ(dJtodS)
    
     def __check_set_dimensions__(self):
         
         """
-        Computes the size 'l,m,n,p' of SIF
+        Compute the size 'l, m, n, p' of SIF
+        
         Check size of matrixes 'J' to 'S'
         """
         
@@ -300,10 +298,8 @@ class SIF(FIPObject):
         
         def plural(n):
             
-            if (n > 1):
-                str='s'
-            else:
-                str=''
+            if (n > 1): str='s'
+            else: str=''
             
             return str
         
