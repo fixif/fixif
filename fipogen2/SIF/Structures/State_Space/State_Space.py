@@ -9,7 +9,7 @@ from numpy import eye, zeros
 
 class State_Space(SIF):
 
-    def __init__(self, A, B, C, D, delta_eps = 1.e-8, father_obj = None, **event_spec):
+    def __init__(self, A, B, C, D, eps = 1.e-8, father_obj = None, **event_spec):
         
         """
         Convert a discrete state space to to SIF
