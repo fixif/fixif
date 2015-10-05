@@ -28,7 +28,7 @@ class Sif(object):
 		
 	def build(self, system):
 		# Equations and Blocks list in the system are needed for SIF generation
-		# Matrix element value placement depend on variables order
+		# /!\ Matrix element value placement depend on variables order
 		u = [u.sid for u in system.getinblocks()]
 		x = [xeq.out for xeq in system.equations if system.getblockbysid(xeq.out).type == 'Delay']
 		sum = [teq.out for teq in system.equations if system.getblockbysid(teq.out).type == 'Sum']
@@ -36,6 +36,7 @@ class Sif(object):
 		y = [s for s in sum if  system.getblockbysid(s).isoutblock() == True]
 
 		# TODO: dirty work, just for test, clean useless variables and computation
+		# for block labeling : type+sid
 		self.u = [system.getblockbysid(i).label for i in u]
 		self.x = [system.getblockbysid(i).label for i in x]
 		self.t = [system.getblockbysid(i).label for i in t]
@@ -96,7 +97,11 @@ class Sif(object):
 		 "\nR:" + str(self.p) + 'x' +str(self.n) + "\n" + strmat(self.R) + \
 		 "\nN:" + str(self.l) + 'x' +str(self.m) + "\n" + strmat(self.N) + \
 		 "\nQ:" + str(self.n) + 'x' +str(self.m) + "\n" + strmat(self.Q) + \
-		 "\nS:" + str(self.p) + 'x' +str(self.m) + "\n" + strmat(self.S)
+		 "\nS:" + str(self.p) + 'x' +str(self.m) + "\n" + strmat(self.S) + \
+		"\n\nt:" + str(self.t) + \
+		"\nx:" + str(self.x) + \
+		"\nu:" + str(self.u) + \
+		"\ny:" + str(self.y) 
 
 	
 	def reorganize(self):
@@ -133,7 +138,7 @@ class Sif(object):
 		N_VISITED = 0
 		lorder = []
 		def visit( node , n_visited):
-			print node[0], node[1], node[2]
+			#print node[0], node[1], node[2]
 			
 			if node[1] == 1:
 				print "\nerror - not a D.A.G !!!"
@@ -185,6 +190,7 @@ class Sif(object):
 		for i in range(self.l): 
 			Nn[i] = self.N[lorder[i]]
 		self.N = Nn
+		#TODO: do J, M and N lines together 
 
 
 		# Reorganize K and L matrix : order column (variables order)
@@ -201,4 +207,9 @@ class Sif(object):
 				Ln[i][j] = self.L[i][lorder[j]]
 		self.L = Ln
 
+		#Reorganize only t vector
+		tn = self.t[:]
+		for i in range(N):
+			tn[i] = self.t[lorder[i]]
+		self.t = tn
 	

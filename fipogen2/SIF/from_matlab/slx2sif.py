@@ -16,9 +16,9 @@ from diagram import System
 
 def generatesif():
 	""" Main function to generate SIF matrix from Simulink diagram"""
-	print "\n------------------------------------"
+	print "\n\x1b[34m\n------------------------------------"
 	print "GENERATING S.I.F FROM SLX MATLAB FILE"
-	print "-------------------------------------\n"
+	print "-------------------------------------\n\x1b[0m\n"
 	
 	# Getting the slx file, containning the diagram, from the command line
 	if len(sys.argv) < 2:
@@ -31,9 +31,9 @@ def generatesif():
 
 	# check archive
 	if slxe.isarchivevalid(zfile):
-		print "archive OK"
+		print "\x1b[32m\narchive OK\x1b[0m\n"
 	else:
-		print "missing or bad archive"
+		print "\x1b[31m\nmissing or bad archive\x1b[0m\n"
 		sys.exit()
 
 	# extract archive file
@@ -49,19 +49,21 @@ def generatesif():
 	# blocks and lines
 	mysys.printblocks()
 	mysys.printlines()
-	print "\nInitial Equations"
+	print "\x1b[32m\n\nInitial Equations\x1b[0m\n"
 	mysys.printequations()
 
 	# Call summerge() before expandeqgain()
 	# call it as much as there may be a cascaded Sum
-	mysys.summerge() 
-	mysys.summerge()
-	mysys.summerge()
+	n_sum = len(mysys.getblocksbytype('Sum'))
+	for i in range(n_sum):
+		mysys.summerge() 
+
 	mysys.expandeqgain() # put gain as Sum coeff 
-	print "\nFinal Equations"
+	print "\x1b[32m\n\nFinal Equations\x1b[0m\n"
 	mysys.printequations()
 
 	# SIF Generation
+	# just for SIF size
 	u,x,t,y = mysys.getsysvar()	
 	l = len(t)
 	m = len(u)
@@ -71,7 +73,7 @@ def generatesif():
 	# build the corresponding SIF
 	mysif.build(mysys)
 	mysif.reorganize()
-	print "\n\nSIF corresponding to initial diagram:"
+	print "\x1b[32m\n\n\nSIF corresponding to initial diagram:\x1b[0m\n"
 	print mysif	
 
 	print "\nSystem variables:"
@@ -85,7 +87,7 @@ def generatesif():
 	siffile.write(str(mysif))
 	siffile.close()
 
-	print "\nSIF matrix saved to SIF.txt"
+	print "\x1b[32m\n\nSIF matrix saved to : \x1b[0mSIF.txt\n"
 	print "\n"
 	
 
