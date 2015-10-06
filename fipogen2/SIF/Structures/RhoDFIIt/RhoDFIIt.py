@@ -148,7 +148,7 @@ class RhoDFIIt(SIF):
         C = dot(Cbar, inv(Tsc))
         D = Dbar  # can also be computed from Valpha and Vbeta
         
-        S = State_Space(A,B,C,D) # TODO add special event
+        S = State_Space(A,B,C,D) # TODO add special event / PROBLEM HERE REGARDING OOP
         
         A0 = diag(ones((p-1,1)),1)
         
