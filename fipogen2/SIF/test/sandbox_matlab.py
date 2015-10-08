@@ -8,35 +8,51 @@ import matlab.engine
 
 from scipy.signal import butter, tf2ss
 
+import numpy.testing as npt
 
+from scipy.io import loadmat
 
-def mtlb_save(filename, variables):
+from numpy import matrix as mat
+
+def mtlb_save(eng, var):
     
     """
-    generate a string to save some variables in a matlab file
-    variables is an array of strings
-    filename completed with .mat
+    saves var variable in var.mat file
+    easier for debug purposes
     """
-    fmt = '\'-v7\'' # we don't want hdf5 format  
-    filename = '\'' + filename + '.mat\''
-  
-    str_save = 'save(' + '\'' + filename + '\', '
-  
-    for var in variables:
-       str_save += '\'' + var + '\', '
-       
-    str_save += fmt + ');'
-  
-    return str_save
+    
+    fmt = '\'-v7\'' # we don't want hdf5 format
+    filename = '\'' + var + '.mat\''
+    
+    str_save = 'save(' + '\'' + filename + '\', ' + var + ', ' + fmt + ');'
+    eng.eval(str_save)
 
-def mtlb_listvar(varz):
-  
-    str_varz = ''
-  
-      for var in varz:
-          str_varz += var + ','
 
-    return str_varz[:-1]
+def mtlb_cleanenv(eng):
+    eng.eval('clear all ; close all ;')
+  
+
+def mtlb_compare(mtlb_eng, mtlb_code, varz, local_varz_dict, decim = 10):
+
+    """
+    Compare value with matlab values for a given executed code
+    """
+    mtlb_cleanenv(mtlb_eng)
+    
+    mtlb_eng.eval(mtlb_code)
+    
+    for var in varz:
+        mtlb_save(var)
+    
+    mtlb_load(filename)
+    
+    	npt.assert_almost_equal(mtlb_getArray(var), local_varz_dict[var], decimal=decim)
+
+def mtlb_getArray(target_var):
+	
+	filename = target_var + '.mat'
+	h = loadmat(filename)
+	return mat(h[target_var])
 
 
 # TEST 1 : reproduce matlab results with numpy/scipy and FIPOgen

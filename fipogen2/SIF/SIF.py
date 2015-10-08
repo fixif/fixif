@@ -193,10 +193,10 @@ class SIF(FIPObject):
         #Init superclass
         FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **SIF_event)
 
-        self._J, self._K, self._L, self._M, self._N, self._P, self._Q, self._R, self._S = [np.matrix(X) for X in JtoS]
+        #self._J, self._K, self._L, self._M, self._N, self._P, self._Q, self._R, self._S = [np.matrix(X) for X in JtoS]
 
         # set and check sizes
-        self._l, self._m, self._n, self._p = self.__check_set_dimensions__()
+        self._l, self._m, self._n, self._p = self.__check_set_dimensions__(JtoS)
         
         self._Z = _build_Z_or_dZ(JtoS)
 
@@ -204,7 +204,7 @@ class SIF(FIPObject):
         self._dZ = _build_dX(self._Z)
 
         # build dJ to dS because we may need those afterwards (modification)
-        self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS = [_build_dX(X, eps) for X in JtoS]
+        #self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS = [_build_dX(X, eps) for X in JtoS]
 
         self._AZ, self._BZ, self._CZ, self._DZ = self._build_AZtoDZ()
 
@@ -360,7 +360,7 @@ class SIF(FIPObject):
 		def dS(self, mymat):
 			self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._q] = mymat      
 	
-    def __check_set_dimensions__(self):
+    def __check_set_dimensions__(self, JtoS):
         
         """
         Compute the size 'l, m, n, p' of SIF
@@ -371,8 +371,10 @@ class SIF(FIPObject):
         #list_mat  = [self._J, self._K, self._L, self._M, self._N, self._P, self._Q, self._R, self._S]
         #list_size = [(l,l),   (n,l),   (p,l),   (l,n),   (l,m),   (n,n),   (n,m),   (p,n),   (p,m) ]
 
+        J, K, L, M, N, P, Q, R, S = [np.matrix(X) for X in JtoS]
+
         # P (n,n)
-        s1,s2 = self._P.shape
+        s1,s2 = P.shape
         
         if (s1 != s2):
             raise ValueError, 'P should be a square matrix'
@@ -380,7 +382,7 @@ class SIF(FIPObject):
             n = s1 # set n from P
         
         # J (l,l)
-        s1,s2 = self._J.shape
+        s1,s2 = J.shape
         
         if (s1 != s2):
             raise ValueError, 'J should be a square matrix'
@@ -388,13 +390,13 @@ class SIF(FIPObject):
             l = s1 # set l from J
         
         # K (n,l)
-        s1,s2 = self._K.shape
+        s1,s2 = K.shape
         
         if (s1 != n) or (s2 != l):
             raise ValueError, 'Dimensions of matrix K not coherent with dimensions of P and/or J'
 
         # L (p,l)
-        s1,s2 = self._L.shape
+        s1,s2 = L.shape
         
         if (s2 != l):
             raise ValueError, 'Dimension 2 of matrix L not coherent with dimension of J'
@@ -403,13 +405,13 @@ class SIF(FIPObject):
         
         # M (l,n)
         
-        s1,s2 = self._M.shape
+        s1,s2 = M.shape
         
         if (s1 != l) or (s2 != n):
             raise ValueError, 'Dimensions of matrix M not coherent with dimensions of P and/or J'
         
         # N (l,m)
-        s1,s2 = self._N.shape
+        s1,s2 = N.shape
         
         if (s1 != l):
             raise ValueError, 'Dimension 1 of matrix N not coherent with dimensions of J'
@@ -417,20 +419,20 @@ class SIF(FIPObject):
             m = s2 # set m from N
         
         # Q (n,m)
-        s1,s2 = self._Q.shape
+        s1,s2 = Q.shape
         
         if (s1 != n) or (s2 != m):
             raise ValueError, 'Dimensions of Q not coherent with dimensions of P and/or N'
         
         # R (p,n)
         
-        s1,s2 = self._R.shape
+        s1,s2 = R.shape
         
         if (s1 != p) or (s2 != n):
             raise ValueError, 'Dimensions of R not coherent with dimensions of L and/or P'
         
         # S (p,m)
-        s1,s2 = self._S.shape
+        s1,s2 = S.shape
         
         if (s1 != p) or(s2 != m):
             raise ValueError, 'Dimensions of S not compatible with dimensions of L and/or N'
