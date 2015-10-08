@@ -296,31 +296,40 @@ class SIF(FIPObject):
         @J.setter
         def J(self, mymat):
         	self._Z[ 0 : self._l, 0 : self._l ] = mymat
+        	self._dZ = _build_dX(self._Z, eps)
 		@K.setter
 		def K(self, mymat):
 			self._Z[ self._l : self._l+self._n, 0 : self._l ] = mymat
+			self._dZ = _build_dX(self._Z, eps)
 		@L.setter
 		def L(self, mymat):
 			self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
+			self._dZ = _build_dX(self._Z, eps)			
 		@M.setter
 		def M(self, mymat):
 			self._Z[ 0 : self._l, self._l : self._l + self._n ] = mymat
+			self._dZ = _build_dX(self._Z, eps)			
 		@N.setter
 		def N(self, mymat):
 			self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._q] = mymat
+			self._dZ = _build_dX(self._Z, eps)			
 		@P.setter
 		def P(self, mymat):
 			self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
+			self._dZ = _build_dX(self._Z, eps)			
 		@Q.setter
 		def Q(self, mymat):
 			self._Z[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._q] = mymat
+			self._dZ = _build_dX(self._Z, eps)			
 		@R.setter
 		def R(self, mymat):
 			self._Z[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ] = mymat
+			self._dZ = _build_dX(self._Z, eps)			
 		@S.setter
 		def S(self, mymat):
 			self._Z[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._q] = mymat
-
+			self._dZ = _build_dX(self._Z, eps)
+			
         #dJtodS setters
 
 		@dJ.setter
