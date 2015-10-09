@@ -1,0 +1,5 @@
+UTILISATION:
+- execute "make" will launch "slx2sif.py" wich analyse "direct_form2.slx" file
+( execute "make FILE=another.slx" to analyse another.slx file )
+
+- "slxextract.py" script can be used to extract blockdiagram xml file from compressed slx file
