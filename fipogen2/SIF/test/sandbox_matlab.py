@@ -25,7 +25,10 @@ def mtlb_save(eng, var):
     filename = '\'' + var + '.mat\''
     
     str_save = 'save(' + '\'' + filename + '\', ' + var + ', ' + fmt + ');'
+    
+    print(str_save)
     eng.eval(str_save)
+
 
 
 def mtlb_cleanenv(eng):
@@ -46,40 +49,51 @@ def mtlb_compare(mtlb_eng, mtlb_code, varz, local_varz_dict, decim = 10):
     
     mtlb_load(filename)
     
-    	npt.assert_almost_equal(mtlb_getArray(var), local_varz_dict[var], decimal=decim)
+    npt.assert_almost_equal(mtlb_getArray(var), local_varz_dict[var], decimal=decim)
 
 def mtlb_getArray(target_var):
-	
-	filename = target_var + '.mat'
-	h = loadmat(filename)
-	return mat(h[target_var])
+    
+    filename = target_var + '.mat'
+    
+    h = loadmat(filename)
+    return mat(h[target_var])
 
+def mtlb_pushCmdGetVar(mtlb_eng, mtlb_code, varz, local_dict):
+    
+    mtlb_eng.eval(mtlb_code, nargout=0)
+    
+    for var in varz:
+        mtlb_save(mtlb_eng, var)
+        local_dict[var] = mtlb_getArray(var)
+        
+    
 
 # TEST 1 : reproduce matlab results with numpy/scipy and FIPOgen
 
 # Test of parts from higher_order_p.m
-eng = matlab.engine.start_matlab()
 
-# create LTI filter example
-eng.eval('[num, den] = butter(4, 0.05) ;')
+#local_vars = {}
 
-num, den = butter(4, 0.05)
+#eng = matlab.engine.start_matlab()
 
-# create TF
+#get num and den from matlab as starting point
+
+cmd = '[num, den] = butter(4, 0.05) ;'
+varz = ['num','den']
+
+mtlb_pushCmdGetVar(eng, cmd, varz, local_vars)
+
+# create TF matlab obj from num and den
 eng.eval('H = tf(num,den,1);')
 
 # convert TF to SS
-eng.eval('[Aq,Bq,Cq,Dq] = tf2ss(H.num{1},H.den{1});')
+cmd = '[Aq,Bq,Cq,Dq] = tf2ss(H.num{1},H.den{1});'
+varz = ['Aq','Bq','Cq','Dq']
 
 Aq, Bq, Cq, Dq = tf2ss(num, den)
 
 varz = ['R1', 'R2']
 
-eng.eval(mtlb_listvar(varz) + ' = rhoDFIIt2FWR(H, );')
-# save test file
-file_rhodfiit = 'rhoDFIIt'
-eng.eval(mtlb_save('rhoDFIIt',varz))
-
-R1, R2 = rhoDFIIt2FWR(num, den)
+#R1, R2 = rhoDFIIt2FWR(num, den)
 
 # load test file
