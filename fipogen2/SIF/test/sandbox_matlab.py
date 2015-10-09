@@ -3,6 +3,7 @@
 
 import sys, os
 sys.path.insert(0, os.path.abspath('./FWRtoolbox/'))
+sys.path.insert(0, os.path.abspath('./../../'))
 
 import matlab.engine
 
@@ -13,6 +14,9 @@ import numpy.testing as npt
 from scipy.io import loadmat
 
 from numpy import matrix as mat
+from numpy import array
+
+from Structures import *
 
 def mtlb_save(eng, var):
     
@@ -21,13 +25,13 @@ def mtlb_save(eng, var):
     easier for debug purposes
     """
     
-    fmt = '\'-v7\'' # we don't want hdf5 format
-    filename = '\'' + var + '.mat\''
+    fmt = "\'-v7\'" # we don't want hdf5 format
+    filename = "\'" + var + ".mat\'"
     
-    str_save = 'save(' + '\'' + filename + '\', ' + var + ', ' + fmt + ');'
+    str_save = 'save(' + filename + ",\'" + var + "\'," + fmt + ');'
     
     print(str_save)
-    eng.eval(str_save)
+    eng.eval(str_save,nargout=0)
 
 
 
@@ -74,23 +78,46 @@ def mtlb_pushCmdGetVar(mtlb_eng, mtlb_code, varz, local_dict):
 
 #local_vars = {}
 
-#eng = matlab.engine.start_matlab()
+eng = matlab.engine.start_matlab()
 
 #get num and den from matlab as starting point
+
+mtlb_vars = {}
+local_vars = {}
 
 cmd = '[num, den] = butter(4, 0.05) ;'
 varz = ['num','den']
 
-mtlb_pushCmdGetVar(eng, cmd, varz, local_vars)
+mtlb_pushCmdGetVar(eng, cmd, varz, mtlb_vars)
 
 # create TF matlab obj from num and den
-eng.eval('H = tf(num,den,1);')
+eng.eval('H = tf(num,den,1);', nargout=0)
+
+#eng.eval('R1, R2, flag = rhoDFIIt2FWR(H, gamma)')
 
 # convert TF to SS
 cmd = '[Aq,Bq,Cq,Dq] = tf2ss(H.num{1},H.den{1});'
 varz = ['Aq','Bq','Cq','Dq']
 
-Aq, Bq, Cq, Dq = tf2ss(num, den)
+mtlb_pushCmdGetVar(eng, cmd, varz, mtlb_vars)
+
+# create local vars
+
+Aq, Bq, Cq, Dq = tf2ss(array(mtlb_vars['num']), array(mtlb_vars['den']))
+
+local_vars['Aq'] = Aq
+local_vars['Bq'] = Bq
+local_vars['Cq'] = Cq
+local_vars['Dq'] = Dq
+
+# Test comparison routine
+
+mtlb_compare(eng, cmd, varz, local_vars, decimal = 10)
+
+
+#mtlb_pushCmdGetVar(eng, cmd, varz, local_vars)
+
+# compare 
 
 varz = ['R1', 'R2']
 
