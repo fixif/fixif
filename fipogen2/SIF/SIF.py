@@ -113,7 +113,7 @@ class SIF(FIPObject):
         return np.vectorize(lambda x:int(not SIF._isTrivial(x, eps))) (X)
    
     @staticmethod
-    def _build_Z_or_dZ(my9matrix):
+    def _build_Z(my9matrix):
             
         """
         build Z or dZ depending on provided matrix tuple
@@ -124,8 +124,8 @@ class SIF(FIPObject):
         return np.bmat([[-J, M, N], 
                         [ K, P, Q], 
                         [ L, R, S]])   
-    
-    def _build_dX(X, eps=1.e-8):
+
+    def _build_dZ(self, eps=1.e-8):
             
         """
         Build dZ from Z
@@ -147,37 +147,26 @@ class SIF(FIPObject):
                                         \text{the largest absolute value of} \\
                                         \text{the block in which} Z_{i,j} \text{resides.}
                                         \end{aligned}\right.
-                                        
         """
             
-        return SIF._nonTrivial(X, eps)
+        return SIF._nonTrivial(self._Z, eps)
     
     # AZ, BZ, CZ, DZ
     def _build_AZtoDZ(self):
         
-        inv_J = np.linalg.inv(self._J)
+        inv_J = np.linalg.inv(self.J)
         
-        AZ = self._K * inv_J * self._M + self._P
-        BZ = self._K * inv_J * self._N + self._Q
-        CZ = self._L * inv_J * self._M + self._R
-        DZ = self._L * inv_J * self._N + self._S
+        AZ = self.K * inv_J * self.M + self.P
+        BZ = self.K * inv_J * self.N + self.Q
+        CZ = self.L * inv_J * self.M + self.R
+        DZ = self.L * inv_J * self.N + self.S
         
         return (AZ, BZ, CZ, DZ)
-    
-    def _refresh_dZ(self):
-			
-		"""
-		- rebuild dZ if some matrix from dJ to dS has changed (manual use as of 02/10/2015)
-		"""
-		
-		dJtodS = self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS
-		
-		self._dZ = _build_Z_or_dZ(dJtodS)
     
     def __init__(self, JtoS, eps=1.e-8, father_obj=None, **event_spec): # name can be specified in e_desc
 
         # Define default event if not specified
-        # default event : SIF instance created from user interface
+        # default : SIF instance created from user interface
         
         my_e_type      = event_spec.get('e_type', 'create')
         my_e_subtype   = event_spec.get('e_subtype', 'new')      
@@ -190,176 +179,172 @@ class SIF(FIPObject):
 
         my_father_obj = father_obj
         
-        #Init superclass
+        #Init FIPObject superclass
         FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **SIF_event)
-
-        #self._J, self._K, self._L, self._M, self._N, self._P, self._Q, self._R, self._S = [np.matrix(X) for X in JtoS]
 
         # set and check sizes
         self._l, self._m, self._n, self._p = self.__check_set_dimensions__(JtoS)
         
-        self._Z = _build_Z_or_dZ(JtoS)
+        self._Z = SIF._build_Z(JtoS)
 
-        # Initial version of dZ from Z
-        self._dZ = _build_dX(self._Z)
+        # dZ from Z
+        self._dZ = SIF._build_dZ(self, eps)
 
-        # build dJ to dS because we may need those afterwards (modification)
-        #self._dJ, self._dK, self._dL, self._dM, self._dN, self._dP, self._dQ, self._dR, self._dS = [_build_dX(X, eps) for X in JtoS]
+        self._AZ, self._BZ, self._CZ, self._DZ = self._build_AZtoDZ()  
 
-        self._AZ, self._BZ, self._CZ, self._DZ = self._build_AZtoDZ()
+    # Only matrix Z is kept in memory
+    # JtoS extracted from Z matrix, dJtodS from dZ resp.
 
-        # JtoS are not stored as is, only matrix Z is kept in memory
-        # We spit out JtoS by extracting those from Z matrix
-        # dJtodS are extracted from dZ respectively
+    # Z, dZ getters
 
-        # Z, dZ getters
+    _l, _m, _n, _p = (0, 0, 0, 0)
 
-        @property
-        def Z(self):
-        	return self._Z
-        @property
-        def dZ(self):
-        	return self._dZ
+    @property
+    def Z(self):
+        return self._Z
+    @property
+    def dZ(self):
+        return self._dZ
 
-        # Z, dZ setters
+    # Z, dZ setters
 
-        @Z.setter
-        def Z(self, mymat):
-        	self._Z = mymat
-        @dZ.setter
-        def dZ(self, mymat):
-            self._dZ = mymat
+    @Z.setter
+    def Z(self, mymat):
+        self._Z = mymat
+    @dZ.setter
+    def dZ(self, mymat):
+        self._dZ = mymat
         
-        
-        # JtoS getters
+    # JtoS getters
 
-        @property
-        def J(self):
-        	return -self._Z[ 0 : self._l, 0 : self._l ]
-        @property
-        def K(self):
-        	return self._Z[ self._l : self._l+self._n, 0 : self._l ]   
-		@property
-		def L(self):
-			return self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ]  
-		@property
-		def M(self):
-			return self._Z[ 0 : self._l, self._l : self._l + self._n ]
-		@property
-		def N(self):
-			return self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._q]
-		@property
-		def P(self):
-			return self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ]
-		@property
-		def Q(self):
-			return self._Z[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._q]
-		@property
-		def R(self):
-			return self._Z[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ]
-		@property
-		def S(self):
-			return self._Z[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._q]	
+    @property
+    def J(self):
+        return -self._Z[ 0 : self._l, 0 : self._l ]
+    @property
+    def K(self):
+        return self._Z[ self._l : self._l+self._n, 0 : self._l ]   
+    @property
+    def L(self):
+        return self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ]  
+    @property
+    def M(self):
+        return self._Z[ 0 : self._l, self._l : self._l + self._n ]
+    @property
+    def N(self):
+        return self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._m]
+    @property
+    def P(self):
+        return self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ]
+    @property
+    def Q(self):
+        return self._Z[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._m]
+    @property
+    def R(self):
+        return self._Z[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ]
+    @property
+    def S(self):
+        return self._Z[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m]
 
-        # dJtodS getters
+    # dJtodS getters
 
-		@property
-		def dJ(self):
-			return -self._dZ[ 0 : self._l, 0 : self._l ]
-		@property
-		def dK(self):
-			return self._dZ[ self._l : self._l+self._n, 0 : self._l ]   
-		@property
-		def dL(self):
-			return self._dZ[ self._l+self._n : self._l+self._n+self._p, 0:self._l ]  
-		@property
-		def dM(self):
-			return self._dZ[ 0 : self._l, self._l : self._l + self._n ]
-		@property
-		def dN(self):
-			return self._dZ[ 0 : self._l, self._l+self._n : self._l+self._n+self._q]
-		@property
-		def dP(self):
-			return self._dZ[ self._l : self._l+self._n, self._l : self._l + self._n ]
-		@property
-		def dQ(self):
-			return self._dZ[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._q]
-		@property
-		def dR(self):
-			return self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ]
-		@property
-		def dS(self):
-			return self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._q]			
+    @property
+    def dJ(self):
+        return -self._dZ[ 0 : self._l, 0 : self._l ]
+    @property
+    def dK(self):
+        return self._dZ[ self._l : self._l+self._n, 0 : self._l ]   
+    @property
+    def dL(self):
+        return self._dZ[ self._l+self._n : self._l+self._n+self._p, 0:self._l ]  
+    @property
+    def dM(self):
+        return self._dZ[ 0 : self._l, self._l : self._l + self._n ]
+    @property
+    def dN(self):
+        return self._dZ[ 0 : self._l, self._l+self._n : self._l+self._n+self._m]
+    @property
+    def dP(self):
+        return self._dZ[ self._l : self._l+self._n, self._l : self._l + self._n ]
+    @property
+    def dQ(self):
+        return self._dZ[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._m]
+    @property
+    def dR(self):
+        return self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ]
+    @property
+    def dS(self):
+        return self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m]
 
-        # JtoS setters
+    # JtoS setters
 
-        @J.setter
-        def J(self, mymat):
-        	self._Z[ 0 : self._l, 0 : self._l ] = mymat
-        	self._dZ = _build_dX(self._Z, eps)
-		@K.setter
-		def K(self, mymat):
-			self._Z[ self._l : self._l+self._n, 0 : self._l ] = mymat
-			self._dZ = _build_dX(self._Z, eps)
-		@L.setter
-		def L(self, mymat):
-			self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
-			self._dZ = _build_dX(self._Z, eps)			
-		@M.setter
-		def M(self, mymat):
-			self._Z[ 0 : self._l, self._l : self._l + self._n ] = mymat
-			self._dZ = _build_dX(self._Z, eps)			
-		@N.setter
-		def N(self, mymat):
-			self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._q] = mymat
-			self._dZ = _build_dX(self._Z, eps)			
-		@P.setter
-		def P(self, mymat):
-			self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
-			self._dZ = _build_dX(self._Z, eps)			
-		@Q.setter
-		def Q(self, mymat):
-			self._Z[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._q] = mymat
-			self._dZ = _build_dX(self._Z, eps)			
-		@R.setter
-		def R(self, mymat):
-			self._Z[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ] = mymat
-			self._dZ = _build_dX(self._Z, eps)			
-		@S.setter
-		def S(self, mymat):
-			self._Z[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._q] = mymat
-			self._dZ = _build_dX(self._Z, eps)
-			
-        #dJtodS setters
+    @J.setter
+    def J(self, mymat, eps=1.e-8):
+        self._Z[ 0 : self._l, 0 : self._l ] = mymat
+        self._dZ = _build_dZ(self, eps)
+    @K.setter
+    def K(self, mymat, eps=1.e-8):
+        self._Z[ self._l : self._l+self._n, 0 : self._l ] = mymat
+        self._dZ = _build_dZ(self, eps)
+    @L.setter
+    def L(self, mymat, eps=1.e-8):
+        self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
+        self._dZ = _build_dZ(self, eps)
+    @M.setter
+    def M(self, mymat, eps=1.e-8):
+        self._Z[ 0 : self._l, self._l : self._l + self._n ] = mymat
+        self._dZ = _build_dZ(self, eps)
+    @N.setter
+    def N(self, mymat, eps=1.e-8):
+        self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._m] = mymat
+        self._dZ = _build_dZ(self, eps)
+    @P.setter
+    def P(self, mymat, eps=1.e-8):
+        self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
+        self._dZ = _build_dZ(self, eps)
+    @Q.setter
+    def Q(self, mymat, eps=1.e-8):
+        self._Z[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._m] = mymat
+        self._dZ = _build_dZ(self, eps)
+    @R.setter
+    def R(self, mymat, eps=1.e-8):
+        self._Z[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ] = mymat
+        self._dZ = _build_dZ(self, eps)
+    @S.setter
+    def S(self, mymat, eps=1.e-8):
+        self._Z[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m] = mymat
+        self._dZ = _build_dZ(self, eps)
 
-		@dJ.setter
-		def dJ(self, mymat):
-			self._dZ[ 0 : self._l, 0 : self._l ] = mymat
-		@dK.setter
-		def dK(self, mymat):
-			self._dZ[ self._l : self._l+self._n, 0 : self._l ] = mymat
-		@dL.setter
-		def dL(self, mymat):
-			self._dZ[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
-		@dM.setter
-		def dM(self, mymat):
-			self._dZ[ 0 : self._l, self._l : self._l + self._n ] = mymat
-		@dN.setter
-		def dN(self, mymat):
-			self._dZ[ 0 : self._l, self._l+self._n : self._l+self._n+self._q] = mymat
-		@dP.setter
-		def dP(self, mymat):
-			self._dZ[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
-		@dQ.setter
-		def dQ(self, mymat):
-			self._dZ[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._q] = mymat
-		@dR.setter
-		def dR(self, mymat):
-			self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ] = mymat
-		@dS.setter
-		def dS(self, mymat):
-			self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._q] = mymat      
-	
+    #dJtodS setters
+
+    @dJ.setter
+    def dJ(self, mymat):
+        self._dZ[ 0 : self._l, 0 : self._l ] = mymat
+    @dK.setter
+    def dK(self, mymat):
+        self._dZ[ self._l : self._l+self._n, 0 : self._l ] = mymat
+    @dL.setter
+    def dL(self, mymat):
+        self._dZ[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
+    @dM.setter
+    def dM(self, mymat):
+        self._dZ[ 0 : self._l, self._l : self._l + self._n ] = mymat
+    @dN.setter
+    def dN(self, mymat):
+        self._dZ[ 0 : self._l, self._l+self._n : self._l+self._n+self._m] = mymat
+    @dP.setter
+    def dP(self, mymat):
+        self._dZ[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
+    @dQ.setter
+    def dQ(self, mymat):
+        self._dZ[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._m] = mymat
+    @dR.setter
+    def dR(self, mymat):
+        self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ] = mymat
+    @dS.setter
+    def dS(self, mymat):
+        self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m] = mymat  
+
+
     def __check_set_dimensions__(self, JtoS):
         
         """
