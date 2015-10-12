@@ -20,6 +20,14 @@ from SIF import *
 from numpy import matrix as mat
 from scipy.signal.filter_design import butter
 
+from func_aux import mtlb_helper
+
+from Structures import *
+
+from scipy.signal import tf2ss
+
+from numpy import array, squeeze, reshape
+
 # use matlab from python
 # note : this should be transient and removed when published on internet
 # http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
@@ -29,7 +37,7 @@ from scipy.signal.filter_design import butter
 
 import matlab.engine
 
-import sys,os
+import sys, os
 # add matlab dir scripts
 sys.path.insert(0, os.path.abspath('./FWRtoolbox/'))
 
@@ -77,20 +85,35 @@ class test_SIF(unittest.TestCase):
         # TODO add test for all other cases
         
     def test_matlab_compliance(self):
-    	
-    	"""
-    	All subfunctions test for compliance of given results with matlab regarding :
-    	- conversion of other forms to SIF
-    	- ...
-    	"""
-    	
-    # Test conversion of different forms to SIF
-    # could be put in an environment for the test, see
-    eng = matlab.engine.start_matlab()
+        
+        """
+        All subfunctions test for compliance of given results with matlab regarding :
+        - conversion of other forms to SIF
+        - ...
+        """
+        
+        eng = matlab.engine.start_matlab()
     
-    # rhoDFIIt.toSIF()
-    
-    	
-    	
-    	    
-    	
+        # test tf2ss numpy code
+        mtlb_vars  = {}
+        local_vars = {}
+        
+        mtlb_cmd_stack = ''
+        
+        cmd  = '[num, den] = butter(4, 0.05) ;'
+        varz = ['num','den']
+        
+        # store num, den in mtlb_vars
+        mtlb_helper.mtlb_pushCmdGetVar(eng, cmd, varz, mtlb_vars)
+        
+        # stack command to be sent to matlab all at once
+        mtlb_cmd_stack += cmd + "\n"
+        # create TF matlab obj from num and den
+        mtlb_cmd_stack += 'H = tf(num,den,1); \n'
+        mtlb_cmd_stack += '[Aq,Bq,Cq,Dq] = tf2ss(H.num{1},H.den{1}); \n'
+        
+        local_vars['Aq'], local_vars['Bq'], local_vars['Cq'], local_vars['Dq'] = tf2ss(squeeze(array(mtlb_vars['num'])), squeeze(array(mtlb_vars['den'])))
+        local_vars['Dq'] = local_vars['Dq'].reshape(1,1)
+            
+        varz = ['Aq','Bq','Cq','Dq']
+        mtlb_helper.mtlb_compare(eng, mtlb_cmd_stack, varz, local_vars, decim = 10)
