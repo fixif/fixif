@@ -22,3 +22,8 @@ if [ "$1" = "SIF" ] ;
 then
   python -m unittest SIF.test.test_SIF ;
 fi
+
+if [ "$1" = "LTI" ] ;
+then
+  python -m unittest LTI.test.test_LTI ;
+fi
