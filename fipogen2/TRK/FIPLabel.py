@@ -30,7 +30,7 @@ class FIPLabel(object):
     
     """
     
-    is_debug_print = True # print label at end of __init__
+    is_debug_print = False # print label at end of __init__
     
     # Contains subclass:free_num items
     free_num = {}

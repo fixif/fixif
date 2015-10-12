@@ -19,7 +19,6 @@ from time import time
 class FIPObjEvent(object):
     
     """
-    
     This class defines an object event that is logged and stacked at instance level
     
     Objects get a global event number and a timestamp
@@ -76,7 +75,6 @@ class FIPObjEvent(object):
     Example event : new instance from converted dSS obj into ???
     
     ``(e_type='create', e_subtype='convert', e_source='func', e_subsource='func_name', e_subclass='bzzz')``
-    
     """
     
     # global event log number regardless
@@ -92,9 +90,7 @@ class FIPObjEvent(object):
     def __init__(self, obj_name, **event_spec):
 		
 		"""
-		
 		Define event based on programmer input, but we add some salt too (timestamp, global_obj_event_num
-		
 		"""
 		
 		# timestamp event
@@ -149,9 +145,7 @@ class FIPObjEvent(object):
     def _human_readable_repr(self): # should be __str__ ??? THIB
         
         """
-        
         Output a human-readable sentence from event
-        
         """
         
         fmt_num = '{0:5}' # up to 99999 events

@@ -20,23 +20,18 @@ from FIPObjEvent import FIPObjEvent
 class FIPObject(object):
     
     """
-    
     This class contains an index of instances of subclasses of FIPObject
-    
     The index is user-accessible with ``__repr__`` function
-    
     """
     
-    is_debug_print = True # print __repr__ at end of init
+    is_debug_print = False # print __repr__ at end of init
     
     idx_subclass = {}
 
     def __repr__(self):
     	
     	"""
-    	
     	Outputs the index of indexed objects of all subclasses indexed by superclass FIPObject
-    	
     	"""
     	
         str_repr = ''
@@ -84,7 +79,6 @@ class FIPObject(object):
     	Outputs string of the event stack of a FIPObject instance
     	"""
     	
-    	
     	str_obj_event_stack = ''
     	
     	# call repr of FIPObjEvent with is_print_labels = True once only
@@ -99,9 +93,7 @@ class FIPObject(object):
     def repr_hr_obj_event_stack(self):
     	
     	"""
-    	
     	Get a human readable string of the event stack of a FIPObject instance
-    	
     	"""
     	
     	str_hr_obj_event_stack = ''
@@ -114,29 +106,23 @@ class FIPObject(object):
     def stack_event(self, obj_name, **event_spec):
     	
     	"""
-    	
     	Add new event to FIPObject instance. 
     	We call it stack because it remembers the order in which the events came
-    	
     	"""
-    	
     	
     	self.obj_events.append(FIPObjEvent(obj_name, **event_spec))
     	
     def build_global_event_stack(self, tgt_subclass, order='time'):
     	
     	"""
-    	
     	Returns an ordered list of all events relative to an indexed subclass
     	
     	Accepts the following arguments :
-    	
-    	tgt_subclass is an array of indexed classes 
+    	-tgt_subclass is an array of indexed classes 
     	
     	.. TODO
     	
     	  implement
-    	
     	"""
     	
     	pass
