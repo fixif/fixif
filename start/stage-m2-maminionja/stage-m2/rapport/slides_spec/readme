@@ -1,7 +1,0 @@
-To compile this latex sources, you need:
- - pdflatex
- - dia
- - eps to pdf 
-
- - evince
- - make
