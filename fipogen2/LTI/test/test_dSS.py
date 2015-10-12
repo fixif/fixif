@@ -57,6 +57,8 @@ class test_dSS( unittest.TestCase):
 	Test class for dSS class
 	"""
 
+        is_debug_print = False
+
 	def test_construction(self):
 	  
 		"""
@@ -218,18 +220,20 @@ class test_dSS( unittest.TestCase):
 			wcpg = calc_wcpg_approx(S, nit)
 			S.WCPG
 			
-			print "=== WCPG approx ==="
-			print str(wcpg)
- 			print "=== A ==="			
- 			print S.A
- 			print "=== B ==="			
- 			print S.B
- 			print "=== C ==="			
- 			print S.C
- 			print "=== D ==="			
- 			print S.D
-			print "=== WCPG dprec  ==="
-			print str(S.WCPG)
+			if test_dSS.is_debug_print:
+			
+			    print "=== WCPG approx ==="
+			    print str(wcpg)
+ 			    print "=== A ==="			
+ 			    print S.A
+ 			    print "=== B ==="			
+ 			    print S.B
+ 			    print "=== C ==="			
+ 			    print S.C
+ 			    print "=== D ==="			
+ 			    print S.D
+			    print "=== WCPG dprec  ==="
+			    print str(S.WCPG)
 			
 			my_assert_relativeclose( msgH,
 									array(S.WCPG),
