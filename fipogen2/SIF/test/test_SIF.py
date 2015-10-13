@@ -20,7 +20,7 @@ from SIF import *
 from numpy import matrix as mat
 from scipy.signal.filter_design import butter
 
-from func_aux import mtlb_helper
+from func_aux.MtlbHelper import MtlbHelper
 
 from Structures import *
 
@@ -28,18 +28,7 @@ from scipy.signal import tf2ss
 
 from numpy import array, squeeze, reshape
 
-# use matlab from python
-# note : this should be transient and removed when published on internet
-# http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
-# installed it in user folder with user
-# cd "matlabroot\extern\engines\python"
-# python setup.py install --user
-
-import matlab.engine
-
 import sys, os
-# add matlab dir scripts
-sys.path.insert(0, os.path.abspath('./FWRtoolbox/'))
 
 class test_SIF(unittest.TestCase):
     
@@ -84,36 +73,90 @@ class test_SIF(unittest.TestCase):
         self.assertRaises(ValueError, SIF, myJtoS)
         # TODO add test for all other cases
         
-    def test_matlab_compliance(self):
+class test_SIF_mtlb(unittest.TestCase):
+
+    def setUp(self):
         
-        """
-        All subfunctions test for compliance of given results with matlab regarding :
-        - conversion of other forms to SIF
-        - ...
-        """
-        
-        eng = matlab.engine.start_matlab()
+		self.engMtlb = MtlbHelper()
+		# add matlab script dir
+		sys.path.insert(0, os.path.abspath('./FWRtoolbox/'))
     
-        # test tf2ss numpy code
-        mtlb_vars  = {}
-        local_vars = {}
+    def gen_numDen(self, TF='butter', opt_num=0):
         
-        mtlb_cmd_stack = ''
+        # Option #1 generate num and den from matlab butter
         
-        cmd  = '[num, den] = butter(4, 0.05) ;'
+        tmp_vars = {}
+
         varz = ['num','den']
         
-        # store num, den in mtlb_vars
-        mtlb_helper.mtlb_pushCmdGetVar(eng, cmd, varz, mtlb_vars)
+        if TF is 'butter':
+            if opt_num is 0:
+                
+                cmd  = '[num, den] = butter(4, 0.05) ;'
+                self.engMtlb.pushCmdGetVar(cmd, varz, tmp_vars)
         
-        # stack command to be sent to matlab all at once
-        mtlb_cmd_stack += cmd + "\n"
+        return tmp_vars
+    
+    def mytest_tf2ss(self, dict_numden):
+        
+        """
+        Test numpy tf2ss routine (example for other tests involving FWRtoolbox)
+        """
+        
+        num = dict_numden['num']
+        den = dict_numden['den']
+        
+        tmp_vars = {}
+
+        # Inject num and den in Matlab workspace
+        self.engMtlb.setVar(dict_numden.keys(), dict_numden)
+
+        #print(self.engMtlb.eng.who())
+
         # create TF matlab obj from num and den
-        mtlb_cmd_stack += 'H = tf(num,den,1); \n'
-        mtlb_cmd_stack += '[Aq,Bq,Cq,Dq] = tf2ss(H.num{1},H.den{1}); \n'
+        mtlb_cmd_stack  = 'H = tf(num,den,1); \n'
         
-        local_vars['Aq'], local_vars['Bq'], local_vars['Cq'], local_vars['Dq'] = tf2ss(squeeze(array(mtlb_vars['num'])), squeeze(array(mtlb_vars['den'])))
-        local_vars['Dq'] = local_vars['Dq'].reshape(1,1)
+        # create Aq, Bq, Cq, Dq in Matlab workspace
+        mtlb_cmd_stack += '[Aq,Bq,Cq,Dq] = tf2ss(H.num{1},H.den{1}); \n'
+
+        varz = ['Aq', 'Bq', 'Cq', 'Dq']
+        
+        tmp_vars['Aq'], tmp_vars['Bq'], tmp_vars['Cq'], tmp_vars['Dq'] = \
+          tf2ss(squeeze(array(num)), squeeze(array(den)))
+        
+        for key in tmp_vars.keys():
+            if tmp_vars[key].shape == (1,): # does not work with "is" ???
+                tmp_vars[key] = tmp_vars[key].reshape(1,1)
             
-        varz = ['Aq','Bq','Cq','Dq']
-        mtlb_helper.mtlb_compare(eng, mtlb_cmd_stack, varz, local_vars, decim = 10)
+        self.engMtlb.compare(mtlb_cmd_stack, varz, tmp_vars, decim = 10)
+        
+        self.engMtlb.cleanenv() # be nice with next test
+        
+    # test all Structures starting from most simple ones
+    
+    def mytest_DFI(self):
+    	
+        pass
+    	
+    def mytest_DFII(self):
+        
+        pass
+       
+    def mytest_rhoDFIIt(self):
+    	
+    	pass
+    
+    def mytest_modalDelta(self):
+    	
+    	pass
+        
+    def runTest(self):
+        
+        # test tf2ss on all transfer functions
+        
+        list_TF = {'butter':1}
+        
+        for TF in list_TF.keys():
+            for i in range(0,list_TF[TF]):
+                
+                self.mytest_tf2ss(self.gen_numDen(TF, i))

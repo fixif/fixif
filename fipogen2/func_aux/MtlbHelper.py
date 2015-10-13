@@ -1,72 +1,103 @@
 import numpy.testing as npt
 
-from scipy.io import loadmat
+from scipy.io import loadmat, savemat
 
-def mtlb_save(eng, var):
+# use matlab from python
+# note : this should be transient and removed when published on internet
+# http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
+# installed it in user folder with user
+# cd "matlabroot\extern\engines\python"
+# python setup.py install --user
+
+import matlab.engine
+
+class MtlbHelper(object):
     
-    """
-    saves var variable in var.mat file
-    easier for debug purposes
-    """
+    def __init__(self):
     
-    fmt = "\'-v7\'" # we don't want hdf5 format
-    filename = "\'" + var + ".mat\'"
+        self.eng = matlab.engine.start_matlab()
+
+    def _save(self, var):
     
-    str_save = 'save(' + filename + ",\'" + var + "\'," + fmt + ');'
+        """
+        saves var variable in var.mat file
+        easier for debug purposes
+        """
     
-    print(str_save)
-    eng.eval(str_save,nargout=0)
+        fmt = "\'-v7\'" # we don't want hdf5 format
+        filename = "\'" + var + ".mat\'"
     
-def mtlb_cleanenv(eng):
-  
-    """
-    Clean matlab engine environment
-    """
-    
-    eng.eval('clear all ; close all ;',nargout=0)
-    
-def mtlb_getArray(target_var):
-  
-    """
-    Get array VAR from mat file VAR.mat storing VAR variable
-    """
-    
-    filename = target_var + '.mat'
-    
-    h = loadmat(filename)
-    return h[target_var]
-  
-def mtlb_pushCmdGetVar(mtlb_eng, mtlb_code, varz, local_dict):
-  
-    """
-    Get varz back from mtlb_code, by saving and loading mat files
-    """
-    
-    #print(mtlb_code)
-    
-    mtlb_eng.eval(mtlb_code, nargout=0)
-    
-    for var in varz:
-        mtlb_save(mtlb_eng, var)
-        local_dict[var] = mtlb_getArray(var)
+        str_save = 'save(' + filename + ",\'" + var + "\'," + fmt + ');'
         
-def mtlb_compare(mtlb_eng, mtlb_code, varz, local_varz_dict, decim = 10):
+        self.eng.eval(str_save, nargout = 0)
+    
+    def cleanenv(self):
+  
+        """
+        Clean matlab engine environment
+        """
+    
+        self.eng.eval('clear all ; close all ;', nargout = 0)
+    
+    def _getVar(self, var):
+  
+        """
+        Get array VAR from mat file VAR.mat storing VAR variable
+        """
+    
+        filename = var + '.mat'
+    
+        h = loadmat(filename)
+        return h[var]
+  
+    def pushCmdGetVar(self, mtlb_code, varz, local_dict):
+  
+        """
+        Get varz back from mtlb_code, by saving and loading mat files
+        """
+    
+        self.eng.eval(mtlb_code, nargout = 0)
+    
+        for var in varz:
+            self._save(var)
+            local_dict[var] = self._getVar(var)
 
-    """
-    Compare value stored in local_varz_dict with matlab values for a given executed code (mtlb_code)
-    """
+    def setVar(self, varz, varz_dict):
     
-    tmp_dict = {}
+        """
+        Inject variables in matlab engine environment using temp .mat file
+        """
+        
+        tmp_dict = {}
     
-    mtlb_cleanenv(mtlb_eng)
+        for var in varz:
+            tmp_dict[var] = varz_dict[var]
     
-    mtlb_pushCmdGetVar(mtlb_eng, mtlb_code, varz, tmp_dict)
+        tmp_name = 'mtlb_inject'
     
-    for var in varz:
-    	
-    	#print("Shape of tmp_dict[" + var + "]")
-    	#print(str(tmp_dict[var].shape))
-    	#print("Shape of local_varz_dict["+ var +"]")
-    	#print(str(local_varz_dict[var].shape))
-    	
-        npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
+        savemat(tmp_name, tmp_dict)
+    
+        cmd = "load(\'"+tmp_name+".mat\')"
+    
+        self.eng.eval(cmd, nargout=0)
+
+    
+        
+    def compare(self, mtlb_code, varz, local_varz_dict, decim = 10):
+
+        """
+        Compare value stored in local_varz_dict with matlab values for a given executed code (mtlb_code)
+        """
+    
+        tmp_dict = {}
+    
+        self.pushCmdGetVar(mtlb_code, varz, tmp_dict)
+    
+        for var in varz:
+        
+            #print("Shape of tmp_dict[" + var + "]")
+            #print(str(tmp_dict[var].shape))
+            #print("Shape of local_varz_dict["+ var +"]")
+            #print(str(local_varz_dict[var].shape))
+        
+            npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
