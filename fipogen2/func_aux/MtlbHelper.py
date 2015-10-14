@@ -16,6 +16,7 @@ class MtlbHelper(object):
     def __init__(self):
     
         self.eng = matlab.engine.start_matlab()
+        #self.debug_mat = True
 
     def _save(self, var):
     
