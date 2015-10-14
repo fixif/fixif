@@ -27,3 +27,8 @@ if [ "$1" = "LTI" ] ;
 then
   python -m unittest LTI.test.test_LTI ;
 fi
+
+if [ "$1" = "Structures" ] ;
+then
+  python -m unittest Structures.test.test_Structures ;
+fi
