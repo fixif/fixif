@@ -71,8 +71,11 @@ class MtlbHelper(object):
         
         tmp_dict = {}
     
+        # force float conversion otherwise matlab will trip on calculations
+        # involving interger and float arrays  
+    
         for var in varz:
-            tmp_dict[var] = varz_dict[var]
+            tmp_dict[var] = varz_dict[var].astype(float)
     
         tmp_name = 'mtlb_inject'
     
@@ -92,8 +95,15 @@ class MtlbHelper(object):
     
         tmp_dict = {}
     
+        print(mtlb_code)
+    
         self.pushCmdGetVar(mtlb_code, varz, tmp_dict)
     
+        print("TMP_DICT")
+        print(tmp_dict)
+        print("LOCAL_VARZ_DICT")
+        print(local_varz_dict)
+        
         for var in varz:
         
             #print("Shape of tmp_dict[" + var + "]")
