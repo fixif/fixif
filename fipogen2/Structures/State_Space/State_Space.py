@@ -32,6 +32,6 @@ class State_Space(SIF):
         m = C.shape[0]
         l = 0
 
-        JtoS = [eye((l)), zeros((n,l)), zeros((m,l)), zeros((l,n)), zeros((l,p)), A, B, C, D]
+        JtoS = eye((l)), zeros((n,l)), zeros((m,l)), zeros((l,n)), zeros((l,p)), A, B, C, D
         
-        SIF.__init__(JtoS, delta_eps, State_Space_father_obj, **State_Space_event)
+        SIF.__init__(self, JtoS, eps, State_Space_father_obj, **State_Space_event)
