@@ -1,58 +1,83 @@
-#coding=UTF8
-
-# dirty but quick fix otherwise doesn't work
-import sys,os
-sys.path.insert(0, os.path.abspath('../../'))
+#coding=utf8
 
 from SIF import SIF
-from numpy import matrix as mat
 
+from numpy import matrix as mat
+from numpy import diag, zeros, eye, rot90, ones, r_, c_
 
 class DFI(SIF):
+  
+    def __init__(self, num, den, opt=1, eps=1.e-8, father_obj = None, **event_spec):
+  
+        """
+        Convert a trasfer function to a DF-I (Direct Form I) SIF
+      
+        Two options are available
+      
+        1 - compute num and den at the same time (normalize,...)
+        2 - compute num and den separately (don't normalize, ...)
+      
+        """
 
-    def __init__(self, num, den, father_obj = None, **event_spec):
+        # create default event if no event specified
         
-        """
-        Convert a transfer function to a Direct Form I SIF
-        """
-        
-        #create default event if no event given
         my_e_type      = event_spec.get('e_type', 'create')
         my_e_subtype   = event_spec.get('e_subtype', 'convert')      
         my_e_subclass  = event_spec.get('e_subclass', 'DFI')
         my_e_source    = event_spec.get('e_source', 'user_input')
-        my_e_subsource = event_spec.get('e_subsource', 'State_Space.__init__') # optional, could also be ''
+        my_e_subsource = event_spec.get('e_subsource', 'DFI.__init__') # optional, could also be ''
         my_e_desc      = event_spec.get('e_desc', '')
 
         DFI_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
 
         DFI_father_obj = father_obj
+        
+        if opt not in {1,2}:
+            raise("Unknown option...")
+        
+        # convert everything to mat
+        
+        num = mat(num)
+        den = mat(den)
+        
+        nnum = num.shape[1] - 1
+        nden = den.shape[1] - 1
+        
+        if opt is 1:
+        # normalize
+            num = num / den[0,0]
+            den = den / den[0,0]
+            
+        # Compute gammas
+        
+        # gamma1 and gamma4 differ between options
+        if opt is 1:
+            gamma1 = num[0,1:] - den[0,1:]
+        elif opt is 2:
+            # Here a potential problem arises ?? verify with thibault
+            gamma1 = r_[c_[num[0,1:], zeros((1,nnum))], zeros((1,nnum)) - den[0,1:]]
+    # ???    
+        #gamma2 = [[diag(ones((1,nnum-1)),-1), zeros((nnum, nden))],[zeros((nden,nnum)), diag(ones((1,nden-1)),-1)]]
+        gamma2 = r_[c_[diagflat(ones((1,nnum-1)),-1), zeros((nnum, nden))],c_[zeros((nden,nnum)), diagflat(ones((1,nden-1)),-1)]]
+        #CurrentWork
+        gamma3 = [[1], [zeros((nnum+nden-1, 1))]]
+    
+        if opt is 1:
+            gamma4 = [[zeros((nnum,1))],[1],[zeros((nden-1,1))]]
+        elif opt is 2:
+            gamma4 = [[zeros((nnum,2))],[1,1],[zeros((nden-1,2))]]
+            
+        # transformation to 'optimize' the code
+        
+        T = mat(rot90(eye(2*nnum)))
+        
+        # build SIF
+        
 
-        num = mat(num).astype(float)
-        den = mat(den).astype(float)
-
-        # normalize coefficients
+        JtoS = den[0], gamma4, [1], gamma1, num[0], gamma2, gamma3, mat(zeros((1, nnum+nden))), [0]
         
-        num = num / den[0,0]
-        den = den / den[0,0]
+        # define event
         
-        n = max(num.shape[1], den.shape[1]) - 1
-        
-        J = mat([1])
-        K = np.r_[np.zeros((n-1,1)), mat([1]), np.zeros((n,1))]
-	L = mat([1])
-	M = np.c_[ mat([-c for c in den[-1:0:-1]]), mat(num[-1:0:-1]) ]
-	N = mat(num[0])
-	
-	P = np.diag([1]*(2*n-1), 1)
-	P[n-1,n] = 0
-	
-	Q = np.r_[ np.zeros((2*n-1,1)), mat([1]) ]
-	R = np.zeros((1,2*n))
-	S = mat([0])
-
-        JtoS = [J, K, L, M, N, P, Q, R, S]
-        
-        SIF.__init__(JtoS, DFI_father_obj, **DFI_event)
+        SIF.__init__(self, JtoS, DFI_father_obj, **DFI_event)
         
         
