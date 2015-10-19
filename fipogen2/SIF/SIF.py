@@ -356,7 +356,10 @@ class SIF(FIPObject):
         #list_mat  = [self._J, self._K, self._L, self._M, self._N, self._P, self._Q, self._R, self._S]
         #list_size = [(l,l),   (n,l),   (p,l),   (l,n),   (l,m),   (n,n),   (n,m),   (p,n),   (p,m) ]
 
+        print JtoS
+
         J, K, L, M, N, P, Q, R, S = [np.matrix(X) for X in JtoS]
+
 
         # P (n,n)
         s1,s2 = P.shape
