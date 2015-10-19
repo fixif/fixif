@@ -39,7 +39,7 @@ class DFII(SIF):
         n = max(num.shape[1], den.shape[1])
         
         J = mat([1])
-        K =  np.r_[ np.mat([1]), np.zeros((n-2,1)) ]
+        K = np.r_[ np.mat([1]), np.zeros((n-2,1)) ]
         L = mat([num[0]])
         M = mat([ -c for c in den[1:] ])
         N = mat([1])
@@ -48,7 +48,7 @@ class DFII(SIF):
         R = mat(num[1:])
         S = mat([0])
 
-        JtoS = [J, K, L, M, N, P, Q, R, S]
+        JtoS = J, K, L, M, N, P, Q, R, S
         
         SIF.__init__(JtoS, DFII_father_obj, **DFII_event)
         
