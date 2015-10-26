@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 from SIF import SIF
 from numpy import matrix as mat
+from numpy import zeros, diagflat
 
 
 class DFII(SIF):
@@ -39,14 +40,14 @@ class DFII(SIF):
         n = max(num.shape[1], den.shape[1])
         
         J = mat([1])
-        K = np.r_[ np.mat([1]), np.zeros((n-2,1)) ]
+        K = np.r_[ mat([1]), zeros((n-2,1)) ]
         L = mat([num[0]])
-        M = mat([ -c for c in den[1:] ])
+        M = - mat(den[0,1:])
         N = mat([1])
-        P = np.diag( [1]*(n-2), -1 )
-        Q = np.zeros((n-1,1))
+        P = diagflat( [1]*(n-2), -1 )
+        Q = zeros((n-1,1))
         R = mat(num[1:])
-        S = mat([0])
+        S = mat(0)
 
         JtoS = J, K, L, M, N, P, Q, R, S
         
