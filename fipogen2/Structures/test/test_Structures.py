@@ -16,6 +16,9 @@ __status__ = "Beta"
 
 import unittest
 
+import sys, os
+sys.path.insert(0, os.path.abspath('./../'))
+
 from Structures import *
 
 #from scipy.signal.filter_design import butter
@@ -116,7 +119,7 @@ class test_Structures(unittest.TestCase):
         # Inject num and den in Matlab workspace
         self.engMtlb.setVar(dict_ABCD.keys(), dict_ABCD)
         
-        print(self.engMtlb.eng.who())
+        #print(self.engMtlb.eng.who())
         
         mtlb_cmd  = 'R = SS2FWR(A,B,C,D); \n'
         
@@ -133,7 +136,8 @@ class test_Structures(unittest.TestCase):
     def mytest_DFI(self, dict_numden, opt):
         
         """
-        Test DFIq2FWR.m vs. DFI.py
+        Test DFIq2FWR.m vs. DFI.py (opt 1)
+        Test DFIqbis2FWR.m vs. DFI.py (opt 2)
         """
         
         tmp_vars = {}
@@ -146,19 +150,31 @@ class test_Structures(unittest.TestCase):
         # create TF matlab obj from num and den
         #mtlb_cmd_stack  = 'H = tf(num,den,1); \n'
         
-        # use DFI2FWR
+
+        def dirty_debug(myCmd):
+        	# temp debug
+		    #debug_varz = ['myJ','myK','myL','myM','myN','myP','myQ','myR','myS']
+		    debug_varz = []
+		    debug_dict = {}
+		    debug_cmd = myCmd
+		    #
+		    self.engMtlb.pushCmdGetVar(debug_cmd, debug_varz, debug_dict)
+		    #
+		    print(debug_dict)
+
         if opt is 1:
             mtlb_cmd = 'R = DFIq2FWR(num, den) ; \n'
             tmp_vars['Z'] = DFI(dict_numden['num'], dict_numden['den'], opt=1, eps=self.eps).Z
         elif opt is 2:
             mtlb_cmd = 'R = DFIqbis2FWR(num, den); \n'
+            #dirty_debug(mtlb_cmd)
             tmp_vars['Z'] = DFI(dict_numden['num'], dict_numden['den'], opt=2, eps=self.eps).Z
         else:
             raise('Unknown mytest_DFI opt number')
         
         varz = ['Z']
         
-        mtlb_cmd += 'Z = R.Z ;\n'        
+        mtlb_cmd += 'Z = R.Z ;\n'
         
         self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
     
@@ -198,7 +214,7 @@ class test_Structures(unittest.TestCase):
 		
 		varz = ['Z']
 		
-		mtlb_cmd += 'Z = R.Z ;\n'		
+		mtlb_cmd += 'Z = R.Z ;\n'
 		
 		self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
 	
@@ -223,10 +239,14 @@ class test_Structures(unittest.TestCase):
                 # test numpy tf2ss
                 self.mytest_tf2ss(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i))
 
-                # test DFI vs. DFIq2FWR ; DFI vs. DFIqbis2FWR
-                # NON-WORKING see with thibault
-                #self.mytest_DFI(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i), opt=1)
-                #self.mytest_DFI(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i), opt=2)
+                # test DFI vs. DFIq2FWR
+                #print("Testing DFI vs. DFIq2FWR")
+                self.mytest_DFI(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i), opt=1)
+                # test DFI vs. DFIqbis2FWR
+                #print("Testing DFI vs. DFIqbis2FWR")
+                self.mytest_DFI(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i), opt=2)
+                # test DFII.py vs. 
+                
                 
                 #self.mytest_rhoDFIIt(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i))
 
