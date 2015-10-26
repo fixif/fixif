@@ -1,7 +1,7 @@
 #coding=utf8
 
 from SIF import SIF
-from State_Space import import State_Space
+from State_Space import State_Space
 
 
 from numpy import matrix as mat
@@ -10,56 +10,59 @@ from numpy.linalg import eig, lstsq
 
 class ModalDelta(SIF):
 
-	def canon_modal(A, B, C, D):
-		
-		"""
-		Canon modal form of dSS
-		"""
-		
-		# Modal form
-		mylambda, E = eig(A)
-		
-		V = diagflat(mylambda)
-		
-		T = mat(zeros((A.shape[0], A.shape[1])))
-		
-		if np.all(np.isreal(A)):
-			
-			# transformation to modal form based on eigenvectors
-			
-			k = 0
-			
-			while k <= (mylambda.shape[0]-1):
-		  
-				if imag(mylambda[k]) is not 0:
-					rel = real(mylambda[k])
-					iml = imag(mylambda[k])
-					T[:,k] = real(V[:,k])
-					T[:,k+1] = imag(V[:,k])
-					E[k:k+1,k:k+1] = c_[[rel, iml],[-iml, rel]]
-					k = k + 2
-				else:
-					T[:,k] = V[:,k]
-					k = k + 1
-			
-		else:
-			T = V
-			
-		
-		A = E
-		B = lstsq(T, B)[0]
-		C = C*T
-		D = D
-		
-		return A, B, C, D
+    def canon_modal(A, B, C, D):
+        
+        """
+        Canon modal form of dSS
+        """
+        
+        # Modal form
+        mylambda, E = eig(A)
+        
+        V = diagflat(mylambda)
+        
+        T = mat(zeros((A.shape[0], A.shape[1])))
+        
+        if np.all(np.isreal(A)):
+            
+            # transformation to modal form based on eigenvectors
+            
+            k = 0
+            
+            while k <= (mylambda.shape[0]-1):
+          
+                if imag(mylambda[k]) is not 0:
+                	
+                    rel = real(mylambda[k])
+                    iml = imag(mylambda[k])
+                    T[:,k] = real(V[:,k])
+                    T[:,k+1] = imag(V[:,k])
+                    E[k:k+1,k:k+1] = c_[[rel, iml],[-iml, rel]]
+                    k = k + 2
+                    
+                else:
+                	
+                    T[:,k] = V[:,k]
+                    k = k + 1
+            
+        else:
+            T = V
+            
+        
+        A = E
+        B = lstsq(T, B)[0]
+        C = C*T
+        D = D
+        
+        return A, B, C, D
   
     def relaxedl2scaling(mySIF):
-    	
-    	
-    	
-    	
+        
+        
+        
+        
         return SIF, Y ,W
-    	
+        
   
     def __init__(self, A, B, C, D, Delta = None, isDeltaExact = None, father=None, **event_spec):
     
@@ -84,7 +87,7 @@ class ModalDelta(SIF):
             Delta = zeros((1, Aq.shape[0]))
             isDeltaExact = True
         elsif (Delta is not None and isDeltaExact is None):
-        	isDeltaExact = False
+            isDeltaExact = False
     
         #if isDeltaExact is None: # see https://www.python.org/dev/peps/pep-0008/#id42 / point 2
         #isDeltaExact = False
