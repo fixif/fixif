@@ -33,18 +33,19 @@ wcpg_test-wcpg_test.o: wcpg_test.c /usr/include/stdc-predef.h wcpg_test.h \
  /usr/include/x86_64-linux-gnu/bits/nan.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
- /usr/include/x86_64-linux-gnu/bits/mathinline.h clapack_headers_config.h \
- /usr/include/f2c.h wcpg.h _wcpg.h glue.h \
+ /usr/include/x86_64-linux-gnu/bits/mathinline.h glue.h \
  /usr/lib/gcc/x86_64-linux-gnu/4.9/include/stdint.h /usr/include/stdint.h \
- /usr/include/x86_64-linux-gnu/bits/wchar.h clapack_headers_config.h \
+ /usr/include/x86_64-linux-gnu/bits/wchar.h clapack_functions_config.h \
+ config.h /usr/include/f2c.h /usr/include/lapacke.h \
+ /usr/include/complex.h /usr/include/x86_64-linux-gnu/bits/cmathcalls.h \
+ /usr/include/lapacke_mangling.h /usr/include/cblas.h \
  /usr/include/x86_64-linux-gnu/gmp.h /usr/include/mpfr.h \
- /usr/include/mpfi.h mpfi_cmpx.h /usr/include/string.h \
+ /usr/include/mpfi.h mpfr_linalg.h mpfi_matrixalg.h /usr/include/string.h \
  /usr/include/xlocale.h /usr/include/x86_64-linux-gnu/bits/string.h \
  /usr/include/x86_64-linux-gnu/bits/string2.h /usr/include/mpfi_io.h \
- /usr/include/ctype.h /usr/include/mpfi.h mpfr_linalg.h mpfi_matrixalg.h \
- clapack_linalg.h clapack_functions_config.h config.h \
- /usr/include/complex.h /usr/include/x86_64-linux-gnu/bits/cmathcalls.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.9/include/float.h inclusion_verif.h
+ /usr/include/ctype.h /usr/include/mpfi.h clapack_linalg.h _wcpg.c \
+ _wcpg.h /usr/lib/gcc/x86_64-linux-gnu/4.9/include/float.h \
+ inclusion_verif.h wcpg.h
 
 /usr/include/stdc-predef.h:
 
@@ -136,14 +137,6 @@ wcpg_test.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathinline.h:
 
-clapack_headers_config.h:
-
-/usr/include/f2c.h:
-
-wcpg.h:
-
-_wcpg.h:
-
 glue.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/4.9/include/stdint.h:
@@ -152,7 +145,21 @@ glue.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
 
-clapack_headers_config.h:
+clapack_functions_config.h:
+
+config.h:
+
+/usr/include/f2c.h:
+
+/usr/include/lapacke.h:
+
+/usr/include/complex.h:
+
+/usr/include/x86_64-linux-gnu/bits/cmathcalls.h:
+
+/usr/include/lapacke_mangling.h:
+
+/usr/include/cblas.h:
 
 /usr/include/x86_64-linux-gnu/gmp.h:
 
@@ -160,7 +167,9 @@ clapack_headers_config.h:
 
 /usr/include/mpfi.h:
 
-mpfi_cmpx.h:
+mpfr_linalg.h:
+
+mpfi_matrixalg.h:
 
 /usr/include/string.h:
 
@@ -176,20 +185,14 @@ mpfi_cmpx.h:
 
 /usr/include/mpfi.h:
 
-mpfr_linalg.h:
-
-mpfi_matrixalg.h:
-
 clapack_linalg.h:
 
-clapack_functions_config.h:
+_wcpg.c:
 
-config.h:
-
-/usr/include/complex.h:
-
-/usr/include/x86_64-linux-gnu/bits/cmathcalls.h:
+_wcpg.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/4.9/include/float.h:
 
 inclusion_verif.h:
+
+wcpg.h:

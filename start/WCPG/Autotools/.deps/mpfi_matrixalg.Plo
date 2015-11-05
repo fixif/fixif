@@ -38,11 +38,12 @@ mpfi_matrixalg.lo: mpfi_matrixalg.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/nan.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
- /usr/include/x86_64-linux-gnu/bits/mathinline.h mpfi_cmpx.h glue.h \
+ /usr/include/x86_64-linux-gnu/bits/mathinline.h glue.h \
  /usr/lib/gcc/x86_64-linux-gnu/4.9/include/stdint.h /usr/include/stdint.h \
- /usr/include/x86_64-linux-gnu/bits/wchar.h clapack_headers_config.h \
- /usr/include/f2c.h mpfr_linalg.h clapack_functions_config.h config.h \
- /usr/include/complex.h /usr/include/x86_64-linux-gnu/bits/cmathcalls.h
+ /usr/include/x86_64-linux-gnu/bits/wchar.h clapack_functions_config.h \
+ config.h /usr/include/f2c.h /usr/include/lapacke.h \
+ /usr/include/complex.h /usr/include/x86_64-linux-gnu/bits/cmathcalls.h \
+ /usr/include/lapacke_mangling.h /usr/include/cblas.h mpfr_linalg.h
 
 /usr/include/stdc-predef.h:
 
@@ -156,8 +157,6 @@ clapack_linalg.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathinline.h:
 
-mpfi_cmpx.h:
-
 glue.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/4.9/include/stdint.h:
@@ -166,16 +165,20 @@ glue.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
 
-clapack_headers_config.h:
-
-/usr/include/f2c.h:
-
-mpfr_linalg.h:
-
 clapack_functions_config.h:
 
 config.h:
 
+/usr/include/f2c.h:
+
+/usr/include/lapacke.h:
+
 /usr/include/complex.h:
 
 /usr/include/x86_64-linux-gnu/bits/cmathcalls.h:
+
+/usr/include/lapacke_mangling.h:
+
+/usr/include/cblas.h:
+
+mpfr_linalg.h:

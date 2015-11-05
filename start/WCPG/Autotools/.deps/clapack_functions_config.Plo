@@ -22,8 +22,8 @@ clapack_functions_config.lo: clapack_functions_config.c \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h config.h \
- clapack_headers_config.h /usr/include/f2c.h /usr/include/lapacke.h \
- /usr/include/complex.h /usr/include/x86_64-linux-gnu/bits/mathdef.h \
+ /usr/include/f2c.h /usr/include/lapacke.h /usr/include/complex.h \
+ /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/cmathcalls.h \
  /usr/include/lapacke_mangling.h /usr/include/cblas.h
 
@@ -84,8 +84,6 @@ clapack_functions_config.h:
 /usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
 
 config.h:
-
-clapack_headers_config.h:
 
 /usr/include/f2c.h:
 

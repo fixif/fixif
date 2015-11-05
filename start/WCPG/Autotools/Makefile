@@ -82,11 +82,11 @@ build_triplet = x86_64-unknown-linux-gnu
 host_triplet = x86_64-unknown-linux-gnu
 bin_PROGRAMS = wcpg_test$(EXEEXT)
 subdir = .
-DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog COPYING \
+DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in depcomp $(include_HEADERS) compile \
-	config.guess config.sub install-sh missing ltmain.sh
+	$(srcdir)/config.h.in depcomp $(include_HEADERS) COPYING \
+	compile config.guess config.sub install-sh missing ltmain.sh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -132,7 +132,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libwcpg_la_LIBADD =
 am_libwcpg_la_OBJECTS = clapack_linalg.lo glue.lo inclusion_verif.lo \
-	mpfi_cmpx.lo mpfi_matrixalg.lo mpfr_linalg.lo _wcpg.lo wcpg.lo \
+	mpfi_matrixalg.lo mpfr_linalg.lo _wcpg.lo \
 	clapack_functions_config.lo
 libwcpg_la_OBJECTS = $(am_libwcpg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -230,16 +230,16 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/joa/svn/WCPG/Autotools/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/joa/git/fipogen/start/WCPG/Autotools/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_CFLAGS =  -fPIC
 AM_CPPFLAGS = 
 AM_DEFAULT_VERBOSITY = 1
 AM_LDFLAGS = -lm -lgmp -lmpfr -lmpfi $(LAPACK_LIBS) $(BLAS_LIBS)
 AR = ar
-AUTOCONF = ${SHELL} /home/joa/svn/WCPG/Autotools/missing autoconf
-AUTOHEADER = ${SHELL} /home/joa/svn/WCPG/Autotools/missing autoheader
-AUTOMAKE = ${SHELL} /home/joa/svn/WCPG/Autotools/missing automake-1.14
+AUTOCONF = ${SHELL} /home/joa/git/fipogen/start/WCPG/Autotools/missing autoconf
+AUTOHEADER = ${SHELL} /home/joa/git/fipogen/start/WCPG/Autotools/missing autoheader
+AUTOMAKE = ${SHELL} /home/joa/git/fipogen/start/WCPG/Autotools/missing automake-1.14
 AWK = mawk
 BLAS_LIBS = -lblas
 CC = gcc
@@ -262,8 +262,8 @@ ECHO_N = -n
 ECHO_T = 
 EGREP = /bin/grep -E
 EXEEXT = 
-F77 = 
-FFLAGS = 
+F77 = f77
+FFLAGS = -g -O2
 FGREP = /bin/grep -F
 GREP = /bin/grep
 INSTALL = /usr/bin/install -c
@@ -280,7 +280,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/joa/svn/WCPG/Autotools/missing makeinfo
+MAKEINFO = ${SHELL} /home/joa/git/fipogen/start/WCPG/Autotools/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -303,15 +303,15 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = strip
 VERSION = 0.9
-abs_builddir = /home/joa/svn/WCPG/Autotools
-abs_srcdir = /home/joa/svn/WCPG/Autotools
-abs_top_builddir = /home/joa/svn/WCPG/Autotools
-abs_top_srcdir = /home/joa/svn/WCPG/Autotools
+abs_builddir = /home/joa/git/fipogen/start/WCPG/Autotools
+abs_srcdir = /home/joa/git/fipogen/start/WCPG/Autotools
+abs_top_builddir = /home/joa/git/fipogen/start/WCPG/Autotools
+abs_top_srcdir = /home/joa/git/fipogen/start/WCPG/Autotools
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 ac_ct_DUMPBIN = 
-ac_ct_F77 = 
+ac_ct_F77 = f77
 am__include = include
 am__leading_dot = .
 am__quote = 
@@ -337,7 +337,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/joa/svn/WCPG/Autotools/install-sh
+install_sh = ${SHELL} /home/joa/git/fipogen/start/WCPG/Autotools/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -358,24 +358,20 @@ top_build_prefix =
 top_builddir = .
 top_srcdir = .
 lib_LTLIBRARIES = libwcpg.la
-include_HEADERS = wcpg.h
+include_HEADERS = wcpg.h mpfr_linalg.h
 libwcpg_la_SOURCES = clapack_linalg.c \
 			   glue.c \
 			   inclusion_verif.c \
-			   mpfi_cmpx.c \
 			   mpfi_matrixalg.c \
 			   mpfr_linalg.c \
 			   _wcpg.c \
-			   wcpg.c \
-			   clapack_functions_config.c \
+			   clapack_functions_config.c  \
 			   clapack_linalg.h \
 			   glue.h \
 			   inclusion_verif.h \
-			   mpfi_cmpx.h \
 			   mpfi_matrixalg.h \
-			   mpfr_linalg.h \
 			   _wcpg.h \
-			   clapack_functions_config.h 
+			   clapack_functions_config.h
 
 libwcpg_la_LDFLAGS = -version-info 0:9:0 $(AM_LDFLAGS)
 wcpg_test_SOURCES = wcpg_test.c wcpg_test.h
@@ -542,10 +538,8 @@ include ./$(DEPDIR)/clapack_functions_config.Plo
 include ./$(DEPDIR)/clapack_linalg.Plo
 include ./$(DEPDIR)/glue.Plo
 include ./$(DEPDIR)/inclusion_verif.Plo
-include ./$(DEPDIR)/mpfi_cmpx.Plo
 include ./$(DEPDIR)/mpfi_matrixalg.Plo
 include ./$(DEPDIR)/mpfr_linalg.Plo
-include ./$(DEPDIR)/wcpg.Plo
 include ./$(DEPDIR)/wcpg_test-wcpg_test.Po
 
 .c.o:

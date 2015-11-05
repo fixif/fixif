@@ -35,15 +35,15 @@ inclusion_verif.lo: inclusion_verif.c /usr/include/stdc-predef.h \
  /usr/lib/gcc/x86_64-linux-gnu/4.9/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
- /usr/include/x86_64-linux-gnu/bits/stdio.h clapack_headers_config.h \
- /usr/include/f2c.h /usr/include/x86_64-linux-gnu/gmp.h \
- /usr/include/mpfr.h /usr/include/mpfi.h mpfi_cmpx.h \
- /usr/include/string.h /usr/include/xlocale.h \
- /usr/include/x86_64-linux-gnu/bits/string.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio.h clapack_functions_config.h \
+ config.h /usr/include/f2c.h /usr/include/lapacke.h \
+ /usr/include/complex.h /usr/include/x86_64-linux-gnu/bits/cmathcalls.h \
+ /usr/include/lapacke_mangling.h /usr/include/cblas.h \
+ /usr/include/x86_64-linux-gnu/gmp.h /usr/include/mpfr.h \
+ /usr/include/mpfi.h mpfr_linalg.h mpfi_matrixalg.h /usr/include/string.h \
+ /usr/include/xlocale.h /usr/include/x86_64-linux-gnu/bits/string.h \
  /usr/include/x86_64-linux-gnu/bits/string2.h /usr/include/mpfi_io.h \
- /usr/include/ctype.h /usr/include/mpfi.h mpfr_linalg.h mpfi_matrixalg.h \
- clapack_linalg.h clapack_functions_config.h config.h \
- /usr/include/complex.h /usr/include/x86_64-linux-gnu/bits/cmathcalls.h
+ /usr/include/ctype.h /usr/include/mpfi.h clapack_linalg.h
 
 /usr/include/stdc-predef.h:
 
@@ -143,9 +143,21 @@ glue.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio.h:
 
-clapack_headers_config.h:
+clapack_functions_config.h:
+
+config.h:
 
 /usr/include/f2c.h:
+
+/usr/include/lapacke.h:
+
+/usr/include/complex.h:
+
+/usr/include/x86_64-linux-gnu/bits/cmathcalls.h:
+
+/usr/include/lapacke_mangling.h:
+
+/usr/include/cblas.h:
 
 /usr/include/x86_64-linux-gnu/gmp.h:
 
@@ -153,7 +165,9 @@ clapack_headers_config.h:
 
 /usr/include/mpfi.h:
 
-mpfi_cmpx.h:
+mpfr_linalg.h:
+
+mpfi_matrixalg.h:
 
 /usr/include/string.h:
 
@@ -169,16 +183,4 @@ mpfi_cmpx.h:
 
 /usr/include/mpfi.h:
 
-mpfr_linalg.h:
-
-mpfi_matrixalg.h:
-
 clapack_linalg.h:
-
-clapack_functions_config.h:
-
-config.h:
-
-/usr/include/complex.h:
-
-/usr/include/x86_64-linux-gnu/bits/cmathcalls.h:

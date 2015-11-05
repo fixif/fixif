@@ -18707,8 +18707,8 @@ done
 
 if test "x${ADD_LBLAS}" = "xyes"
 then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: blas.h is successfully found." >&5
-$as_echo "$as_me: blas.h is successfully found." >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: blas.h found." >&5
+$as_echo "$as_me: blas.h found." >&6;}
 fi
 
 #Check for CBLAS headers
@@ -18735,8 +18735,8 @@ done
 
 if test "x${ADD_LCBLAS}" = "xyes"
 then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: cblas.h is successfully found." >&5
-$as_echo "$as_me: cblas.h is successfully found." >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: cblas.h found." >&5
+$as_echo "$as_me: cblas.h found." >&6;}
 fi
 
 #Check for BLASWRAP headers
@@ -18762,14 +18762,14 @@ done
 
 if test "x${ADD_LBLASWRAP}" = "xyes"
 then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: blaswrap.h is successfully found." >&5
-$as_echo "$as_me: blaswrap.h is successfully found." >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: blaswrap.h found." >&5
+$as_echo "$as_me: blaswrap.h found." >&6;}
 fi
 
 if test "x${BLAS_FLAG}"="xyes"
 then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: At least one blas header file was found is successfully found." >&5
-$as_echo "$as_me: At least one blas header file was found is successfully found." >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: At least one blas header file was found." >&5
+$as_echo "$as_me: At least one blas header file was found." >&6;}
 else
   as_fn_error $? "No blas header file found." "$LINENO" 5
 fi
@@ -18805,8 +18805,8 @@ done
 
 if test "x${ADD_LCLAPACK}" = "xyes"
 then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: clapack.h is successfully found." >&5
-$as_echo "$as_me: clapack.h is successfully found." >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: clapack.h found." >&5
+$as_echo "$as_me: clapack.h found." >&6;}
 fi
 
 #Check for lapacke.h headers
@@ -18834,8 +18834,8 @@ done
 
 if test "x${ADD_LLAPACKE}" = "xyes"
 then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: ADD_LLAPACKE is successfully found." >&5
-$as_echo "$as_me: ADD_LLAPACKE is successfully found." >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: lapacke.h found." >&5
+$as_echo "$as_me: lapacke.h found." >&6;}
 fi
 
 #Check for lapack.h headers
@@ -19184,7 +19184,6 @@ else
 fi
 
 
-#AX_LAPACK(, AC_MSG_ERROR([lapack unusable!!!]))
 
 
 FLAG="no"
@@ -19276,7 +19275,8 @@ then
     as_fn_error $? "Missing (c)blas, function dgemv not found" "$LINENO" 5
 fi
 
-FLAG="no"
+FLAG1="no"
+FLAG2="no"
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for LAPACKE_zgetri in -llapacke" >&5
 $as_echo_n "checking for LAPACKE_zgetri in -llapacke... " >&6; }
 if ${ac_cv_lib_lapacke_LAPACKE_zgetri+:} false; then :
@@ -19314,7 +19314,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lapacke_LAPACKE_zgetri" >&5
 $as_echo "$ac_cv_lib_lapacke_LAPACKE_zgetri" >&6; }
 if test "x$ac_cv_lib_lapacke_LAPACKE_zgetri" = xyes; then :
-  LAPACK_LIBS="-llapacke"  FLAG="yes"
+  FLAG1="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing lapacke but maybe lapack is installed" >&5
 $as_echo "$as_me: WARNING: Missing lapacke but maybe lapack is installed" >&2;}
@@ -19357,18 +19357,27 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lapack_zgetri_" >&5
 $as_echo "$ac_cv_lib_lapack_zgetri_" >&6; }
 if test "x$ac_cv_lib_lapack_zgetri_" = xyes; then :
-  FLAG="yes" LAPACK_LIBS="-llapack"
+  FLAG2="yes" LAPACK_LIBS="-llapack"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing lapack" >&5
 $as_echo "$as_me: WARNING: Missing lapack" >&2;}
 fi
 
-if test "x${FLAG}" != "xyes"
+
+if test "x${FLAG1}" == "xyes"
 then
+    LAPACK_LIBS="-llapacke"
+elif test "x${FLAG2}" == "xyes"
+then
+    LAPACK_LIBS="-llapack"
+else
     as_fn_error $? "Missing clapack/lapacke, function zgetri_/LAPACKE_zgetri not found" "$LINENO" 5
 fi
 
-FLAG="no"
+
+
+FLAG1="no"
+FLAG2="no"
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for LAPACKE_dgeevx in -llapacke" >&5
 $as_echo_n "checking for LAPACKE_dgeevx in -llapacke... " >&6; }
 if ${ac_cv_lib_lapacke_LAPACKE_dgeevx+:} false; then :
@@ -19406,7 +19415,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lapacke_LAPACKE_dgeevx" >&5
 $as_echo "$ac_cv_lib_lapacke_LAPACKE_dgeevx" >&6; }
 if test "x$ac_cv_lib_lapacke_LAPACKE_dgeevx" = xyes; then :
-  FLAG="yes" LAPACK_LIBS="-llapacke"
+  FLAG1="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing lapacke but maybe lapack is installed" >&5
 $as_echo "$as_me: WARNING: Missing lapacke but maybe lapack is installed" >&2;}
@@ -19449,18 +19458,25 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lapack_dgeevx_" >&5
 $as_echo "$ac_cv_lib_lapack_dgeevx_" >&6; }
 if test "x$ac_cv_lib_lapack_dgeevx_" = xyes; then :
-  FLAG="yes" LAPACK_LIBS="-llapack"
+  FLAG2="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing lapack" >&5
 $as_echo "$as_me: WARNING: Missing lapack" >&2;}
 fi
 
-if test "x${FLAG}" != "xyes"
+if test "x${FLAG1}" == "xyes"
 then
+    LAPACK_LIBS="-llapacke"
+elif test "x${FLAG2}" == "xyes"
+then
+    LAPACK_LIBS="-llapack"
+else
     as_fn_error $? "Missing clapack/lapacke, function dgeevx_/LAPACKE_dgeevx not found" "$LINENO" 5
 fi
 
-FLAG="no"
+
+FLAG1="no"
+FLAG2="no"
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for LAPACKE_zgetrf in -llapacke" >&5
 $as_echo_n "checking for LAPACKE_zgetrf in -llapacke... " >&6; }
 if ${ac_cv_lib_lapacke_LAPACKE_zgetrf+:} false; then :
@@ -19498,7 +19514,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lapacke_LAPACKE_zgetrf" >&5
 $as_echo "$ac_cv_lib_lapacke_LAPACKE_zgetrf" >&6; }
 if test "x$ac_cv_lib_lapacke_LAPACKE_zgetrf" = xyes; then :
-  FLAG="yes" LAPACK_LIBS="-llapacke"
+  FLAG1="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing lapacke but maybe lapack is installed" >&5
 $as_echo "$as_me: WARNING: Missing lapacke but maybe lapack is installed" >&2;}
@@ -19541,17 +19557,21 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lapack_zgetrf_" >&5
 $as_echo "$ac_cv_lib_lapack_zgetrf_" >&6; }
 if test "x$ac_cv_lib_lapack_zgetrf_" = xyes; then :
-  FLAG="yes" LAPACK_LIBS="-llapack"
+  FLAG2="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing lapack" >&5
 $as_echo "$as_me: WARNING: Missing lapack" >&2;}
 fi
 
-if test "x${FLAG}" != "xyes"
+if test "x${FLAG1}" == "xyes"
 then
+    LAPACK_LIBS="-llapacke"
+elif test "x${FLAG2}" == "xyes"
+then
+    LAPACK_LIBS="-llapack"
+else
     as_fn_error $? "Missing clapack/lapacke, function zgetrf_/LAPACKE_zgetrf not found" "$LINENO" 5
 fi
-
 
 
 # Check that dynamic libraries are available at runtime

@@ -82,11 +82,11 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = wcpg_test$(EXEEXT)
 subdir = .
-DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog COPYING \
+DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in depcomp $(include_HEADERS) compile \
-	config.guess config.sub install-sh missing ltmain.sh
+	$(srcdir)/config.h.in depcomp $(include_HEADERS) COPYING \
+	compile config.guess config.sub install-sh missing ltmain.sh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -132,7 +132,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libwcpg_la_LIBADD =
 am_libwcpg_la_OBJECTS = clapack_linalg.lo glue.lo inclusion_verif.lo \
-	mpfi_cmpx.lo mpfi_matrixalg.lo mpfr_linalg.lo _wcpg.lo wcpg.lo \
+	mpfi_matrixalg.lo mpfr_linalg.lo _wcpg.lo \
 	clapack_functions_config.lo
 libwcpg_la_OBJECTS = $(am_libwcpg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -358,24 +358,20 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libwcpg.la
-include_HEADERS = wcpg.h
+include_HEADERS = wcpg.h mpfr_linalg.h
 libwcpg_la_SOURCES = clapack_linalg.c \
 			   glue.c \
 			   inclusion_verif.c \
-			   mpfi_cmpx.c \
 			   mpfi_matrixalg.c \
 			   mpfr_linalg.c \
 			   _wcpg.c \
-			   wcpg.c \
-			   clapack_functions_config.c \
+			   clapack_functions_config.c  \
 			   clapack_linalg.h \
 			   glue.h \
 			   inclusion_verif.h \
-			   mpfi_cmpx.h \
 			   mpfi_matrixalg.h \
-			   mpfr_linalg.h \
 			   _wcpg.h \
-			   clapack_functions_config.h 
+			   clapack_functions_config.h
 
 libwcpg_la_LDFLAGS = -version-info 0:9:0 $(AM_LDFLAGS)
 wcpg_test_SOURCES = wcpg_test.c wcpg_test.h
@@ -542,10 +538,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clapack_linalg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inclusion_verif.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpfi_cmpx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpfi_matrixalg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpfr_linalg.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wcpg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wcpg_test-wcpg_test.Po@am__quote@
 
 .c.o:
