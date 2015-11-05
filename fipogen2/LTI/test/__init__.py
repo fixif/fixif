@@ -1,1 +1,1 @@
-# Test suite for the dSS class and its functions 
+# Test suite for LTI module

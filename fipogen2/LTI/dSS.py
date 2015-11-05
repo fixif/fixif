@@ -34,12 +34,10 @@ from copy                 import copy
 from slycot               import sb03md
 
 # WCPG calculation needs mpmath
-from mpmath import mp
+#from mpmath import mp
 
 # WCPG C func wrapped in python
 import _pyWCPG
-
-from SIF.SIF import SIF # conversion to SIF in toSIF function
 
 class dSS(FIPObject):
 
@@ -140,7 +138,7 @@ class dSS(FIPObject):
         self._WCPG = None
         
         # set precision for mpmath
-        mp.dps = 64
+        #mp.dps = 64
         
 
 
