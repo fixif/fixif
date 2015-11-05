@@ -1,0 +1,31 @@
+\begin{algorithm}[h]
+	\caption{<}
+<<caption>>
+	\SetAlgoLined
+	\Begin{
+%Inputs
+%<>%
+%< declare('u', texDict.u.numVar, 'KwIn') >%
+%outputs
+%< declare('y', texDict.y.numVar, 'KwOut') >%
+%states
+%< if texDict.isPnut:>%
+%< declare('xn, xnp', texDict.xn.numVar, 'KwData'>%
+%< else: >%
+%< declare('xn', texDict.xn.numVar, 'KwData') >%
+%< endif >%
+%intermediate variables
+%< declare('T', texDict.T.numVar, 'KwData') >%
+<<calculations>>
+}
+\end{algorithm}
+
+
+
+%< macro declare(baseName, numVar, kwName) -%>
+%< if length(numVar) > 1:>%
+    \<<kwName>>{$<<baseName>>$: real}
+%< else: >%
+    \<<kwName>>{$<<baseName>>$: array [1..<<numVar>>] of reals}
+%< endif >%
+%< endmacro %>
