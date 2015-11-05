@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 from SIF import SIF
 from numpy import matrix as mat
-from numpy import zeros, diagflat
+from numpy import zeros, diagflat, r_
 
 
 class DFII(SIF):
@@ -29,28 +29,39 @@ class DFII(SIF):
 
         DFII_father_obj = father_obj
 
-        num = mat(num).astype(float)
-        den = mat(den).astype(float)
+        num = mat(num)
+        den = mat(den)
 
         # normalize coefficients
         
         num = num / den[0,0]
         den = den / den[0,0]
         
-        n = max(num.shape[1], den.shape[1])
+        #ordre du filtre
+        n = max(num.shape[1], den.shape[1]) - 1
         
-        J = mat([1])
-        K = np.r_[ mat([1]), zeros((n-2,1)) ]
-        L = mat([num[0]])
-        M = - mat(den[0,1:])
-        N = mat([1])
-        P = diagflat( [1]*(n-2), -1 )
-        Q = zeros((n-1,1))
-        R = mat(num[1:])
+        
+        if (num.shape[1] != den.shape[1]):
+            raise('num and den do not have the same size')
+        
+        J = mat(1)
+        M = - den[0,1:]
+        N = mat(1)
+                
+        K = r_[ mat(1), mat(zeros((n-1,1))) ]
+        P = diagflat( [1]*(n-1), -1 )
+        Q = mat(zeros((n,1)))
+                
+        L = mat(num[0,0])
+        R = mat(num[0,1:])
         S = mat(0)
+
+        #J = mat(1)
+        #K = mat(zeros((n-2,1)))
+        
 
         JtoS = J, K, L, M, N, P, Q, R, S
         
-        SIF.__init__(JtoS, DFII_father_obj, **DFII_event)
+        SIF.__init__(self, JtoS, DFII_father_obj, **DFII_event)
         
-        
+        print(self.Z)

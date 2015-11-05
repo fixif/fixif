@@ -72,7 +72,7 @@ class DFI(SIF):
         gamma3 = mat(gamma3)
         gamma4 = mat(gamma4)
 
-		# transformation to 'optimize' the code
+	# transformation to 'optimize' the code
         
         T = mat(rot90(eye(2*nnum)))
         
