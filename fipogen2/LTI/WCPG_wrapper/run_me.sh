@@ -4,9 +4,17 @@
 clear
 
 #set LD_LIBRARY_PATH
-LD_LIBRARY_PATH='/usr/local/lib/'
+#LD_LIBRARY_PATH='/usr/local/lib/'
 
-python setup.py build_ext --inplace
+# This script is LINUX ONLY and enables the user to compile and install the wrapper without global installation of libWCPG.
+# if installed as global, remove rpath option. Otherwise libWCPG will be searched for in current folder
+# http://stackoverflow.com/questions/1099981/why-cant-python-find-shared-objects-that-are-in-directories-in-sys-path
+
+rm -rf ./build/*
+rm _pyWCPG.so
+CURRENTDIR=$(pwd)
+python setup.py build_ext --inplace --rpath=$CURRENTDIR
+#python setup.py build
 
 #--libraries ./libwcpg.so.0.0.9
 
