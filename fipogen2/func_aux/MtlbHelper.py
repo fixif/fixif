@@ -111,4 +111,6 @@ class MtlbHelper(object):
             #print("Shape of local_varz_dict["+ var +"]")
             #print(str(local_varz_dict[var].shape))
         
+            print("Comparing "+var)
+        
             npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
