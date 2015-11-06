@@ -72,7 +72,7 @@ class test_Structures(unittest.TestCase):
 
         return tmp_vars
 
-    def _reshape_1dto2d(self, var_dict):
+    def _reshape_1dto2d(self, var_dict): #could be replaced by atleast2d() ???
         
         for key in var_dict.keys():
             if var_dict[key].shape == (1,): # does not work with "is" ???
@@ -152,15 +152,15 @@ class test_Structures(unittest.TestCase):
         
 
         def dirty_debug(myCmd):
-        	# temp debug
-		    #debug_varz = ['myJ','myK','myL','myM','myN','myP','myQ','myR','myS']
-		    debug_varz = []
-		    debug_dict = {}
-		    debug_cmd = myCmd
-		    #
-		    self.engMtlb.pushCmdGetVar(debug_cmd, debug_varz, debug_dict)
-		    #
-		    print(debug_dict)
+            # temp debug
+            #debug_varz = ['myJ','myK','myL','myM','myN','myP','myQ','myR','myS']
+            debug_varz = []
+            debug_dict = {}
+            debug_cmd = myCmd
+            #
+            self.engMtlb.pushCmdGetVar(debug_cmd, debug_varz, debug_dict)
+            #
+            print(debug_dict)
 
         if opt is 1:
             mtlb_cmd = 'R = DFIq2FWR(num, den) ; \n'
@@ -180,45 +180,71 @@ class test_Structures(unittest.TestCase):
     
         self.engMtlb.cleanenv() # be nice with next test 
         
-    #def mytest_DFII(self):
+    def mytest_DFII(self, dict_numden):
         
-    #    pass
+        """
+        Test rhoDFIIt.m vs. DFII.py
+        """
+        
+        # does not work this way as rhoDFIIt generates more variables
+        # so we would need to use the "simplify" routine to erase those
+        
+        tmp_vars = {}
+        
+        self.engMtlb.setVar(dict_numden.keys(), dict_numden)
+        # create TF obj from num and den
+        
+        mtlb_cmd  = 'H = tf(num, den, 1); \n'
+        mtlb_cmd += 'gamma = zeros([1 length(num)-1]); \n'
+        mtlb_cmd += 'isGammaExact = 1; \n'
+        mtlb_cmd += 'delta = ones(size(gamma)); \n'
+        mtlb_cmd += 'isDeltaExact = 1; \n'
+        mtlb_cmd += '[R1, R2, flag] = rhoDFIIt2FWR(H, gamma, isGammaExact, delta, isDeltaExact); \n'
+        mtlb_cmd += 'Z1 = R1.Z; \n'
+        mtlb_cmd += 'Z2 = R2.Z; \n'
+    
+        tmp_vars['Z1'] = DFII(dict_numden['num'], dict_numden['den']).Z
+        tmp_vars['Z2'] = DFII(dict_numden['num'], dict_numden['den']).Z
+        
+        varz = ['Z1','Z2']
+        
+        self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
        
     def mytest_rhoDFIIt(self):
         
-    		
-		"""
-		Test rhoDFIIt2FWR.m (opt=1), rhoDFIIt2FWRrelaxedL2 vs. rhoDFIIt.py
-		"""
-		
-		tmp_vars = {}
+            
+        """
+        Test rhoDFIIt2FWR.m (opt=1), rhoDFIIt2FWRrelaxedL2 vs. rhoDFIIt.py
+        """
+        
+        tmp_vars = {}
 
-		# Inject num and den in Matlab workspace
-		self.engMtlb.setVar(dict_numden.keys(), dict_numden)
+        # Inject num and den in Matlab workspace
+        self.engMtlb.setVar(dict_numden.keys(), dict_numden)
 
-		#print(self.engMtlb.eng.who())
+        #print(self.engMtlb.eng.who())
 
-		# create TF matlab obj from num and den
-		mtlb_cmd  = 'H = tf(num,den,1); \n'
-		
-		# use rhoDFIIt2FWR
-		# probleme je n'ai pas de matrice gamma...
-		if opt is 1:
-			mtlb_cmd = 'R = rhoDFIIt2FWR(H) ; \n'
-			tmp_vars['Z'] = RhoDFIIt(dict_numden['num'], dict_numden['den'], opt=1, eps=self.eps).Z
-		elif opt is 2:
-			mtlb_cmd = 'R = rhoDFIIt2FWR(H); \n'
-			tmp_vars['Z'] = RhoDFIIt(dict_numden['num'], dict_numden['den'], opt=2, eps=self.eps).Z
-		else:
-			raise('Unknown mytest_DFI opt number')
-		
-		varz = ['Z']
-		
-		mtlb_cmd += 'Z = R.Z ;\n'
-		
-		self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
-	
-		self.engMtlb.cleanenv() # be nice with next test 
+        # create TF matlab obj from num and den
+        mtlb_cmd  = 'H = tf(num,den,1); \n'
+        
+        # use rhoDFIIt2FWR
+        # probleme je n'ai pas de matrice gamma...
+        if opt is 1:
+            mtlb_cmd = 'R = rhoDFIIt2FWR(H) ; \n'
+            tmp_vars['Z'] = RhoDFIIt(dict_numden['num'], dict_numden['den'], opt=1, eps=self.eps).Z
+        elif opt is 2:
+            mtlb_cmd = 'R = rhoDFIIt2FWR(H); \n'
+            tmp_vars['Z'] = RhoDFIIt(dict_numden['num'], dict_numden['den'], opt=2, eps=self.eps).Z
+        else:
+            raise('Unknown mytest_DFI opt number')
+        
+        varz = ['Z']
+        
+        mtlb_cmd += 'Z = R.Z ;\n'
+        
+        self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
+    
+        self.engMtlb.cleanenv() # be nice with next test 
         
     
     #def mytest_modalDelta(self):
@@ -245,8 +271,8 @@ class test_Structures(unittest.TestCase):
                 # test DFI vs. DFIqbis2FWR
                 #print("Testing DFI vs. DFIqbis2FWR")
                 self.mytest_DFI(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i), opt=2)
-                # test DFII.py vs. 
-                
+                # test DFII.py vs. rhoDFIIt.m with gamma = 0 and delta = 1
+                #self.mytest_DFII(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i))
                 
                 #self.mytest_rhoDFIIt(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i))
 
