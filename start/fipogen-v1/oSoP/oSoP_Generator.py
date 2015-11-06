@@ -10,7 +10,7 @@ from math import ceil, log, factorial, floor
 
 	
 	
-def oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, alfix = False, plus = False):
+def oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, alfix = False, plus = False, formatting = False):
 	# args
 	N=len(multipliers)
 	if N==2:
@@ -58,19 +58,19 @@ def oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, alfix = False, plu
 							#yield osop
 
 
-							#optim 
-							# if osop.height() == int(ceil(log(N,2))):
-							# 	return osop
+							if formatting: 
+								if osop.height() == int(ceil(log(N,2))):
+									return osop
 
-							#pas optim
-							if osop._Top._total_error.mean <= best_mean:
-								if osop._Top._total_error.mean < best_mean:
-									best_osop = osop
-									best_mean = osop._Top._total_error.mean
-								else:
-									if osop.height() < best_osop.height():
+							else:
+								if osop._Top._total_error.mean <= best_mean:
+									if osop._Top._total_error.mean < best_mean:
 										best_osop = osop
 										best_mean = osop._Top._total_error.mean
+									else:
+										if osop.height() < best_osop.height():
+											best_osop = osop
+											best_mean = osop._Top._total_error.mean
 								
 								
 
@@ -178,7 +178,7 @@ def best_oSoP_gen(variables_name, variables, constants, constants_wordlength, mu
 	if formatting:
 		# Computation of fpf_add, ie fpf_final 'plus' delta bits considered for additions
 		fpf_add = FPF(wl=fpf_final.wl+delta, msb=fpf_final.msb, lsb=fpf_final.lsb-delta, signed=fpf_final._signed)
-		for L in oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, alfix = False,plus = False):
+		for L in oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, alfix = False,plus = False, formatting=formatting):
 			if L.height() ==ceil(log(N,2)):
 				h=L.height()
 				best_osop = L
@@ -191,7 +191,7 @@ def best_oSoP_gen(variables_name, variables, constants, constants_wordlength, mu
 		nb=0
 		LT=[]
 		best_mean = 10000
-		for L in oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, alfix = False,plus = False):
+		for L in oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, alfix = False,plus = False, formatting=formatting):
 			nb+=1
 			if nb%10000 == 0:
 				print nb
@@ -301,8 +301,9 @@ def best_oSoP_gen_from_dict(D):
 			fpf_add = FPF(wl=fpf_final.wl+delta, msb=fpf_final.msb, lsb=fpf_final.lsb-delta, signed=fpf_final._signed)
 			if N ==1:
 				best_osop = oSoP(multipliers[0])
+				# print best_osop._var_final
 			elif N<10:
-				best_osop= oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final)
+				best_osop= oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, formatting=formatting)
 			else:
 				osop = multipliers[0]
 				for m in multipliers[1:]:
@@ -317,7 +318,7 @@ def best_oSoP_gen_from_dict(D):
 			LT=[]
 			best_mean = 10000
 			if  7>N >1:
-				best_osop = oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final)
+				best_osop = oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, formatting=formatting)
 			elif N ==1:
 				best_osop = oSoP(multipliers[0])
 			else:

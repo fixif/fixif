@@ -19,7 +19,10 @@ class oSoP(object):
 	def __init__(self, top, var_final=None):
 		"""Constructeur"""
 		self._Top = top
-		self._var_final = var_final
+		if isinstance(top,Multiplier):
+			self._var_final = top._var_result
+		else:
+			self._var_final = var_final
 		#self._var_test= self._Top._var_result.copy()
 		self._rshift_final = 0
 

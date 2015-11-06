@@ -51,19 +51,7 @@ def contraintes_AMPL(fichier, bound=0):
 
 
 	# je construit mon vecteur de bornes sup (seulement SISO ou même borne sur chaque sortie)
-	b=[]
-	for i in range(ny):
-		b.append(2**bound)
-
-
-	# calcul du delta
-	d=[]
-	for i in range(nt + nx + ny):
-		c = 0
-		for j in range(nt + nx + nu):
-			if Z[i][j] != 0:
-				c+=1
-		d.append(int(ceil(log(c,2))))
+	b=[2**bound]*ny
 
 
 	if ny == 1 :
@@ -73,22 +61,30 @@ def contraintes_AMPL(fichier, bound=0):
 		A = [[abs(dce[i][j] + wcpge[i][j]) for j in range(nt+nx+ny)] for i in range(ny)]
 		D = [[abs(dce[i][j] - wcpge[i][j]) for j in range(nt+nx+ny)] for i in range(ny)]
 	
-
+	delta=[]
 	for i in range(ny):
 		for j in range(nt+nx+ny):
 			s=0
 			l=0
 			for k in range(nt+nx+nu):
-				if Z[j][k] != 0:
+				if Z[j][k] != 0 and (j >= nt or j != k):
 					s += Z[j][k]
 					l += 1
+			if l >= 2:
+				delta.append(int(floor(log(l-1,2))+1))
+			else:
+				delta.append(0)
 
-			if l == 2 and abs(s) == 0:
+			if l == 2 and abs(s) == 0: # utile pour la LGS mais on peut mieux faire
 				A[i][j] = 0
 				D[i][j] = 0
 			else:
-				A[i][j] = float(A[i][j])*2**(m_var_out[j]+1) / b[i]
-				D[i][j] = float(D[i][j])*2**(m_var_out[j]+1) / b[i]
+				# A[i][j] = float(A[i][j])*2**(m_var_out[j]+1) / b[i]
+				# D[i][j] = float(D[i][j])*2**(m_var_out[j]+1) / b[i]
+				# test nouvelle version plus fine
+				#print float(A[i][j])*2**(m_var_out[j]+1) / b[i], float(A[i][j])*2**(m_var_out[j])*(1+(l-1)*2**(-delta[j])) / b[i]
+				A[i][j] = float(A[i][j])*2**(m_var_out[j])*(1+(l-1)*2**(-delta[j])) / b[i]
+				D[i][j] = float(D[i][j])*2**(m_var_out[j])*(1+(l-1)*2**(-delta[j])) / b[i]
 
 	# sA = 0
 	# sD = 0

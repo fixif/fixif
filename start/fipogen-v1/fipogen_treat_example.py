@@ -58,7 +58,7 @@ def ValiderIO():
 
 def Browser():
 	global filemat
-	filemat = tkFileDialog.askopenfilename(initialdir=fenetre, title='Please select a Matlab file', filetypes=[("Matlab","*.mat")])
+	filemat = tkFileDialog.askopenfilename(initialdir="Examples/These/ex_bis", title='Please select a Matlab file', filetypes=[("Matlab","*.mat")])
 	lbl_browser.config(text=filemat.split("/")[-1])
 	lbl_browser.pack(side=LEFT)
 
@@ -137,7 +137,10 @@ def GenConstraint():
 				file_out.write(text)
 				file_out.close()
 		else: # au moins un argument est donné
-			text=contraintes_AMPL(filemat)
+			if inf!= None:
+				text=contraintes_AMPL(filemat,inf)
+			else:
+				text=contraintes_AMPL(filemat,sup)
 			file_out = open(destdir+"/contraintes_"+filemat.split("/")[-1].split(".")[0]+".dat", 'w')
 			file_out.write(text)
 			file_out.close()
@@ -153,6 +156,7 @@ def GenConstraint():
 def GenSoP():
 	if srcdir and destdir2 and filemat:
 		files = listdir(srcdir) # on liste les fichiers dans le dossier source
+		st = ""
 		for f in files:
 			if f.split(".")[-1] == "sol":
 				# Q&D : on lit les largeurs obtenues par l'optimisation
@@ -161,15 +165,22 @@ def GenSoP():
 				line = ""
 				while line.strip("\n") != "Wx":
 					line = fichier.readline()
+					if "Objective" in line:
+						w = float(line.split(":")[-1].strip("\n"))
 				line = fichier.readline()
+				nb_var=0
 				while line.strip("\n") != "Wy":
-					W_var.append(int(line.strip("\n")))
+					W_var.append(int(float(line.strip("\n"))))
+					nb_var += 1
 					line = fichier.readline()
 				line = fichier.readline()
 				while line.strip("\n") != '':
-					W_var.append(int(line.strip("\n")))
+					W_var.append(int(float(line.strip("\n"))))
+					nb_var += 1
 					line = fichier.readline()
+				w /= nb_var
 				fichier.close()
+
 
 				# à partir des largeurs des variables on détermine les largeurs des coeff
 				WL_cst, WL_var = wordlengths_cst_var_post_optim(filemat,W_var)
@@ -182,15 +193,22 @@ def GenSoP():
 				eps = []
 				for osop in OSOP:
 					eps.append(osop._Top._total_error.inter)
-
+					#print eps[-1]
+					#print osop._var_final.FPF
+				
 				D = loadmat(filemat)
 				dcge = D["dcHe"][0]
 				wcpge = [D["wcpgHe"][i][0] for i in range(len(D["wcpgHe"]))]
-				print erreur_finale(eps, wcpge, dcge)
+				err_fin = erreur_finale(eps, wcpge, dcge)
+				print err_fin
+				st += "{0} {1}\n".format(w, max(abs(err_fin[0]),abs(err_fin[1])))
 
-				fichier = open(destdir2+"/osops_"+filemat.split("/")[-1].split(".")[0]+".pkl", "w")
+				fichier = open(destdir2+"/"+f.replace("contraintes", "osops").replace("sol","pkl"), "w")
 				dump(OSOP, fichier)
 				fichier.close()
+		file_gnuplot = open(destdir2+"/datas_{0}.dat".format(filemat.split("/")[-1].split(".")[0]), "w")
+		file_gnuplot.write(st)
+		file_gnuplot.close()
 	else:
 		print "Argument manquant"
 		if not srcdir :
@@ -225,6 +243,7 @@ def GenSoP_isoWL():
 		st = ""
 		# pour chaque largeur dans l'intervalle donnée
 		for  w in range(inf_isow, sup_isow+1):
+			print "\nlargeur : "+str(w)+"\n"
 			# pour chaque SoP
 			for i in range(nt+nx+ny):
 				d={}
@@ -294,10 +313,10 @@ def GenSoP_isoWL():
 				Dy_r += wcpge[i] * E_r[i]
 
 
-			st += "{0} {1} {2}\n".format(w, Dy_m, Dy_r)
+			#st += "{0} {1} {2}\n".format(w, Dy_m, Dy_r)
 
 			W_var = [w for k in range(nt+nx+ny)]
-			WL_cst, WL_var = wordlengths_cst_var_post_optim(filemat,W_var, iso_wl=True)
+			WL_cst, WL_var = wordlengths_cst_var_post_optim(filemat,W_var, iso_wl=False)
 			DWL = {"W_var":W_var, "WL_cst":WL_cst, "WL_var":WL_var, "formatting":True}
 			print DWL
 			DSIF = MatlabDict2FilterExample_SIF(filemat, dicos=DWL)
@@ -311,7 +330,9 @@ def GenSoP_isoWL():
 			D = loadmat(filemat)
 			dcge = D["dcHe"][0]
 			wcpge = [D["wcpgHe"][i][0] for i in range(len(D["wcpgHe"]))]
-			print erreur_finale(eps, wcpge, dcge)
+			err_fin = erreur_finale(eps, wcpge, dcge)
+			print err_fin
+			st += "{0} {1}\n".format(w, max(abs(err_fin[0]),abs(err_fin[1])))
 
 			fichier = open(destdir3+"/osops_{0}_w{1}.pkl".format(filemat.split("/")[-1].split(".")[0], w), "w")
 			dump(OSOP, fichier)
