@@ -3,6 +3,6 @@
 
 from SIF import SIF
 from Structures import State_Space
-
+from algorithmLaTeX import algorithmLaTeX
 
 #__all__ = ["SIF", "Structures"]
