@@ -162,7 +162,7 @@ class oSoP(object):
 				if R[j] != None:
 					i_res = j
 					break
-			code_int_sop += "\treturn r%d"%(i_res)
+			code_int_sop += "\n\treturn r%d"%(i_res)
 			if self._rshift_final > 0 :
 				code_int_sop += " >> %d"%(self._rshift_final)
 			code_int_sop += ";"

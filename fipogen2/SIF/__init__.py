@@ -1,3 +1,8 @@
+# coding=utf8
 # SIF package from FiPogen2
 
-__all__ = []
+from SIF import SIF
+from Structures import State_Space
+
+
+#__all__ = ["SIF", "Structures"]

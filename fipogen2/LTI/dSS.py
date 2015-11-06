@@ -1,58 +1,69 @@
 # coding=utf8
 
-"""Blablabla"""
+# Reference file header
 
-# Object and "methods" for a Discrete State Space
-# 2015 LIP6
+"""
+This file contains Object and methods for a Discrete State Space
+"""
 
+__author__ = "Thibault Hilaire, Joachim Kruithof"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__ = ["Thibault Hilaire", "Joachim Kruithof", "Anastasia Lozanova"]
+
+__license__ = "CECILL-C"
+__version__ = "1.0a"
+__maintainer__ = "Joachim Kruithof"
+__email__ = "joachim.kruithopf@lip6.fr"
+__status__ = "Beta"
+
+#To enable obj tracking, must be a subclass of FIPObject
+from TRK.FIPObject        import FIPObject
+
+from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
+#from numpy.ctypeslib      import as_array
 from numpy                import matrix as mat
-from numpy                import inf, shape, identity, absolute, dot
+from numpy                import eye, zeros
 
-from numpy.linalg               import inv, det, solve
-from numpy.linalg.linalg        import LinAlgError
-
-# Imports for random_dSS
-from numpy                import dot, eye, pi, cos, sin
-from numpy.random         import rand, randn
+from numpy.linalg         import inv, det, solve
+from numpy.linalg.linalg  import LinAlgError
 
 from scipy.linalg         import solve_discrete_lyapunov
 
-#IFDEF SLYCOT
-#import slycot # lin eq solver
+# slycot method for observers Wo and Wc
+from copy                 import copy
+from slycot               import sb03md
 
-# Module description
-__author__ = "FiPoGen Team"
-__email__ = "fipogen@lip6.fr"
-__license__ = "CECILL-C"
-__version__ = "0.0.1"  # Modify this to increment with git scripting
+# WCPG calculation needs mpmath
+#from mpmath import mp
 
-class dSS(object):
+# WCPG C func wrapped in python
+import _pyWCPG
 
-    """
+class dSS(FIPObject):
+
+    r"""
+    
     The dSS class describes a discrete state space realization
        
-       A state space system is defined as
-       
+     A state space system :math:`(A,B,C,D)` is defined by 
+      
     .. math::
-    
-         A \\in \\mathbb{R}^{n \\times n}, \\ B \\in \\mathbb{R}^{n \\times p}, \\ C \\in \\mathbb{R}^{q \\times n} \\text{ and } D \\in \\mathbb{R}^{q \\times p}   
        
-    .. math::
-       :nowrap:
-       
-         \\begin{equation*}
-         \\text{and }\\left\\lbrace\\begin{aligned}
-         X(k+1) &= AX(k) + BU(k) \\\\
+        \left\lbrace \begin{aligned}
+         X(k+1) &= AX(k) + BU(k) \\
          Y(k)   &= CX(k) + DU(k)
-         \\end{aligned}\\right.
-         \\end{equation*}
+         \end{aligned}\right.
+
+
+    with :math:`A \in \mathbb{R}^{n \times n}, B \in \mathbb{R}^{n \times p}, C \in \mathbb{R}^{q \times n} \text{ and } D \in \mathbb{R}^{q \times p}`. 
+    
 
     **Dimensions of the state space :**
        
     .. math::
-       :align: left
+        :align: left
        
-         n,p,q \\in \\mathbb{N}
+         n,p,q \in \mathbb{N}
          
     ==  ==================
     n   number of states
@@ -65,35 +76,70 @@ class dSS(object):
     
        - Observers : Wo and Wc
        - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) (see doc for each)
+       
     """
 
-    def __init__(self, A, B, C, D):
+    def __init__(self, A, B, C, D, father_obj=None, **event_spec): # cannot use dSS.__class__.__name__ here. http://stackoverflow.com/questions/14513019/python-get-class-name
 
         """
+        
         Construction of a discrete state space
+        
+        .. TODO
+        
+          force docstring to appear in doc because calling spec is important
+          
+          add special section to document event_spec and examples
+        
         """
 
-        self._A = A  # User input, numpy matrixes
-        self._B = B
-        self._C = C
-        self._D = D
+        # Build event based on provided info.
+        # default event : dSS instance created from user interface
+        
+        my_e_type      = event_spec.get('e_type', 'create')
+        my_e_subtype   = event_spec.get('e_subtype', 'new')      
+        my_e_subclass  = event_spec.get('e_subclass', 'dSS')
+        my_e_source    = event_spec.get('e_source', 'user_input')
+        my_e_subsource = event_spec.get('e_subsource', 'dSS.__init__') # optional, could also be ''
+        my_e_desc      = event_spec.get('e_desc', '')
+
+        dSS_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
+
+        my_father_obj = father_obj
+        
+        #Init superclass
+        # TODO: check if self.__class__.__name__ needed or can the superclass get it (in case of simple inheritance)
+        FIPObject.__init__(self, self.__class__.__name__, father_obj=my_father_obj, **dSS_event)
+
+        self._A = mat(A)  # User input
+        self._B = mat(B)
+        self._C = mat(C)
+        self._D = mat(D)
 
         # Initialize state space dimensions from user input
 
         (self._n, self._p, self._q) = self.__check_dimensions__()  # Verify coherence, set dimensions
-
-        # Initialize observers
+        
+        # Initialize observers and method for computation of those
+        
+        self._W_method = 'slycot1'  # linalg, slycot1
         self._Wo = None
         self._Wc = None 
 
-        # Initialize norms
+        # Initialize norm
 
         self._norm_h2 = None
-        self._WCPG = None
 
         # Other criterions,values
 
         self._DC_gain = None
+        
+        # WCPG
+        self._WCPG = None
+        
+        # set precision for mpmath
+        #mp.dps = 64
+        
 
 
 
@@ -129,103 +175,155 @@ class dSS(object):
 
     @property
     def Wo(self):
-        if (self._Wo == None): self.calc_Wo()
+        if (self._Wo is None): self.calc_W('Wo', self._W_method)
         return self._Wo
 
     @property
     def Wc(self):
-        if (self._Wc == None): self.calc_Wc()
+        if (self._Wc is None): self.calc_W('Wc', self._W_method)
         return self._Wc
 
     @property
     def norm_h2(self):
-        if (self._norm_h2 == None): self.calc_h2()
+        if (self._norm_h2 is None): self.calc_h2()
         return self._norm_h2
 
     @property
     def WCPG(self):
-        if (self._WCPG == None): self.calc_WCPG()
+        if (self._WCPG is None): self.calc_WCPG()
         return self._WCPG
 
     @property
     def DC_gain(self):
-        if (self._DC_gain == None): self.calc_DC_gain()
+        if (self._DC_gain is None): self.calc_DC_gain()
         return self._DC_gain
 
 
 
     #======================================================================================#      
-    # Observers (Wo, Wc) calculation : solve Lyapunov equation
+    # Observers (Wo, Wc) calculation
     #======================================================================================#
 
-    def calc_Wo(self):
+    def calc_W(self, Woc, meth):
 
         """
-        Compute observer :math:`W_o` using ``scipy.linalg.solve_discrete_lyapunov``
+        
+        Computes observers :math:`W_o` or :math:`W_c` (using 'Woc' parameter) with method 'meth' :
+
+        :math:`W_o` is solution of equation :
 
         .. math::
         
            A^T * W_o * A + C^T * C = W_o
-
-        """
-
-        try:
-            #,method='bilinear'
-            X = solve_discrete_lyapunov(self._A, self._C.transpose() * self._C)
-            self._Wo = mat(X)
-            
-        except LinAlgError, ve:
-
-            if (ve.info < 0):
-                e = LinAlgError(ve.message)
-                e.info = ve.info
-            else:
-                e = LinAlgError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
-                e.info = ve.info
-                raise e
-
-
-    def calc_Wc(self):
-
-        """
-        Compute observer :math:`W_c` using ``scipy.linalg.solve_discrete_lyapunov``
-
+           
+        :math:`W_c` is solution of equation :
+        
         .. math::
 
            A * W_c * A^T + B * B^T = W_c
+        
+        Available methods :
+        
+        - ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
+        1 digit precision with bilinear algorithm for big matrixes (really bad). 
+        not good enough with usual python data types
+
+        - ``slycot1`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
+        see http://slicot.org/objects/software/shared/libindex.html
+        
+        ..Example::
+        
+          >>>mydSS = random_dSS() ## define a new state space from random data
+          >>>mydSS.calc_W('Wo','linalg') # use numpy
+          >>>mydSS.calc_W('Wo','slycot1') # use slycot
+          >>>mydSS.calc_W('Wc','linalg')
+          >>>mydSS.calc_W('Wc','slycot1')    
+
+        .. warning::
+        
+           solve_discrete_lyapunov does not work as intended, see http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
+           Precision is not good (4 digits, failed tests)
+           
+        .. todo::
+        
+           - octave routine in http://octave.sourceforge.net/control/function/dlyap.html uses another function from slicot
+           - scilab routine https://www.scilab.org/product/man/linmeq.html uses slicot too
 
         """
-
-        try:
+        
+        # DEVNOTE / We could try to use mpmath in the current function as a test bench for gain in precision using multiprecision
+        # data types
+        
+        if (self._W_method == 'linalg'):
             
-            X = solve_discrete_lyapunov(self._A.transpose(), self._B * self._B.transpose())
-            self._Wc = mat(X)
+          try:
+              
+              if (Woc == 'Wo'):
+                  
+                X = solve_discrete_lyapunov(self._A.transpose(), self._C.transpose() * self._C)
+                self._Wo = mat(X)
+                
+              elif (Woc == 'Wc'):
+                  
+                X = solve_discrete_lyapunov(self._A, self._B * self._B.transpose())
+                self._Wc = mat(X)
+                
+              else: raise "unknown Woc for W calculation"
             
-        except LinAlgError, ve:
+          except LinAlgError, ve:
 
-            if (ve.info < 0):
-                e = LinAlgError(ve.message)
-                e.info = ve.info 
-            else:
-                e = LinAlgError("scipy Linalg failed to compute eigenvalues of Lyapunov equation.")
+              if (ve.info < 0):
+                  e = LinAlgError(ve.message)
+                  e.info = ve.info
+              else:
+                  e = LinAlgError(Woc + " : " + "scipy Linalg failed to compute eigenvalues of Lyapunov equation")
+                  e.info = ve.info
+              raise e
+
+        # Solve the Lyapunov equation by calling the Slycot function sb03md
+        # If we don't use "copy" in the call, the result is plain false
+          
+        elif (self._W_method == 'slycot1'):
+            
+            try:
+                if (Woc == 'Wo'):
+                    
+                  X, scale, sep, ferr, w = sb03md(self.n, -self._C.transpose() * self._C, copy(self._A.transpose()), eye(self.n, self.n), dico='D', trana='T')
+                  self._Wo = mat(X)
+                  
+                elif (Woc == 'Wc'):
+                    
+                  X, scale, sep, ferr, w = sb03md(self.n, -self._B * self._B.transpose(), copy(self._A), eye(self.n, self.n), dico='D', trana='T')
+                  self._Wc = mat(X)
+                  
+                else: raise "unknown Woc for W calculation"
+                
+            except ValueError, ve:
+                
+              if ve.info < 0:
+                e = ValueError(ve.message)
                 e.info = ve.info
-                raise e
+              else:
+                e = ValueError(Woc + " : " + "The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+                e.info = ve.info
+              raise e
+        
+        else: raise "unknown _W_method to calculate observers"
+
                
-
-
     #======================================================================================#      
     # Norms calculation
     #======================================================================================#
 
-
     def calc_h2(self):
 
-        """
+        r"""
+        
         Compute the H2-norm of the system
         
         .. math::
         
-           \\langle \\langle H \\rangle \\rangle = \\sqrt{tr ( C*W_c * C^T + D*D^T )}
+           \langle \langle H \rangle \rangle = \sqrt{tr ( C*W_c * C^T + D*D^T )}
         
         """
 
@@ -243,14 +341,20 @@ class dSS(object):
 
         return
 
-    def calc_WCPG(self,n_it):
 
-        """
+
+	 
+
+    #======================================================================================#
+    def calc_WCPG(self):
+
+        r"""
+        
         Compute the Worst Case Peak Gain of the state space
 
         .. math::
 
-           \\langle \\langle H \\rangle \\rangle \\triangleq |D| + \\sum_{k=0}^\\infty |C * A^k * B|
+           \langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
         
         Using algorithm developed in paper :
         
@@ -261,32 +365,20 @@ class dSS(object):
            Lozanova & al., calculation of WCPG
         
         """
-        #Method not precise
-        #res = 0
-
-        #try:
-        #    for i in range(1, self._nit_WCPG):
-        #        res += numpy.absolute(self._C * matrix_power(A, i) * B)
-        #        #res += numpy.absolute(self._C * A**i * B)
-        #except:
-        #    raise ValueError, 'Impossible to compute WCPG at rank i = ' + str(i) + "\n"
-        #else:
-        #    self._WCPG = res + absolute(D)
-
-        #
-
-        return self._WCPG
+          
+        self._WCPG = _pyWCPG.pyWCPG(array(self._A), array(self._B), array(self._C), array(self._D), self._n, self._p, self._q)
 
     #======================================================================================#
     def calc_DC_gain(self):
 
-        """
+        r"""
+        
         Compute the DC-gain of the filter
 
         .. math::
 
-           \\langle H \\rangle = C * (I_n - A)^{-1} * B + D
-
+           \langle H \rangle = C * (I_n - A)^{-1} * B + D
+           
         """
 
         try:
@@ -294,14 +386,16 @@ class dSS(object):
         except:
             raise ValueError, 'Impossible to compute DC-gain from current discrete state space'
 
-        return self._DC_gain  
+        return self._DC_gain
 
     #======================================================================================#
     def __check_dimensions__(self):
 
         """
+        
         Computes the number of inputs and outputs.
         Check for concordance of the matrixes' size
+        
         """
 
         # A
@@ -338,7 +432,9 @@ class dSS(object):
     def __str__(self):
 
         """
+        
         Display the state-space
+        
         """
 
         str_mat = "State Space\nA=" + repr(self._A) + "\nB=" + repr(self._B) + "\nC=" + repr(self._C) + "\nD=" + repr(self._D) + "\n\n"
@@ -368,129 +464,17 @@ class dSS(object):
 
         return str_mat
 
-        #======================================================================================#
+    #======================================================================================#
     def __repr__(self):
         return str(self)
 
-        #======================================================================================#
+    if __name__ == "__main__":
+        import doctest
+        doctest.testmod()
 
-    #def __doc__(self):
+    # def __doc__(self):
     #  return "Class for discrete state-space, and aux functions"
 
     # def _latex_(self):
         # #TODO
         # return ""
-        
-  # Random state-space
-# def random_dSS(n=None, p=1, q=1):
-#   """Generate a n-th order random stable state-space, with p inputs and q outputs
-#   
-#   copy/Adapted from control-python library
-#   """
-#   
-#   if n == None:
-#     n = random.randint(5, 10)
-# 
-#   # Probability of repeating a previous root.
-#   pRepeat = 0.05
-#   # Probability of choosing a real root.  Note that when choosing a complex
-#   # root, the conjugate gets chosen as well.  So the expected proportion of
-#   # real roots is pReal / (pReal + 2 * (1 - pReal)).
-#   pReal = 0.6
-#   # Probability that an element in B or C will not be masked out.
-#   pBCmask = 0.8
-#   # Probability that an element in D will not be masked out.
-#   pDmask = 0.3
-#   # Probability that D = 0.
-#   pDzero = 0.2
-#         
-#   # Check for valid input arguments.
-#   if n < 1 or n % 1:
-#       raise ValueError(("states must be a positive integer.  #states = %g." % n))
-#   if p < 1 or p % 1:
-#     raise ValueError(("inputs must be a positive integer.  #inputs = %g." % p))
-#   if q < 1 or q % 1:
-#     raise ValueError(("outputs must be a positive integer.  #outputs = %g." % q))
-#         
-#   # Make some poles for A.  Preallocate a complex array.
-#   poles = np.zeros(n) + np.zeros(n) * 0.j
-#   i = 0
-#         
-#   while i < n:
-#     if rand() < pRepeat and i != 0 and i != n - 1:
-#       # Small chance of copying poles, if we're not at the first or last
-#       # element.
-#       if poles[i - 1].imag == 0:
-#         # Copy previous real pole.
-#         poles[i] = poles[i - 1]
-#         i += 1
-#       else:
-#         # Copy previous complex conjugate pair of poles.
-#         poles[i:i + 2] = poles[i - 2:i]
-#         i += 2
-#     elif rand() < pReal or i == n - 1:
-#       # No-oscillation pole.
-#       poles[i] = 2. * rand() - 1.
-#       i += 1
-#     else:
-#       # Complex conjugate pair of oscillating poles.
-#       mag = rand()
-#       phase = 2. * pi * rand()
-#       poles[i] = complex(mag * cos(phase), mag * sin(phase))
-#       poles[i + 1] = complex(poles[i].real, -poles[i].imag)
-#       i += 2
-# 
-#   # Now put the poles in A as real blocks on the diagonal.
-#   A = np.zeros((n, n))
-#   i = 0
-#   while i < n:
-#     if poles[i].imag == 0:
-#       A[i, i] = poles[i].real
-#       i += 1
-#     else:
-#       A[i, i] = A[i + 1, i + 1] = poles[i].real
-#       A[i, i + 1] = poles[i].imag
-#       A[i + 1, i] = -poles[i].imag
-#       i += 2
-#   # Finally, apply a transformation so that A is not block-diagonal.
-#   while True:
-#     T = randn(n, n)
-#     try:
-#       A = dot(solve(T, A), T)  # A = T \ A * T
-#       break
-#     except LinAlgError:
-#       # In the unlikely event that T is rank-deficient, iterate again.
-#       pass
-# 
-#   # Make the remaining matrices.
-#   B = randn(n, p)
-#   C = randn(q, n)
-#   D = randn(q, p)
-# 
-#   # Make masks to zero out some of the elements.
-#   while True:
-#     Bmask = rand(n, p) < pBCmask 
-#     if not Bmask.all():  # Retry if we get all zeros.
-#       break
-#   
-#   while True:
-#     Cmask = rand(q, n) < pBCmask
-#     if not Cmask.all():  # Retry if we get all zeros.
-#       break
-#   
-#   if rand() < pDzero:
-#     Dmask = np.zeros((q, p))
-#   else:
-#     while True:
-#       Dmask = rand(q, p) < pDmask
-#       if not Dmask.all():  # Retry if we get all zeros.
-#         break
-#   
-# 
-#   # Apply masks.
-#   B = B * Bmask
-#   C = C * Cmask
-#   D = D * Dmask
-# 
-#   return dSS(A, B, C, D)
-  

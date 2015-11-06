@@ -1,0 +1,598 @@
+ 
+%%%%%%%%%%%%%%%%%%% bib des articles %%%%%%%%%%%%%%%%%%%
+
+@ARTICLE{LCW07, 
+author={G. Li and J. Chu and J. Wu}, 
+journal={Signal Processing}, 
+title={A Matrix Factorization-Based Structure for Digital Filters}, 
+year={2007}, 
+month={Oct}, 
+volume={55}, 
+number={10}, 
+pages={5108-5112}, 
+keywords={digital filters;filtering theory;matrix decomposition;roundoff errors;LCW structure;LGS structure;digital filter structure;filter output sample;matrix factorization;roundoff noise gain;Adaptive filters;Adders;Circuits and systems;Differential equations;Digital filters;IIR filters;Lattices;Noise reduction;Polynomials;Sun;Digital filter structures;finite-word-length (FWL) effects;roundoff noise;state-space realizations}, 
+doi={10.1109/TSP.2007.896111}, 
+ISSN={1053-587X},}
+
+@ARTICLE{LGS00, 
+author={G. Li and Gevers, M. and Y. Sun}, 
+journal={{IEEE} Trans. on  Circuits and Systems I: Fundamental Theory and Applications}, 
+title={Performance analysis of a new structure for digital filter implementation}, 
+year={2000}, 
+month={Apr}, 
+volume={47}, 
+number={4}, 
+pages={474-482}, 
+keywords={digital filters;roundoff errors;state-space methods;LGS-structure;digital filter implementation;nontrivial parameters;optimal state-space realizations;orthonormal ladder filter;roundoff noise gain;sensitivity measure;Digital control;Digital filters;Dynamic range;Error correction;Gain measurement;Noise measurement;Optimal control;Performance analysis;Sun;Transfer functions}, 
+doi={10.1109/81.841849}, 
+ISSN={1057-7122},}
+
+@ARTICLE{JSS89, 
+author={Johns, D.A. and Snelgrove, W.M. and Sedra, A. S.}, 
+journal={Circuits and Systems}, 
+title={Orthonormal ladder filters}, 
+year={1989}, 
+month={March}, 
+volume={36}, 
+number={3}, 
+pages={337-343}, 
+keywords={active filters;ladder networks;transfer functions;MOSFET-C;active-RC filters;adaptive filters;arbitrary filter transfer-functions;dynamic range properties;dynamic range scaling;optimum dynamic range;orthonormal ladder filters;singly terminated LC ladder;state-space structure;transconductance-C;Adaptive filters;Circuits and systems;Councils;Digital systems;Dynamic range;Information technology;MOSFET circuits;Passband;Speech;White noise}, 
+doi={10.1109/31.17579}, 
+ISSN={0098-4094},}
+
+
+%%%%%%%%%%%%%%%%%%% TEX LGS %%%%%%%%%%%%%%%%%%%
+
+\subsection{Structure LGS}
+
+Cette structure, proposée par Li, Gevers et Sun (LGS) \cite{LGS00}, s'inspire d'une paramétrisation (on rappelle qu'une paramétrisation est l'ensemble des quatre matrices caractérisant un state-space donné) proposée par Johns, Snelgrove et Sedra (JSS) pour un filtre dans le domaine continu \cite{JSS89}. La paramétrisation JSS a l'avantage d'utiliser des matrices très creuses et donc de diminuer fortement le nombre de calculs (cette paramétrisation est décrite dans l'annexe \ref{anx:JSS}), mais possède également une sensibilité très faible par rapport à la quantification des coefficients. Ainsi, Li \emph{et al.} ont eu l'idée de décrire la paramétrisation JSS discrète (paramétrisation DJSS) puisque celle-ci possède également une sensibilité très faible (en effet, il a été montré que si une paramétrisation avait une mesure de sensibilité faible dans le domaine continu, alors son équivalent dans le domaine discret avait aussi une mesure de sensibilité faible \cite{LuHa88}). Cependant, le passage du domaine continu au domaine discret implique une inversion de matrice et donc une matrice creuse devient une matrice dense. Li \emph{et al.} proposent alors la structure LGS, qui consiste à factoriser la matrice des coefficients en un produit de matrices creuses. Le terme paramétristation n'est pas applicable pour la réalisation proposée par Li \emph{et al.} car elle n'a plus la forme d'un state-space. 
+
+La construction de cette structure, décrite dans \cite{LGS00}, est détaillée dans l'annexe \ref{anx:LGS}. On donne néanmoins ici la structure LGS :
+\begin{equation*}
+\left \{
+\begin{array}{rcl}
+\ve{X}^{(0)}(k)&=&\ve{X}(k)\\
+\ve{X}^{(m)}(k) & = & \ma{A}^{(m)}\ve{X}^{(m-1)}(k), \quad m=1,2,\ldots,N\\
+\ve{X}(k+1) & = & \ve{X}^{(N)}(k)+\ve{B}_{in}u(k) \\
+y(k)& = & \ve{C}_{in}\ve{X}(k)+du(k)\\
+\end{array}
+\right .
+\end{equation*}
+où les vecteurs $\ve{b}_{in}$ et $\ve{c}_{in}$ sont issus de la paramétrisation DJSS, les matrices $\ma{A}^{(m)}$ pour $1\leq m \leq N$ sont issues de la factorisation de $\ma{a}_{in}$ (étant elle-même la matrice carrée dans la paramétrisation DJSS), les $\ve{X}^{(m)}(k)$  pour $1\leq m \leq N$ sont des variables intermédiaires, et $N = 3(n-1)+1$ où $n$ est l'ordre du filtre.
+
+
+Cette structure possède une sensibilité $\mathcal{L}_2$ très faible (proche de celle de la paramétrisation DJSS), nécessite $7n-3$ multiplications et $6n-3$ additions (un state-space classique dense nécessite $(n+1)^2$ multiplications et $n(n+1)$ additions si tous les coefficients sont non nuls), et est caractérisée par $5(n-1)$ coefficients non triviaux ($(n+1)^2$ pour un state-space dense).
+
+
+%%%%%%%% TEX pour illustration LGS %%%%%%%%
+\paragraph{Structure LGS :}
+
+On se propose ici de décrire la structure LGS sous forme d'une SIF. On rappelle pour cela l'expression de la structure LGS :
+\begin{equation*}
+\left \{
+\begin{array}{rcl}
+\ve{X}^{(0)}(k)&=&\ve{X}(k)\\
+\ve{X}^{(m)}(k) & = & \ma{A}^{(m)}\ve{X}^{(m-1)}(k), \quad m=1,2,\ldots,N\\
+\ve{X}(k+1) & = & \ve{X}^{(N)}(k)+\ve{B}_{in}u(k) \\
+y(k)& = & \ve{C}_{in}\ve{X}(k)+du(k)\\
+\end{array}
+\right .
+\end{equation*}
+dont les notations sont décrites dans l'annexe \ref{anx:LGS}.
+
+Il faut bien remarquer ici que le produit des variables intermédiaires $\ve{x}^{(m)}$ se calcule dans un ordre précis. En effet, puisque, selon les notations utilisées dans la description de la structure, $\ma{A}_{in} = \prod\limits_{m=1}^N \ma{A}^{(m)} =\ma{A}^{(N)}\ma{A}^{(N-1)}\ldots \ma{A}^{(2)}\ma{A}^{(1)}$, alors le produit des $\ve{x}^{(m)}$ se calcule selon l'ordre suivant :
+\begin{eqnarray}
+	\ve{x}^{(0)}(k) &=& \ve{X}(k),\\
+	\ve{x}^{(1)}(k) &=& \ma{A}^{(1)}\ve{X}^{(0)}(k),\\
+	\ldots\\
+	\ve{x}^{(N)}(k) &=& \ma{A}^{(N)}\ve{X}^{(N-1)}(k).
+\end{eqnarray}
+
+On a alors la même notion d'ordre que dans le cas de la SIF avec le calcul du vecteur de variables intermédiaires $\ve{t}$. La correspondance se fait donc naturellement entre les variables $\ve{x}^{(m)}$ et les variables $\ve{t}_i$ (en supprimant le terme initial $\ve{x}^{(0)}(k)$) :
+
+\begin{equation*}
+\left \{
+\begin{array}{rcl}
+\ve{t}_1(k+1) & = & \ma{A}^{(1)}\ve{X}(k)\\
+\ve{t}_2(k+1) & = & \ma{A}^{(2)}\ve{t}_1(k+1) \\
+ & \vdots &  \\
+\ve{t}_N(k+1)& = & \ma{A}^{(N)}\ve{t}_{N-1}(k+1)\\
+\end{array}
+\right .
+\end{equation*}
+
+\begin{rmq}
+On pourra noter qu'ici un élément $\ve{t}_i$, avec $1\leq i \leq N$, est un vecteur de taille $n$ (l'ordre du filtre, on rappelle qu'on a $N= 3(n-1)+1$), alors que dans la description générale $\ve{t}_i$ est un scalaire, même si cela ne change rien à la mise en \oe{}uvre de la SIF.
+\end{rmq}
+
+On a donc, pour tout $2 \leq i \leq N$ :
+\begin{equation}\label{eq:t_i_LGS}
+	\ve{t}_i (k+1)= -\sum_{j<i} \ma{J}_{ij} \ve{t}_j(k+1) \quad \text{avec}\quad
+	\begin{cases}
+		\ma{J}_{ij} = \ma{0}_n &\text{ pour } \quad j<i-1,\\
+		\ma{J}_{ij} = -\ma{A}^{(i)} &\text{ pour } \quad j=i-1,
+	\end{cases}  
+\end{equation}
+où $\ma{0}_n$ désigne la matrice carrée composée uniquement de $0$. L'équation \eqref{eq:t_i_LGS}, par analogie avec l'équation \eqref{eq:tJMN_dev}, donne la matrice $\ma{J}$ suivante :
+\begin{equation}
+	\ma{J}\triangleq \begin{pmatrix}
+		\ma{I}_n &  &  & \text{\Huge 0} \\
+		-\ma{A}^{(2)}& \ma{I}_n & & \\
+		  & \ddots & \ddots & \\
+		\text{\Huge 0} &  & -\ma{A}^{(N)} & \ma{I}_n \\
+	\end{pmatrix}.
+\end{equation}
+De plus, on a $\ve{t}_1(k+1) = \ma{A}^{(1)}\ve{x}(k)$, dont on peut déduire, toujours par analogie avec l'équation \eqref{eq:tJMN_dev} la matrice $\ma{M}$ et le vecteur $\ve{N}$ (puisque $u(k)$ n'intervient pas dans le calcul des $\ve{t}_i$) : 
+\begin{equation}
+	\ma{M}\triangleq \begin{pmatrix}
+		\ma{A}^{(1)}\\
+		\ma{0}\\
+		\vdots\\
+		\ma{0} \\
+	\end{pmatrix}, \quad
+	\ve{N}\triangleq \ve{0}_{1\times nN},
+\end{equation}
+où $nN$ correspond à la taille du vecteur $\ve{t}$ ($\ve{t}_i$ est un vecteur de taille $n$ pour tout $1\leq i \leq N$).
+
+Le reste de la structure s'écrit alors :
+\begin{eqnarray}
+	\ve{X}(k+1) & = & \ve{t}_N(k+1)+\ve{B}_{in}u(k) \\
+	y(k)& = & \ve{C}_{in}\ve{X}(k)+du(k)
+\end{eqnarray}
+
+Le calcul de $\ve{X}(k+1)$ dépend uniquement de la variable $\ve{t}_N$ et de l'entrée $u(k)$, pas des $ \ve{t}_i$ pour $i<N$ ni de l'état $\ve{x}(k)$, on peut donc en déduire les matrices $\ma{K}$ et $\ma{P}$ et le vecteur $\ma{Q}$ :
+\begin{equation}
+	\ma{K} \triangleq \begin{pmatrix}
+		0 & \ldots & 0 & \ma{I}_{n\times n}
+	\end{pmatrix}, \quad 
+	\ma{P}\triangleq \ma{0}_{n\times n}, \quad \text{et}\quad 
+	\ma{q}\triangleq \ve{b}_{in}.
+\end{equation}
+
+Le calcul de la sortie $y(k)$ ne dépend pas des variables intermédiaires $\ve{t}_i$ pour $1\leq i \leq N$, on peut donc directement déduire $\ma{l}$ et $\ma{r}$ et $\ma{s}$ :
+\begin{equation}
+	\ma{l} \triangleq \ve{0}_{nN\times 1}, \quad 
+	\ma{r}\triangleq \ve{c}_{in}, \quad \text{et}\quad 
+	\ma{s}\triangleq d.
+\end{equation}
+
+Finalement, on a la matrice des coefficients $\ma{Z}$ :
+\begin{equation}
+\ma{Z}=
+\begin{pmatrix}
+	-\ma{J} & \ma{M}&\ma{N}\\
+	\ma{K}&\ma{P}&\ma{Q}\\
+	\ma{L}&\ma{R}&\ma{s}\\
+\end{pmatrix}
+=
+\begin{pmat}({...||})
+	-\ma{I}_n &  &  & \text{\Huge 0}& \ma{A}^{(1)} & 0\cr
+	\ma{A}^{(2)}& -\ma{I}_n & & & \ma{0} & 0\cr
+	  & \ddots & \ddots & & \vdots & \vdots\cr
+	\text{\Huge 0} &  & \ma{A}^{(N)} & -\ma{I}_n & \ma{0} & 0\cr\-
+	\ma{0}& \ldots & \ma{0} & \ma{I}_n & \ma{0} & \ve{b}_{in}\cr\-
+	0& \ldots & \ldots & 0 & \ve{c}_{in} & d\cr
+\end{pmat}.
+\label{eq:Z_LGS}
+\end{equation}
+
+Les tailles des vecteurs $\ve{t}$ et $\ve{x}$ sont respectivement $n_t = nN = n(3n-2)$ et $n_x=n$, avec $n$ l'ordre du filtre, et puisqu'on est dans le cas SISO, on a $n_u=n_y=1$.
+
+
+
+
+%%%%%%%%%%%%%%%%%%% TEX LCW %%%%%%%%%%%%%%%%%%%
+
+\subsection{Structure LCW}
+
+Cette structure, proposée par Li, Chu et Wu (LCW) \cite{LCW07} est une amélioration de la structure LGS. En effet, cette structure se base elle aussi sur la paramétrisation DJSS et propose une autre factorisation de la matrice $\ma{A}_{in}$ (voir notations de la structure LGS). La description de la structure est donnée dans l'annexe \ref{anx:LCW} et la structure est donnée par :
+\begin{equation*}
+	\begin{cases}
+		\ve{X}^{(0)}(k)&=2\ve{X}(k)\\
+		\ve{X}^{(m)}(k) & =  \tilde{\ma{A}}_m\ve{X}^{(m-1)}(k),\\
+		\ve{X}(k+1) & =  \ve{X}^{(N)}(k)-\ve{X}(k)+\tilde{\ve{B}}u(k) ,\\
+		y(k)& =  \tilde{\ve{C}}\ve{X}(k)+du(k),
+	\end{cases}
+\end{equation*}
+
+Les matrices $\tilde{\ma{A}}_m$ sont très creuses et il en est de même pour le vecteur $ \tilde{\ve{C}}$.
+
+La structure LCW offre une meilleure sensibilité que la structure LGS, et diminue encore le nombres d'opérations. En effet, cette structure nécessite $4n-1$ multiplications, contre $7n-3$ pour la structure LGS et $(n+1)^2$ pour un state-space pleinement paramétré, et $4n-1$ additions contre $6n-3$ pour la structure LGS et $n(n+1)$ pour un state-space pleinement paramètre.
+
+%%%%%%%% TEX pour illustration LCW %%%%%%%%
+
+\paragraph{Structure LCW :}
+
+Exprimons maintenant la structure LCW sous forme de SIF. La structure LCW est donnée par :
+\begin{equation*}
+	\begin{cases}
+		\ve{X}^{(0)}(k)&=2\ve{X}(k)\\
+		\ve{X}^{(m)}(k) & =  \tilde{\ma{A}}_m\ve{X}^{(m-1)}(k),\\
+		\ve{X}(k+1) & =  \ve{X}^{(N)}(k)-\ve{X}(k)+\tilde{\ve{B}}u(k) ,\\
+		y(k)& =  \tilde{\ve{C}}\ve{X}(k)+du(k),
+	\end{cases}
+\end{equation*}
+avec les notations décrites dans l'annexe \ref{anx:LCW}. Attention, ici on a $N=3(n-1)$, contrairement au $3(n-1)+1$ de la structure LGS, car la factorisation utilisée pour la structure LCW possède une matrice en moins que celle de la structure LGS.
+
+On peut alors, de la même façon que pour la structure LGS, trouver une ressemblance entre les $\ve{t}_i$ impliqués dans la SIF et les $\ve{X}^{(m)}(k)$ impliqués dans la structure LCW. On pose alors :
+\begin{equation*}
+\left \{
+\begin{array}{rcl}
+\ve{t}_1(k+1) & = & 2\tilde{\ma{A}}_1\ve{X}(k)\\
+\ve{t}_2(k+1) & = & \tilde{\ma{A}}_2\ve{t}_1(k+1) \\
+ & \vdots &  \\
+\ve{t}_N(k+1)& = & \tilde{\ma{A}}_{N}\ve{t}_{N-1}(k+1)\\
+\end{array}
+\right .
+\end{equation*}
+On peut alors réécrire l'équation \eqref{eq:t_i_LGS} dans le cas de la structure LCW, c'est-à-dire en changeant uniquement $-\ma{A}^{(i)}$ par $-\tilde{\ma{A}}_i$. On en déduit la matrice $\ma{J}$ suivante :
+\begin{equation}
+	\ma{J}\triangleq \begin{pmatrix}
+		\ma{I}_n &  &  & \text{\Huge 0} \\
+		-\tilde{\ma{A}}_2& \ma{I}_n & & \\
+		  & \ddots & \ddots & \\
+		\text{\Huge 0} &  & -\tilde{\ma{A}}_N & \ma{I}_n \\
+	\end{pmatrix}.
+\end{equation}
+De plus, toujours par analogie avec la construction de la SIF pour la structure LGS, on peut déduire les matrices $\ma{M}$ et le vecteur $\ma{n}$ :
+\begin{equation}
+	\ma{M}\triangleq \begin{pmatrix}
+		2\tilde{\ma{A}}_1\\
+		\ma{0}\\
+		\vdots\\
+		\ma{0} \\
+	\end{pmatrix}, \quad
+	\ma{N}\triangleq \ve{0}_{1\times nN},
+\end{equation}
+où de la même façon $nN$ correspond à la taille du vecteur $\ve{t}$ ($\ve{t}_i$ est un vecteur de taille $n$ pour tout $1\leq i \leq N$).
+
+Le reste de la structure s'écrit :
+\begin{eqnarray}
+	\ve{X}(k+1) &=&  \ve{t}_N(k)-\ve{X}(k)+\tilde{\ve{B}}u(k)\\
+	y(k)&=&  \tilde{\ve{C}}\ve{X}(k)+du(k)
+\end{eqnarray}
+
+Le calcul de $\ve{X}(k+1)$ dépend uniquement de la variable $\ve{t}_N$, de l'état $\ve{x}(k)$ et de l'entrée $u(k)$, pas des $ \ve{t}_i$ pour $i<N$, on peut donc en déduire les matrices $\ma{K}$ et $\ma{P}$ et le vecteur $\ma{Q}$ :
+\begin{equation}
+	\ma{K} \triangleq \begin{pmatrix}
+		0 & \ldots & 0 & \ma{I}_{n\times n}
+	\end{pmatrix}, \quad 
+	\ma{P}\triangleq -\ma{I}_{n\times n}, \quad \text{et}\quad 
+	\ma{q}\triangleq \tilde{\ve{B}}.
+\end{equation}
+
+Le calcul de la sortie $y(k)$ ne dépend pas, comme pour la structure LGS, des variables intermédiaires $\ve{t}_i$ pour $1\leq i \leq N$, on peut donc directement déduire $\ma{l}$, $\ma{r}$ et $\ma{s}$ :
+\begin{equation}
+	\ma{l} \triangleq \ve{0}_{nN\times 1}, \quad 
+	\ma{r}\triangleq \tilde{\ve{C}}, \quad \text{et}\quad 
+	\ma{s}\triangleq d.
+\end{equation}
+
+Finalement, on a la matrice des coefficients $\ma{Z}$ :
+\begin{equation}
+\ma{Z}=
+\begin{pmatrix}
+	-\ma{J} & \ma{M}&\ma{N}\\
+	\ma{K}&\ma{P}&\ma{Q}\\
+	\ma{L}&\ma{R}&\ma{s}\\
+\end{pmatrix}
+=
+\begin{pmat}({...||})
+	-\ma{I}_n &  &  & \text{\Huge 0}& 2\tilde{\ma{A}}_1 & 0\cr
+	\tilde{\ma{A}}_2& -\ma{I}_n & & & \ma{0} & 0\cr
+	  & \ddots & \ddots & & \vdots & \vdots\cr
+	\text{\Huge 0} &  & \tilde{\ma{A}}_N & -\ma{I}_n & \ma{0} & 0\cr\-
+	\ma{0}& \ldots & \ma{0} & \ma{I}_n & -\ma{I}_n & \tilde{\ve{B}}\cr\-
+	0& \ldots & \ldots & 0 & \tilde{\ve{c}} & d\cr
+\end{pmat}.
+\label{eq:Z_LCW}
+\end{equation}
+
+Les tailles des vecteurs $\ve{t}$ et $\ve{x}$ sont respectivement $n_t = nN = 3n(n-1)$ et $n_x=n$, avec $n$ l'ordre du filtre, et puisqu'on est dans le cas SISO, on a $n_u=n_y=1$.
+
+
+
+
+%%%%%%%%%%%%%%%%%%% ANNEXE LGS/LCW %%%%%%%%%%%%%%%%%%%
+
+\chapter{Structures LGS et LCW}
+
+\section{Paramétrisation JSS\label{anx:JSS}}
+Décrite dans \cite{JSS89,LGS00} par Johns, Snelgrove et Sedra (d'où le nom JSS donné à la paramétrisation par Li \emph{et al.}), cette paramétrisation caractérise en fait un state-space dans le domaine continu. Elle offre l'avantage d'avoir une matrice de coefficients très creuse mais également un très bon conditionnement numérique par rapport à la norme $L_2$.
+
+Soient $\mathcal{H}$ un filtre et $F(s)$ sa fonction de transfert dans le domaine continu, $F(s)$ est de la forme
+\begin{equation}\label{eq:fct_transfert_continue}
+F(s)=\frac{N(s)}{D(s)},
+\end{equation}
+où $D$ et $N$ sont deux polynômes en $s$. Le polynôme $D$ peut se décomposer en une somme de deux polynômes, l'un composé des monômes de degré pair, noté $E$, et l'autre composé des monômes de degré impair, noté $O$. 
+
+On pose alors $Z(s)=\frac{O(s)}{E(s)}$ si le degré de $D$ est impair et $Z(s)=\frac{E(s)}{O(s)}$ si le degré de $D$ est pair. On note $A$ le polynôme au numérateur et $B$ le polynôme au dénominateur, on a alors $Z(s)=\frac{A(s)}{B(s)}$ et $deg(A)=deg(B)+1$.
+
+On peut alors écrire $Z$ sous la forme d'une fraction continue :
+\begin{equation}\label{eq:frac_continue}
+Z(s)=r_n s+\cfrac{1}{r_{n-1}s+\cfrac{1}{r_{n-2}s+\cfrac{1}{\ddots \frac{1}{r_1s}}}}
+\end{equation}
+
+Pour cela, on décompose $A(s)$ en
+\begin{equation}
+A(s)=LM_A(s) + R_A(s)
+\label{eq:6}
+\end{equation}
+où $LM_A$ est le monôme de plus haut degré de $A$ (leading monomial) et $R_A$ est le polynôme formé des autres monômes de $A$. Soient $Q$ et $R$, respectivement le quotient et le reste de la division de $LM_A$ par $B$. Puisque $deg(A)=deg(B)+1$, on a $Q=r_ns$, où $r_n$ est une constante. On a alors :
+
+\begin{eqnarray}
+Z (s)& = & \frac{A(s)}{B(s)}=\frac{LM_A(s)}{B(s)}+\frac{R_A(s)}{B(s)} = Q(s)+\frac{R(s)}{B(s)}+\frac{R_A(s)}{B(s)}\\
+  & = & Q + \frac{R+R_A}{B}\\
+  & = & r_ns + \frac{R+R_A}{B}\\
+  & = & r_ns + \frac{1}{\frac{B}{R+R_A}}
+\end{eqnarray}
+
+Soit $d\triangleq deg(A)$. On a, par construction, $deg(B)=d-1$ et $deg(R_A)=d-2$. De plus, puisque $R$ est le reste de la division de $LM_A$ par $B$, on a $deg(R) < deg(B)$, et par conséquent on a $deg(B)=deg(R+R_A)+1$, on peut alors répéter l'opération jusqu'à obtenir une décomposition complète.
+
+Une fois la décomposition  de $Z$ sous forme de fraction continue complétée, et les $r_i\in \mathbb{R}$ tous obtenus, on calcule $\alpha_1,\alpha_2,\ldots, \alpha_n$ :
+\begin{eqnarray}
+\alpha_k & = & \sqrt{\frac{1}{r_kr_{k+1}}},\quad k =1,2,\ldots, n-1\\
+\alpha_n & = & \frac{1}{r_n}
+\end{eqnarray}
+
+On construit alors la matrice $\ma{\Phi}_{in}$ et le vecteur $\ve{k}_{in}$ de la façon suivante :
+
+\begin{eqnarray}
+\ma{\Phi}_{in} & \triangleq & 
+\begin{pmatrix}
+	0 & \alpha_1 &   & &  &  \\
+	-\alpha_1 & 0 & \alpha_2  &  & \text{\huge0} & \\
+	 & -\alpha_2 & 0 & \ddots  &  & \\
+	 &   & \ddots & \ddots & \ddots &  \\
+	 & \text{\huge0} &  & \ddots & 0 & \alpha_{n-1}\\
+	 &  &  &  & -\alpha_{n-1} & -\alpha_n\\
+\end{pmatrix},\label{eq:phi_in}\\
+\ve{k}_{in} & \triangleq &
+\begin{pmatrix}
+	0 \\
+	\vdots \\
+	0 \\
+	\sqrt{2\alpha_n}\\
+\end{pmatrix}.\label{eq:k_in}
+\end{eqnarray}
+
+Si la fonction de transfert $F$ est décrite sous la forme d'un state-space ayant pour paramétrisaiton $(\ma{\Phi}, \ve{k}, \ve{l},m)$, alors de la même manière que dans le domaine discret, toute fonction de transfert ayant pour paramétrisation $(\ma{T}^{-1}\ma{\Phi T}, \ma{T}^{-1}\ve{k},\ve{l}\ma{T},m)$ est mathématiquement équivalente à $F$, pour toute transformation non singulière $\ma{T}$. Par conséquent, à partir de $\ma{\Phi}_{in}$ et $\ve{k}_{in}$, on peut trouver $\ma{T}_{in}$ telle que :
+\begin{eqnarray}
+\ma{\Phi}_{in}&=&\ma{T}_{in}^{-1}\ma{\Phi}\ma{T}_{in}\\
+\ve{K}_{in} &=& \ma{T}_{in}^{-1}\ve{K}
+\end{eqnarray}
+et en déduire $\ve{L}_{in} \triangleq \ve{L}\ma{T}_{in}$, de sorte que $(\ma{\Phi}_{in}, \ve{k}_{in}, \ve{l}_{in},m)$ est équivalente à la paramétrisation $(\ma{\Phi}, \ve{k}, \ve{l},m)$.
+
+
+\section{Structure LGS\label{anx:LGS}}
+On l'a vu, cette structure s'inspire de la paramétrisation JSS dans le domaine continue, il est donc nécessaire, étant données une fonction de transfert $H$ dans le domaine discret et une paramétrisation $(\ma{A},\ve{B},\ve{c}, d)$, de passer dans le domaine continue pour appliquer la transformation qui nous donnera la paramétrisation JSS. 
+Pour passer de la fonction de transfert $H(z)$ dans le domaine discret à son équivalent dans le domaine continue $F(s)$, on applique la transformée de Tustin \cite{OppSch09}, c'est-à-dire le changement de variable $s=\frac{z-1}{z+1}$, ou $z=\frac{1+s}{1-s}$, tel que :
+\begin{equation}
+	F(s) = H(z)|_{z=\frac{1+s}{1-s}}.
+\end{equation}
+
+Si $(\ma{A},\ve{B},\ve{c}, d)$ est une paramétrisation de $H$, il peut être montré qu'il existe une paramétrisation de $F$, $(\ma{\Phi}, \ve{k}, \ve{l},m)$, telle que :
+\begin{subequations}
+	\begin{align}
+		\ma{\Phi} &= (\ma{I}+\ma{A})^{-1}(\ma{A}-\ma{I})\\
+		\ve{K} &= \sqrt{2}(\ma{I}+\ma{A})^{-1}\ve{B}\\
+		\ve{L} &= \sqrt{2}\ve{C}(\ma{I}+\ma{A})^{-1}\\
+		m &= d-\ve{C}(\ma{I}+\ma{A})^{-1}\ve{B}
+	\end{align}
+	\label{eq:param_dicret_continu}
+\end{subequations}
+
+À partir de la fonction de transfert $F(s)$, on peut calculer $\ma{\Phi}_{in}$ et $\ve{k}_{in}$ comme dans les équations \eqref{eq:phi_in} et \eqref{eq:k_in}, et en déduire la transformation $\ma{T}_{in}$ pour passer de la paramétrisation $(\ma{\Phi}, \ve{k}, \ve{l},m)$ à la paramétrisation $(\ma{\Phi}_{in}, \ve{k}_{in}, \ve{l}_{in},m)$, comme vu précédemment.
+
+On repasse alors dans le domaine discret à partir de cette nouvelle paramétrisation en appliquant l'inverse de la transformations des équations \eqref{eq:param_dicret_continu}, on a alors :
+\begin{subequations}
+	\begin{align}
+		\ma{A}_{in}&=(\ma{I}+\ma{\Phi}_{in})(\ma{I}-\ma{\Phi}_{in})^{-1}\label{eq:A_in}\\
+		\ve{B}_{in}&=\frac{\sqrt{2}}{2}(\ma{I}+\ma{A}_{in})\ve{K}_{in}\\
+		\ve{C}_{in}&=\frac{\sqrt{2}}{2}\ve{L}_{in}(\ma{I}+\ma{A}_{in})\\
+		d&=m+\ve{C}_{in}(\ma{I}+\ma{A}_{in})^{-1}\ve{B}_{in}
+	\end{align}
+	\label{eq:param_continu_discret}
+\end{subequations}
+
+L'inversion de matrice dans l'équation \eqref{eq:A_in} implique que la matrice $\ma{A}_{in}$ est dense, contrairement à la matrice $\ma{\Phi}_{in}$ qui est creuse. On montre alors que $\ma{A}_{in}$ peut se factoriser en un produit de matrice creuse (un seul coefficient non trivial par matrice).
+
+Soit $\ma{U}(i,j,x)$ la matrice définie comme la matrice identité sauf l'élément en position $(i,j)$ qui vaut $x$, c'est-à-dire :
+ \begin{equation}
+	\ma{U}(i_0,j_0,x)_{i,j}  \triangleq
+	\left \{
+	\begin{array}{cl}
+	1 & \mbox{si}~i=j \\
+	x& \mbox{si}~i=i_0 ~\mbox{et}~j=j_0\\
+	0 & \mbox{sinon}\\
+	\end{array}
+	\right .
+	\label{eq:Uijx}
+\end{equation}
+
+On peut montrer que $\ma{I}-\ma{\Phi}_{in}$ s'écrit :
+\begin{equation}
+	\ma{I}-\ma{\Phi}_{in} = \ma{T}_1^{-1}\ma{T}_2^{-1}\ldots \ma{T}_k^{-1} \ldots \ma{T}_{n-1}^{-1}\ma{\Psi},
+\end{equation}
+avec
+\begin{equation}\label{eq:T_LGS}
+	\ma{T}_k  \triangleq  \ma{U}(k+1,k+1,\gamma_k)\ma{U}(k+1,k,-\alpha_k),
+\end{equation}
+$\ma{\Psi}$ la matrice définie par :
+\begin{equation}
+	\ma{\Psi}_{i,j} \triangleq  
+	\left \{
+	\begin{array}{ll}
+		1 & \mbox{si}~i=j \\
+		\beta_k& \mbox{si}~j=i+1\\
+		0 & \mbox{sinon}\\
+	\end{array}
+	,\right .
+\end{equation}
+les coefficients $\beta_k$ sont définis par la récurrence suivante :
+
+\begin{equation*}
+	\begin{array}{rclrclr}
+		\beta_{k+1}&\triangleq& -\frac{\alpha_{k+1}}{s_k},\quad  &s_k&\triangleq& 1-\alpha_k\beta_k, &\quad \forall 1\leq k \leq n-2,\\
+		\beta_1&\triangleq&-\alpha_1, \quad &s_{n-1} &\triangleq& 1+\alpha_n-\alpha_{n-1}\beta_{n-1},&
+	\end{array}
+\end{equation*}
+et enfin les coefficients $\gamma_k$ sont définis par
+\begin{equation}
+	\gamma_k\triangleq s_k^{-1}, \quad \forall 1\leq k \leq n-1.
+\end{equation}
+
+On peut remarquer que l'inverse de $\ma{\Psi}$ peut s'écrire :
+\begin{equation*}
+	\ma{\Psi}^{-1}=\ma{U}(1,2,-\beta_1)\ldots \ma{U}(n-1,n,-\beta_{n-1}) = \prod_{i=1}^{n-1} \ma{u}(i,i+1,-\beta_i).
+\end{equation*}
+
+Finalement, toutes ces notations permettent de factoriser la matrice $\ma{A}_{in}$ :
+\begin{eqnarray}
+	\ma{A}_{in}&=&(\ma{I}-\ma{\Phi}_{in})(\ma{I}+\ma{\Phi}_{in})^{-1}\nonumber\\
+	  & = & (\ma{I}-\ma{\Phi}_{in})\ma{\Psi}^{-1}\ma{T}_{n-1}\ma{T}_{n-2}\ldots \ma{T}_1\nonumber\\
+	  & = & \underbrace{(\ma{I}+\ma{\Phi}_{in})}_{\ma{A}^{(N)}}\underbrace{\ma{U}(1,2,-\beta_1)}_{\ma{A}^{(N-1)}}\ldots \ma{U}(n-1,n,-\beta_{n-1})\nonumber\\
+	  &   & \times \ma{U}(n,n,\gamma_{n-1})\ma{U}(n,n-1,-\alpha_{n-1})\ldots \label{eq:}\\
+	  &   & \times \ldots \underbrace{\ma{U}(2,2,\gamma_1)}_{\ma{A}^{(2)}}\underbrace{\ma{U}(2,1,-\alpha_1)}_{\ma{A}^{(1)}}\nonumber
+\end{eqnarray}
+
+On obtient donc
+\begin{equation*}
+	\ma{A}_{in} = \prod_{k=1}^{N}\ma{A}^{(k)}\quad \text{ avec }N\triangleq3n-1, 
+\end{equation*}
+et le state-space caractérisé par la paramétrisation $(\ma{A}_{in}, \ve{b}_{in}, \ve{c}_{in},d)$ devient, avec cette factorisation :
+\begin{equation*}
+\left \{
+\begin{array}{rcl}
+\ve{X}^{(0)}(k)&=&\ve{X}(k)\\
+\ve{X}^{(m)}(k) & = & \ma{A}^{(m)}\ve{X}^{(m-1)}(k), \quad k=1,2,\ldots,N\\
+\ve{X}(k+1) & = & \ve{X}^{(N)}(k)+\ve{B}_{in}u(k) \\
+y(k)& = & \ve{C}_{in}\ve{X}(k)+du(k)\\
+\end{array}
+\right .
+\end{equation*}
+
+L'algorithme ci-dessus n'est plus un state-space, et correspond à ce que l'on appelle la structure LGS.
+
+
+
+
+
+\section{Structure LCW\label{anx:LCW}}
+
+On reprend l'écriture de la DJSS décrite pour la structure LGS (équations \eqref{eq:param_continu_discret}), rappelée ici :
+\begin{subequations}
+	\begin{align}
+		\ma{A}_{in}&=(\ma{I}+\ma{\Phi}_{in})(\ma{I}-\ma{\Phi}_{in})^{-1}\label{eq:A_in}\\
+		\ve{B}_{in}&=\frac{\sqrt{2}}{2}(\ma{I}+\ma{A}_{in})\ve{K}_{in}\\
+		\ve{C}_{in}&=\frac{\sqrt{2}}{2}\ve{L}_{in}(\ma{I}+\ma{A}_{in})\\
+		d&=m+\ve{C}_{in}(\ma{I}+\ma{A}_{in})^{-1}\ve{B}_{in}
+	\end{align}
+	\label{eq:param_continu_discret_LCW}
+\end{subequations}
+
+On précise que les notations pour la paramétrisation JSS dans le domaine continu sont conservées ici.
+
+On a alors :
+\begin{equation*}
+	\begin{array}{ccl}
+		\ma{A}_{in} &=& (\ma{I}-\ma{\Phi}_{in})^{-1}(\ma{I}+\ma{\Phi}_{in})\\
+		&=& (2\ma{I}-(\ma{I}-\ma{\Phi}_{in}))(\ma{I}-\ma{\Phi}_{in})^{-1}\\
+		 &=&2(\ma{I}-\ma{\Phi}_{in})^{-1}-I
+	\end{array}
+\end{equation*}
+et on en déduit $ \ma{B}_{in}=\sqrt{2}(\ma{I}-\ma{\Phi}_{in})^{-1}\ve{K}_{in}$.
+
+On utilise maintenant une propriété des state-space dans le cas d'un filtre SISO. Cette propriété stipule que la paramétrisation duale d'une paramétrisation $(\ma{A},\ve{b},\ve{c},d)$, obtenue par $(\ma{A}^{\top},\ve{c}^{\top},\ve{b}^{\top},d)$, est une paramétrisation du même filtre. On note alors $(\ma{A}_t,\ve{B}_t,\ve{C}_t,d)$ la paramétrisation duale de $(\ma{A}_{in},\ve{b}_{in},\ve{c}_{in},d)$ et on a :
+\begin{eqnarray}
+	\ma{A}_t&\triangleq&\ma{A}_{in}^{\top} = (\ma{I}+\ma{\Phi}_{in})^{\top}(\ma{I}-\ma{\Phi}_{in})^{-\top} = (\ma{I}-\ma{\Phi}_{in})^{-\top}(\ma{I}+\ma{\Phi}_{in})^{\top}\\
+	\ve{b}_t &\triangleq& \ve{c}_{in}^{\top}\\
+	\ve{c}_t &\triangleq& \ve{b}_{in}^{\top}=\sqrt{2}\ve{K}_{in}^{\top}(\ma{I}-\ma{\Phi}_{in})^{-\top}
+\end{eqnarray}
+
+On applique ensuite la transformation $\ma{T}^*\triangleq(\ma{I}-\ma{\Phi}_{in})^{\top}$ sur cette réalisation pour obtenir $(\ma{A}^*,\ve{B}^*,\ve{C}^*,d)$
+\begin{equation*}
+\begin{array}{ccl}
+\ma{A}^*&=&(\ma{I}-\ma{\Phi}_{in})^{-\top}(\ma{I}+\ma{\Phi}_{in})^{\top} = \ma{A}_{in}^{\top}\\
+\ve{B}^* &=& (\ma{I}-\ma{\Phi}_{in})^{-\top}\ve{c}_{in}^{\top}\\
+\ve{C}^* &=& \sqrt{2}\ve{K}_{in}^{\top}\\
+\end{array}
+\end{equation*}
+
+On définit maintenant
+\begin{equation*}
+	\begin{array}{rclrclr}
+		\beta_{k+1}&\triangleq& -\alpha_{k+1}\gamma_k, \quad &\gamma_k&\triangleq&\frac{1}{1-\alpha_k\beta_k}, &\quad \forall 1\leq k \leq n-2,\\
+		\beta_1&\triangleq&-\alpha_1, \quad & \gamma_{n-1} &\triangleq& \frac{1}{1+\alpha_n-\alpha_{n-1}\beta_{n-1}},&
+	\end{array}
+\end{equation*}
+on reprend également les notations définies pour la structure LGS, $\ma{U}(i,j,x)$ (voir équation \eqref{eq:Uijx}) et $\ma{T}_k$ pour $1\leq k\leq n-1$ (voir équation \eqref{eq:T_LGS}).
+
+On peut montrer que l'on a :
+\begin{eqnarray}
+	((\ma{I}-\ma{\Phi}_{in})^{-1})^{\top} &=& \ma{\Gamma}^{-1}\ma{T}_{n-1} \ldots \ma{T}_2\ma{T}_1\nonumber\\
+	 &=& \ma{\Gamma}^{-1}\ma{U}(n,n,\gamma_{n-1})\ma{U}(n,n-1,\alpha_{n-1})\ldots \ma{U}(2,2,\gamma_1)\ma{U}(2,1,\alpha_1)\nonumber\\
+	 &=& \ma{\Gamma}^{-1}\ma{A}_{2(n-1)}\ma{A}_{2(n-1)-1} \ldots \ma{A}_{2}\ma{A}_{1}\label{eq:IPhiT_LCW}
+\end{eqnarray}
+où
+\begin{equation*}
+	\ma{\Gamma}_{i,j}=  
+	\begin{cases}
+		1 & \mbox{si}~i=j \\
+		-\beta_k& \mbox{si}~j=i+1\\
+		0 & \mbox{sinon}
+	\end{cases}
+\end{equation*}
+
+On a la décomposition suivante pour $\ma{\Gamma}^{-1}$ :
+\begin{eqnarray}
+	\ma{\Gamma}^{-1} &=& \ma{U}(1,2,\beta_1)\ma{U}(2,3,\beta_2)\ldots \ma{U}(k,k+1,\beta_k)\ldots \ma{U}(n-1,n,\beta_{n-1})\nonumber\\
+	 & = & \ma{A}_{3(n-1)}\ma{A}_{3(n-1)-1} \ldots \ma{A}_{3(n-1)-k} \ldots \ma{A}_{2(n-1)+1}\label{eq:An_LCW}
+\end{eqnarray}
+
+D'après \eqref{eq:IPhiT_LCW} et \eqref{eq:An_LCW}, on a :
+
+\begin{eqnarray}
+	((\ma{I}-\ma{\Phi}_{in})^{-1})^{\top} &=& \ma{\Gamma}^{-1}\ma{T}_{n-1} \ldots \ma{T}_2\ma{T}_1\nonumber\\
+	  & = & \ma{A}_{3(n-1)}\ma{A}_{3(n-1)-1} \ldots \ma{A}_m \ldots \ma{A}_2\ma{A}_1\nonumber\\
+	  & = & \prod_{m=1}^{3(n-1)}\ma{A}_m
+\end{eqnarray}
+
+On a donc 
+\begin{eqnarray*}
+	\ma{A}^* &=& 2((\ma{I}-\ma{\Phi}_{in})^{-1})^{\top}-\ma{I}\\
+	  & = & 2\prod_{m=1}^{3(n-1)}\ma{A}_m-\ma{I}
+\end{eqnarray*}
+
+Soient $\ma{W}_{\hspace{-0.12cm}c}^*$ le grammien de commandabilité défini d'après la paramétrisation $(\ma{A}^*,\ve{B}^*,\ve{C}^*,d)$, et $s_k^2\triangleq (\ma{W}_{\hspace{-0.12cm}c}^*)_{k,k}$. On peut montrer (voir \cite{LCW07}) que, généralement, la paramétrisation $(\ma{A}^*,\ve{B}^*,\ve{C}^*,d)$ n'est pas $\mathcal{L}_2$-échelonnée, c'est-à-dire qu'il existe un entier $k$ tel que $s_k^2\neq 1$. Li \emph{et al.} appliquent alors une dernière transformation pour obtenir une paramétrisation $\mathcal{L}_2$-échelonnée ($\mathcal{L}_2$\emph{-scaled}). La transformation appliquée est $\ma{T}_s=diag\{s_1,s_2,\ldots, s_n\}$ ($(\ma{T}_s)_{i,j} = s_i$ si $j=i$ et $(\ma{T}_s)_{i,j} = 0$ sinon), on obtient ainsi $(\tilde{A},\tilde{B},\tilde{C},d)$ :
+\begin{eqnarray*}
+	\tilde{\ma{A}} &\triangleq& \ma{T}_s^{-1}\ma{A}^*\ma{T}_s = 2\prod_{m=1}^{3(n-1)}\tilde{\ma{A}}_m-I\\
+	\tilde{\ve{B}} &\triangleq& \ma{T}_s^{-1}\ve{C}_{in}^{\top}\\
+	\tilde{\ve{C}} &\triangleq& \sqrt{2}s_n\ve{k}_{in}^{\top}
+\end{eqnarray*}
+où $\tilde{\ma{A}}_m = \ma{T}_s^{-1}\ma{A}_m\ma{T}_s$, $\forall m$. Le vecteur $\tilde{\ve{C}}$ a la même structure creuse que le vecteur $\ve{k}_{in}$ (un seul élément non nul, voir équation \eqref{eq:k_in}). De plus, $\tilde{\ma{A}}_m$ a la même structure que $\ma{A}_m$, où les coefficients $\{\alpha_k,\beta_k,\gamma_k\}$ sont remplacés par les coefficients $\{\tilde{\alpha}_k,\tilde{\beta}_k,\tilde{\gamma}_k\}$ avec 
+\begin{eqnarray*}
+	\tilde{\alpha}_k &\triangleq& s_{k+1}^{-1}s_k\alpha_k,\\
+	\tilde{\beta}_{k}&\triangleq& s_k^{-1}s_{k+1}\beta_k,\\
+	\tilde{\gamma}_k &\triangleq& \gamma_k,
+\end{eqnarray*}
+pour $1\leq k \leq n-1$.
+
+Finalement, on obtient la structure suivante :
+
+\begin{equation*}
+	\begin{cases}
+		\ve{X}^{(0)}(k)&=2\ve{X}(k)\\
+		\ve{X}^{(m)}(k) & =  \tilde{\ma{A}}_m\ve{X}^{(m-1)}(k), \quad k=1,2,\ldots,N\\
+		\ve{X}(k+1) & =  \ve{X}^{(N)}(k)-\ve{X}(k)+\tilde{\ve{B}}u(k) ,\\
+		y(k)& =  \tilde{\ve{C}}\ve{X}(k)+du(k),
+	\end{cases}
+\end{equation*}
+avec $N\triangleq 3(n-1)$. Cette structure est appelée structure LCW. De même que pour la structure LGS, l'utilisation de variables intermédiaires $\ve{X}^{(m)}(k)$ fait que cette structure n'est pas un state-space.
+
+\bigskip
+
+Les transformations nécessaires pour obtenir une LGS ou une LCW paraissent bien compliqués, toutefois il y a un réel intérêt à obtenir une réalisation d'espace d'état creuse (avec peu de coefficients, $5(n-1)$ pour la LGS et $4n$ pour la LCW) et présentant une faible sensibilité vis-à-vis de la quantification des coefficients. Nous mettrons cela en évidence dans le chapitre \ref{chap:ex_fipogen} et l'exemple final.
+
+
+

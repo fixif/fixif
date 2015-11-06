@@ -29,3 +29,8 @@ Can I run tests ?
 -----------------
 
 Yes, you will find a test orchestrator in ./bin 
+
+DOC WARNING
+-----------
+
+Needs sphinx >=1.3.1 to generate doc because otherwie all imports are documented...
