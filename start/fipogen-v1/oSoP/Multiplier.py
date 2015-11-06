@@ -90,6 +90,8 @@ class Multiplier(object):
 		else:
 			self._var_result, self._rshift = self._var.mult(self._cst , wl = self._wl)
 		self._local_error = Error(lsb=self._var_result.FPF.lsb, rshift=self._rshift)
+		# je copie _local_error dans _total_error pour les oSoPs à un seul produit
+		self._total_error = Error(lsb=self._var_result.FPF.lsb, rshift=self._rshift)
 		self._rshift_cst = -self._cst.FPF.lsb + self._cst_bs.FPF.lsb
 		
 
