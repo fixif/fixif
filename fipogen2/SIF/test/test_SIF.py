@@ -19,6 +19,12 @@ import unittest
 from SIF import *
 from numpy import matrix as mat
 
+from scipy import signal
+
+from Structures import DFI
+
+from SIF import algorithmLaTeX
+
 class test_SIF(unittest.TestCase):
     
     """
@@ -61,3 +67,11 @@ class test_SIF(unittest.TestCase):
         
         self.assertRaises(ValueError, SIF, myJtoS)
         # TODO add test for all other cases
+
+    def test_algoLaTeX(self):
+    	
+    	num, den = signal.butter(4,0.05)
+    	
+    	mySIF = DFI(num, den)
+    	
+    	algorithmLaTeX(mySIF, 'testlegend')
