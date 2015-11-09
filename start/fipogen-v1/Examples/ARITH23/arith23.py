@@ -91,16 +91,19 @@ def SIFH_to_SIFHstar(z,w):
 	S_t = np.bmat([[S_tilde-S.S, np.zeros((S._p, S._l+S._n)), IdenY]])
 	
 	print "\n### Z exact ###\n"
-	print "WCPG exact : "+ LTI.dSS(S._AZ,S._BZ,S._CZ,S._DZ).WCPG
+	print "WCPG exact : "
+	print(LTI.dSS(S._AZ,S._BZ,S._CZ,S._DZ).WCPG)
 	#print S.J,S.K,S.L,S.M,S.N,S.P,S.Q,S.R,S.S
 	print "\n### Z degrade ###\n"
 	if S._l != 0:
 		SIF_tilde =SIF.SIF((J_tilde,K_tilde,L_tilde,M_tilde,N_tilde,P_tilde,Q_tilde,R_tilde,S_tilde))
-		print "WCPG arrondi : "+ LTI.dSS(SIF_tilde._AZ,SIF_tilde._BZ,SIF_tilde._CZ,SIF_tilde._DZ).WCPG
+		print "WCPG arrondi : "
+		print(LTI.dSS(SIF_tilde._AZ,SIF_tilde._BZ,SIF_tilde._CZ,SIF_tilde._DZ).WCPG)
 		return SIF.SIF((J,K,L,M,N,P,Q,R,S_t))
 	else:
 		SIF_tilde =SIF.SIF((J_tilde,K_tilde,L_tilde,M_tilde,N_tilde,P_tilde,Q_tilde,R_tilde,S_tilde))
-		print "WCPG arrondi : "+ LTI.dSS(SIF_tilde._AZ,SIF_tilde._BZ,SIF_tilde._CZ,SIF_tilde._DZ).WCPG
+		print "WCPG arrondi : "
+		print(LTI.dSS(SIF_tilde._AZ,SIF_tilde._BZ,SIF_tilde._CZ,SIF_tilde._DZ).WCPG)
 		return SIF.SIF((J,K,L,M,N,P,Q,R,S_t))
 	
 
@@ -112,6 +115,7 @@ for sifName in ["SIF_DFI", "SIF_LWDF", "SIF_SS", "SIF_rho"]:
 	Z_DFI=[D[sifName][0][0][i] for i in range(4,13)]
 	newSIF = SIFH_to_SIFHstar(Z_DFI, 8)
 	print "\n### Z erreur ###\n"
-	print "WCPG erreur : "+LTI.dSS(newSIF._AZ,newSIF._BZ,newSIF._CZ,newSIF._DZ).WCPG
+	print "WCPG erreur : "
+	print(LTI.dSS(newSIF._AZ,newSIF._BZ,newSIF._CZ,newSIF._DZ).WCPG)
 	#print newdss
 	#print newdss.WCPG
