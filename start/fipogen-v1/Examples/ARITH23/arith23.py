@@ -83,4 +83,4 @@ for sifName in ["SIF_DFI", "SIF_LWDF", "SIF_SS", "SIF_rho"]:
 	Z_DFI=[D["SIF_DFI"][0][0][i] for i in range(4,13)]
 	newSIF = SIFH_to_SIFHstar(Z_DFI, 8)
 	newdss = LTI.dSS(newSIF._AZ,newSIF._BZ,newSIF._CZ,newSIF._DZ)
-	print newdss.WCPG()
+	print newdss.WCPG
