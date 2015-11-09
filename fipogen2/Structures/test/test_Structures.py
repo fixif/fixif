@@ -49,9 +49,9 @@ class test_Structures(unittest.TestCase):
         
         tmp_vars = {}
 
-        if opt is 'butter':
+        if opt == 'butter':
             
-            if opt_num is 0:
+            if opt_num == 0:
                 
                 cmd  = '[num, den] = butter(4, 0.05) ;'
              
@@ -59,12 +59,12 @@ class test_Structures(unittest.TestCase):
             
                 #cmd =  '[num, den] = butter(8, 0.12) ;'
                 
-            if type is 'TF':
+            if type == 'TF':
                     
                 varz = ['num','den']
                 self.engMtlb.pushCmdGetVar(cmd, varz, tmp_vars)
                     
-            elif type is 'SS':
+            elif type == 'SS':
                     
                 varz = ['A','B', 'C', 'D']
                 cmd += '[A,B,C,D] = tf2ss(num,den); \n'
@@ -162,10 +162,10 @@ class test_Structures(unittest.TestCase):
             #
             print(debug_dict)
 
-        if opt is 1:
+        if opt == 1:
             mtlb_cmd = 'R = DFIq2FWR(num, den) ; \n'
             tmp_vars['Z'] = DFI(dict_numden['num'], dict_numden['den'], opt=1, eps=self.eps).Z
-        elif opt is 2:
+        elif opt == 2:
             mtlb_cmd = 'R = DFIqbis2FWR(num, den); \n'
             #dirty_debug(mtlb_cmd)
             tmp_vars['Z'] = DFI(dict_numden['num'], dict_numden['den'], opt=2, eps=self.eps).Z
@@ -229,10 +229,10 @@ class test_Structures(unittest.TestCase):
         
         # use rhoDFIIt2FWR
         # probleme je n'ai pas de matrice gamma...
-        if opt is 1:
+        if opt == 1:
             mtlb_cmd = 'R = rhoDFIIt2FWR(H) ; \n'
             tmp_vars['Z'] = RhoDFIIt(dict_numden['num'], dict_numden['den'], opt=1, eps=self.eps).Z
-        elif opt is 2:
+        elif opt == 2:
             mtlb_cmd = 'R = rhoDFIIt2FWR(H); \n'
             tmp_vars['Z'] = RhoDFIIt(dict_numden['num'], dict_numden['den'], opt=2, eps=self.eps).Z
         else:
