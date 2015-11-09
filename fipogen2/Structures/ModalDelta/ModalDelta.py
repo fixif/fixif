@@ -39,7 +39,7 @@ class ModalDelta(SIF):
             
             while k <= (mylambda.shape[0]-1):
           
-                if imag(mylambda[k]) is not 0:
+                if not(imag(mylambda[k]) == 0):
                     
                     rel = real(mylambda[k])
                     iml = imag(mylambda[k])
@@ -83,7 +83,7 @@ class ModalDelta(SIF):
         
         l, m, n, p = mySIF.size()
         
-        if not ((m is not 1) and (p is not 1)):
+        if not (not(m == 1) and not(p == 1)):
             raise('The system must be SISO!')
         
         # alpha

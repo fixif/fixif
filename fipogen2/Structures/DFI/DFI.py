@@ -44,7 +44,7 @@ class DFI(SIF):
         nnum = num.shape[1] - 1
         nden = den.shape[1] - 1
         
-        if opt is 1:
+        if opt == 1:
         # normalize
             num = num / den[0,0]
             den = den / den[0,0]
@@ -52,9 +52,9 @@ class DFI(SIF):
         # Compute gammas
         
         # gamma1 and gamma4 differ between options
-        if opt is 1:
+        if opt == 1:
             gamma1 = c_[[num[0, 1:]],[-den[0, 1:]]]
-        elif opt is 2:
+        elif opt == 2:
             gamma1 = r_[[c_[num[0, 1:], zeros((1, nden))]], [c_[zeros((1, nnum)), -den[0, 1:]]]]
     # ???    
         #gamma2 = [[diag(ones((1,nnum-1)),-1), zeros((nnum, nden))],[zeros((nden,nnum)), diag(ones((1,nden-1)),-1)]]
@@ -62,9 +62,9 @@ class DFI(SIF):
         #CurrentWork
         gamma3 = r_[atleast_2d(1), zeros((nnum+nden-1, 1))]
     
-        if opt is 1:
+        if opt == 1:
             gamma4 = r_[zeros((nnum, 1)), atleast_2d(1), zeros((nden-1, 1))]
-        elif opt is 2:
+        elif opt == 2:
             gamma4 = r_[zeros((nnum, 2)), [[1,1]], zeros((nden-1, 2))]
             
         gamma1 = mat(gamma1)
@@ -80,11 +80,11 @@ class DFI(SIF):
         
         # build SIF
         
-        if opt is 1:
+        if opt == 1:
             
             JtoS = atleast_2d(den[0,0]), invT*gamma4, atleast_2d(1), gamma1*T, atleast_2d(num[0,0]), invT*gamma2*T, invT*gamma3, mat(zeros((1, nnum+nden))), atleast_2d(0)
         
-        elif opt is 2:
+        elif opt == 2:
             
             JtoS = mat(eye(2)), invT*gamma4, mat([1,1]), gamma1*T, r_[atleast_2d(num[0,0]),atleast_2d(0)], invT*gamma2*T, invT*gamma3, mat(zeros((1, nnum+nden))), atleast_2d(0)
 

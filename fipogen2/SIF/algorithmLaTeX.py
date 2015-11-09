@@ -13,7 +13,8 @@ __status__ = "Beta"
 
 import SIF
 from jinja2 import Environment, FileSystemLoader, PackageLoader
-from numpy import tril, all, eye, zeros, where, abs, matrix
+from numpy import tril, all, eye, zeros, where, abs, matrix, r_, c_
+from numpy import matrix as mat
 
 
 # Found inspiration here
@@ -36,10 +37,10 @@ def algorithmLaTeX(R, out_file, caption=None):
         varNames = []
         
         if numVar is 1:
-            varNames[0]=baseName
+            varNames.append(baseName)
         else:
             for i in range(0,numVar):
-                varNames[i]=baseName + "_{" + str(i) + "}"
+                varNames.append(baseName + "_{" + str(i+1) + "}")
                 
         return varNames
     
@@ -63,12 +64,14 @@ def algorithmLaTeX(R, out_file, caption=None):
         
         WARNING
         string conversion of float induces a rounding of the number (was the case in matlab)
+        
         matlab
+        
         d=0.09789879876298743
         num2str(d,'%.6g')
+        0.0978988
+        
         str(d,'%.6g')
-        
-        
         """
         
         tol = 1.e-10
@@ -81,21 +84,22 @@ def algorithmLaTeX(R, out_file, caption=None):
         
         for i in range(0,rows.size):
         
-            pos = rows(i),cols(i)
+            pos = rows[i],cols[i]
+            vecpos = cols[i]
         
-            vecpos = max(rows(i),cols(i))
-        
-            if (abs(P[pos])-1<tol):
-                S += names[vecpos]
-            elif (abs(P[pos])+1<tol):
-                S += "-"+names[vecpos]
+            if abs(P[pos]-1.)<tol:
+                S += "+ " + names[vecpos] + "\\\n"
+            elif abs(P[pos]+1.)<tol:
+                S += "- " + names[vecpos] + "\\\n"
             else:
-                S+= ("{:."+str(dec_format)+"g}").format(P[pos]) + "*" + names[vecpos]
+                S+= "+ " + ("{:."+str(dec_format)+"g}").format(P[pos]) + "*" + names[vecpos] + "\\\n"
         
             if i is (rows.size - 1):
-                S += "\n + "
+                S += "\n"
+        
+        S = S[1:-3]
             
-        if S is "":
+        if S == "":
             S += "0"
         
         return S
@@ -106,30 +110,31 @@ def algorithmLaTeX(R, out_file, caption=None):
       variable_start_string = '<<',
       variable_end_string = '>>',
       comment_start_string= '[§',
-      comment_end_string = '§]'
+      comment_end_string = '§]',
+      trim_blocks=True,
+      lstrip_blocks=True
       )
     
     texPlate = env.get_template('algorithmLaTeX_template.tex')
     
-    l = R.l
-    m = R.m
-    n = R.n
-    p = R.p
+    l,m,n,p = R.size
     
     texDict = {}
         
     # Lower triangular part non-null ?
     isPnut = True
         
-    if all(tril(R.P,-1)) is 0:
+    if all(tril(R.P,-1) == 0):
         isPnut = False
     
-    strTXU = _genVarName('T', l) + _genVarName('Xn', n) + _genVarName('u', m)
+    texDict['isPnut'] = isPnut
+    
+    strTXU = _genVarName('T', l) + _genVarName('xn', n) + _genVarName('u', m)
     
     if isPnut:
-    	strTXY = _genVarName('T', l) + _genVarName('Xnp', n) + _genVarName('y', m)
+    	strTXY = _genVarName('T', l) + _genVarName('xnp', n) + _genVarName('y', m)
     else:
-    	strTXY = _genVarName('T', l) + _genVarName('Xn', n) + _genVarName('y', m)
+    	strTXY = _genVarName('T', l) + _genVarName('xn', n) + _genVarName('y', m)
     
     #Caption 
     if caption is None:
@@ -141,8 +146,6 @@ def algorithmLaTeX(R, out_file, caption=None):
     texDict['y'] = {}
     texDict['xn'] = {}
     texDict['T'] = {}
-       
-    varlist = ['u', 'y', 'xn', 'T']
         
     #Inputs
     texDict['u']['numVar'] = m
@@ -153,33 +156,30 @@ def algorithmLaTeX(R, out_file, caption=None):
     #Intermediate variables
     texDict['T']['numVar'] = l
 
-    for name in mylist:
-        texDict[name]['varNames'] = _genVarNames(name, texDict[name]['numVar'])
-
-    # Z is a matrix
-    Zbis = R.Z + r_[c_[eye(l), zeros(l, n+m)], zeros(n+p, l+n+m)]
-    
-    # To be removed if matrix property is conserved
-    #Zbis = matrix(Zbis)
+    Zbis = R.Z + mat(r_[c_[eye(l), zeros((l,n+m))], zeros((n+p,l+n+m))])
     
     comp_str = ""
     
     for i in range(1, l+n+p+1):
         
-        if i is 1:
+        if i == 1:
             comp_str += "\t\\tcp{\\emph{Intermediate variables}}\n"
-        elif (i is l+1) and (n is not 0):
+        elif (i == l+1) and not(n == 0):
             comp_str += "\t\\tcp{\\emph{States}}\n"
-        elif (i is l+n+1):
+        elif (i == l+n+1):
             comp_str += "\t\\tcp{\\emph{Outputs}}\n"
             
-        comp_str += "\t" + "$" + strTXY[i] + "\leftarrow" + _scalprodCdouble(Zbis[i,:],strTXU) + "$\;\n"
+        comp_str += "\t" + "$" + strTXY[i-1] + " \leftarrow " + _scalprodCdouble(Zbis[i-1,:],strTXU) + "$\;\n"
 
     if isPnut:
+    	
     	comp_str += " \n\t\\tcp{\\emph{Permutations}}\n"
     	comp_str += "\t$xn \\leftarrow xnp$\;"
 
-    teXContents = texPlate.render(())
+    # jinja2 only works with unicode
+    texDict['computations'] = unicode(comp_str, 'utf-8')
+
+    texContents = texPlate.render(**texDict)
 
     print(texContents)
         
