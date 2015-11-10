@@ -15,6 +15,7 @@ __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
 import unittest
+import numpy.testing as npt
 
 from SIF import *
 from numpy import matrix as mat
@@ -60,14 +61,26 @@ class test_SIF(unittest.TestCase):
         myJtoS = myJ, myK, myL, myM, myN, myP, myQ, myR, myS
         
         # test correct obj creation
-        SIF(myJtoS)
+        mySIF = SIF(myJtoS)
         
         # test wrong sizes are caught
         myJtoS = myK, myL, myJ, myM, myN, myP, myQ, myR, myS
         
         self.assertRaises(ValueError, SIF, myJtoS)
-        # TODO add test for all other cases
+        
+        #testing getters/properties
 
+        npt.assert_almost_equal(mySIF.J,myJ)
+        npt.assert_almost_equal(mySIF.K,myK)
+        npt.assert_almost_equal(mySIF.L,myL)
+        npt.assert_almost_equal(mySIF.M,myM)
+        npt.assert_almost_equal(mySIF.N,myN)
+        npt.assert_almost_equal(mySIF.P,myP)
+        npt.assert_almost_equal(mySIF.Q,myQ)
+        npt.assert_almost_equal(mySIF.R,myR)                                                        
+        npt.assert_almost_equal(mySIF.S,myS)
+
+		
     def test_algoLaTeX(self):
     	
     	num, den = signal.butter(4,0.05)
