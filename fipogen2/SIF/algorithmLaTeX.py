@@ -1,5 +1,4 @@
 #coding=UTF8
-from macpath import basename
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -15,7 +14,7 @@ import SIF
 from jinja2 import Environment, PackageLoader
 from numpy import tril, all, eye, zeros, where, abs, matrix, r_, c_
 from numpy import matrix as mat
-import algorithmAuxFunc
+from algorithmAuxFunc import _scalprodCdouble
 
 # Found inspiration here
 # http://martin-ueding.de/en/latex/computation-results/index.html
