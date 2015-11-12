@@ -12,7 +12,8 @@ __status__ = "Beta"
 
 import SIF
 from jinja2 import Environment, PackageLoader
-import algorithmAuxFunc
+from algorithmAuxFunc import _scalprodCdouble
+from numpy import tril, all, r_, c_
 
 def algorithmCfloat(R, outFile, funcName):
     
@@ -24,6 +25,8 @@ def algorithmCfloat(R, outFile, funcName):
     cTemplate = env.get_template('algorithmC_template.c')
     
     cDict = {}
+    
+    cDict['funcName']=funcName
     
     l,m,n,p = R.size
     
@@ -38,10 +41,10 @@ def algorithmCfloat(R, outFile, funcName):
         varNames = []
         
         if numVar is 1:
-            varNames.append(baseName)
+            varNames.append(unicode(baseName,'utf-8'))
         else:
-            for i in range(0,numVar):
-                varNames.append(baseName + "[" + str(i+1) + "]")
+            for i in range(0, numVar):
+                varNames.append(unicode(baseName + "[" + str(i) + "]",'utf-8'))
                 
         return varNames
     
@@ -64,19 +67,19 @@ def algorithmCfloat(R, outFile, funcName):
         
     #Input(s)
     if m == 1:
-    	strU = 'u'
+    	strU = ['u']
     else:
     	strU = _genVarName('u', m)
     	
     #Intermediate variables
     if l == 1:
-    	strT = 'T'
+    	strT = ['T']
     else:
     	strT = 	[ 'T'+str(i) for i in xrange(0,l)]
     	
     # i/o variables, c func
     
-    variables = ''
+    variables = u''
     
     if m == 1:
     	variables += 'double u'
@@ -90,7 +93,7 @@ def algorithmCfloat(R, outFile, funcName):
     else:
     	variables += 'double* xn'
     
-    cDict['variables']=variables
+    cDict['variables'] = variables
     
     del(variables)
     	
@@ -98,31 +101,55 @@ def algorithmCfloat(R, outFile, funcName):
     
     cDict['calculations'] = {}
     
-    cDict['output'] = '\t'
+    cDict['output'] = u'\t'
     cDict['output'] += "double y"
     
     
     # intermediate variables J.T = M.X(k) + N.U(k)
-    cDict['calculations']['inter'] = ""
+    cDict['calculations']['inter'] = u""
     
     for i in range(0, l):
+    	print(l)
+    	print(i)
     	cDict["calculations"]["inter"] += "\t" + "double " + strT[i] + " = " + _scalprodCdouble(c_[R.M[i,:], R.N[i,:], -R.J[i,0:i-2]], strXn + strU + strT[0:i-2]) + ";\n"
     
     
     
     # output Y(k) = R.X(k) + code.U(k) + L.T
     
-    cDict['calculations']['output'] = ""
+    cDict['calculations']['outputs'] = u""
     
     for i in range(0, p):
-    	cDict['calculations']['output'] += strY[i] + " = " + _scalprodCdouble()
+    	cDict['calculations']['outputs'] += "\t" + strY[i] + " = " + _scalprodCdouble(c_[R.R[i,:], R.S[i,:], R.L[i,:]], strXn + strU + strT) + ";\n"
     
     # states X(k) = P.X(k) + Q.U(k) + K.T
     
+    cDict['calculations']['states'] = u""
+    
+    for i in range (0, n):
+    	if isPnut:
+    		cDict['calculations']['states'] += "\t" + strXnp[i] + " = " + _scalprodCdouble(c_[R.P[i,:], R.Q[i,:], R.K[i,:]], strXn + strU + strT) + ";\n"
+    	else:    
+    		cDict['calculations']['states'] += "\t" + strXn[i] + " = " + _scalprodCdouble(c_[R.P[i,:], R.Q[i,:], R.K[i,:]], strXn + strU + strT) + ";\n"
+    		
     # permutation
     
+    cDict['calculations']['permutation'] = u""
+    
+    if isPnut:
+    	cDict['calculations']['permutation'] += "\t//permutations\n"
+    	cDict['calculations']['permutation'] += "\tdouble* temp = (*xn);\n"
+    	cDict['calculations']['permutation'] += "\t(*xn) = (*xnp);\n"
+    	cDict['calculations']['permutation'] += "\t(*xnp) = temp;\n"
+
+    cDict['calculations']['return'] = u""
+    cDict['calculations']['return'] += "\treturn y;"
+    
     filename = funcName + '.c'
-    	
+    
+    cRender = cTemplate.render(**cDict)
+    
+    print(cRender)
 
     
     
