@@ -327,6 +327,7 @@ def LGS(b,a=None):
     return Z,J,K,L,M,N,P,Q,R,S
 
 
+# NE MARCHE PAS (d'après Benoit, à tester donc)
 def LCW(b,a):
     """Retourne la forme SIF de la structure LCW correspondant au filtre donné"""
     #Par la fonction de scipy.signal on obtient le state-space associé

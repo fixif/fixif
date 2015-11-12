@@ -43,6 +43,15 @@ T=rot90(eye(2*nnum));
 %R = FWR( denq(1), Gamma4, 1, Gamma1, numq(1), Gamma2, Gamma3, [ zeros([1 nnum+nden]) ], 0);
 R = FWR( eye(2), inv(T)*Gamma4, [1 1], Gamma1*T, [numq(1);0] , inv(T)*Gamma2*T, inv(T)*Gamma3, zeros([1 nnum+nden]), 0);
 
+%myJ = eye(2)
+%myK = inv(T)*Gamma4
+%myL = [1 1]
+%myM = Gamma1*T
+%myN = [numq(1);0]
+%myP = inv(T)*Gamma2*T
+%myQ = inv(T)*Gamma3
+%myR = zeros([1 nnum+nden])
+%myS = 0
 
 % cf fiche
 % Gamma1 et Gamma4 sont changés, par rapport à la forme "en ligne" (en 1

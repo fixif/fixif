@@ -50,6 +50,9 @@ end
 % intermediate variables
     strT = [ setstr( ones(R.l,1)*'T_{' ) num2str((1:R.l)') setstr( ones(R.l,1)*'}' ) ];
 %
+
+strT
+
 strTXU = strvcat( strT, strXn, strU  );
 if (isPnut)
     strTXY = strvcat( strT, strXnp, strY  );
@@ -78,6 +81,9 @@ else
 	declare( tmpFile, 'xn', strXn,  'KwData');
 end
 % intermediates variables
+% BUG here because matlab has a weird behaviour with counting length
+% because the name was not set to length-1 "T" it gives a result of 5
+% variables
 declare( tmpFile, 'T', strT,  'KwData');
 
 
@@ -125,6 +131,10 @@ function declare( tmpFile, varArray, varNames, KwName)
 
 tabu = '	';
 endl=13;
+
+varNames
+length(varNames)
+
 if length(varNames)==1
 	fwrite( tmpFile, [ tabu '\' KwName '{$' varArray '$: real}' endl ]);
 elseif length(varNames)>1

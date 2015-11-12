@@ -33,23 +33,32 @@ tmpFile = fopen([ tempdir '/FWRtempfile.tex' ],'w');
 %===================================
 % input(s)/states/output(s) strings
 % output(s)
+% generate y (if == 1)
+% otherwise generate y(1), y(2), ..., y(p)
 if (R.p==1)
     strY = 'y';
 else
     strY = [ setstr( ones(R.p,1)*'y' ) setstr( ones(R.p,1)*'(' ) num2str((1:R.p)') setstr( ones(R.p,1)*')' ) ];
 end
 % states
+% generate xn_{1}, ..., xn_{n} with n = number
+% idem xnp{n}
 strXn = [ setstr( ones(R.n,1)*'xn_{' ) num2str((1:R.n)') setstr( ones(R.n,1)*'}' ) ];
 strXnp = [ setstr( ones(R.n,1)*'xnp_{' ) num2str((1:R.n)') setstr( ones(R.n,1)*'}' ) ];
 % input(s)
+% u (==1) or
+% u(1), ..., u(m)
 if (R.m==1)
     strU = 'u';
 else
     strU = [ setstr( ones(R.m,1)*'u' ) setstr( ones(R.m,1)*'(' ) num2str((1:R.m)') setstr( ones(R.m,1)*')' ) ];
 end
 % intermediate variables
+% T_{1} , ..., T_{L}
     strT = [ setstr( ones(R.l,1)*'T_{' ) num2str((1:R.l)') setstr( ones(R.l,1)*'}' ) ];
 %
+
+% Concatenate
 strTXU = strvcat( strT, strXn, strU  );
 if (isPnut)
     strTXY = strvcat( strT, strXnp, strY  );
@@ -60,12 +69,19 @@ end
 
 %=========
 % caption
+
+% Insert caption after first part of template
+
 copyUntilSharps( FP_file, tmpFile); % ##CAPTION##
 fwrite( tmpFile, caption);
 
 
 %======================
 % variables declaration
+
+% Augment variables names
+% with "declare" routine
+
 copyUntilSharps( FP_file, tmpFile); % ##VARIABLES##
 % inputs
 declare( tmpFile, 'u', strU, 'KwIn');
