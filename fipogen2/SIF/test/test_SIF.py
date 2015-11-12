@@ -24,7 +24,8 @@ from scipy import signal
 
 from Structures import DFI
 
-from SIF import algorithmLaTeX
+#from SIF import algorithmLaTeX
+#from SIF import algorithmCfloat
 
 class test_SIF(unittest.TestCase):
     
@@ -81,10 +82,14 @@ class test_SIF(unittest.TestCase):
         npt.assert_almost_equal(mySIF.S,myS)
 
 		
-    def test_algoLaTeX(self):
+    def test_algo(self):
     	
     	num, den = signal.butter(4,0.05)
     	
     	mySIF = DFI(num, den)
     	
     	algorithmLaTeX(mySIF, 'testlegend')
+    	
+    	algorithmCfloat(mySIF, "outfile", "myFunction")
+    	
+    	
