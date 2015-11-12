@@ -1,0 +1,30 @@
+Bref, voici ce que j'ai fait :
+- pour la compil du WCPG d'Anastasiia :
+        - ./configure, ce qui crée le makefile
+        - LAPACK et BLAS sont installés dans le framework Accelerate, donc dans le makefile généré j'ai changé :
+                LAPACK_LIBS = -llapack
+                BLAS_LIBS = -lblas
+                par
+                LAPACK_LIBS = -framework Accelerate
+                BLAS_LIBS = -framework Accelerate
+                (voir http://arma.sourceforge.net/faq.html#blas_lapack_replacements <http://arma.sourceforge.net/faq.html#blas_lapack_replacements> point (2) )
+                J'avais aussi modifié (ajouté en fait car les champs étaient vides)
+                CPPFLAGS = -I/usr/local/include (avec mes headers lapacke)
+                LDFLAGS = -L/usr/local/lib (avec les libs lapack, lapacke, blas, etc)
+                mais pas sûr que ça ait vraiment servi
+        - make, make install, puis ./wcpg_test sans souci
+- pour le wrapper :
+        - sur OSX on n'a pas de .so (enfin ça peut exister et c'est pris en compte mais par exemple l'install du WCPG crée un .dylib, un .a, etc mais pas de .so), donc :
+                - j'ai copié le .dylib dans LTI/WCPG_wrapper
+                - dans run_me.sh j'ai modifié :
+                        nm -g /usr/local/lib/libwcpg.so|grep 'ABCD'
+                        par
+                        nm -g /usr/local/lib/libwcpg.dylib|grep 'ABCD' (passé de .so à .dylib)
+                - dans setup.py j'ai mis pour extra_link_args :
+                        extra_link_args=['-rdynamic', '-Wl,./libwcpg.dylib /usr/lib/liblapacke.a'])] (parce que pour lapacke j'ai uniquement un .a)
+                - dans _pyWCPG.c j'ai aussi changé l'extension de libwcpg :
+                        handle = dlopen("libwcpg.dylib", RTLD_GLOBAL | RTLD_LAZY) ;
+        - j'ai lancé ./run_me.sh, sans erreur cette fois
+- j'ai testé mon script et ça marche (mis à part les NaN et autres eigen vallues trop grandes).
+
+Au final je pense que les problèmes venaient du fait que j'avais installé lapack et blas à la main alors qu'il en existait une version dans le framework Accelerate, ce qui devait causer des conflits. Mais en même temps je me dis que j'avais pas le choix parce que dans le framework il n'y a pas lapacke.
