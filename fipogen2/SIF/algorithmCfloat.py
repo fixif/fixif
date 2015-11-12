@@ -15,7 +15,7 @@ from jinja2 import Environment, PackageLoader
 from algorithmAuxFunc import _scalprodCdouble
 from numpy import tril, all, r_, c_
 
-def algorithmCfloat(R, outFile, funcName):
+def algorithmCfloat(R, funcName, fileName=None):
     
     env = Environment(loader=PackageLoader('SIF','templates'),
      trim_blocks=True,
@@ -145,12 +145,16 @@ def algorithmCfloat(R, outFile, funcName):
     cDict['calculations']['return'] = u""
     cDict['calculations']['return'] += "\treturn y;"
     
-    filename = funcName + '.c'
-    
     cRender = cTemplate.render(**cDict)
     
     print(cRender)
 
+    if fileName is None:
+    	fileName = funcName + '.c'
+    elif not(fileName.endswith('.c')):
+        fileName = fileName + ".c"
     
+    with open(fileName, 'w') as outFile:
+        outFile.write(cRender)
     
     	

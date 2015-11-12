@@ -90,6 +90,6 @@ class test_SIF(unittest.TestCase):
     	
     	algorithmLaTeX(mySIF, 'testlegend')
     	
-    	algorithmCfloat(mySIF, "outfile", "myFunction")
+    	algorithmCfloat(mySIF, "myFunction", "cFile")
     	
     	
