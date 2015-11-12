@@ -9,12 +9,15 @@
   http://dan.iel.fm/posts/python-c-extensions/
   http://stackoverflow.com/questions/27829946/extend-python-with-c-return-numpy-array-gives-garbage
   http://docs.scipy.org/doc/numpy/reference/c-api.dtype.html
+  https://wiki.python.org/moin/DebuggingWithGdb
   
-  */
+*/
 
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include <dlfcn.h>
+#include <string.h>
+#include <stdio.h>
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION // remove warning for old versions of numpy
 
@@ -71,6 +74,8 @@ static PyObject *WCPG_pyWCPG(PyObject *self, PyObject *args){
       
   int tmp = 0 ;
   
+  char libName[64] = "libwcpg";
+  
   /* Parse tuple */
   
   if (!PyArg_ParseTuple(args, "OOOOiii", &A_obj, &B_obj, &C_obj, &D_obj, &n, &p, &q))
@@ -121,10 +126,17 @@ if (A_obj == NULL || B_obj == NULL || C_obj == NULL || D_obj == NULL) {
   int loc_n = (uint64_t)n,
       loc_p = (uint64_t)p, 
       loc_q = (uint64_t)q ;
+      
+#if defined(__linux__)
+  strcat(libName, ".so") ;
+#elif defined(__APPLE__)
+  strcat(libName, ".dylib") ;
+#endif
+
+  //fprintf(stderr, "%s", libName);
   
-  //handle = dlopen("./libWCPG.so.0.0.9", RTLD_LAZY) ;
-  handle = dlopen("libwcpg.so", RTLD_GLOBAL | RTLD_LAZY) ;
-  
+  handle = dlopen(libName, RTLD_GLOBAL | RTLD_LAZY) ;
+
   if (!handle) {
    fprintf(stderr, "%s\n", dlerror()) ;
    exit(EXIT_FAILURE) ;
