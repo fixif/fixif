@@ -22,7 +22,7 @@ from TRK.FIPObject        import FIPObject
 from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
 #from numpy.ctypeslib      import as_array
 from numpy                import matrix as mat
-from numpy                import eye, zeros
+from numpy                import eye, zeros, r_, c_
 
 from numpy.linalg         import inv, det, solve
 from numpy.linalg.linalg  import LinAlgError
@@ -198,7 +198,14 @@ class dSS(FIPObject):
         if (self._DC_gain is None): self.calc_DC_gain()
         return self._DC_gain
 
-
+    @property
+    def size(self):
+           
+        """
+        Return size of state space
+        """
+              
+        return (self._n, self._p, self._q)
 
     #======================================================================================#      
     # Observers (Wo, Wc) calculation
@@ -343,7 +350,7 @@ class dSS(FIPObject):
 
 
 
-	 
+     
 
     #======================================================================================#
     def calc_WCPG(self):
@@ -465,12 +472,54 @@ class dSS(FIPObject):
         return str_mat
 
     #======================================================================================#
+    def __mul__(self, other):
+        
+        """
+        We overload the multiplication operator so that two state spaces in series  give
+        a resultant state space with formula checked in matlab and available at :
+        https://en.wikibooks.org/wiki/Control_Systems/Block_Diagrams
+        To be able to multiply matrixes, systems must respect some constraints
+        """
+        
+        # we must verify the following conditions for matrix multiplication
+        # n2 = n1 
+        # p2 = q1
+        # q2 = p1
+        # p2 = n1 (=> n2 = p2)
+        # n2 = q1 (=> id)
+        
+        n1, p1, q1 = self.size
+        n2, p2, q2 = other.size
+        
+        if (not(n1 == n2)):
+            raise("states spaces must have same number of states n")
+        elif (not(p2 == q1)):
+            raise("second state space should have same number of outputs as first state number of inputs")
+        elif (not(q2 == p1)):
+            raise("second state space should have same number of inputs as first state number of outputs")
+        elif (not(p2 == n1)):
+            raise("second state space should have number of inputs equal to first state space number of states")
+        elif (not(n2 == q1)):
+            raise("second state space number of states should be equal to first state space number of outputs")
+        
+        
+        
+        amul = r_[c_[ other.A, other.B*self.C ], c_[ zeros((n1, n1)), self.A ]]
+        bmul = r_[ other.B*self.D, self.B ]
+        cmul = c_[ other.C, other.D*self.C ]
+        dmul = other.D*self.D
+        
+        return dSS(amul, bmul, cmul, dmul)
+        
+    #======================================================================================#
     def __repr__(self):
         return str(self)
 
     if __name__ == "__main__":
         import doctest
         doctest.testmod()
+
+
 
     # def __doc__(self):
     #  return "Class for discrete state-space, and aux functions"
