@@ -515,6 +515,12 @@ class dSS(FIPObject):
     def __repr__(self):
         return str(self)
 
+    # mimic matlab behaviour
+    def __getitem__(self, *args):
+
+        return dSS(self._A, self._B[:,args[0][1]], self._C[args[0][0],:], self._D[args[0][0],args[0][1]])
+
+
     if __name__ == "__main__":
         import doctest
         doctest.testmod()
