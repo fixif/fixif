@@ -322,7 +322,7 @@ class dSS(FIPObject):
     # Norms calculation
     #======================================================================================#
 
-    def calc_h2(self):
+    def norm(self, type):
 
         r"""
         
@@ -332,21 +332,31 @@ class dSS(FIPObject):
         
            \langle \langle H \rangle \rangle = \sqrt{tr ( C*W_c * C^T + D*D^T )}
         
+        Only valid for discrete-time systems
+        
         """
 
         res = None
 
-        try:
-            M = self._C * self._Wc * self._C.transpose() + self._D * self._D.transpose()
-        except:
-            res = inf
-            raise ValueError, "Impossible to compute H2-norm of current discrete state space. Default value is 'inf'" 
+        if type == 'h2':
+
+            try:
+                M = self._C * self._Wc * self._C.transpose() + self._D * self._D.transpose()
+                # less errors when Wc is big and Wo is small
+                # M = self._B.transpose() * self._Wo * self._B + self._D * self._D.transpose()
+            except:
+                res = inf
+                raise ValueError, "Impossible to compute H2-norm of current discrete state space. Default value is 'inf'" 
+            else:
+                res = sqrt(M.trace())
+
+            #self._norm_h2 = res
+
         else:
-            res = sqrt(M.trace())
+        	
+        	raise('norm type not supported (yet)')
 
-        self._norm_h2 = res
-
-        return
+        return res
 
 
 
