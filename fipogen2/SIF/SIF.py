@@ -195,6 +195,20 @@ class SIF(FIPObject):
     # Only matrix Z is kept in memory
     # JtoS extracted from Z matrix, dJtodS from dZ resp.
 
+    # AZ to DZ getters
+    def AZ(self):
+    	return self._AZ
+    
+    def BZ(self):
+    	return self._BZ
+    
+    def CZ(self):
+    	return self._CZ
+    
+    def DZ(self):
+    	return self._DZ
+    
+
     # Z, dZ getters
 
     _l, _m, _n, _p = (0, 0, 0, 0)
