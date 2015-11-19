@@ -196,18 +196,22 @@ class SIF(FIPObject):
     # JtoS extracted from Z matrix, dJtodS from dZ resp.
 
     # AZ to DZ getters
+    
     @property
     def AZ(self):
-    	return self._AZ
-	@property    
+        return self._AZ
+    
+    @property
     def BZ(self):
-    	return self._BZ
-	@property    
+        return self._BZ
+    
+    @property    
     def CZ(self):
-    	return self._CZ
-	@property    
+        return self._CZ
+    
+    @property    
     def DZ(self):
-    	return self._DZ
+        return self._DZ
     
 
     # Z, dZ getters
