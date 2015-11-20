@@ -15,6 +15,9 @@ __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
 from TRK.FIPObject import FIPObject
+
+from func_aux import _dynMethodAdder
+
 import numpy as np
 
 class SIF(FIPObject):
@@ -477,3 +480,7 @@ class SIF(FIPObject):
         #TODO show matrix Z (see matlab display method for FWR object)
         
         return mystr
+
+# Add additional methods from modules
+    
+_dynMethodAdder(SIF)
