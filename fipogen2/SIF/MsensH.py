@@ -21,11 +21,23 @@ from numpy.linalg import norm, inv, lstsq, eig, max, abs
 from scipy.linalg import schur
 
 
-def MsensH(R):
+def MsensH(R, plant=None):
     
     """
-    OPEN-LOOP
+    
+    
+    If open-loop,
+    
+    plant=None
+    
+    If closed-loop,
+    
+    plant=ss (state space)
+    
+    
     """
+
+    # SISO opt disabled ATM
 
     def _w_norm_prod_SISO(Ag, Bg, Cg, Dg, Ah, Bh, Ch, Dh, W):
     
@@ -67,7 +79,9 @@ def MsensH(R):
         Sg = dSS(Ag, Bg, Cg, Dg)        
         Sh = dSS(Ah, Bh, Ch, Dh)
         
-        if Dg.shape[0]*Dh.shape[1] == 1:
+        is_SISO_opt = False # disabled, code not complete
+        
+        if Dg.shape[0]*Dh.shape[1] == 1 & is_SISO_opt :
             
             print('SISO system')
             N, MX = _w_norm_prod_SISO(Ag,Bg,Cg,Dg, Ah,Bh,Ch,Dh, W)
@@ -76,10 +90,15 @@ def MsensH(R):
             
             MX = zeros(W.shape)
             
+            Sh_subsys = []
+            
+            for j in range(0, W.shape[1]):
+            	Sh_subsys_line.append(Sh[j,:])
+            
             for i in range(0, W.shape[0]):
                   for j in range(0, W.shape[1]):
                        if not(W[i, j] == 0):
-                           MX[i, j] = (Sg[:,i]*Sg[j,:]).norm('h2')
+                           MX[i, j] = (Sg[:,i]*Sh_subsys_line[j]).norm('h2')
             
             MX = multiply(MX, W)
         
