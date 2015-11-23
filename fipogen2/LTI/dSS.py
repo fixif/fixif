@@ -22,7 +22,7 @@ from TRK.FIPObject        import FIPObject
 from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
 #from numpy.ctypeslib      import as_array
 from numpy                import matrix as mat
-from numpy                import eye, zeros, r_, c_
+from numpy                import eye, zeros, r_, c_, sqrt
 
 from numpy.linalg         import inv, det, solve
 from numpy.linalg.linalg  import LinAlgError
@@ -263,6 +263,8 @@ class dSS(FIPObject):
         
         if (self._W_method == 'linalg'):
             
+          print('linalg method')
+            
           try:
               
               if (Woc == 'Wo'):
@@ -341,9 +343,9 @@ class dSS(FIPObject):
         if type == 'h2':
 
             try:
-                M = self._C * self._Wc * self._C.transpose() + self._D * self._D.transpose()
+                M = self._C * self.Wc * self._C.transpose() + self._D * self._D.transpose()
                 # less errors when Wc is big and Wo is small
-                # M = self._B.transpose() * self._Wo * self._B + self._D * self._D.transpose()
+                #M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
             except:
                 res = inf
                 raise ValueError, "Impossible to compute H2-norm of current discrete state space. Default value is 'inf'" 
@@ -353,8 +355,8 @@ class dSS(FIPObject):
             #self._norm_h2 = res
 
         else:
-        	
-        	raise('norm type not supported (yet)')
+            
+            raise('norm type not supported (yet)')
 
         return res
 
@@ -501,16 +503,16 @@ class dSS(FIPObject):
         n1, p1, q1 = self.size
         n2, p2, q2 = other.size
         
-        if (not(n1 == n2)):
-            raise("states spaces must have same number of states n")
-        elif (not(p2 == q1)):
-            raise("second state space should have same number of outputs as first state number of inputs")
-        elif (not(q2 == p1)):
-            raise("second state space should have same number of inputs as first state number of outputs")
-        elif (not(p2 == n1)):
-            raise("second state space should have number of inputs equal to first state space number of states")
-        elif (not(n2 == q1)):
-            raise("second state space number of states should be equal to first state space number of outputs")
+#         if (not(n1 == n2)):
+#             raise(ValueError, "states spaces must have same number of states n")
+#         elif (not(p1 == n2)):
+#             raise(ValueError, "second state space should have same number of states as first state number of inputs")
+#         elif (not(n1 == q2)):
+#             raise(ValueError, "second state space should have same number of outputs as first state number of states")
+#         elif (not(p1 == q2)):
+#             raise(ValueError, "second state space should have number of outputs equal to first state space number of inputs")
+#         elif (not(q1 == p2)):
+#             raise(ValueError, "second state space number of inputs should be equal to first state space number of outputs")
         
         
         
