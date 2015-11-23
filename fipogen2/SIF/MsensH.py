@@ -39,39 +39,39 @@ def MsensH(R, plant=None):
 
     # SISO opt disabled ATM
 
-    def _w_norm_prod_SISO(Ag, Bg, Cg, Dg, Ah, Bh, Ch, Dh, W):
-    
-        # Product matrices
-        A = r_[ c_[ Ag, mat(zeros(Ag.shape[0])), mat(zeros(Ah.shape[1])) ], c_[ Bh*Cg, Ah ] ]
-        B = r_[ Bg, Bh*Dg ]
-        C = r_[ Dh*Cg, Ch ]
-        D = Dh*Dg
-        
-        # MATLAB code
-        #Balance A matrix prior to performing Schur decomposition
-        #[t,A] = balance(A);
-        #B = t\B;
-        #C = C*t;
-
-        # Perform schur decomposition on AA (and convert to complex form)
-        m, n = A.shape
-        AA = lstsq(A + eye(M), A - eye(M))[0] # x,resid,rank,s
-        
-        ta, ua = schur(AA, 'complex')
-        #ta, ua = schur(AA)
-        #ta, ua = rsf2csf(ta, ua)
-    
-        # Stability test
-        r = eig(A)
-        if max(abs(r)) >= 1:
-        	print("unstable system : 2-norm is infinite")
-        	
-        # Computation of the norm
-        MX = zeros(W.shape)
-        
-        for i in range(0, W.shape[0]):
-        	
-        	BB = (eye(m) - AA)*B[:,i].transpose()*(eye(m) - AA.transpose())/2
+#     def _w_norm_prod_SISO(Ag, Bg, Cg, Dg, Ah, Bh, Ch, Dh, W):
+#     
+#         # Product matrices
+#         A = r_[ c_[ Ag, mat(zeros(Ag.shape[0])), mat(zeros(Ah.shape[1])) ], c_[ Bh*Cg, Ah ] ]
+#         B = r_[ Bg, Bh*Dg ]
+#         C = r_[ Dh*Cg, Ch ]
+#         D = Dh*Dg
+#         
+#         # MATLAB code
+#         #Balance A matrix prior to performing Schur decomposition
+#         #[t,A] = balance(A);
+#         #B = t\B;
+#         #C = C*t;
+# 
+#         # Perform schur decomposition on AA (and convert to complex form)
+#         m, n = A.shape
+#         AA = lstsq(A + eye(M), A - eye(M))[0] # x,resid,rank,s
+#         
+#         ta, ua = schur(AA, 'complex')
+#         #ta, ua = schur(AA)
+#         #ta, ua = rsf2csf(ta, ua)
+#     
+#         # Stability test
+#         r = eig(A)
+#         if max(abs(r)) >= 1:
+#         	print("unstable system : 2-norm is infinite")
+#         	
+#         # Computation of the norm
+#         MX = zeros(W.shape)
+#         
+#         for i in range(0, W.shape[0]):
+#         	
+#         	BB = (eye(m) - AA)*B[:,i].transpose()*(eye(m) - AA.transpose())/2
         	#P = 
     
     def _w_norm_prod(Ag,Bg,Cg,Dg, Ah,Bh,Ch,Dh, W):
