@@ -22,7 +22,7 @@ from numpy import matrix as mat
 
 from scipy import signal
 
-from Structures import DFI
+from Structures import DFI, State_Space
 
 #from SIF import algorithmLaTeX
 #from SIF import algorithmCfloat
@@ -81,15 +81,24 @@ class test_SIF(unittest.TestCase):
         npt.assert_almost_equal(mySIF.R,myR)                                                        
         npt.assert_almost_equal(mySIF.S,myS)
 
-		
+        
     def test_algo(self):
-    	
-    	num, den = signal.butter(4,0.05)
-    	
-    	mySIF = DFI(num, den)
-    	
-    	algorithmLaTeX(mySIF, 'testlegend')
-    	
-    	algorithmCfloat(mySIF, "myFunction", "cFile")
-    	
-    	
+        
+        num, den = signal.butter(4,0.05)
+        
+        mySIF = DFI(num, den)
+        
+        mySIF.algorithmLaTeX('testlegend')
+        
+        mySIF.algorithmCfloat("myFunction", "cFile")
+        
+    def test_MsensH(self):
+        
+        num, den = signal.butter(4, 0.05)        
+        
+        A, B, C, D = signal.tf2ss(num, den)
+        
+        mySIF = State_Space(A,B,C,D)
+        
+        print(mySIF.MsensH())
+        
