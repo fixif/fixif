@@ -481,6 +481,7 @@ class SIF(FIPObject):
         
         return mystr
 
-# Add additional methods from modules
-    
+# Add additional methods SIF_othermoethods.py 
+# from modules in current folder
 _dynMethodAdder(SIF)
+
