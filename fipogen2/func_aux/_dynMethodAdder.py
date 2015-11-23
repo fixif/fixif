@@ -64,7 +64,7 @@ def _dynMethodAdder(t_class):
         # Argh, see http://bugs.python.org/issue6448 
         # https://hg.python.org/cpython/rev/b28dadd20d9b/
         # with previous hack, [path_mod] can be omitted find_module(submod_name)
-        f, tmp_filename, description = find_module(submod_name, [path_mod]) 
+        f, tmp_filename, description = find_module(submod_name, [path_mod])
         
         try:
             #submod_name = tmp_filename[:-len(f_name_suffix)]
