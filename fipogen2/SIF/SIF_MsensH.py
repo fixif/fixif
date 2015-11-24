@@ -102,7 +102,8 @@ def MsensH(R, plant=None):
             
             MX = multiply(MX, W)
         
-            N = norm(MX, 'fro')*norm(MX, 'fro') # inlining x5 speedup... http://stackoverflow.com/questions/25254541/why-is-numpy-power-60x-slower-than-in-lining
+            N = norm(MX, 'fro')
+            N = N*N # inlining x5 speedup... http://stackoverflow.com/questions/25254541/why-is-numpy-power-60x-slower-than-in-lining
         
         return N, MX
         
