@@ -367,6 +367,7 @@ class SIF(FIPObject):
         self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m] = mymat  
 
 
+
     def __check_set_dimensions__(self, JtoS):
         
         """
