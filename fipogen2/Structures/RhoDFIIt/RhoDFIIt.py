@@ -4,7 +4,7 @@
 
 from SIF import SIF
 from LTI import TF, dSS
-from numpy import zeros, all, poly, matrix, sqrt, prod, transpose, diag
+from numpy import zeros, all, poly, matrix, sqrt, prod, transpose, diag, r_, c_
 from numpy.linalg import cond, inv
 
 class RhoDFIIt(SIF):
@@ -180,7 +180,7 @@ class RhoDFIIt(SIF):
         
         
         # this is surely wrong with Vbeta
-        JtoS = eye(p), K, [1,zeros((1,p-1))], diag(delta), [[Vbeta[1]],[zeros((p-1, 1))]], diag(gamma), Vbeta[range(1, p+1)], zeros((1, p)), 0
+        JtoS = eye(p), K, c_[1,zeros((1,p-1))], diag(delta), r_[Vbeta[1], zeros((p-1, 1))], diag(gamma), Vbeta[range(1, p+1)], zeros((1, p)), 0
         
         R1 = SIF(JtoS)
           
