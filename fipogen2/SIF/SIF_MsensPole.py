@@ -10,12 +10,10 @@ __maintainer__ = "Joachim Kruithof"
 __email__ = "joachim.kruithof@lip6.fr"
 __status__ = "Beta"
 
-from LTI import dSS
 from numpy import matrix as mat
 from numpy import eye, c_, r_, zeros, multiply, all, real, conj
 from numpy import transpose
-from numpy.linalg import norm, inv, lstsq, eig
-from scipy.linalg import schur
+from numpy.linalg import norm, inv, eig
 
 __all__ = ['MsensPole']
 
