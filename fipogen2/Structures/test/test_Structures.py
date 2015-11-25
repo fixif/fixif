@@ -39,8 +39,8 @@ class test_Structures(unittest.TestCase):
         self.engMtlb = MtlbHelper()
         
         # add matlab script dir
-        abs_fwr_dir = os.getcwd() + "/Structures/test/FWRToolbox/"
-        self.engMtlb.eng.addpath(abs_fwr_dir,nargout=0)
+        abs_fwr_dir = os.path.join(os.getcwd(),"Structures","test","FWRToolbox","")
+        self.engMtlb.eng.addpath(abs_fwr_dir, nargout=0)
         
         self.ndigit = 10
         self.eps = 1.e-8        
@@ -75,7 +75,7 @@ class test_Structures(unittest.TestCase):
     def _reshape_1dto2d(self, var_dict): #could be replaced by atleast2d() ???
         
         for key in var_dict.keys():
-            if var_dict[key].shape == (1,): # does not work with "is" ???
+            if var_dict[key].shape == (1,):
                 var_dict[key] = var_dict[key].reshape(1,1)
                 
         return var_dict
