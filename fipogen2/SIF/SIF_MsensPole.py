@@ -63,10 +63,11 @@ def MsensPole(R, plant=None, moduli=1):
     
         # same code as closed-loop case MsensH
                 # dimensions of plant system
-        
+                
+        l0, m0, n0, p0 = R.size
         n1, p1, q1 = plant.size
         
-        q2 = m1 - m0 
+        q2 = q1 - m0 
         p2 = p1 - p0
         
         if p1 < 0 or m1 <= 0:
@@ -90,7 +91,6 @@ def MsensPole(R, plant=None, moduli=1):
         Abar = r_[ c_[plant.A + B2*R.DZ*C2, B2*R.CZ], c_[R.BZ*C2, R.AZ] ]
     
         # intermediate matrices
-        
         invJ = inv(R.J)
         
         M1bar = r_[ c_[B2*R.L*invJ, zeros(n1, n0), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]

@@ -24,10 +24,11 @@ def Mstability(R, plant, moduli=1):
 	
 	# Same code as MsenH
 	# dimensions of plant system
-		
+	
+	l0, m0, n0, p0 = R.size	
 	n1, p1, q1 = plant.size
 		
-	q2 = m1 - m0 
+	q2 = q1 - m0 
 	p2 = p1 - p0
 		
 	if p1 < 0 or m1 <= 0:
