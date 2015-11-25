@@ -104,10 +104,8 @@ def MsensH(R, plant=None):
             N = N*N # inlining x5 speedup... http://stackoverflow.com/questions/25254541/why-is-numpy-power-60x-slower-than-in-lining
         
         return N, MX
-        
-
     
-    l0,m0,n0,p0 = R.size
+    l0, m0, n0, p0 = R.size
     
     # open-loop system
     if plant is None:
@@ -119,7 +117,7 @@ def MsensH(R, plant=None):
         N1 = r_[ inv(R.J)*R.M, eye(n0), zeros((m0, n0)) ]
         N2 = r_[ inv(R.J)*R.N, zeros((n0, m0)), eye(m0) ]
     
-        M, MZ = _w_norm_prod(R._AZ,M1,R._CZ,M2, R._AZ,R._BZ,N1,N2, R.dZ)
+        M, MZ = _w_norm_prod(R.AZ,M1,R.CZ,M2, R.AZ,R.BZ,N1,N2, R.dZ)
     
     else:
         
@@ -127,7 +125,7 @@ def MsensH(R, plant=None):
         
         n1, p1, q1 = plant.size
         
-        q2 = m1 - m0 
+        q2 = q1 - m0 
         p2 = p1 - p0
         
         if p1 < 0 or m1 <= 0:
@@ -158,7 +156,7 @@ def MsensH(R, plant=None):
         invJ = inv(R.J)
         
         M1bar = r_[ c_[B2*R.L*invJ, zeros(n1, n0), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
-        M2bar = c_[ D12*R.L*invJ, zeros((m2, R.n)), D12 ]
+        M2bar = c_[ D12*R.L*invJ, zeros((m2, n0)), D12 ]
         N1bar = r_[ c_[invJ*R.N*C2, invJ*R.M], c_[zeros((n0, n1)), eye(n0)], c_[C2, zeros((m1, n0))] ]
         N2bar = r_[ invJ*R.N*D21, zeros((n0, p2)), D21 ]
         
