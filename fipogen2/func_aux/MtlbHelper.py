@@ -1,6 +1,8 @@
 import numpy.testing as npt
 
 from scipy.io import loadmat, savemat
+import os, sys
+
 
 # use matlab from python
 # note : this should be transient and removed when published on internet
@@ -13,10 +15,31 @@ import matlab.engine
 
 class MtlbHelper(object):
     
-    def __init__(self):
+    @staticmethod
+    def _quoted(string):
+        
+        return "\'" + string + "\'"
+       
+    @staticmethod
+    def _quoted_list(string_list):
+        
+        return ["\'" + string + "\'" for string in string_list]
+    
+    def __init__(self, target_folder = None):
     
         self.eng = matlab.engine.start_matlab()
         #self.debug_mat = True
+        
+        if target_folder is None :
+            target_folder = "tmp_mat"
+        
+        self.path_mat = os.path.join(os.getcwd(), target_folder, "")
+        
+        try:
+            os.makedirs(self.path_mat)
+        except OSError:
+            if not os.path.isdir(self.path_mat): #don't complain if dir exists
+                raise
 
     def _save(self, var):
     
@@ -26,9 +49,12 @@ class MtlbHelper(object):
         """
     
         fmt = "\'-v7\'" # we don't want hdf5 format
-        filename = "\'" + var + ".mat\'"
+        
+        filename = var + ".mat"
+        
+        abspath_filename = self._quoted(os.path.join(self.path_mat, filename))
     
-        str_save = 'save(' + filename + ",\'" + var + "\'," + fmt + ');'
+        str_save = 'save(' + abspath_filename + "," + self._quoted(var) + "," + fmt + ');'
         
         self.eng.eval(str_save, nargout = 0)
     
@@ -48,7 +74,9 @@ class MtlbHelper(object):
     
         filename = var + '.mat'
     
-        h = loadmat(filename)
+        abspath_filename = os.path.join(self.path_mat, filename)
+    
+        h = loadmat(abspath_filename)
         return h[var]
   
     def pushCmdGetVar(self, mtlb_code, varz, local_dict):
@@ -77,11 +105,15 @@ class MtlbHelper(object):
         for var in varz:
             tmp_dict[var] = varz_dict[var].astype(float)
     
-        tmp_name = 'mtlb_inject'
+        name_tmp = 'mtlb_inject'
     
-        savemat(tmp_name, tmp_dict)
+        abspath_tmp = os.path.join(self.path_mat, name_tmp)
+
+        savemat(abspath_tmp, tmp_dict)
     
-        cmd = "load(\'"+tmp_name+".mat\')"
+        abspath_tmp += ".mat"
+
+        cmd = "load(" + self._quoted(abspath_tmp) + ")"
     
         self.eng.eval(cmd, nargout=0)
 
@@ -111,6 +143,6 @@ class MtlbHelper(object):
             #print("Shape of local_varz_dict["+ var +"]")
             #print(str(local_varz_dict[var].shape))
         
-            print("Comparing "+var)
+            print("Comparing " + var)
         
             npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
