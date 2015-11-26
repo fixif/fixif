@@ -164,5 +164,7 @@ def random_dSS(n=None, p=1, q=1):
     C = C * Cmask
     D = D * Dmask
 
-    return dSS(A, B, C, D)
+    
+
+    return dSS(A, B, C, D, e_source="func", e_subsource="random_dSS")
   

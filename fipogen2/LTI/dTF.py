@@ -7,7 +7,7 @@ from TRK.FIPObject import FIPObject
 from numpy import nditer
 from numpy import matrix as mat
 
-class TF(FIPObject):
+class dTF(FIPObject):
   
     def __init__(self, num, den, father_obj = None, **event_spec):
     
@@ -25,7 +25,7 @@ class TF(FIPObject):
     
         my_e_type      = event_spec.get('e_type', 'create')
         my_e_subtype   = event_spec.get('e_subtype', 'new')      
-        my_e_subclass  = event_spec.get('e_subclass', 'TF')
+        my_e_subclass  = event_spec.get('e_subclass', 'dTF')
         my_e_source    = event_spec.get('e_source', 'user_input')
         my_e_subsource = event_spec.get('e_subsource', 'TF.__init__') # optional, could also be ''
         my_e_desc      = event_spec.get('e_desc', '')
