@@ -125,6 +125,16 @@ class MtlbHelper(object):
         Compare value stored in local_varz_dict with matlab values for a given executed code (mtlb_code)
         """
     
+        def _reshape_1dto2d(var_dict): #could be replaced by atleast2d() ???
+        
+            for key in var_dict.keys():
+                if var_dict[key].shape == (1,):
+                    var_dict[key] = var_dict[key].reshape(1,1)
+                
+            return var_dict
+    
+        local_varz_dict = _reshape_1dto2d(local_varz_dict)
+    
         tmp_dict = {}
     
         #print(mtlb_code)
