@@ -14,6 +14,8 @@ __maintainer__ = "Joachim Kruithof"
 __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
+from LTI import dSS
+
 from TRK.FIPObject import FIPObject
 
 from func_aux import _dynMethodAdder
@@ -164,7 +166,12 @@ class SIF(FIPObject):
         CZ = self.L * inv_J * self.M + self.R
         DZ = self.L * inv_J * self.N + self.S
         
-        return (AZ, BZ, CZ, DZ)
+        temp_dSS = dSS(AZ,BZ,CZ,DZ)
+        
+        Wo = temp_dSS.Wo
+        Wc = temp_dSS.Wc
+        
+        return (AZ, BZ, CZ, DZ, Wo, Wc)
     
     def __init__(self, JtoS, eps=1.e-8, father_obj=None, **event_spec): # name can be specified in e_desc
 
@@ -193,7 +200,9 @@ class SIF(FIPObject):
         # dZ from Z
         self._dZ = SIF._build_dZ(self, eps)
 
-        self._AZ, self._BZ, self._CZ, self._DZ = self._build_AZtoDZ()  
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()  
+
+        
 
     # Only matrix Z is kept in memory
     # JtoS extracted from Z matrix, dJtodS from dZ resp.
@@ -216,6 +225,13 @@ class SIF(FIPObject):
     def DZ(self):
         return self._DZ
     
+    @property
+    def Wo(self):
+    	return self._Wo
+    
+    @property
+    def Wc(self):
+    	return self._Wc
 
     # Z, dZ getters
 
@@ -303,38 +319,47 @@ class SIF(FIPObject):
     def J(self, mymat, eps=1.e-8):
         self._Z[ 0 : self._l, 0 : self._l ] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @K.setter
     def K(self, mymat, eps=1.e-8):
         self._Z[ self._l : self._l+self._n, 0 : self._l ] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @L.setter
     def L(self, mymat, eps=1.e-8):
         self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
     @M.setter
     def M(self, mymat, eps=1.e-8):
         self._Z[ 0 : self._l, self._l : self._l + self._n ] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @N.setter
     def N(self, mymat, eps=1.e-8):
         self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._m] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @P.setter
     def P(self, mymat, eps=1.e-8):
         self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @Q.setter
     def Q(self, mymat, eps=1.e-8):
         self._Z[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._m] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @R.setter
     def R(self, mymat, eps=1.e-8):
         self._Z[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @S.setter
     def S(self, mymat, eps=1.e-8):
         self._Z[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m] = mymat
         self._dZ = _build_dZ(self, eps)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
 
     #dJtodS setters
 
