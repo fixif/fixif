@@ -49,7 +49,7 @@ def _dynMethodAdder(t_class):
     path_start = os.getcwd()
     path_mod = os.path.join(os.getcwd(),t_class.__name__,"")
     
-    sys.path.append(path_mod) # otherwise, modules importing "other modules" in functions to be added to class will not 
+    sys.path.append(path_mod) # otherwise, modules importing "other modules" in functions to be added to class will not find dependencies
     
     os.chdir(path_mod)
     file_names = glob(f_name_prefix + '*' + f_name_suffix)
