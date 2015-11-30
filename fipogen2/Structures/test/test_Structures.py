@@ -71,14 +71,6 @@ class test_Structures(unittest.TestCase):
                 self.engMtlb.pushCmdGetVar(cmd, varz, tmp_vars)
 
         return tmp_vars
-
-    def _reshape_1dto2d(self, var_dict): #could be replaced by atleast2d() ???
-        
-        for key in var_dict.keys():
-            if var_dict[key].shape == (1,):
-                var_dict[key] = var_dict[key].reshape(1,1)
-                
-        return var_dict
     
     def mytest_tf2ss(self, dict_numden):
         
@@ -103,8 +95,6 @@ class test_Structures(unittest.TestCase):
         
         tmp_vars['Aq'], tmp_vars['Bq'], tmp_vars['Cq'], tmp_vars['Dq'] = \
           tf2ss(squeeze(array(dict_numden['num'])), squeeze(array(dict_numden['den'])))
-        
-        tmp_vars = self._reshape_1dto2d(tmp_vars)
             
         self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
         
