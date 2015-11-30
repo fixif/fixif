@@ -40,7 +40,15 @@ class dTF(FIPObject):
         self._den = mat(den)
         
         if (self._num.shape[0] is not 1) or (self._den.shape[0] is not 1):
-            raise('TF : num and den should be 1D matrixes')
+            raise(ValueError,'TF : num and den should be 1D matrixes')
+        
+    @property
+    def num(self):
+	return self._num
+	 
+    @property
+    def den(self):
+        return self._den
         
     def __str__(self):
        
