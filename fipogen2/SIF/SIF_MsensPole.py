@@ -11,7 +11,7 @@ __email__ = "joachim.kruithof@lip6.fr"
 __status__ = "Beta"
 
 from numpy import matrix as mat
-from numpy import eye, c_, r_, zeros, multiply, all, real, conj
+from numpy import eye, c_, r_, zeros, multiply, all, real, conj, diag
 from numpy import transpose
 from numpy.linalg import norm, inv, eig
 
@@ -19,7 +19,7 @@ __all__ = ['MsensPole']
 
 def MsensPole(R, plant=None, moduli=1):
     
-    def deigdZ(A, M1, M2, shapeZ, moduli):
+    def deigdZ(A, M1, M2, shapeZ, moduli=1):
         
         mylambda, Mx = eig(A)
         My = inv(Mx).transpose()
@@ -42,21 +42,29 @@ def MsensPole(R, plant=None, moduli=1):
         
         for i in range(0, shapeZ[0]):
             for j in range(0, shapeZ[1]):
-                dlambda_dZ[i,j] = norm(dlk_dZ[i,j,:],'fro')
+                                
+                if len(dlk_dZ[i,j,:].shape) == 1:
+                    norm_target = diag(dlk_dZ[i,j,:]) # maybe there's a missing func or bug in numpy here, cannot calculate froebenius norm on a vector
+                else:
+                    norm_target = dlk_dZ[i,j,:] 
+                    
+                dlambda_dZ[i,j] = norm(norm_target, 'fro')
             
         return dlambda_dZ, dlk_dZ
     
-    # open-loop case
-    if Plant is None:
-        
-        invJ = inv(J)
+    l0, m0, n0, p0 = R.size
     
-        M1 = c_[R.K*invJ, eye(R.n), zeros((R.n, R.p))]
-        N1 = r_[invJ*R.M, eye(R.n), zeros((R.m,R.n))]
+    # open-loop case
+    if plant is None:
+        
+        invJ = inv(R.J)
+    
+        M1 = c_[R.K*invJ, eye(n0), zeros((n0, p0))]
+        N1 = r_[invJ*R.M, eye(n0), zeros((m0, n0))]
     
         # measures
         # moduli is not sent in MsensPole
-        dlambda, dlk_dZ = deigdZ(R.AZ, M1, N1, R.Z.shape)
+        dlambda_dZ, dlk_dZ = deigdZ(R.AZ, M1, N1, R.Z.shape)
         
     #closed-loop case
     else:
@@ -67,10 +75,10 @@ def MsensPole(R, plant=None, moduli=1):
         l0, m0, n0, p0 = R.size
         n1, p1, q1 = plant.size
         
-        q2 = q1 - m0 
+        m2 = q1 - m0 
         p2 = p1 - p0
         
-        if p1 < 0 or m1 <= 0:
+        if p2 < 0 or m2 <= 0:
             raise(ValueError,"dimension error : check plant and realization dimension")
         
         

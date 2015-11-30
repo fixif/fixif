@@ -13,7 +13,7 @@ __status__ = "Beta"
 from LTI import dSS
 
 from numpy import matrix as mat
-from numpy import eye, c_, r_, zeros, multiply, all, diag, trace
+from numpy import eye, c_, r_, zeros, multiply, all, diag, trace, ones, where, logical_or
 from numpy import transpose, fmod, log2
 from numpy.linalg import norm, inv, eig
 
@@ -25,7 +25,7 @@ def RNG(R, plant=None, tol=1.e-8):
         
         W = ones(X.shape)
         
-        rows, cols = where(abs(X) < tol | abs(X-1) < tol | abs(X+1) < tol)
+        rows, cols = where(logical_or((abs(X) < tol),(abs(X-1) < tol),(abs(X+1) < tol)))
         
         for row, col in zip(rows, cols):
             W[row, col] = 0
@@ -40,19 +40,21 @@ def RNG(R, plant=None, tol=1.e-8):
         
         return W
     
+    l0, m0, n0, p0 = R.size
+    
     if plant is None:
     
         invJ = inv(R.J)
     
-        M1 = c_[R.K*invJ, eye(R.n), zeros((R.n, R.m))]
-        M2 = c_[R.L*invJ, zeros((R.p, R.n)), eye(R.p)]
+        M1 = c_[R.K*invJ, eye(n0), zeros((n0, m0))]
+        M2 = c_[R.L*invJ, zeros((p0, n0)), eye(p0)]
     
         W01Z = computeWeight(R.Z, tol, rem=True)
-        dZ = diag( W01Z*ones(R.l+R.n+R.m, 1) )
+        dZ = diag( W01Z*ones((l0+n0+m0, 1)) )
     
         G = trace( dZ * ( M2.transpose()*M2 + M1.transpose()*R.Wo*M1 ) )
     
-    	return G, dZ
+        return G, dZ
     
     else:
         
@@ -60,10 +62,10 @@ def RNG(R, plant=None, tol=1.e-8):
         # dimensions of plant system
         n1, p1, q1 = plant.size
         
-        q2 = q1 - m0 
+        m2 = q1 - m0 
         p2 = p1 - p0
         
-        if p1 < 0 or m1 <= 0:
+        if p2 < 0 or m2 <= 0:
             raise(ValueError,"dimension error : check plant and realization dimension")
         
         

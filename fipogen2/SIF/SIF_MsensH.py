@@ -125,10 +125,10 @@ def MsensH(R, plant=None):
         
         n1, p1, q1 = plant.size
         
-        q2 = q1 - m0 
+        m2 = q1 - m0 
         p2 = p1 - p0
         
-        if p1 < 0 or m1 <= 0:
+        if p2 < 0 or m2 <= 0:
             raise(ValueError,"dimension error : check plant and realization dimension")
         
         
