@@ -35,7 +35,7 @@ class test_SIF(unittest.TestCase):
     """
     Test class for SIF class
     """
-    
+
     def setUp(self):
         
         """
@@ -48,10 +48,10 @@ class test_SIF(unittest.TestCase):
         # add matlab script dir
         
         abs_fwr_dir = os.path.join(os.getcwd(),"Structures","test","FWRToolbox","")
-        print('==================================================')
-        print('Adding the following path to matlab engine : ')
-        print(abs_fwr_dir)
-        print('==================================================')
+        #print('==================================================')
+        #print('Adding the following path to matlab engine : ')
+        #print(abs_fwr_dir)
+        #print('==================================================')
         self.engMtlb.eng.addpath(abs_fwr_dir, nargout=0)
         
         self.ndigit = 10
@@ -59,10 +59,10 @@ class test_SIF(unittest.TestCase):
     
         self.list_dTF = get_data("TF", "signal", "butter")# + get_data("TF", "random")
         #self.list_dTF = get_data("TF", "random") ,BUG
-        print("Number of dTF objects : " + str(len(self.list_dTF)) + "\n")
+        #print("Number of dTF objects : " + str(len(self.list_dTF)) + "\n")
         #self.list_dSS = get_data("SS", "signal", "butter")# + get_data("SS", "random")
         self.list_dSS = get_data("SS", "random")
-        print("Number of dSS objects : " + str(len(self.list_dSS)) + "\n")
+        #print("Number of dSS objects : " + str(len(self.list_dSS)) + "\n")
         # TODO add PLANT generator to test closed-loop variants
     
     def test_construction(self):
@@ -145,7 +145,11 @@ class test_SIF(unittest.TestCase):
                     
             return SIFobj, dict_ABCD
 
-        varz = ["OL_sensH", "OL_sensPole", "OL_RNG", "CL_sensH", "CL_sensPole", "CL_stability", "CL_RNG"]
+       
+        
+        varz = ["OH_M", "OH_MZ", "OP_M", "OP_dlambda_dZ", "OP_dlk_dZ", "ORNG_G", "ORNG_dZ"]
+        
+        #var += ["CH_M", "CH_MZ", "CP_M", "CP_dlambdabar_dZ", "CP_dlbk_dZ", "CS_M", "CRNG_G", "CRNG_dZ", "CRNG_M1M2Wobar"]
         
         dict_ABCD = {}
         
@@ -153,23 +157,20 @@ class test_SIF(unittest.TestCase):
 
         mtlb_cmd  = 'R = SS2FWR(A,B,C,D); \n'
         # open loop
-        mtlb_cmd += "OL_sensH = MsensH(R); \n"
-        mtlb_cmd += "OL_sensPole = MsensPole(R); \n"
-        #mtlb_cmd += "OL_stability = Mstability(R); \n" # open-loop case
-        mtlb_cmd += "OL_RNG = RNG(R); \n" # open-loop case
+        mtlb_cmd += "[OH_M, OH_MZ] = MsensH(R); \n"
+        mtlb_cmd += "[OP_M, OP_dlambda_dZ, OP_dlk_dZ] = MsensPole(R); \n"
+        mtlb_cmd += "[ORNG_G, ORNG_dZ] = RNG(R); \n" # open-loop case
         
         # plant
-        mtlb_cmd += "ss_plant = ss(Ap, Bp, Cp, Dp); \n"
+        #mtlb_cmd += "ss_plant = ss(Ap, Bp, Cp, Dp); \n"
         # closed-loop
-        mtlb_cmd += "CL_sensH = MsensH(R, ss_plant); \n" 
-        mtlb_cmd += "CL_sensPole = MsensPole(R, ss_plant); \n"
-        mtlb_cmd += "CL_stability = Mstability(R, ss_plant); \n"
-        mtlb_cmd += "CL_RNG = RNG(R); \n"
+        #mtlb_cmd += "[CH_M, CH_MZ] = MsensH(R, ss_plant); \n" 
+        #mtlb_cmd += "[CP_M, CP_dlambdabar_dZ, CP_dlbk_dZ] = MsensPole(R, ss_plant); \n"
+        #mtlb_cmd += "CS_M = Mstability(R, ss_plant); \n"
+        #mtlb_cmd += "[CRNG_G, CRNG_dZ, CRNG_M1M2Wobar] = RNG(R); \n"
                 
         for dSSobj in self.list_dSS:
         
-            # SHITTY HACK
-            # PLANT SHOULD REPLACE this fake, shitty, dumb dSSObj
             dSSobj_plant = dSSobj
         
             SIFobj, dict_ABCD = _build_SIFobj_dict_ABCD(dSSobj, dSSobj_plant) # PLANT SHOULD REPLACE SECOND dSSObj !!!
@@ -177,15 +178,24 @@ class test_SIF(unittest.TestCase):
             self.engMtlb.setVar(dict_ABCD.keys(), dict_ABCD) # A,B,C,D, Ap,Bp,Cp,Dp
         
             # open loop
-            fipVarz[varz[0]] = SIFobj.MsensH()
-            fipVarz[varz[1]] = SIFobj.MsensPole()
-            fipVarz[varz[2]] = SIFobj.RNG()
+            tmp_var = SIFobj.MsensH()
+            fipVarz[varz[0]] = tmp_var[0]
+            fipVarz[varz[1]] = tmp_var[1]
+            
+            tmp_var = SIFobj.MsensPole()
+            fipVarz[varz[2]] = tmp_var[0]
+            fipVarz[varz[3]] = tmp_var[1]
+            fipVarz[varz[4]] = tmp_var[2]
         
+            tmp_var = SIFobj.RNG()
+            fipVarz[varz[5]] = tmp_var[0]
+            fipVarz[varz[6]] = tmp_var[1]
+            
             # closed-loop
-            fipVarz[varz[3]] = SIFobj.MsensH(dSSobj_plant)
-            fipVarz[varz[4]] = SIFobj.MsensPole(dSSobj_plant)
-            fipVarz[varz[5]] = SIFobj.Mstability(dSSobj_plant)            
-            fipVarz[varz[6]] = SIFobj.RNG(dSSobj_plant)            
+            #fipVarz[varz[3]] = SIFobj.MsensH(dSSobj_plant)
+            #fipVarz[varz[4]] = SIFobj.MsensPole(dSSobj_plant)
+            #fipVarz[varz[5]] = SIFobj.Mstability(dSSobj_plant)            
+            #fipVarz[varz[6]] = SIFobj.RNG(dSSobj_plant)            
         
             self.engMtlb.compare(mtlb_cmd, varz, fipVarz, decim = self.ndigit)
         
