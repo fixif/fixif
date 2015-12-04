@@ -519,7 +519,9 @@ class dSS(FIPObject):
         amul = r_[c_[ other.A, other.B*self.C ], c_[ zeros((n1, n1)), self.A ]]
         bmul = r_[ other.B*self.D, self.B ]
         cmul = c_[ other.C, other.D*self.C ]
+        #cmul = r_[c_[other.C, other.D*self.C],c_[zeros((q1,n1)), self.C]]
         dmul = other.D*self.D
+        #dmul = r_[other.D*self.D, self.D]
         
         return dSS(amul, bmul, cmul, dmul)
         
