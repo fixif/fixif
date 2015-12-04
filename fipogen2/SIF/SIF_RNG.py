@@ -13,7 +13,7 @@ __status__ = "Beta"
 from LTI import dSS
 
 from numpy import matrix as mat
-from numpy import eye, c_, r_, zeros, multiply, all, diag, trace, ones, where, logical_or
+from numpy import eye, c_, r_, zeros, multiply, all, diagflat, trace, ones, where, logical_or
 from numpy import transpose, fmod, log2
 from numpy.linalg import norm, inv, eig
 
@@ -32,10 +32,10 @@ def RNG(R, plant=None, tol=1.e-8):
         
         if rem:
             
-            rows, cols = where(abs(W) > tol)
+            rows, cols = where(abs(W) > tol) # inutile ?? already verified condition
         
-            for row, col in zip(rows, cols):
-                if fmod(abs(log2(W[row, col])), 1) < tol:
+            for row, col in zip(rows, cols): # test could be included earlier
+                if fmod(abs(log2(X[row, col])), 1) < tol:
                     W[row, col] = 0
         
         return W
@@ -50,7 +50,8 @@ def RNG(R, plant=None, tol=1.e-8):
         M2 = c_[R.L*invJ, zeros((p0, n0)), eye(p0)]
     
         W01Z = computeWeight(R.Z, tol, rem=True)
-        dZ = diag( W01Z*ones((l0+n0+m0, 1)) )
+        
+        dZ = diagflat( W01Z*mat(ones((l0+n0+m0, 1))) )
     
         G = trace( dZ * ( M2.transpose()*M2 + M1.transpose()*R.Wo*M1 ) )
     
@@ -92,12 +93,12 @@ def RNG(R, plant=None, tol=1.e-8):
         
         invJ = inv(R.J)
         
-        M1bar = r_[ c_[B2*R.L*invJ, zeros(n1, n0), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
+        M1bar = r_[ c_[B2*R.L*invJ, zeros((n1, n0)), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
         M2bar = c_[ D12*R.L*invJ, zeros((m2, n0)), D12 ]
         
         Wobar = dSS(Abar, Bbar, Cbar, Dbar).Wo
         W01Z = computeWeight(R.Z, tol, rem=False)
-        dZ = diag( W01Z*ones((l0+n0+m0, 1)))
+        dZ = diag( W01Z*mat(ones((l0+n0+m0, 1))))
 
         G = trace( dZ * (M2bar.transpose()*M2bar + M1bar.transpose() * Wobar * M1bar) )
         

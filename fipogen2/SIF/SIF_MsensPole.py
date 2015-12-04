@@ -101,7 +101,7 @@ def MsensPole(R, plant=None, moduli=1):
         # intermediate matrices
         invJ = inv(R.J)
         
-        M1bar = r_[ c_[B2*R.L*invJ, zeros(n1, n0), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
+        M1bar = r_[ c_[B2*R.L*invJ, zeros((n1, n0)), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
         N1bar = r_[ c_[invJ*R.N*C2, invJ*R.M], c_[zeros((n0, n1)), eye(n0)], c_[C2, zeros((m1, n0))] ]
         
         # dlambdabar,dlbk in _cl code

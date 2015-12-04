@@ -112,13 +112,15 @@ def MsensH(R, plant=None):
     
         # 16/11/15 : eye does not need a tuple, zeros does...
     
-        M1 = c_[ R.K*inv(R.J), eye(n0), zeros((n0, p0)) ]
-        M2 = c_[ R.L*inv(R.J), zeros((p0, n0)), eye(p0) ]
-        N1 = r_[ inv(R.J)*R.M, eye(n0), zeros((m0, n0)) ]
-        N2 = r_[ inv(R.J)*R.N, zeros((n0, m0)), eye(m0) ]
+        invJ = inv(R.J)
+    
+        M1 = c_[ R.K*invJ, eye(n0), zeros((n0, p0)) ]
+        M2 = c_[ R.L*invJ, zeros((p0, n0)), eye(p0) ]
+        N1 = r_[ invJ*R.M, eye(n0), zeros((m0, n0)) ]
+        N2 = r_[ invJ*R.N, zeros((n0, m0)), eye(m0) ]
     
         M, MZ = _w_norm_prod(R.AZ,M1,R.CZ,M2, R.AZ,R.BZ,N1,N2, R.dZ)
-    
+        
     else:
         
         # dimensions of plant system
@@ -155,7 +157,7 @@ def MsensH(R, plant=None):
         
         invJ = inv(R.J)
         
-        M1bar = r_[ c_[B2*R.L*invJ, zeros(n1, n0), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
+        M1bar = r_[ c_[B2*R.L*invJ, zeros((n1, n0)), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
         M2bar = c_[ D12*R.L*invJ, zeros((m2, n0)), D12 ]
         N1bar = r_[ c_[invJ*R.N*C2, invJ*R.M], c_[zeros((n0, n1)), eye(n0)], c_[C2, zeros((m1, n0))] ]
         N2bar = r_[ invJ*R.N*D21, zeros((n0, p2)), D21 ]
