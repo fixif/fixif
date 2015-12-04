@@ -128,6 +128,10 @@ class MtlbHelper(object):
         def _reshape_1dto2d(var_dict): #could be replaced by atleast2d() ???
         
             for key in var_dict.keys():
+                
+#                print(key)
+#                print(type(var_dict[key]))
+                
                 if var_dict[key].shape == (1,):
                     var_dict[key] = var_dict[key].reshape(1,1)
                 
@@ -141,11 +145,20 @@ class MtlbHelper(object):
     
         self.pushCmdGetVar(mtlb_code, varz, tmp_dict)
     
-        #print("TMP_DICT")
-        #print(tmp_dict)
-        #print("LOCAL_VARZ_DICT")
-        #print(local_varz_dict)
-        
+#         for var in varz:
+
+#             print('+++++++++++++++')            
+#             print('+++++++++++++++')
+#             print(var)
+#             print('+++++++++++++++')            
+#             print('Matlab variable')
+#             print('+++++++++++++++')
+#             print(str(tmp_dict[var]))
+#             print('+++++++++++++++')
+#             print('Python variable')
+#             print('+++++++++++++++')
+#             print(str(local_varz_dict[var]))
+
         for var in varz:
         
             #print("Shape of tmp_dict[" + var + "]")
@@ -154,5 +167,18 @@ class MtlbHelper(object):
             #print(str(local_varz_dict[var].shape))
         
             print("Comparing " + var)
-        
-            npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
+            try:
+                npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
+            except AssertionError as e:
+                
+                print(e)
+                print('+++++++++++++++')
+                print(var)
+                print('+++++++++++++++')            
+                print('Matlab variable')
+                print('+++++++++++++++')
+                print(str(tmp_dict[var]))
+                print('+++++++++++++++')
+                print('Python variable')
+                print('+++++++++++++++')
+                print(str(local_varz_dict[var]))                
