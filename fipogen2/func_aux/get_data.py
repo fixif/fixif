@@ -21,35 +21,33 @@ import pickle
 
 from gen_data import gen_data
 
-def get_data(data_type, data_source, opt="", dir_data=None, is_refresh=False):
-    
-    def _gen_data_files(data_type, data_source, opt, file_basename, file_suffix):
+def gen_data_files(data_type, data_source, opt, file_basename, file_suffix):
         
-        # get list of objects
-        list_obj = gen_data(data_type, data_source, opt)
+    # get list of objects
+    list_obj = gen_data(data_type, data_source, opt)
         
-        i = 0
+    i = 0
         
-        # save obj to file
-        for obj in list_obj:
+    # save obj to file
+    for obj in list_obj:
             
-            with open(file_basename + str(i) + file_suffix, 'wb') as pfile:
-                pickle.dump(obj, pfile, protocol=0) # use human-readable format 
-                
-            i += 1
-                
-    
-    def _load_data_files(files_current):
+        with open(file_basename + str(i) + file_suffix, 'wb') as pfile:
+            pickle.dump(obj, pfile, protocol=0) # use human-readable format
+            
+        i += 1
         
-        list_obj = []
+def load_data_files(files_current):
         
-        for file in files_current:
-            with open(file, 'r') as pfile:
-                list_obj.append(pickle.load(pfile))
+    list_obj = []
         
-        return list_obj
+    for file in files_current:
+        with open(file, 'r') as pfile:
+            list_obj.append(pickle.load(pfile))
         
-    
+    return list_obj        
+
+def get_data(data_type, data_source, opt="", dir_data=None, is_refresh=False):
+
     list_obj = [] # dTF or dSS list
     dir_start = os.getcwd()
     
@@ -88,10 +86,10 @@ def get_data(data_type, data_source, opt="", dir_data=None, is_refresh=False):
         files_current = []
     
     if not files_current:
-        _gen_data_files(data_type, data_source, opt, file_basename, file_suffix)
+        gen_data_files(data_type, data_source, opt, file_basename, file_suffix)
         files_current = glob(file_basename + "*")
     
-    list_obj = _load_data_files(files_current)
+    list_obj = load_data_files(files_current)
     
     os.chdir(dir_start)
     

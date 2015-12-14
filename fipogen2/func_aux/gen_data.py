@@ -64,16 +64,19 @@ def gen_data(data_type, data_source, opt):
         
         # range / order of state_space
         random_n_order = range(1,20,1)
+        
+        n_io = 5 # needs to be the same for plant tests
+        
         #range of inputs
-        random_p_range = range(1,5,1)
+        random_p_range = range(1,n_io,1)
         #range of outputs
-        random_q_range = range(1,5,1)
+        random_q_range = range(1,n_io,1)
         
         for n in random_n_order:
             for p in random_p_range:
                 for q in random_q_range:
-                    
-                    list_obj.append(random_dSS(n, p, q)) # TODO add tracking to random_dSS or modify to get dSS(*chain(random_ABCD(n,p,q)), e_source=ev_subsource)
+
+                    list_obj.append(random_dSS(n, p, q)) # TODO add tracking to random_dSS or modify to get dSS(*chain(random_ABCD(n,p,q)), e_source=ev_subsource)            
         
         return list_obj, is_data_TF
         
@@ -91,7 +94,7 @@ def gen_data(data_type, data_source, opt):
         
         for obj in list_obj:
             A, B, C, D = tf2ss(obj.num.A1, ob.den.A1)
-            list_obj.append(dSS(A, B, C, D, e_source = ev_source, e_subsource=ev_subsource))
+            obj_list.append(dSS(A, B, C, D, e_source = ev_source, e_subsource=ev_subsource))
         
         list_obj = obj_list
         
