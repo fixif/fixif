@@ -17,13 +17,13 @@ from numpy import transpose
 from numpy.linalg import norm, inv, lstsq, eig
 #from scipy.linalg import schur
 
+from calc_plantSIF import calc_plantSIF
+
 __all__ = ['MsensH']
 
 def MsensH(R, plant=None):
     
     """
-    
-    
     If open-loop,
     
     plant=None
@@ -31,46 +31,7 @@ def MsensH(R, plant=None):
     If closed-loop,
     
     plant=ss (state space)
-    
-    
     """
-
-    # SISO opt disabled ATM
-
-#     def _w_norm_prod_SISO(Ag, Bg, Cg, Dg, Ah, Bh, Ch, Dh, W):
-#     
-#         # Product matrices
-#         A = r_[ c_[ Ag, mat(zeros(Ag.shape[0])), mat(zeros(Ah.shape[1])) ], c_[ Bh*Cg, Ah ] ]
-#         B = r_[ Bg, Bh*Dg ]
-#         C = r_[ Dh*Cg, Ch ]
-#         D = Dh*Dg
-#         
-#         # MATLAB code
-#         #Balance A matrix prior to performing Schur decomposition
-#         #[t,A] = balance(A);
-#         #B = t\B;
-#         #C = C*t;
-# 
-#         # Perform schur decomposition on AA (and convert to complex form)
-#         m, n = A.shape
-#         AA = lstsq(A + eye(M), A - eye(M))[0] # x,resid,rank,s
-#         
-#         ta, ua = schur(AA, 'complex')
-#         #ta, ua = schur(AA)
-#         #ta, ua = rsf2csf(ta, ua)
-#     
-#         # Stability test
-#         r = eig(A)
-#         if abs(r).max() >= 1:
-#             print("unstable system : 2-norm is infinite")
-#             
-#         # Computation of the norm
-#         MX = zeros(W.shape)
-#         
-#         for i in range(0, W.shape[0]):
-#             
-#             BB = (eye(m) - AA)*B[:,i].transpose()*(eye(m) - AA.transpose())/2
-            #P = 
     
     def _w_norm_prod(Ag,Bg,Cg,Dg, Ah,Bh,Ch,Dh, W):
 
@@ -105,68 +66,16 @@ def MsensH(R, plant=None):
         
         return N, MX
     
-    l0, m0, n0, p0 = R.size
-    
     # open-loop system
     if plant is None:
     
-        # 16/11/15 : eye does not need a tuple, zeros does...
-    
-        invJ = inv(R.J)
-    
-        M1 = c_[ R.K*invJ, eye(n0), zeros((n0, p0)) ]
-        M2 = c_[ R.L*invJ, zeros((p0, n0)), eye(p0) ]
-        N1 = r_[ invJ*R.M, eye(n0), zeros((m0, n0)) ]
-        N2 = r_[ invJ*R.N, zeros((n0, m0)), eye(m0) ]
-    
-        M, MZ = _w_norm_prod(R.AZ,M1,R.CZ,M2, R.AZ,R.BZ,N1,N2, R.dZ)
+        M, MZ = _w_norm_prod(R.AZ,R.M1,R.CZ,R.M2, R.AZ,R.BZ,R.N1,R.N2, R.dZ)
         
     else:
         
-        # dimensions of plant system
+        Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, plant)
         
-        n1, p1, q1 = plant.size
-        
-        m2 = q1 - m0 
-        p2 = p1 - p0
-        
-        if p2 < 0 or m2 <= 0:
-            raise(ValueError,"dimension error : check plant and realization dimension")
-        
-        
-        B1 = plant.B[:, :p2-1]
-        B2 = plant.B[:, p2:p0-1]
-        C1 = plant.C[:m2-1, :]
-        C2 = plant.C[m2:m0-1, :]        
-
-        D11 = plant.D[:p2-1, :m2-1]
-        D12 = plant.D[:p2-1, m2:m0]
-        D21 = plant.D[p2:p0-1, :m2-1]
-        D22 = plant.D[p2:p0-1, m2:m0-1]
-        
-        if not (all(D22 == zeros(D22.shape))):
-            raise(ValueError, "D22 needs to be null")
-        
-        # closed-loop related matrices
-        Abar = r_[ c_[plant.A + B2*R.DZ*C2, B2*R.CZ], c_[R.BZ*C2, R.AZ] ]
-        Bbar = r_[ B1 + B2*R.DZ*D21, R.BZ*D21 ]
-        Cbar = c_[ C1 + D12*R.DZ*C2, D12*R.CZ ]
-        Dbar = D11 + D12*R.DZ*D21
-        
-        # intermediate matrices
-        
-        invJ = inv(R.J)
-        
-        M1bar = r_[ c_[B2*R.L*invJ, zeros((n1, n0)), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
-        M2bar = c_[ D12*R.L*invJ, zeros((m2, n0)), D12 ]
-        N1bar = r_[ c_[invJ*R.N*C2, invJ*R.M], c_[zeros((n0, n1)), eye(n0)], c_[C2, zeros((m1, n0))] ]
-        N2bar = r_[ invJ*R.N*D21, zeros((n0, p2)), D21 ]
-        
-        # sensitivity matrix, and sensitivity measure
-        
-        M, MZ = _w_prod_norm(Abar,M1bar,Cbar,M2bar, Abar,Bbar,N1bar,N2bar, R.dZ)
+        M, MZ = _w_norm_prod(Abar,M1bar,Cbar,M2bar, Abar,Bbar,N1bar,N2bar, R.dZ)
         
     return M, MZ
-   
-   
-   
+      

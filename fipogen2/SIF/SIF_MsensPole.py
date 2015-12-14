@@ -15,6 +15,8 @@ from numpy import eye, c_, r_, zeros, multiply, all, real, conj, diag
 from numpy import transpose
 from numpy.linalg import norm, inv, eig
 
+from calc_plantSIF import calc_plantSIF
+
 __all__ = ['MsensPole']
 
 def MsensPole(R, plant=None, moduli=1):
@@ -52,19 +54,19 @@ def MsensPole(R, plant=None, moduli=1):
             
         return dlambda_dZ, dlk_dZ
     
-    l0, m0, n0, p0 = R.size
+    #l0, m0, n0, p0 = R.size
     
     # open-loop case
     if plant is None:
         
-        invJ = inv(R.J)
+        #invJ = inv(R.J)
     
-        M1 = c_[R.K*invJ, eye(n0), zeros((n0, p0))]
-        N1 = r_[invJ*R.M, eye(n0), zeros((m0, n0))]
+        #M1 = c_[R.K*invJ, eye(n0), zeros((n0, p0))]
+        #N1 = r_[invJ*R.M, eye(n0), zeros((m0, n0))]
     
         # measures
         # moduli is not sent in MsensPole
-        dlambda_dZ, dlk_dZ = deigdZ(R.AZ, M1, N1, R.Z.shape)
+        dlambda_dZ, dlk_dZ = deigdZ(R.AZ, R.M1, R.N1, R.Z.shape)
         
     #closed-loop case
     else:
@@ -72,37 +74,39 @@ def MsensPole(R, plant=None, moduli=1):
         # same code as closed-loop case MsensH
                 # dimensions of plant system
                 
-        l0, m0, n0, p0 = R.size
-        n1, p1, q1 = plant.size
+#         l0, m0, n0, p0 = R.size
+#         n1, p1, q1 = plant.size
+#         
+#         m2 = q1 - m0 
+#         p2 = p1 - p0
+#         
+#         if p2 < 0 or m2 <= 0:
+#             raise(ValueError,"dimension error : check plant and realization dimension")
+#         
+#         
+#         B1 = plant.B[:, :p2-1]
+#         B2 = plant.B[:, p2:p0-1]
+#         C1 = plant.C[:m2-1, :]
+#         C2 = plant.C[m2:m0-1, :]        
+# 
+#         D11 = plant.D[:p2-1, :m2-1]
+#         D12 = plant.D[:p2-1, m2:m0]
+#         D21 = plant.D[p2:p0-1, :m2-1]
+#         D22 = plant.D[p2:p0-1, m2:m0-1]
+#         
+#         if not (all(D22 == zeros(D22.shape))):
+#             raise(ValueError, "D22 needs to be null")
+#         
+#         # closed-loop related matrices
+#         Abar = r_[ c_[plant.A + B2*R.DZ*C2, B2*R.CZ], c_[R.BZ*C2, R.AZ] ]
+#     
+#         # intermediate matrices
+#         invJ = inv(R.J)
+#         
+#         M1bar = r_[ c_[B2*R.L*invJ, zeros((n1, n0)), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
+#         N1bar = r_[ c_[invJ*R.N*C2, invJ*R.M], c_[zeros((n0, n1)), eye(n0)], c_[C2, zeros((m1, n0))] ]
         
-        m2 = q1 - m0 
-        p2 = p1 - p0
-        
-        if p2 < 0 or m2 <= 0:
-            raise(ValueError,"dimension error : check plant and realization dimension")
-        
-        
-        B1 = plant.B[:, :p2-1]
-        B2 = plant.B[:, p2:p0-1]
-        C1 = plant.C[:m2-1, :]
-        C2 = plant.C[m2:m0-1, :]        
-
-        D11 = plant.D[:p2-1, :m2-1]
-        D12 = plant.D[:p2-1, m2:m0]
-        D21 = plant.D[p2:p0-1, :m2-1]
-        D22 = plant.D[p2:p0-1, m2:m0-1]
-        
-        if not (all(D22 == zeros(D22.shape))):
-            raise(ValueError, "D22 needs to be null")
-        
-        # closed-loop related matrices
-        Abar = r_[ c_[plant.A + B2*R.DZ*C2, B2*R.CZ], c_[R.BZ*C2, R.AZ] ]
-    
-        # intermediate matrices
-        invJ = inv(R.J)
-        
-        M1bar = r_[ c_[B2*R.L*invJ, zeros((n1, n0)), B2], c_[R.K*invJ, eye(n0), zeros((n0, p1))] ]
-        N1bar = r_[ c_[invJ*R.N*C2, invJ*R.M], c_[zeros((n0, n1)), eye(n0)], c_[C2, zeros((m1, n0))] ]
+        Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, plant)
         
         # dlambdabar,dlbk in _cl code
         dlambda_dZ, dlk_dZ = deigdZ(Abar, M1bar, N1bar, R.Z.shape, moduli)

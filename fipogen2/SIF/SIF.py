@@ -22,6 +22,9 @@ from func_aux import _dynMethodAdder
 
 import numpy as np
 
+from numpy import c_, r_, eye, zeros
+from numpy.linalg import inv
+
 class SIF(FIPObject):
     
     """
@@ -159,12 +162,10 @@ class SIF(FIPObject):
     # AZ, BZ, CZ, DZ
     def _build_AZtoDZ(self):
         
-        inv_J = np.linalg.inv(self.J)
-        
-        AZ = self.K * inv_J * self.M + self.P
-        BZ = self.K * inv_J * self.N + self.Q
-        CZ = self.L * inv_J * self.M + self.R
-        DZ = self.L * inv_J * self.N + self.S
+        AZ = self.K * self._invJ * self.M + self.P
+        BZ = self.K * self._invJ * self.N + self.Q
+        CZ = self.L * self._invJ * self.M + self.R
+        DZ = self.L * self._invJ * self.N + self.S
         
         temp_dSS = dSS(AZ,BZ,CZ,DZ)
         
@@ -172,6 +173,15 @@ class SIF(FIPObject):
         Wc = temp_dSS.Wc
         
         return (AZ, BZ, CZ, DZ, Wo, Wc)
+    
+    def _build_M1M2N1N2(self):
+        
+        M1 = c_[self.K*self._invJ, eye(self._n), zeros((self._n, self._p))]
+        M2 = c_[self.L*self._invJ, zeros((self._p, self._n)), eye(self._p)]
+        N1 = r_[self._invJ*self.M, eye(self._n), zeros((self._m, self._n))]
+        N2 = r_[self._invJ*self.N, zeros((self._n, self._m)), eye(self._m)]
+        
+        return (M1, M2, N1, N2)
     
     def __init__(self, JtoS, eps=1.e-8, father_obj=None, **event_spec): # name can be specified in e_desc
 
@@ -199,13 +209,19 @@ class SIF(FIPObject):
 
         # dZ from Z
         self._dZ = SIF._build_dZ(self, eps)
+        
+        self._invJ = inv(JtoS[0])
 
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()  
 
-        
+        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
 
     # Only matrix Z is kept in memory
     # JtoS extracted from Z matrix, dJtodS from dZ resp.
+
+    @property
+    def invJ(self):
+    	return self._invJ
 
     # AZ to DZ getters
     
@@ -224,15 +240,35 @@ class SIF(FIPObject):
     @property    
     def DZ(self):
         return self._DZ
-    
+
+    # Wo and Wc are from AZ to DZ state space
+
     @property
     def Wo(self):
-    	return self._Wo
+        return self._Wo
     
     @property
     def Wc(self):
-    	return self._Wc
+        return self._Wc
 
+    # M1 to N2 are used in sensitivity calculations
+
+    @property
+    def M1(self):
+        return self._M1
+    
+    @property
+    def M2(self):
+        return self._M2
+        
+    @property
+    def N1(self):
+        return self._N1
+    
+    @property
+    def N2(self):
+        return self._N2
+    
     # Z, dZ getters
 
     _l, _m, _n, _p = (0, 0, 0, 0)
@@ -240,6 +276,7 @@ class SIF(FIPObject):
     @property
     def Z(self):
         return self._Z
+       
     @property
     def dZ(self):
         return self._dZ
@@ -249,6 +286,11 @@ class SIF(FIPObject):
     @Z.setter
     def Z(self, mymat):
         self._Z = mymat
+        self._dZ = _build_dZ(self, eps)
+        self._invJ = inv(self.J)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
+        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
+        
     @dZ.setter
     def dZ(self, mymat):
         self._dZ = mymat
@@ -319,27 +361,33 @@ class SIF(FIPObject):
     def J(self, mymat, eps=1.e-8):
         self._Z[ 0 : self._l, 0 : self._l ] = mymat
         self._dZ = _build_dZ(self, eps)
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
+        self._invJ = inv(mymat)
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
+        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @K.setter
     def K(self, mymat, eps=1.e-8):
         self._Z[ self._l : self._l+self._n, 0 : self._l ] = mymat
         self._dZ = _build_dZ(self, eps)
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
+        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @L.setter
     def L(self, mymat, eps=1.e-8):
         self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
         self._dZ = _build_dZ(self, eps)
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
+        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @M.setter
     def M(self, mymat, eps=1.e-8):
         self._Z[ 0 : self._l, self._l : self._l + self._n ] = mymat
         self._dZ = _build_dZ(self, eps)
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
+        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @N.setter
     def N(self, mymat, eps=1.e-8):
         self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._m] = mymat
         self._dZ = _build_dZ(self, eps)
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
+        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @P.setter
     def P(self, mymat, eps=1.e-8):
         self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
@@ -510,4 +558,3 @@ class SIF(FIPObject):
 # Add additional methods SIF_othermoethods.py 
 # from modules in current folder
 _dynMethodAdder(SIF)
-
