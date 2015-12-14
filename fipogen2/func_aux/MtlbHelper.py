@@ -1,3 +1,5 @@
+#coding=utf8
+
 import numpy.testing as npt
 
 from scipy.io import loadmat, savemat
@@ -125,6 +127,8 @@ class MtlbHelper(object):
         Compare value stored in local_varz_dict with matlab values for a given executed code (mtlb_code)
         """
     
+        is_debug = False
+    
         def _reshape_1dto2d(var_dict): #could be replaced by atleast2d() ???
         
             for key in var_dict.keys():
@@ -171,14 +175,15 @@ class MtlbHelper(object):
                 npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
             except AssertionError as e:
                 
-                print(e)
-                print('+++++++++++++++')
-                print(var)
-                print('+++++++++++++++')            
-                print('Matlab variable')
-                print('+++++++++++++++')
-                print(str(tmp_dict[var]))
-                print('+++++++++++++++')
-                print('Python variable')
-                print('+++++++++++++++')
-                print(str(local_varz_dict[var]))                
+                if is_debug:
+                    print(e)
+                    print('+++++++++++++++')
+                    print(var)
+                    print('+++++++++++++++')            
+                    print('Matlab variable')
+                    print('+++++++++++++++')
+                    print(str(tmp_dict[var]))
+                    print('+++++++++++++++')
+                    print('Python variable')
+                    print('+++++++++++++++')
+                    print(str(local_varz_dict[var]))                
