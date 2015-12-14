@@ -32,9 +32,18 @@ else
         for j=1:size(W,2)
             if (W(i,j)~=0)
                 MX(i,j) = norm(  Sg(:,i)*Sh(j,:) );
+
             end
         end
     end
+%     disp('=============')
+%     kk = Sg(:,1)*Sh(1,:)
+%     Sh(1,:).b
+%     Sg(:,1).c
+%     Sh(1,:).b*Sg(:,1).c
+%     
+%     disp('=============')
+%     kk = Sg(:,2)*Sh(2,:)
     
     MX= MX.*W;
     

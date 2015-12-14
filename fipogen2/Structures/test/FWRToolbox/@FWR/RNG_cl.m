@@ -29,7 +29,7 @@ p = size(Sysp.B,2);
 l=R.l; m2=R.m; n=R.n; p2=R.p;
 m1=m-m2;
 p1=p-p2;
-if ( (p1<0) | (m1<=0) )
+if ( (p1<=0) | (m1<=0) )
     error('dimension error - check plant and realization dimension');
 end
 
@@ -39,10 +39,19 @@ B1 = Sysp.B(:,1:p1);
 B2 = Sysp.B(:,p1+1:p);
 C1 = Sysp.C(1:m1,:);
 C2 = Sysp.C(m1+1:m,:);
-D11 = Sysp.D(1:p1,1:m1);
-D12 = Sysp.D(1:p1,m1+1:m);
-D21 = Sysp.D(p1+1:p,1:m1);
-D22 = Sysp.D(p1+1:p,m1+1:m);
+
+%D11 = Sysp.D(1:p1,1:m1);
+%D12 = Sysp.D(1:p1,m1+1:m);
+%D21 = Sysp.D(p1+1:p,1:m1);
+%D22 = Sysp.D(p1+1:p,m1+1:m);
+
+% JOA bug correction
+D11 = Sysp.D(1:m1, 1:p1);
+D12 = Sysp.D(1:m1, p1+1:p);
+D21 = Sysp.D(m1+1:m, 1:p1);
+D22 = Sysp.D(m1+1:m, p1+1:p);
+
+
 if (D22~=zeros(size(D22)))
     error('D22 needs to be null')
 end
@@ -114,7 +123,7 @@ W(i)=0;
 %See also: <@FWR/RNG>, <@FWS/RNG_cl>
 
 %References:
-%	\cite{Hila08b} T. Hilaire, P. Chevrel, and J. Whidborne. Finite wordlength controller realizations using the specialized implicit form. Technical Report RR-6759, INRIA, 2008.
+%	\cite{Hila08b} T.ï¿½Hilaire, P.ï¿½Chevrel, and J.ï¿½Whidborne. Finite wordlength controller realizations using the specialized implicit form. Technical Report RR-6759, INRIA, 2008.
 
 
 

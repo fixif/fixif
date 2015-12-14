@@ -514,14 +514,10 @@ class dSS(FIPObject):
 #         elif (not(q1 == p2)):
 #             raise(ValueError, "second state space number of inputs should be equal to first state space number of outputs")
         
-        
-        
-        amul = r_[c_[ other.A, other.B*self.C ], c_[ zeros((n1, n1)), self.A ]]
-        bmul = r_[ other.B*self.D, self.B ]
-        cmul = c_[ other.C, other.D*self.C ]
-        #cmul = r_[c_[other.C, other.D*self.C],c_[zeros((q1,n1)), self.C]]
-        dmul = other.D*self.D
-        #dmul = r_[other.D*self.D, self.D]
+        amul = r_[c_[ self.A, self.B*other.C ], c_[ zeros((n2, n1)), other.A ]]
+        bmul = r_[ self.B*other.D, other.B ]
+        cmul = c_[ self.C, self.D*other.C ]
+        dmul = self.D*other.D
         
         return dSS(amul, bmul, cmul, dmul)
         

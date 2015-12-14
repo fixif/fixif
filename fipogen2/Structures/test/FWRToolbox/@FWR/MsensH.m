@@ -26,7 +26,6 @@ Te = 1;
 % sensitivity matrix and sensitivity measure
 [M, MZ] = w_prod_norm( R.AZ,M1,R.CZ,M2, R.AZ,R.BZ,N1,N2, R.rZ );
 
-
 %Description:
 % 	The open-loop transfer function sensitivity measure is defined by
 % 	\begin{equation}
@@ -103,13 +102,13 @@ Te = 1;
 
 %See also: <@FWR/MsensH_cl>, <@FWR/w_prod_norm>
 %References:
-%	\cite{Hila07d}	T. Hilaire and P. Chevrel. On the compact
+%	\cite{Hila07d}	T.ï¿½Hilaire and P.ï¿½Chevrel. On the compact
 %	formulation of thederivation of a transfer matrix with respect to
 %	another matrix. Technical Report RR-6760, INRIA, 2008.\\
-%	\cite{Hila06a} T. Hilaire, P. Chevrel, and J.-P. Clauzel. Low
+%	\cite{Hila06a} T.ï¿½Hilaire, P.ï¿½Chevrel, and J.-P. Clauzel. Low
 %	parametric sensitivity realization design for FWL implementation
 %	of MIMO controllers : Theory and application to the active control of vehicle longitudinal oscillations. In Proc. of Control Applications of Optimisation CAO'O6, April 2006.\\
-%	\cite{Hila07b} T. Hilaire, P. Chevrel, and J. Whidborne. A
+%	\cite{Hila07b} T.ï¿½Hilaire, P.ï¿½Chevrel, and J.ï¿½Whidborne. A
 %	unifying framework for finite wordlength realizations. IEEE Trans.
 %	on Circuits and Systems, 8(54), August 2007.\\
 

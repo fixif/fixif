@@ -21,10 +21,11 @@ if nargin==1
     tol=1e-8;
 end
 
-M1 = [ R.K*inv(R.J) eye(R.n) zeros(R.n,R.m) ];
+M1 = [ R.K*inv(R.J) eye(R.n) zeros(R.n,R.p) ];
 M2 = [ R.L*inv(R.J) zeros(R.p,R.n) eye(R.p) ];
 
 W01Z = computeWeight(R.Z,tol);
+
 dZ = diag( W01Z*ones(R.l+R.n+R.m,1) );
 
 G = trace( dZ * ( M2'*M2 + M1'*R.Wo*M1 ) );
@@ -41,7 +42,7 @@ W(i)=0;
 
 ind = find( abs(W)>tol );
 k = size( ind,1 );
-for j=1:k;
+for j=1:k
 	if ( rem(abs(log2(X(ind(j)))),1)<tol )
 		W(ind(j))=0;
 	end
@@ -82,4 +83,4 @@ end
 %See also: <@FWR/RNG_cl>, <@FWS/RNG>
 
 %References:
-%	\cite{Hila07c} T. Hilaire, D. Ménard, and O. Sentieys. Roundoff noise analysis of finite wordlength realizations with the implicit state-space framework. In 15th European Signal Processing Conference (EUSIPOC'07), September 2007.
+%	\cite{Hila07c} T.ï¿½Hilaire, D.ï¿½Mï¿½nard, and O.ï¿½Sentieys. Roundoff noise analysis of finite wordlength realizations with the implicit state-space framework. In 15th European Signal Processing Conference (EUSIPOC'07), September 2007.

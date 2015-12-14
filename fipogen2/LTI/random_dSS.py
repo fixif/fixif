@@ -37,13 +37,16 @@ def random_dSS(n=None, p=1, q=1):
         n = random.randint(5, 10)
 
     # Probability of repeating a previous root.
-    pRepeat = 0.05
+    #pRepeat = 0.05
+    pRepeat = 0.01
     # Probability of choosing a real root.  Note that when choosing a complex
     # root, the conjugate gets chosen as well.  So the expected proportion of
     # real roots is pReal / (pReal + 2 * (1 - pReal)).
-    pReal = 0.6
+    #pReal = 0.6
+    pReal = 0.5
     # Probability that an element in B or C will not be masked out.
-    pBCmask = 0.8
+    #pBCmask = 0.8
+    pBCmask = 0.01
     # Probability that an element in D will not be masked out.
     pDmask = 0.3
     # Probability that D = 0.
@@ -52,7 +55,7 @@ def random_dSS(n=None, p=1, q=1):
     # Check for valid input arguments.
     
     if n < 1 or n % 1:
-            raise ValueError(("states must be a positive integer.  #states = %g." % n))
+        raise ValueError(("states must be a positive integer.  #states = %g." % n))
     if p < 1 or p % 1:
         raise ValueError(("inputs must be a positive integer.  #inputs = %g." % p))
     if q < 1 or q % 1:

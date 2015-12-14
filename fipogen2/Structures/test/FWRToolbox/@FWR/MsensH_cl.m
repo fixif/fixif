@@ -24,9 +24,17 @@ p = size(Sysp.B,2);
 l=R.l; m2=R.m; n=R.n; p2=R.p;
 m1=m-m2;
 p1=p-p2;
-if ( (p1<0) | (m1<=0) )
+if ( (p1<=0) | (m1<=0) )
     error('dimension error - check plant and realization dimension');
 end
+
+% sizes
+% n1 = size(Sysp.A, 1)
+% p1 = size(Sysp.B, 2)
+% q1 = size(Sysp.C, 1)
+% l0 = R.l ; m0 = R.m ; n0 = R.n ; p0 = R.p
+% m2 = q1 - m0
+% p2 = p1 - p0
 
 
 % plant matrices
@@ -34,13 +42,49 @@ B1 = Sysp.B(:,1:p1);
 B2 = Sysp.B(:,p1+1:p);
 C1 = Sysp.C(1:m1,:);
 C2 = Sysp.C(m1+1:m,:);
-D11 = Sysp.D(1:p1,1:m1);
-D12 = Sysp.D(1:p1,m1+1:m);
-D21 = Sysp.D(p1+1:p,1:m1);
-D22 = Sysp.D(p1+1:p,m1+1:m);
+
+%D11 = Sysp.D(1:p1,1:m1);
+%D12 = Sysp.D(1:p1,m1+1:m);
+%D21 = Sysp.D(p1+1:p,1:m1);
+%D22 = Sysp.D(p1+1:p,m1+1:m);
+
+% JOA bug correction
+D11 = Sysp.D(1:m1, 1:p1);
+D12 = Sysp.D(1:m1, p1+1:p);
+D21 = Sysp.D(m1+1:m, 1:p1);
+D22 = Sysp.D(m1+1:m, p1+1:p);
+
 if (D22~=zeros(size(D22)))
     error('D22 needs to be null')
 end
+
+%disp('B1')
+%disp(size(B1))
+%disp('B2')
+%disp(size(B2))
+%disp('C1')
+%disp(size(C1))
+%disp('C2')
+%disp(size(C2))
+
+%disp('D11')
+%disp(size(D11))
+%disp('D12')
+%disp(size(D12))
+%disp('D21')
+%disp(size(D21))
+
+%disp('R.AZ')
+%disp(size(R.AZ))
+
+%disp('R.BZ')
+%disp(size(R.BZ))
+
+%disp('R.CZ')
+%disp(size(R.CZ))
+
+%disp('R.DZ')
+%disp(size(R.DZ))
 
 % closedloop related matrices
 Abar = [ Sysp.A + B2*R.DZ*C2 B2*R.CZ;
@@ -57,7 +101,6 @@ N1bar = [ inv(R.J)*R.N*C2 inv(R.J)*R.M;
           zeros(n,np) eye(n);
           C2 zeros(m2,n) ];
 N2bar = [ inv(R.J)*R.N*D21; zeros(R.n,p1); D21 ];
-
 
 % sensitivity matrix and sensitivity measure
 [M, MZ] = w_prod_norm( Abar,M1bar,Cbar,M2bar, Abar,Bbar,N1bar,N2bar, R.rZ );
@@ -111,13 +154,13 @@ N2bar = [ inv(R.J)*R.N*D21; zeros(R.n,p1); D21 ];
 
 %See also: <@FWR/MsensH>, <@FWR/w_prod_norm>
 %References:
-%	\cite{Hila07d}	T. Hilaire and P. Chevrel. On the compact
+%	\cite{Hila07d}	T.ï¿½Hilaire and P.ï¿½Chevrel. On the compact
 %	formulation of the derivation of a transfer matrix with respect to
 %	another matrix. Technical Report RR-6760, INRIA, 2008.\\
-%	\cite{Hila07e}	T. Hilaire, P. Chevrel, and J. Whidborne. Low
+%	\cite{Hila07e}	T.ï¿½Hilaire, P.ï¿½Chevrel, and J.ï¿½Whidborne. Low
 %	parametric closed-loop sensitivity realizations using fixed-point
 %	and floating-point arithmetic. In Proc. European Control Conference (ECC'07), July 2007.\\
-%	\cite{Hila08b}	T. Hilaire, P. Chevrel, and J. Whidborne. Finite
+%	\cite{Hila08b}	T.ï¿½Hilaire, P.ï¿½Chevrel, and J.ï¿½Whidborne. Finite
 %	wordlength controller realizations using the specialized implicit
 %	form. Technical Report RR-6759, INRIA, 2008.\\
 
