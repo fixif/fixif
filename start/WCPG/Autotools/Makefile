@@ -62,10 +62,10 @@ am__make_running_with_option = \
   test $$has_opt = yes
 am__make_dryrun = (target_option=n; $(am__make_running_with_option))
 am__make_keepgoing = (target_option=k; $(am__make_running_with_option))
-pkgdatadir = $(datadir)/wcpg_api
-pkgincludedir = $(includedir)/wcpg_api
-pkglibdir = $(libdir)/wcpg_api
-pkglibexecdir = $(libexecdir)/wcpg_api
+pkgdatadir = $(datadir)/wcpg
+pkgincludedir = $(includedir)/wcpg
+pkglibdir = $(libdir)/wcpg
+pkglibexecdir = $(libexecdir)/wcpg
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
@@ -289,11 +289,11 @@ OBJDUMP = objdump
 OBJEXT = o
 OTOOL = 
 OTOOL64 = 
-PACKAGE = wcpg_api
-PACKAGE_BUGREPORT = email@address.com
-PACKAGE_NAME = WCPG_API
-PACKAGE_STRING = WCPG_API 0.9
-PACKAGE_TARNAME = wcpg_api
+PACKAGE = wcpg
+PACKAGE_BUGREPORT = anastasia.volkova@lip6.fr
+PACKAGE_NAME = WCPG
+PACKAGE_STRING = WCPG 0.9
+PACKAGE_TARNAME = wcpg
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.9
 PATH_SEPARATOR = :

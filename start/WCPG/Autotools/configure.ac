@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([WCPG_API], [0.9], [email@address.com])
+AC_INIT([WCPG], [0.9], [anastasia.volkova@lip6.fr])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4])
@@ -241,12 +241,12 @@ FLAG2="no"
 AC_CHECK_LIB([lapacke],[LAPACKE_zgetri],[FLAG1="yes"], AC_MSG_WARN([Missing lapacke but maybe lapack is installed]))
 AC_CHECK_LIB([lapack],[zgetri_],[FLAG2="yes" LAPACK_LIBS="-llapack"], AC_MSG_WARN([Missing lapack]))
 
-if test "x${FLAG1}" == "xyes"
-then
-    LAPACK_LIBS="-llapacke"
-elif test "x${FLAG2}" == "xyes"
+if test "x${FLAG2}" == "xyes"
 then
     LAPACK_LIBS="-llapack"
+elif test "x${FLAG1}" == "xyes"
+then
+    LAPACK_LIBS="$(LAPACK_LIBS) -llapacke"
 else
     AC_MSG_ERROR([Missing clapack/lapacke, function zgetri_/LAPACKE_zgetri not found])
 fi

@@ -122,16 +122,16 @@
 #define LT_OBJDIR ".libs/"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "email@address.com"
+#define PACKAGE_BUGREPORT "anastasia.volkova@lip6.fr"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "WCPG_API"
+#define PACKAGE_NAME "WCPG"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "WCPG_API 0.9"
+#define PACKAGE_STRING "WCPG 0.9"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "wcpg_api"
+#define PACKAGE_TARNAME "wcpg"
 
 /* Define to the home page for this package. */
 #define PACKAGE_URL ""
