@@ -30,7 +30,7 @@ from func_aux.MtlbHelper import MtlbHelper
 from scipy import signal
 
 from numpy import zeros
-import matlab
+import matlab # needed to catch matlab-specific exceptions
 
 class test_SIF(unittest.TestCase):
     
@@ -46,15 +46,6 @@ class test_SIF(unittest.TestCase):
         """
         
         self.engMtlb = MtlbHelper()
-        
-        # add matlab script dir
-        
-        abs_fwr_dir = os.path.join(os.getcwd(),"Structures","test","FWRToolbox","")
-        #print('==================================================')
-        #print('Adding the following path to matlab engine : ')
-        #print(abs_fwr_dir)
-        #print('==================================================')
-        self.engMtlb.eng.addpath(abs_fwr_dir, nargout=0)
         
         self.ndigit = 10
         self.eps = 1.e-8    
@@ -143,8 +134,15 @@ class test_SIF(unittest.TestCase):
                 dict_ABCD['Dp'] = dSSobj_plant.D
             
             return dict_ABCD
-                
+        
+        n_obj = len(self.list_dSS)
+        
+        i_obj = 1
+            
         for dSSobj in self.list_dSS:
+            
+            print ("obj {0: >3d} / {1}".format(i_obj, n_obj))
+            i_obj += 1
             
             fipVarz = {}
             dict_ABCD = {}
@@ -240,7 +238,10 @@ class test_SIF(unittest.TestCase):
                 tmp_var = SIFobj.RNG(dSSobj_plant)
                 fipVarz[varz[13]] = tmp_var[0]
                 fipVarz[varz[14]] = tmp_var[1]
-                fipVarz[varz[15]] = tmp_var[2]            
+                fipVarz[varz[15]] = tmp_var[2]
+                
+            else:
+            	print('No suitable plant found, skipping tests involving plant')        
          
             self.engMtlb.compare(mtlb_cmd, varz, fipVarz, decim = self.ndigit)
         
