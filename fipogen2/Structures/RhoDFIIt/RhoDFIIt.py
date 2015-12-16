@@ -4,7 +4,8 @@
 
 from SIF import SIF
 from LTI import TF, dSS
-from numpy import zeros, all, poly, matrix, sqrt, prod, transpose, diag, r_, c_
+from numpy import zeros, all, poly, matrix, sqrt, prod, transpose, diagflat, r_, c_
+from numpy import matrix as mat
 from numpy.linalg import cond, inv
 
 class RhoDFIIt(SIF):
@@ -13,7 +14,9 @@ class RhoDFIIt(SIF):
     def F2(x):
         return log2(x)-floor(log2(x))
 
-    def __init__(self, num, den, gamma, isGammaExact = None, delta = None, isDeltaExact = None, father_obj = None, **event_spec):
+    def __init__(self, num, den, gamma, isGammaExact = True, delta = None, isDeltaExact = False, father_obj = None, cond_limit=1.e20, **event_spec):
+        
+        
         
         #create default event if no event given
         my_e_type      = event_spec.get('e_type', 'create')
@@ -26,32 +29,21 @@ class RhoDFIIt(SIF):
         RhoDFIIt_event = {'e_type':my_e_type, 'e_subtype':my_e_subtype, 'e_source':my_e_source, 'e_subsource':my_e_subsource, 'e_desc':my_e_desc, 'e_subclass':my_e_subclass}
 
         RhoDFIIt_father_obj = father_obj
-        
-        if not isGammaExact:
-            isGammaExact = True   
           
         # warning if we don't use matrixes transpose is not going to work correctly 
                 
         if not delta:
-            delta = matrix(zeros(gamma.shape))
-            
-        if not isDeltaExact:
-            isDeltaExact = False
+            self._delta = mat(zeros(gamma.shape))
+        else:
+            self._delta = delta
         
         self._num = num
         self._den = den
+
+        self._gamma = mat(gamma)
         
-        self._delta = delta
-        self._gamma = matrix(gamma)
-        
-    def toSIF(self, cond_limit = 1.e20):
-        
-        """
-        Warning : 2 matrixes as output
-        """
-        
-        Va = transpose(matrix(self._den))/self._den[0]
-        Vb = transpose(matrix(self._num))/self._den[0]
+        Va = transpose(mat(self._den))/self._den[0]
+        Vb = transpose(mat(self._num))/self._den[0]
         
         # Compare #column (#lines is 1 ?)
         p1 = Va.shape[1] - 1
@@ -59,8 +51,8 @@ class RhoDFIIt(SIF):
         p3 = self._gamma.shape[1]
         p4 = self._delta.shape[1]
 
-        if not (np.all(np.matrix([p1, p2, p3]) == p4)):
-            raise("Dimensions not coherent")
+        if not (all(mat([p1, p2, p3]) == p4)):
+            raise(ValueError, "Dimensions not coherent")
         
         p = p1
         
@@ -72,11 +64,11 @@ class RhoDFIIt(SIF):
         
         # Build Tbar
         
-        Tbar = zeros((p+1,p+1))
+        Tbar = mat(zeros((p+1,p+1)))
         Tbar[p,p] = 1
         
         for i in range(p-1,-1,-1):
-            Tbar[i,range(i,p)] = poly(self._gamma[1, range(i,p+1)])# if we use matlab-like syntax, namely i:p+1 there's no check on matrix boundary (if p+1 exceeds boundary we got a result)
+            Tbar[i, i:p] = poly(self._gamma[0, i:p])# if we use matlab-like syntax, namely i:p+1 there's no check on matrix boundary (if p+1 exceeds boundary we got a result)
         
         #check for ill-conditioned matrix (relaxed check)
         
@@ -86,22 +78,23 @@ class RhoDFIIt(SIF):
             raise('Cannot compute matrix inverse') 
         
         #Valpha_bar, Vbeta_bar
-        Valpha_bar = dot(transpose(inv(Tbar)), Va)
-        Vbeta_bar  = dot(transpose(inv(Tbar)), Vb)
+        
+        Valpha_bar = transpose(inv(Tbar))* Va
+        Vbeta_bar  = transpose(inv(Tbar))* Vb
         
         # Equivalent state space (Abar, Bbar, Cbar, Dbar)
         
-        A_0 = diag(matrix(ones((p-1,1))),1)
-        A_0[0:,0] = - Valpha_bar[1:]
+        A0 = diagflat(mat(ones((p-1,1))),1)
+        A0[0:,0] = - Valpha_bar[1:]
         
-        Abar = diag(self._gamma) + A_0
+        Abar = diagflat(self._gamma) + A0
         
-        Bbar = Vbeta_bar[1:] - Vbeta_bar[0]*Valpha_bar[1:]
+        Bbar = Vbeta_bar[1:] - Vbeta_bar[0,0]*Valpha_bar[0, 1:]
         
-        Cbar = matrix(zeros((1,p)))
+        Cbar = mat(zeros((1,p)))
         Cbar[0,0] = 1
         
-        Dbar = Vbeta_bar[0]
+        Dbar = Vbeta_bar[0,0]
         
         # ============================
         # Step 2 : L2-scaling
@@ -110,79 +103,84 @@ class RhoDFIIt(SIF):
         # compute delta (leading to a l2-scaled realization) 
         # when delta is not given (or null)
         
-        Sbar = dSS(Abar, Bbar, Cbar, Dbar)
-        Wc = Sbar.Wc
+        Wc = dSS(Abar, Bbar, Cbar, Dbar).Wc
         
-        if (self._delta == matrix(zeros(gamma.shape))):
+        if (self._delta == mat(zeros(self._gamma.shape))):
             
-            self._delta[0] = sqrt(Wc[0,0])
+            self._delta[0,0] = sqrt(Wc[0,0])
             
-            for i in range(1,p+1):
-                self._delta[i] = sqrt( Wc[i,i] / Wc[i-1,i-1] )* 2^(F2(sqrt(Wc[i-1,i-1])) - F2(sqrt(Wc[i,i])) )
+            for i in range(1,p):
+                self._delta[0,i] = sqrt( Wc[i,i] / Wc[i-1,i-1] )
+        
+        elif delta[0,0] < 0:
+            
+            self._delta[0,0] = sqrt(Wc[0,0]) * 2^-F2(sqrt(Wc[0,0]))
+            
+            for i in range(1,p):
+                self._delta[0,i] = sqrt(Wc[i,i] / Wc[i-1, i-1]) * 2^(F2(sqrt(Wc[i-1,i-1])) - F2(sqrt(Wc[i,i])) )
                 
         # compute Valpha and Vbeta
+        # compute Tbar
         
-        Tbar = matrix(zeros((p+1,p+1)))
+        # Tbar
+        # Valpha used in A0 calculation
+        #Vbeta used in second variant
+        
+        Tbar = mat(zeros((p+1,p+1)))
         
         Tbar[p,p] = 1
         
         for i in range(p-1,-1,-1):
-            Tbar[i, range(i,p+2)] = poly( self._gamma[range(i,p+1)] / prod(self._delta[range(i,p+1)]))
+            Tbar[i, i:p+1] = poly( self._gamma[0, i:p] / prod(self._delta[0, i:p]))
             
-        Ka = matrix(prod(self._delta[:,:]))
+        Ka = mat(prod(self._delta[0,:]))
         
-        Valpha = dot(transpose(inv(dot(Ka, Tbar))), Va)
-        Vbeta  = dot(transpose(inv(dot(Ka, Tbar))), Vb)
+        Valpha = transpose(inv(Ka * Tbar))*Va
+        Vbeta  = transpose(inv(Ka * Tbar))*Vb
         
         # equivalent l2-scaled state space
         
-        d = matrix(zeros((p,1)))
+        d = mat(zeros((1,p)))
         
         for i in range(0, p):
-            d[i] = inv(prod(self._delta(range(0, i))))
+            d[0,i] = inv( prod(self._delta[0, 0:i]) )
 
-        Tsc = diag(d)
+		# ============================
+		# Step 3 : build SIF from state space or JtoS
+		# ============================
+
+        if opt == '1':
+
+            Tsc = mat(diagflat(d))
         
-        A = dot(dot(Tsc, Abar),inv(Tsc))
-        B = dot(Tsc, Bbar)
-        C = dot(Cbar, inv(Tsc))
-        D = Dbar  # can also be computed from Valpha and Vbeta
+            invTsc = inv(Tsc)
         
-        S = State_Space(A,B,C,D) # TODO add special event / PROBLEM HERE REGARDING OOP
+            A = Tsc*Abar*invTsc
+            B = Tsc*Bbar
+            C = Cbar*invTsc
+            D = Dbar  # can also be computed from Valpha and Vbeta
+
+            State_Space.__init__(A, B, C, D)
         
-        A0 = diag(ones((p-1,1)),1)
+            A0 = diagflat(ones((p-1,1)),1) # NOT USED ???
         
-        A0[:,0] = -Valpha[1:]
+            A0[:,0] = -Valpha[0, 1:] # NOT USED ???
         
-        # ============================
-        # Step 3 : build SIF
-        # ============================
-               
-        R2 = S.toSIF()
+            if isGammaExact:
+                for i in range(1,p):
+                    self.dP[i, i] = 0 # loss of efficiency because dZ is rebuilt each time
         
-        if isGammaExact:
-            
-            for i in range(1,p):
-                R2._dP[i, i] = 0 # should rebuild dZ after that
+            if isDeltaExact:
+                for i in range(1,p):
+                    self.dP[i-1, i] = 0
+
+        elif opt == '2':
+
+            K = diagflat(ones((1, p-1)), 1)
         
-        if isDeltaExact:
-            
-            for i in range(1,p):
-                R2._dP[i-1, i] = 0
+            K[:,1] = -Valpha[0, 1:p+1] # maybe transpose is needed here ?
+
+            JtoS = eye(p), K, c_[1, zeros((1,p-1))], diagflat(delta), r_[Vbeta[0, 1], zeros((p-1, 1))], diagflat(gamma), Vbeta[0, 1:p+1], zeros((1, p)), 0
         
-        R2._refresh_dZ()
-        
-        # There's an old version of following code in rhoDFIIt2FWR.m
-        
-        K = diag(ones((1, p-1)), 1)
-        
-        K[:,1] = -Valpha[range(1,p+1)]
-        
-        
-        # this is surely wrong with Vbeta
-        JtoS = eye(p), K, c_[1,zeros((1,p-1))], diag(delta), r_[Vbeta[1], zeros((p-1, 1))], diag(gamma), Vbeta[range(1, p+1)], zeros((1, p)), 0
-        
-        R1 = SIF(JtoS)
-          
-        return R1, R2
+            SIF.__init__(JtoS)
         
