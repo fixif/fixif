@@ -32,6 +32,15 @@ class MtlbHelper(object):
         self.eng = matlab.engine.start_matlab()
         #self.debug_mat = True
         
+        # current location of target functions to test
+        abs_fwr_dir = os.path.join(os.getcwd(),"Structures","test","FWRToolbox","")
+        self.eng.addpath(abs_fwr_dir, nargout=0)
+        
+        #print('==================================================')
+        #print('Adding the following path to matlab engine : ')
+        #print(abs_fwr_dir)
+        #print('==================================================')
+        
         if target_folder is None :
             target_folder = "tmp_mat"
         
@@ -170,7 +179,9 @@ class MtlbHelper(object):
             #print("Shape of local_varz_dict["+ var +"]")
             #print(str(local_varz_dict[var].shape))
         
-            print("Comparing " + var)
+            if is_debug:
+                print("Comparing " + var)
+            
             try:
                 npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
             except AssertionError as e:
