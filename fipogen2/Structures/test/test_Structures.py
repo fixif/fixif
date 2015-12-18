@@ -29,48 +29,37 @@ from func_aux.get_data import get_data
 
 from scipy.signal import tf2ss
 
-from numpy import array, squeeze, reshape
+from numpy import matrix as mat
+from numpy import array, squeeze, reshape, zeros, ones
 
 import sys, os
 
 class test_Structures(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+    	super(test_Structures, cls).setUpClass()
         
-        self.engMtlb = MtlbHelper()
+        cls.engMtlb = MtlbHelper()
         
-        self.ndigit = 10
-        self.eps = 1.e-8  
+        cls.ndigit = 10
+        cls.eps = 1.e-8  
         
-        self.list_dSS = get_data("SS", "random", is_refresh=True) #+ get_data("SS", "signal", "butter", is_refresh=True)
-        self.list_dTF = get_data("TF", "signal", "butter", is_refresh=True)
+        cls.list_dSS = get_data("SS", "random", is_refresh=False) #+ get_data("SS", "signal", "butter", is_refresh=True)
+        cls.list_dTF = get_data("TF", "signal", "butter", is_refresh=False)
 
-#     def gen_TF_or_SS(self, type='TF',opt='butter', opt_num=0):
-#         
-#         tmp_vars = {}
-# 
-#         if opt == 'butter':
-#             
-#             if opt_num == 0:
-#                 
-#                 cmd  = '[num, den] = butter(4, 0.05) ;'
-#              
-#             #elif opt_num is 1:
-#             
-#                 #cmd =  '[num, den] = butter(8, 0.12) ;'
-#                 
-#             if type == 'TF':
-#                     
-#                 varz = ['num','den']
-#                 self.engMtlb.pushCmdGetVar(cmd, varz, tmp_vars)
-#                     
-#             elif type == 'SS':
-#                     
-#                 varz = ['A','B', 'C', 'D']
-#                 cmd += '[A,B,C,D] = tf2ss(num,den); \n'
-#                 self.engMtlb.pushCmdGetVar(cmd, varz, tmp_vars)
-# 
-#         return tmp_vars
+    @staticmethod
+    def _show_progress(testname, i_obj, n_obj):
+        
+        CURSOR_UP_ONE = '\x1b[1A'
+        ERASE_LINE = '\x1b[2K'
+        
+        if i_obj > 1:
+            print(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE)
+            
+        print ("{0} : obj {1: >3d} / {2}".format(testname, i_obj, n_obj))
+
+
     @staticmethod
     def _augment_dict_ABCD(dSSobj, target_dict):
         
@@ -85,6 +74,7 @@ class test_Structures(unittest.TestCase):
         target_dict['num'] = dTFobj.num
         target_dict['den'] = dTFobj.den
     
+    #@unittest.skip("skip DFI")
     def test_DFI(self):
         
         out_dict = {}
@@ -92,7 +82,14 @@ class test_Structures(unittest.TestCase):
         
         varz = ['Z1','Z2']
         
+        i_obj = 1
+        n_obj = len(self.list_dTF)
+        testname = 'DFI'
+        
         for dTFobj in self.list_dTF:
+            
+            self._show_progress(testname, i_obj, n_obj)
+            i_obj += 1
             
             self._augment_dict_numden(dTFobj, out_dict)
             self.engMtlb.setVar(out_dict.keys(), out_dict)
@@ -109,18 +106,26 @@ class test_Structures(unittest.TestCase):
             self.engMtlb.compare(mtlb_cmd, varz, fip_dict, decim = self.ndigit)
     
             self.engMtlb.cleanenv() # be nice with next test 
-            
+       
+    #@unittest.skip("skip State_Space")
     def test_State_Space(self):
         
         out_dict = {}
         fip_dict = {}    
         
         varz = ['Z']
+
+        i_obj = 1     
+        n_obj = len(self.list_dSS)
+        testname = "State_Space"
         
         for dSSobj in self.list_dSS:
             
             self._augment_dict_ABCD(dSSobj, out_dict)
             self.engMtlb.setVar(out_dict.keys(), out_dict)
+            
+            self._show_progress(testname, i_obj, n_obj)
+            i_obj += 1
             
             mtlb_cmd  = """R = SS2FWR(A,B,C,D);
                             Z = R.Z ;"""
@@ -131,209 +136,66 @@ class test_Structures(unittest.TestCase):
     
             self.engMtlb.cleanenv() # be nice with next test 
     
-#     def mytest_tf2ss(self, dict_numden):
-#         
-#         """
-#         Test numpy tf2ss routine (example for other tests involving FWRtoolbox)
-#         """
-#         
-#         tmp_vars = {}
-# 
-#         # Inject num and den in Matlab workspace
-#         self.engMtlb.setVar(dict_numden.keys(), dict_numden)
-# 
-#         #print(self.engMtlb.eng.who())
-# 
-#         # create TF matlab obj from num and den
-#         mtlb_cmd  = 'H = tf(num,den,1); \n'
-#         
-#         # create Aq, Bq, Cq, Dq in Matlab workspace
-#         mtlb_cmd += '[Aq,Bq,Cq,Dq] = tf2ss(H.num{1},H.den{1}); \n'
-# 
-#         varz = ['Aq', 'Bq', 'Cq', 'Dq']
-#         
-#         tmp_vars['Aq'], tmp_vars['Bq'], tmp_vars['Cq'], tmp_vars['Dq'] = \
 #           tf2ss(squeeze(array(dict_numden['num'])), squeeze(array(dict_numden['den'])))
-#             
 #             # squeeze(array(mat))<=> mat.A1
-#             
-#         self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
-#         
-#        self.engMtlb.cleanenv() # be nice with next test
+
+    def test_rhoDFIIt(self):
         
-    # test all Structures starting from most simple ones
-    
-#     def mytest_State_Space(self, dict_ABCD):
-#         
-#         tmp_vars = {}
-# 
-#         # Inject num and den in Matlab workspace
-#         self.engMtlb.setVar(dict_ABCD.keys(), dict_ABCD)
-#         
-#         #print(self.engMtlb.eng.who())
-#         
-#         mtlb_cmd  = 'R = SS2FWR(A,B,C,D); \n'
-#         
-#         mtlb_cmd += 'Z = R.Z ;\n'
-#         
-#         varz = ['Z']
-#         
-#         tmp_vars['Z'] = State_Space(dict_ABCD['A'], dict_ABCD['B'], dict_ABCD['C'], dict_ABCD['D']).Z
-#         
-#         self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
-#     
-#         self.engMtlb.cleanenv() # be nice with next test 
-    
-#     def mytest_DFI(self, dict_numden, opt):
-#         
-#         """
-#         Test DFIq2FWR.m vs. DFI.py (opt 1)
-#         Test DFIqbis2FWR.m vs. DFI.py (opt 2)
-#         """
-#         
-#         tmp_vars = {}
-# 
-#         # Inject num and den in Matlab workspace
-#         self.engMtlb.setVar(dict_numden.keys(), dict_numden)
-# 
-#         #print(self.engMtlb.eng.who())
-# 
-#         # create TF matlab obj from num and den
-#         #mtlb_cmd_stack  = 'H = tf(num,den,1); \n'
-#         
-# 
-#         def dirty_debug(myCmd):
-#             # temp debug
-#             #debug_varz = ['myJ','myK','myL','myM','myN','myP','myQ','myR','myS']
-#             debug_varz = []
-#             debug_dict = {}
-#             debug_cmd = myCmd
-#             #
-#             self.engMtlb.pushCmdGetVar(debug_cmd, debug_varz, debug_dict)
-#             #
-#             print(debug_dict)
-# 
-#         if opt == 1:
-#             mtlb_cmd = 'R = DFIq2FWR(num, den) ; \n'
-#             tmp_vars['Z'] = DFI(dict_numden['num'], dict_numden['den'], opt=1, eps=self.eps).Z
-#         elif opt == 2:
-#             mtlb_cmd = 'R = DFIqbis2FWR(num, den); \n'
-#             #dirty_debug(mtlb_cmd)
-#             tmp_vars['Z'] = DFI(dict_numden['num'], dict_numden['den'], opt=2, eps=self.eps).Z
-#         else:
-#             raise('Unknown mytest_DFI opt number')
-#         
-#         varz = ['Z']
-#         
-#         mtlb_cmd += 'Z = R.Z ;\n'
-#         
-#         self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
-#     
-#         self.engMtlb.cleanenv() # be nice with next test 
+        out_dict = {}
+        fip_dict = {}    
         
-    def mytest_DFII(self, dict_numden):
+        varz = ['Z1', 'Z2', 'dZ1', 'dZ2']
+        
+        i_obj = 1
+        n_obj = len(self.list_dTF)
+        testname = 'rhoDFIIt'
+        
+        for dTFobj in self.list_dTF:
+            
+            self._augment_dict_numden(dTFobj, out_dict)
+            self.engMtlb.setVar(out_dict.keys(), out_dict)
+            
+            self._show_progress(testname, i_obj, n_obj)
+            i_obj += 1
+            
+            mtlb_cmd  = """H = tf(num, den, 1);
+                           gamma = zeros([1 length(num)-1]);
+                           isGammaExact = 1;
+                           delta = ones(size(gamma));
+                           isDeltaExact = 1;
+                           [R1, R2, flag] = rhoDFIIt2FWR(H, gamma, isGammaExact, delta, isDeltaExact);
+                           Z1 = R1.Z;
+                           Z2 = R2.Z;
+                           dZ1 = R1.rZ;
+                           dZ2 = R2.rZ;
+                           """
+    
+            "CODEPATH : isGammaExact = True, isDeltaExact = True, opt : ALL"
+    
+            self.engMtlb.eng.eval(mtlb_cmd, nargout = 0)
+    
+            cur_gamma = mat(zeros((out_dict['num'].shape[0], out_dict['num'].shape[1] - 1)))
+            cur_delta = ones(cur_gamma.shape)
+    
+            SIF_1 = RhoDFIIt(out_dict['num'], out_dict['den'], gamma=cur_gamma, isGammaExact=True, delta=cur_delta, isDeltaExact=True, opt = '1')
+            SIF_2 = RhoDFIIt(out_dict['num'], out_dict['den'], gamma=cur_gamma, isGammaExact=True, delta=cur_delta, isDeltaExact=True, opt = '2')
+            
+            fip_dict['Z1'] = SIF_1.Z
+            fip_dict['dZ1'] = SIF_1.dZ
+            fip_dict['Z2'] = SIF_2.Z
+            fip_dict['dZ2'] = SIF_2.dZ
+        
+            self.engMtlb.compare(mtlb_cmd, varz, fip_dict, decim = self.ndigit)
+    
+            self.engMtlb.cleanenv() # be nice with next test             
+                    
+    def test_DFII(self):
         
         """
         Test rhoDFIIt.m vs. DFII.py
         """
         
-        # does not work this way as rhoDFIIt generates more variables
-        # so we would need to use the "simplify" routine to erase those
-        
-        tmp_vars = {}
-        
-        self.engMtlb.setVar(dict_numden.keys(), dict_numden)
-        # create TF obj from num and den
-        
-        mtlb_cmd  = 'H = tf(num, den, 1); \n'
-        mtlb_cmd += 'gamma = zeros([1 length(num)-1]); \n'
-        mtlb_cmd += 'isGammaExact = 1; \n'
-        mtlb_cmd += 'delta = ones(size(gamma)); \n'
-        mtlb_cmd += 'isDeltaExact = 1; \n'
-        mtlb_cmd += '[R1, R2, flag] = rhoDFIIt2FWR(H, gamma, isGammaExact, delta, isDeltaExact); \n'
-        mtlb_cmd += 'Z1 = R1.Z; \n'
-        mtlb_cmd += 'Z2 = R2.Z; \n'
-    
-        tmp_vars['Z1'] = DFII(dict_numden['num'], dict_numden['den']).Z
-        tmp_vars['Z2'] = DFII(dict_numden['num'], dict_numden['den']).Z
-        
-        varz = ['Z1','Z2']
-        
-        self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
-       
-    def mytest_rhoDFIIt(self):
-        
-            
-        """
-        Test rhoDFIIt2FWR.m (opt=1), rhoDFIIt2FWRrelaxedL2 vs. rhoDFIIt.py
-        """
-        
-        tmp_vars = {}
-
-        # Inject num and den in Matlab workspace
-        self.engMtlb.setVar(dict_numden.keys(), dict_numden)
-
-        #print(self.engMtlb.eng.who())
-
-        # create TF matlab obj from num and den
-        mtlb_cmd  = 'H = tf(num,den,1); \n'
-        
-        # use rhoDFIIt2FWR
-        # probleme je n'ai pas de matrice gamma...
-        if opt == 1:
-            mtlb_cmd = 'R = rhoDFIIt2FWR(H) ; \n'
-            tmp_vars['Z'] = RhoDFIIt(dict_numden['num'], dict_numden['den'], opt=1, eps=self.eps).Z
-        elif opt == 2:
-            mtlb_cmd = 'R = rhoDFIIt2FWR(H); \n'
-            tmp_vars['Z'] = RhoDFIIt(dict_numden['num'], dict_numden['den'], opt=2, eps=self.eps).Z
-        else:
-            raise('Unknown mytest_DFI opt number')
-        
-        varz = ['Z']
-        
-        mtlb_cmd += 'Z = R.Z ;\n'
-        
-        self.engMtlb.compare(mtlb_cmd, varz, tmp_vars, decim = self.ndigit)
-    
-        self.engMtlb.cleanenv() # be nice with next test 
+        pass
+     
         
     
-    #def mytest_modalDelta(self):
-        
-    #    pass
-    
-#     def runTest(self):
-#         
-#         # test tf2ss on all transfer functions
-#         
-#         list_TF = {'butter':1}
-#         list_SS = {'butter':1}
-#         
-#         # all te'sts needing a TF input defined as num, den
-#         
-#         for TF in list_TF.keys():
-#             for i in range(0,list_TF[TF]):
-#                 # test numpy tf2ss
-#                 self.mytest_tf2ss(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i))
-# 
-#                 # test DFI vs. DFIq2FWR
-#                 #print("Testing DFI vs. DFIq2FWR")
-#                 self.mytest_DFI(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i), opt=1)
-#                 # test DFI vs. DFIqbis2FWR
-#                 #print("Testing DFI vs. DFIqbis2FWR")
-#                 self.mytest_DFI(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i), opt=2)
-#                 # test DFII.py vs. rhoDFIIt.m with gamma = 0 and delta = 1
-#                 #self.mytest_DFII(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i))
-#                 
-#                 #self.mytest_rhoDFIIt(self.gen_TF_or_SS(type='TF', opt=TF, opt_num=i))
-# 
-#         # all tests needing a State Space input, defined as A, B, C, D
-# 
-#         for SS in list_SS.keys():
-#             for i in range(0,list_SS[SS]):
-#                 
-#                 # test State_Space.py vs. SS2FWR.m
-#                 self.mytest_State_Space(self.gen_TF_or_SS(type='SS', opt=SS, opt_num=i))
-
-                # test DFI generation
-                #self.mytest_DFI(self.gen_numDen(TF, i))
