@@ -127,11 +127,11 @@ def gen_data(data_type, data_source, opt):
         list_obj = obj_list
       
     elif data_type == "SS" and not(is_data_TF):
-        print("data is SS and we need SS : doing nothing")
-    
+        #print("data is SS and we need SS : doing nothing")
+        pass
     elif data_type == "TF" and is_data_TF:
-        print("data is TF and we need TF : doing nothing")
-
+        #print("data is TF and we need TF : doing nothing")
+        pass
     else:  
         raise(ValueError, "data_type not known")
     
