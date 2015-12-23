@@ -65,6 +65,10 @@ class ModalDelta(SIF):
         
         return A, B, C, D
   
+    def canon_modal_v2(self):
+    	
+    	pass
+  
     def relaxedl2scaling(mySIF, Umax=None, delta=None):
         
         # change of behaviour vs. old code : if Umax is specified it overrides other data
@@ -109,7 +113,7 @@ class ModalDelta(SIF):
         return SIF, Y ,W
         
   
-    def __init__(self, A, B, C, D, Delta = None, isDeltaExact = None, father=None, **event_spec):
+    def __init__(self, A, B, C, D, Delta = None, isDeltaExact = False, father=None, **event_spec):
     
         #create default event if no event given
         my_e_type      = event_spec.get('e_type', 'create')
@@ -130,14 +134,9 @@ class ModalDelta(SIF):
     
         if Delta is None:
             Delta = zeros((1, Aq.shape[0]))
-            isDeltaExact = True
-        elif (Delta is not None and isDeltaExact is None):
             isDeltaExact = False
     
         # Conflit dans le code matlab, voir ModalDelta2FWR.m
-    
-        #if isDeltaExact is None: # see https://www.python.org/dev/peps/pep-0008/#id42 / point 2
-        #isDeltaExact = False
         
     
         n = Aq.shape[0]
