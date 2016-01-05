@@ -133,7 +133,7 @@ class SIF(FIPObject):
                         [ K, P, Q], 
                         [ L, R, S]])   
 
-    def _build_dZ(self, eps=1.e-8):
+    def _build_dZ(self):
             
         """
         Build dZ from Z
@@ -157,7 +157,7 @@ class SIF(FIPObject):
                                         \end{aligned}\right.
         """
             
-        return SIF._nonTrivial(self._Z, eps)
+        return SIF._nonTrivial(self._Z, self._eps)
     
     # AZ, BZ, CZ, DZ
     def _build_AZtoDZ(self):
@@ -207,8 +207,10 @@ class SIF(FIPObject):
         
         self._Z = SIF._build_Z(JtoS)
 
+        self._eps = eps
+
         # dZ from Z
-        self._dZ = SIF._build_dZ(self, eps)
+        self._dZ = self._build_dZ()
         
         self._invJ = inv(JtoS[0])
 
@@ -216,12 +218,56 @@ class SIF(FIPObject):
 
         self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
 
+        # sensitivity measures
+        # important note
+        # those are not calculated at instance creation because it consumes time and we don't
+        # know what there is to do at instance creation.
+        # So all measures are initialized as None.
+        # when the optimization routine is used, there are two possible ways
+        # or we recalculate the value from scratch (same scenario as if value not instantiated)
+        # or we use the existing value and UYW matrixes to get new value
+        
+        # 
+        self._plant = None
+        
+        @property
+        def plant(self):
+            return _plant(self)
+        
+        @plant.setter
+        def plant(self, mymat):
+            self._plant = mymat
+        
+        # OL
+        self._MsensH_OL = None
+        self._MsensPole_OL = None
+        
+        # CL
+        self._MsensH_CL = None
+        self._MsensPole_CL = None
+        self._Mstability = None
+        
+        
+        
+        @property
+        def MsensH(self, type='ol', plant=None):
+            
+            if type == 'ol':
+                
+                
+                
+                return self._MsensH
+        # if plant is new then we renew plant in SIF to have data updated @ same time.
+        # a SIF cannot keep two value for two different plant at the same time
+        
+        
+
     # Only matrix Z is kept in memory
     # JtoS extracted from Z matrix, dJtodS from dZ resp.
 
     @property
     def invJ(self):
-    	return self._invJ
+        return self._invJ
 
     # AZ to DZ getters
     
@@ -286,7 +332,7 @@ class SIF(FIPObject):
     @Z.setter
     def Z(self, mymat):
         self._Z = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ(self._eps)
         self._invJ = inv(self.J)
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
         self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
@@ -358,55 +404,55 @@ class SIF(FIPObject):
     # JtoS setters
 
     @J.setter
-    def J(self, mymat, eps=1.e-8):
-        self._Z[ 0 : self._l, 0 : self._l ] = mymat
-        self._dZ = _build_dZ(self, eps)
+    def J(self, mymat):
+        self._Z[ 0 : self._l, 0 : self._l ] = - mymat
+        self._dZ = self._build_dZ()
         self._invJ = inv(mymat)
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
         self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @K.setter
-    def K(self, mymat, eps=1.e-8):
+    def K(self, mymat):
         self._Z[ self._l : self._l+self._n, 0 : self._l ] = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ()
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
         self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @L.setter
-    def L(self, mymat, eps=1.e-8):
+    def L(self, mymat):
         self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ()
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
         self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @M.setter
-    def M(self, mymat, eps=1.e-8):
+    def M(self, mymat):
         self._Z[ 0 : self._l, self._l : self._l + self._n ] = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ(self._eps)
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
         self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @N.setter
-    def N(self, mymat, eps=1.e-8):
+    def N(self, mymat):
         self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._m] = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ()
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
         self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
     @P.setter
-    def P(self, mymat, eps=1.e-8):
+    def P(self, mymat):
         self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ()
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @Q.setter
-    def Q(self, mymat, eps=1.e-8):
+    def Q(self, mymat):
         self._Z[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._m] = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ()
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @R.setter
-    def R(self, mymat, eps=1.e-8):
+    def R(self, mymat):
         self._Z[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ] = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ()
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
     @S.setter
-    def S(self, mymat, eps=1.e-8):
+    def S(self, mymat):
         self._Z[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m] = mymat
-        self._dZ = _build_dZ(self, eps)
+        self._dZ = self._build_dZ()
         self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
 
     #dJtodS setters
@@ -541,11 +587,13 @@ class SIF(FIPObject):
             
             return str
         
-        mystr = "Realization " + self.obj_events[0].e_desc + " : \n"
-        mystr += "m = " + str(self._m) + " input"  + plural(self._m) + "\n"
-        mystr += "p = " + str(self._p) + " output" + plural(self._p) + "\n"
-        mystr += "n = " + str(self._n) + " state"  + plural(self._n) + "\n"
-        mystr += "l = " + str(self._l) + " intermediate variable" + plural(self._l) + "\n"
+        mystr = "Realization {0} : \n".format(self.obj_events[0].e_desc)
+        mystr += "m = {0} input{1} \n".format(self._m, plural(self._m))
+        mystr += "p = {0} output{1} \n".format(self._p, plural(self._p))
+        mystr += "n = {0} state{1} \n".format(self._n, plural(self._n))
+        mystr += "l = {0} intermediate variable{1} \n".format(self._l, plural(self._l))
+        
+        mystr += "eps = {}".format(self._eps) + "\n"
         
         mystr += "Z = \n"+ str(self._Z) + "\n"
         
