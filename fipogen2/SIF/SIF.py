@@ -227,40 +227,158 @@ class SIF(FIPObject):
         # or we recalculate the value from scratch (same scenario as if value not instantiated)
         # or we use the existing value and UYW matrixes to get new value
         
-        # 
+        # ATM we can only set plant after obj creation
         self._plant = None
+
+        self._measureTypes = ['OL','CL']
         
-        @property
-        def plant(self):
-            return _plant(self)
+        # OL & CL
+        self._MsensH = {key:None for key in self._measureTypes}
+        self._MsensPole = {key:None for key in self._measureTypes}
+        self._RNG = {key:None for key in self._measureTypes}
         
-        @plant.setter
-        def plant(self, mymat):
-            self._plant = mymat
-        
-        # OL
-        self._MsensH_OL = None
-        self._MsensPole_OL = None
-        
-        # CL
-        self._MsensH_CL = None
-        self._MsensPole_CL = None
+        # CL only
         self._Mstability = None
+
+    @staticmethod
+    def _check_type(fname, target, words):
         
+         if target not in words:
+            raise(ValueError, '{0} type not recognized (use {1})'.format(fname, ' OR '.join(words)))
         
+
         
-        @property
-        def MsensH(self, type='ol', plant=None):
+    # Functions to calculate measures. 
+    # We keep updated closed-loop measures with stored plant at SIF instance level 
+        
+    def MsensH(self, type='OL', plant=None):
+        """
+        If plant is specified here, CL will *always* be recalculated (we don't compare input with existing _plant)
+        We need manual possible input of type because, we may want access to the stored CL MsensH without recalculating it. 
             
-            if type == 'ol':
-                
-                
-                
-                return self._MsensH
-        # if plant is new then we renew plant in SIF to have data updated @ same time.
-        # a SIF cannot keep two value for two different plant at the same time
+        inst.MsensH(type='CL')
+        """
+            
+        self._check_type('MsensH', type, self._measureTypes)
         
+        cur_plant = None
         
+        # force CL calculation if there's a plant
+        if plant is not None :
+                
+            self._plant = plant
+            type = 'CL'
+            is_plant_modified = True
+            cur_plant = plant
+                
+        else:
+                
+            is_plant_modified = False
+                
+            if type == 'CL':
+                    
+                if self._plant is None:
+                     raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
+                                
+                cur_plant = self._plant
+                 
+        if (self._MsensH[type] is None) or (is_plant_modified):
+                
+              self._MsensH[type] = self.calc_MsensH(loc_plant = cur_plant)
+
+        return self._MsensH[type]
+        
+    def MsensPole(self, type = 'OL', plant = None, moduli=1):
+          
+        self._check_type('MsensPole', type, self._measureTypes)
+            
+        cur_plant = None
+            
+        if plant is not None:
+                
+            self._plant = plant
+            type = 'CL'
+            is_plant_modified = True
+            cur_plant = plant
+                
+        else:
+                
+            is_plant_modified = False
+                
+            if type == 'CL':
+                    
+                if self._plant is None:
+                    raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
+                                
+                cur_plant = self._plant
+                                
+        if (self._MsensPole[type] is None) or (is_plant_modified):
+                
+            self._MsensPole[type] = self.calc_MsensPole(loc_plant = cur_plant, moduli = moduli)
+
+        return self._MsensPole[type]
+            
+            
+    def RNG(self, type = 'OL', plant=None):
+            
+        self._check_type('RNG', type, self._measureTypes)
+            
+        cur_plant = None
+            
+        if plant is not None:
+                
+            self._plant = plant
+            type = 'CL'
+            is_plant_modified = True
+            cur_plant = plant
+                                
+        else:
+                
+            is_plant_modified = False
+                
+            if type == 'CL':
+                    
+                if self._plant is None:
+                    raise(ValueError, 'Cannot provide RNG closed-loop measuer as no plant is defined')
+                    
+                cur_plant = self._plant
+                    
+        if (self._RNG[type] is None) or is_plant_modified:
+                
+            self._RNG[type] = self.calc_RNG(loc_plant = cur_plant)
+                
+        return self._RNG[type]
+            
+    def Mstability(self, plant=None):
+            
+        if plant is not None:
+                
+            self._plant = plant
+            is_plant_modified = True
+                
+        else:
+                
+            is_plant_modified = False            
+            
+            if self._plant is None:
+                raise(ValueError, 'Cannot provide Mstability measure as no plant is defined')
+                   
+        if (self._Mstability is None) or is_plant_modified:
+                
+            self._Mstability = self.calc_Mstability(self._plant)
+        
+        return self._Mstability
+        
+    # if plant is new then we renew plant in SIF to have data updated @ same time.
+    # a SIF cannot keep two value for two different plant at the same time
+        
+    @property
+    def plant(self):
+        return _plant(self)
+        
+    @plant.setter
+    def plant(self, mymat):
+        self._plant = mymat    
 
     # Only matrix Z is kept in memory
     # JtoS extracted from Z matrix, dJtodS from dZ resp.
