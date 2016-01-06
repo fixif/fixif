@@ -241,7 +241,7 @@ class SIF(FIPObject):
         self._Mstability = None
 
     @staticmethod
-    def _check_type(fname, target, words):
+    def _check_MeasureType(fname, target, words):
         
          if target not in words:
             raise(ValueError, '{0} type not recognized (use {1})'.format(fname, ' OR '.join(words)))
@@ -251,15 +251,15 @@ class SIF(FIPObject):
     # Functions to calculate measures. 
     # We keep updated closed-loop measures with stored plant at SIF instance level 
         
-    def MsensH(self, type='OL', plant=None):
+    def MsensH(self, measureType='OL', plant=None):
         """
         If plant is specified here, CL will *always* be recalculated (we don't compare input with existing _plant)
         We need manual possible input of type because, we may want access to the stored CL MsensH without recalculating it. 
             
-        inst.MsensH(type='CL')
+        inst.MsensH(measureType='CL')
         """
             
-        self._check_type('MsensH', type, self._measureTypes)
+        self._check_MeasureType('MsensH', measureType, self._measureTypes)
         
         cur_plant = None
         
@@ -267,7 +267,7 @@ class SIF(FIPObject):
         if plant is not None :
                 
             self._plant = plant
-            type = 'CL'
+            measureType = 'CL'
             is_plant_modified = True
             cur_plant = plant
                 
@@ -275,29 +275,29 @@ class SIF(FIPObject):
                 
             is_plant_modified = False
                 
-            if type == 'CL':
+            if measureType == 'CL':
                     
                 if self._plant is None:
                      raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
                                 
                 cur_plant = self._plant
                  
-        if (self._MsensH[type] is None) or (is_plant_modified):
+        if (self._MsensH[measureType] is None) or (is_plant_modified):
                 
-              self._MsensH[type] = self.calc_MsensH(loc_plant = cur_plant)
+              self._MsensH[measureType] = self.calc_MsensH(loc_plant = cur_plant)
 
-        return self._MsensH[type]
+        return self._MsensH[measureType]
         
-    def MsensPole(self, type = 'OL', plant = None, moduli=1):
+    def MsensPole(self, measureType = 'OL', plant = None, moduli=1):
           
-        self._check_type('MsensPole', type, self._measureTypes)
+        self._check_MeasureType('MsensPole', measureType, self._measureTypes)
             
         cur_plant = None
             
         if plant is not None:
                 
             self._plant = plant
-            type = 'CL'
+            measureType = 'CL'
             is_plant_modified = True
             cur_plant = plant
                 
@@ -305,30 +305,30 @@ class SIF(FIPObject):
                 
             is_plant_modified = False
                 
-            if type == 'CL':
+            if measureType == 'CL':
                     
                 if self._plant is None:
                     raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
                                 
                 cur_plant = self._plant
                                 
-        if (self._MsensPole[type] is None) or (is_plant_modified):
+        if (self._MsensPole[measureType] is None) or (is_plant_modified):
                 
-            self._MsensPole[type] = self.calc_MsensPole(loc_plant = cur_plant, moduli = moduli)
+            self._MsensPole[measureType] = self.calc_MsensPole(loc_plant = cur_plant, moduli = moduli)
 
-        return self._MsensPole[type]
+        return self._MsensPole[measureType]
             
             
-    def RNG(self, type = 'OL', plant=None):
+    def RNG(self, measureType = 'OL', plant=None):
             
-        self._check_type('RNG', type, self._measureTypes)
+        self._check_MeasureType('RNG', measureType, self._measureTypes)
             
         cur_plant = None
             
         if plant is not None:
                 
             self._plant = plant
-            type = 'CL'
+            measureType = 'CL'
             is_plant_modified = True
             cur_plant = plant
                                 
@@ -336,18 +336,18 @@ class SIF(FIPObject):
                 
             is_plant_modified = False
                 
-            if type == 'CL':
+            if measureType == 'CL':
                     
                 if self._plant is None:
                     raise(ValueError, 'Cannot provide RNG closed-loop measuer as no plant is defined')
                     
                 cur_plant = self._plant
                     
-        if (self._RNG[type] is None) or is_plant_modified:
+        if (self._RNG[measureType] is None) or is_plant_modified:
                 
-            self._RNG[type] = self.calc_RNG(loc_plant = cur_plant)
+            self._RNG[measureType] = self.calc_RNG(loc_plant = cur_plant)
                 
-        return self._RNG[type]
+        return self._RNG[measureType]
             
     def Mstability(self, plant=None):
             
@@ -368,6 +368,27 @@ class SIF(FIPObject):
             self._Mstability = self.calc_Mstability(self._plant)
         
         return self._Mstability
+    
+    def _refresh_sensitivity(self):
+    	
+    	for cur_type in self._measureTypes:
+    	
+        	if not(self._MsensH[cur_type] is None):
+    		    self._MsensH[cur_type] = None
+    		    self.MsensH(measureType=cur_type)
+    		    
+			if not(self._MsensPole[cur_type] is None):
+				self._MsensPole[cur_type] = None
+				self.MsensPole(measureType=cur_type)
+				
+			if not(self._RNG[cur_type] is None):
+				self._RNG[cur_type] = None
+				self.RNG(measureType=cur_type)
+				
+	    if not(self._Mstability is None):
+			self._Mstability = None
+			self.Mstability()
+        
         
     # if plant is new then we renew plant in SIF to have data updated @ same time.
     # a SIF cannot keep two value for two different plant at the same time
