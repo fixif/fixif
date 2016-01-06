@@ -370,24 +370,24 @@ class SIF(FIPObject):
         return self._Mstability
     
     def _refresh_sensitivity(self):
-    	
-    	for cur_type in self._measureTypes:
-    	
-        	if not(self._MsensH[cur_type] is None):
-    		    self._MsensH[cur_type] = None
-    		    self.MsensH(measureType=cur_type)
-    		    
-			if not(self._MsensPole[cur_type] is None):
-				self._MsensPole[cur_type] = None
-				self.MsensPole(measureType=cur_type)
-				
-			if not(self._RNG[cur_type] is None):
-				self._RNG[cur_type] = None
-				self.RNG(measureType=cur_type)
-				
-	    if not(self._Mstability is None):
-			self._Mstability = None
-			self.Mstability()
+        
+        for cur_type in self._measureTypes:
+        
+            if not(self._MsensH[cur_type] is None):
+                self._MsensH[cur_type] = None
+                self.MsensH(measureType=cur_type)
+                
+            if not(self._MsensPole[cur_type] is None):
+                self._MsensPole[cur_type] = None
+                self.MsensPole(measureType=cur_type)
+                
+            if not(self._RNG[cur_type] is None):
+                self._RNG[cur_type] = None
+                self.RNG(measureType=cur_type)
+                
+        if not(self._Mstability is None):
+            self._Mstability = None
+            self.Mstability()
         
         
     # if plant is new then we renew plant in SIF to have data updated @ same time.
