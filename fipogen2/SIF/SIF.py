@@ -160,7 +160,12 @@ class SIF(FIPObject):
         return SIF._nonTrivial(self._Z, self._eps)
     
     # AZ, BZ, CZ, DZ
+    # and reset Wo and Wc because when this function is called, it means either we are initializing the structure
+    # or we have refreshed any of JtoS matrix which invalidates calculation of Wc and Wo
     def _build_AZtoDZ(self):
+
+		self._Wo = None
+		self._Wc = None
         
         AZ = self.K * self._invJ * self.M + self.P
         BZ = self.K * self._invJ * self.N + self.Q
@@ -169,10 +174,14 @@ class SIF(FIPObject):
         
         temp_dSS = dSS(AZ,BZ,CZ,DZ)
         
-        Wo = temp_dSS.Wo
-        Wc = temp_dSS.Wc
-        
-        return (AZ, BZ, CZ, DZ, Wo, Wc)
+        return (AZ, BZ, CZ, DZ, temp_dSS)
+    
+    def _build_W(self, opt):
+    	
+    	if opt == 'o':
+    		self._Wo = self._Z_dSS.Wo
+    	elif opt == 'c':
+    		self._Wc = self._Z_dSS.Wc
     
     def _build_M1M2N1N2(self):
         
@@ -214,7 +223,11 @@ class SIF(FIPObject):
         
         self._invJ = inv(JtoS[0])
 
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()  
+        self._AZ, self._BZ, self._CZ, self._DZ, self._Z_dSS = self._build_AZtoDZ()  
+
+        # buildAZ_to_DZ implies resetting wo and wc to None
+        #self._Wc = None
+        #self._Wo = None
 
         self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
 
@@ -239,6 +252,12 @@ class SIF(FIPObject):
         
         # CL only
         self._Mstability = None
+        
+        # define two different cases : or we can use UYW transform, or we cannot
+        # this should be modified in each subclass AFTER using the init routine of SIF class
+        is_use_UYW_transform = True
+        
+        # if the UYW transform is not used, the 
 
     @staticmethod
     def _check_MeasureType(fname, target, words):
@@ -252,6 +271,7 @@ class SIF(FIPObject):
     # We keep updated closed-loop measures with stored plant at SIF instance level 
         
     def MsensH(self, measureType='OL', plant=None):
+    	
         """
         If plant is specified here, CL will *always* be recalculated (we don't compare input with existing _plant)
         We need manual possible input of type because, we may want access to the stored CL MsensH without recalculating it. 
@@ -369,7 +389,10 @@ class SIF(FIPObject):
         
         return self._Mstability
     
-    def _refresh_sensitivity(self):
+    # Used when the Z.setter is used
+    
+    
+    def _recalc_sensitivity(self):
         
         for cur_type in self._measureTypes:
         
@@ -388,7 +411,24 @@ class SIF(FIPObject):
         if not(self._Mstability is None):
             self._Mstability = None
             self.Mstability()
-        
+    
+    def _translate_sensitivity_UYW(self, UYW):
+    	
+    	U, Y, W = UYW
+    	
+    	for cur_type in self._measureTypes:
+    		
+    		if not(self._RNG[cur_type] is None):
+    			
+    			
+    	
+    def _translate_Z(self, UYW):
+    	
+    	"""
+    	If the UYW transform can be used, use it on existing Z to get new_Z
+    	"""
+    	
+    	pass
         
     # if plant is new then we renew plant in SIF to have data updated @ same time.
     # a SIF cannot keep two value for two different plant at the same time
@@ -430,10 +470,18 @@ class SIF(FIPObject):
 
     @property
     def Wo(self):
+    	
+    	if self._Wo is None:
+    		self._build_W('o')
+    	
         return self._Wo
     
     @property
     def Wc(self):
+    	
+    	if self._Wc is None:
+    		self._build_W('c')
+    	
         return self._Wc
 
     # M1 to N2 are used in sensitivity calculations
