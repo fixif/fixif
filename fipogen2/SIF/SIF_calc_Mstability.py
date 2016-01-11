@@ -31,7 +31,6 @@ def calc_Mstability(R, loc_plant, moduli=1):
     Psi = zeros((dlbk_dZ.shape[2]))
     
     # measure
-    # DANGER TODO ALERT WZ ???
     for k in range(0, dlbk_dZ.shape[2]):
         Psi[k] = norm(R.dZ, 'fro') * norm( multiply(dlbk_dZ[:,:,k], R.dZ), 'fro')
     
