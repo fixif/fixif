@@ -21,7 +21,7 @@ from calc_plantSIF import calc_plantSIF
 
 __all__ = ['calc_MsensH']
 
-def calc_MsensH(R, loc_measureType, loc_plant):
+def calc_MsensH(R, loc_measureType):
     
     """
     If open-loop,

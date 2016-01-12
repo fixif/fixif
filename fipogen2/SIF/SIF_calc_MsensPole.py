@@ -19,7 +19,7 @@ from calc_plantSIF import calc_plantSIF
 
 __all__ = ['calc_MsensPole']
 
-def calc_MsensPole(R, measureType, plant, moduli):
+def calc_MsensPole(R, measureType, moduli):
     
     def deigdZ(A, M1, M2, shapeZ, moduli):
         

@@ -239,6 +239,40 @@ class SIF(FIPObject):
         self._N1bar = r_[ c_[self.invJ*self.N*C2, self.invJ*self.M], c_[zeros((n, np)), eye(n)], c_[C2, zeros((m2, n))] ]
         self._N2bar = r_[ self.invJ*self.N*D21, zeros((n, p1)), D21 ]
     
+    def _translate_Z_AZtoDZ_W(self, UYW):
+        
+        """
+        Calculate Z, AZtoDZ and W in the same function to factorize invU calculation
+        """
+        
+        U,Y,W = UYW
+        
+        U = mat(U)
+        Y = mat(Y)
+        W = mat(W)
+        
+        invU = inv(U)
+        
+        # _build_Z
+        #             J           K              L         M           N         P              Q            R         S
+        self._build_Z(Y*self.J*W, invU*self.K*W, self.L*W, Y*self.M*U, Y*self.N, invU*self.P*U, invU*self.Q, self.R*U, self.S)
+    
+    
+        # _build_AZtoDZ
+        self._AZ = invU*self._AZ*U
+        self._BZ = invU*self._BZ
+        self._CZ = self._CZ*U
+        #self._DZ = self._DZ not modified by transformation
+        
+        self._Z_dSS = dSS(self._AZ,self._BZ,self._CZ,self._DZ)
+        
+        if self._Wo is not None:
+            self._Wo = transpose(U)*self._Wo*U
+        
+        if self._Wc is not None:
+            self._Wc = invU*self._Wc*transpose(invU)
+        
+    
     def __init__(self, JtoS, eps=1.e-8, plant=None, father_obj=None, **event_spec): # name can be specified in e_desc
 
         # Define default event if not specified
@@ -282,12 +316,14 @@ class SIF(FIPObject):
 
         # default plant
         if plant is not None :
-        	self.plant = plant # calculate intermediate matrixes
+            self.plant = plant # calculate intermediate matrixes
         else:
-            self._plant = None
+            self._plant = None # do not trigger calculation : set private attribute w/o setter
             # all following matrixes are relative to a SIF-plant couple
             # they are built when self.plant setter is used
             self._Abar, self._Bbar, self._Cbar, self._Dbar, self._M1bar, self._M2bar, self._N1bar, self._N2bar = [None]*8
+
+
 
         # sensitivity measures
         # important note
@@ -297,8 +333,6 @@ class SIF(FIPObject):
         # when the optimization routine is used, there are two possible ways
         # or we recalculate the value from scratch (same scenario as if value not instantiated)
         # or we use the existing value and UYW matrixes to get new value
-        
-
 
         self._measureTypes = ['OL','CL']
         
@@ -307,14 +341,15 @@ class SIF(FIPObject):
         self._MsensPole = {key:None for key in self._measureTypes}
         self._RNG = {key:None for key in self._measureTypes}
         
+        self._MsensPole_moduli = None
+        self._RNG_tol = None
+        
         # CL only
         self._Mstability = None
         
         # define two different cases : or we can use UYW transform, or we cannot
         # this should be modified in each subclass AFTER using the init routine of SIF class
         is_use_UYW_transform = True
-        
-        # if the UYW transform is not used, the 
 
     @staticmethod
     def _check_MeasureType(fname, target, words):
@@ -337,46 +372,49 @@ class SIF(FIPObject):
             
         self._check_MeasureType('MsensH', measureType, self._measureTypes)
         
+        is_calc_modified = False
+        
         # force CL calculation if there's a plant defined in call
         if plant is not None :
                 
             self.plant = plant # calculate or recalculate intermediate bar matrixes
             measureType = 'CL'
-            is_plant_modified = True
+            is_calc_modified = True
                 
-        else:
-                
-            is_plant_modified = False
-                
-            if measureType == 'CL' and self.plant is None:
-                raise(ValueError, 'Cannot provide MsensH closed-loop measure as no plant is defined')
+        elif measureType == 'CL' and self.plant is None:
+            
+            raise(ValueError, 'Cannot provide MsensH closed-loop measure as no plant is defined')
                  
-        if (self._MsensH[measureType] is None) or (is_plant_modified):
+        if (self._MsensH[measureType] is None) or (is_calc_modified):
                 
-              self._MsensH[measureType] = self.calc_MsensH(measureType, self.plant)
+              self._MsensH[measureType] = self.calc_MsensH(measureType)
 
         return self._MsensH[measureType]
         
     def MsensPole(self, measureType='OL', plant=None, moduli=1):
           
         self._check_MeasureType('MsensPole', measureType, self._measureTypes)
-            
+        
+        is_calc_modified = False
+        
         if plant is not None:
                 
             self.plant = plant # calculate or recalculate intermediate bar matrixes
             measureType = 'CL'
-            is_plant_modified = True
+            is_calc_modified = True
                 
-        else:
+        elif measureType == 'CL' and self.plant is None:
+            
+            raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
+        
+        if not(moduli == self._MsensPole_moduli): # dangerous if not integer value
+            
+            self._MsensPole_moduli = moduli
+            is_calc_modified = True
+                               
+        if (self._MsensPole[measureType] is None) or (is_calc_modified):
                 
-            is_plant_modified = False
-                
-            if measureType == 'CL' and self.plant is None:
-                raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
-                                
-        if (self._MsensPole[measureType] is None) or (is_plant_modified):
-                
-            self._MsensPole[measureType] = self.calc_MsensPole(measureType, self.plant, moduli)
+            self._MsensPole[measureType] = self.calc_MsensPole(measureType, moduli)
 
         return self._MsensPole[measureType]
             
@@ -385,55 +423,54 @@ class SIF(FIPObject):
             
         self._check_MeasureType('RNG', measureType, self._measureTypes)
             
+        is_calc_modified = False
+            
         if plant is not None:
                 
             self.plant = plant # trigger recalculation of plantSIF intermediate matrixes by calling setter
             measureType = 'CL'
-            is_plant_modified = True
-                                
-        else:
-                
-            is_plant_modified = False
-                
-            if measureType == 'CL' and self.plant is None:
-                raise(ValueError, 'Cannot provide RNG closed-loop measure as no plant is defined')
+            is_calc_modified = True
+
+        elif measureType == 'CL' and self.plant is None:
+            
+            raise(ValueError, 'Cannot provide RNG closed-loop measure as no plant is defined')
+        
+        if not(tol == self._RNG_tol):
+             
+            self._RNG_tol = tol
+            is_calc_modified = True           
                     
-        if (self._RNG[measureType] is None) or is_plant_modified:
+        if (self._RNG[measureType] is None) or is_calc_modified:
                 
-            self._RNG[measureType] = self.calc_RNG(measureType, self.plant, tol)
+            self._RNG[measureType] = self.calc_RNG(measureType, tol)
                 
         return self._RNG[measureType]
             
     def Mstability(self, plant=None, moduli=1):
         
+        is_calc_modified = False
+        
         if plant is not None:
                 
             self.plant = plant
-            is_plant_modified = True
+            is_calc_modified = True
                 
-        else:
-                
-            is_plant_modified = False            
+        elif self._plant is None:
             
-            if self._plant is None:
-                raise(ValueError, 'Cannot provide Mstability measure as no plant is defined')
-                  
-        if (self._Mstability is None) or is_plant_modified:
+            raise(ValueError, 'Cannot provide Mstability measure as no plant is defined')
+        
+        if not(moduli == self._MsensPole_moduli):
+             
+            self._MsensPole_moduli = moduli
+            is_calc_modified = True       
+                 
+        if (self._Mstability is None) or is_calc_modified:
                 
-            self._Mstability = self.calc_Mstability(self._plant, moduli)
+            self._Mstability = self.calc_Mstability(moduli)
         
         return self._Mstability
     
-    # Used when the Z.setter is used
-    
-    # Order of calculations is fundamental here, otherwise we are not efficient :
-    # RNG needs no other measure calculated
-    # MsensH needs no other measure calculated
-    # MsensPole needs MsensH calculation
-    # Mstability needs MsensPole calculation
-    
-    # So, to MsensH and MsensPole are free once you want Mstability.
-    # MsensH is free once you want MsensPole
+
     
     # Hypothesis : plant is kept UNCHANGED from start to end of routine
     
@@ -457,9 +494,34 @@ class SIF(FIPObject):
             self._Mstability = None
             self.Mstability()
     
-    def _translate_sensitivity_UYW(self, UYW):
+    # use the UYW transform to get 
+    # equivalent realization from existing realization
+    # new values of sensitivity measurements
+    
+    # Order of calculations is fundamental here, otherwise we are not efficient :
+	# RNG needs no other measure calculated
+	# MsensH needs no other measure calculated
+	# MsensPole needs MsensH calculation
+	# Mstability needs MsensPole calculation
+	
+	# So, to MsensH and MsensPole are free once you want Mstability.
+	# MsensH is free once you want MsensPole
+    
+    def _translate_realization(self, UYW):
         
-        U, Y, W = UYW
+        self._translate_Z_AZtoDZ_W(UYW)
+        
+        # mimic matlab code (could it destroy information during the process ??)
+        self._build_dZ()
+        
+        # rebuild remaining matrixes
+        self._buildM1M2N1N2()
+    
+        # if there's a plant, let's rebuild all bar matrixes
+        if self.plant is not None:
+            self._build_plantSIF()
+        
+        # rebuild plant matrixes (or erase in that case, because we don't use the usual path for recalculation ???)
         
         for cur_type in self._measureTypes:
             
@@ -468,13 +530,7 @@ class SIF(FIPObject):
                 pass
                 
         
-    def _translate_Z(self, UYW):
-        
-        """
-        If the UYW transform can be used, use it on existing Z to get new_Z
-        """
-        
-        pass
+
         
     # if plant is new then we renew plant in SIF to have data updated @ same time.
     # a SIF cannot keep two value for two different plant at the same time

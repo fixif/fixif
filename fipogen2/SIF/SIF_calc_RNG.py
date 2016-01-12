@@ -21,11 +21,11 @@ from calc_plantSIF import calc_plantSIF
 
 __all__ = ['calc_RNG']
 
-def calc_RNG(R, measureType, loc_plant, tol):
+def calc_RNG(R, measureType, tol):
     """
     Calculation of the RNG criterion
     """
-    def computeWeight(X, tol, rem=True):
+    def computeWeight(X, tol, rem):
         
         W = ones(X.shape)
         
@@ -48,13 +48,12 @@ def calc_RNG(R, measureType, loc_plant, tol):
     l0, m0, n0, p0 = R.size
 
     # exclude powers of 2 if there is no plant, otherwise don't
-    W01Z = computeWeight(R.Z, tol, rem=(loc_plant is None))
+    W01Z = computeWeight(R.Z, tol, (measureType == 'OL'))
     dZ = diagflat( W01Z*mat(ones((l0+n0+m0, 1))))
     
     if measureType == 'OL':
     
         #W01Z = computeWeight(R.Z, tol, rem=True)
-        
         #dZ = diagflat( W01Z*mat(ones((l0+n0+m0, 1))) )
     
         G = trace( dZ * ( R.M2.transpose()*R.M2 + R.M1.transpose()*R.Wo*R.M1 ) )
