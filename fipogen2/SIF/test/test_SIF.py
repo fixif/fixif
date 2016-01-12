@@ -1,5 +1,6 @@
 #coding=utf8
-
+# We want to print without a newline
+from __future__ import print_function
 """
 This file contains tests for the SIF functions & class
 """
@@ -13,6 +14,8 @@ __version__ = "1.0a"
 __maintainer__ = "Joachim Kruithof"
 __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
+
+
 
 import unittest
 import numpy.testing as npt
@@ -141,7 +144,7 @@ class test_SIF(unittest.TestCase):
             
         for dSSobj in self.list_dSS:
             
-            print ("obj {0: >3d} / {1}".format(i_obj, n_obj))
+            print ("obj {0: >3d} / {1}".format(i_obj, n_obj), end="")
             i_obj += 1
             
             fipVarz = {}
@@ -208,6 +211,7 @@ class test_SIF(unittest.TestCase):
             # open loop
             
             tmp_var = SIFobj.MsensH()
+            
             fipVarz[varz[0]] = tmp_var[0]
             fipVarz[varz[1]] = tmp_var[1]
             
@@ -215,7 +219,7 @@ class test_SIF(unittest.TestCase):
             fipVarz[varz[2]] = tmp_var[0]
             fipVarz[varz[3]] = tmp_var[1]
             fipVarz[varz[4]] = tmp_var[2]
-        
+
             tmp_var = SIFobj.RNG()
             fipVarz[varz[5]] = tmp_var[0]
             fipVarz[varz[6]] = tmp_var[1]
@@ -223,25 +227,27 @@ class test_SIF(unittest.TestCase):
             # closed-loop
             if is_plant_found:
             	
-                tmp_var = SIFobj.MsensH(dSSobj_plant)
+                tmp_var = SIFobj.MsensH(plant=dSSobj_plant)
                 fipVarz[varz[7]] = tmp_var[0]
                 fipVarz[varz[8]] = tmp_var[1]
             
-                tmp_var = SIFobj.MsensPole(dSSobj_plant)
+                tmp_var = SIFobj.MsensPole(plant=dSSobj_plant)
                 fipVarz[varz[9]] = tmp_var[0]
                 fipVarz[varz[10]] = tmp_var[1]
                 fipVarz[varz[11]] = tmp_var[2]            
-
+                
                 tmp_var = SIFobj.Mstability(dSSobj_plant)
                 fipVarz[varz[12]] = tmp_var[0]
-
-                tmp_var = SIFobj.RNG(dSSobj_plant)
+                
+                tmp_var = SIFobj.RNG(plant=dSSobj_plant)
                 fipVarz[varz[13]] = tmp_var[0]
                 fipVarz[varz[14]] = tmp_var[1]
                 fipVarz[varz[15]] = tmp_var[2]
                 
+                print('')
+                
             else:
-            	print('No suitable plant found, skipping tests involving plant')        
+            	print(' : No suitable plant found, skipping tests involving plant')        
          
             self.engMtlb.compare(mtlb_cmd, varz, fipVarz, decim = self.ndigit)
         
