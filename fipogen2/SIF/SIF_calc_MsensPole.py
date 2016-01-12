@@ -19,9 +19,9 @@ from calc_plantSIF import calc_plantSIF
 
 __all__ = ['calc_MsensPole']
 
-def calc_MsensPole(R, loc_plant=None, moduli=1):
+def calc_MsensPole(R, measureType, plant, moduli):
     
-    def deigdZ(A, M1, M2, shapeZ, moduli=1):
+    def deigdZ(A, M1, M2, shapeZ, moduli):
         
         mylambda, Mx = eig(A)
         My = inv(Mx).transpose()
@@ -55,17 +55,17 @@ def calc_MsensPole(R, loc_plant=None, moduli=1):
         return dlambda_dZ, dlk_dZ
     
     # open-loop case
-    if loc_plant is None:
+    if measureType == 'OL':
         
-        dlambda_dZ, dlk_dZ = deigdZ(R.AZ, R.M1, R.N1, R.Z.shape)
+        dlambda_dZ, dlk_dZ = deigdZ(R.AZ, R.M1, R.N1, R.Z.shape, moduli)
         
     #closed-loop case
     else:
         
-        Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, loc_plant)
+        #Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, plant)
         
         # dlambdabar,dlbk in _cl code
-        dlambda_dZ, dlk_dZ = deigdZ(Abar, M1bar, N1bar, R.Z.shape, moduli)
+        dlambda_dZ, dlk_dZ = deigdZ(R.Abar, R.M1bar, R.N1bar, R.Z.shape, moduli)
         
     M = norm(multiply(dlambda_dZ, R.dZ), 'fro')
     M = M*M                

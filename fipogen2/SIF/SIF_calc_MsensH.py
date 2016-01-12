@@ -21,16 +21,16 @@ from calc_plantSIF import calc_plantSIF
 
 __all__ = ['calc_MsensH']
 
-def calc_MsensH(R, loc_plant=None):
+def calc_MsensH(R, loc_measureType, loc_plant):
     
     """
     If open-loop,
     
-    loc_plant=None
+    loc_measureType == 'OL'
     
     If closed-loop,
     
-    loc_plant=ss (state space)
+    loc_measureType == 'CL'
     """
     
     def _w_norm_prod(Ag,Bg,Cg,Dg, Ah,Bh,Ch,Dh, W):
@@ -67,15 +67,15 @@ def calc_MsensH(R, loc_plant=None):
         return N, MX
     
     # open-loop system
-    if loc_plant is None:
+    if loc_measureType == 'OL':
     
         M, MZ = _w_norm_prod(R.AZ,R.M1,R.CZ,R.M2, R.AZ,R.BZ,R.N1,R.N2, R.dZ)
         
     else:
         
-        Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, loc_plant)
+       #Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, loc_plant)
         
-        M, MZ = _w_norm_prod(Abar,M1bar,Cbar,M2bar, Abar,Bbar,N1bar,N2bar, R.dZ)
+        M, MZ = _w_norm_prod(R.Abar,R.M1bar,R.Cbar,R.M2bar, R.Abar,R.Bbar,R.N1bar,R.N2bar, R.dZ)
         
     return M, MZ
       

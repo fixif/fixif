@@ -19,14 +19,14 @@ from calc_plantSIF import calc_plantSIF
 
 __all__ = ['calc_Mstability']
 
-def calc_Mstability(R, loc_plant, moduli=1):
+def calc_Mstability(R, loc_plant, loc_moduli):
     
     # MsensPole, closed-loop
-    M, dlambdabar_dZ, dlbk_dZ = R.MsensPole(plant=loc_plant, moduli=moduli)
+    M, dlambdabar_dZ, dlbk_dZ = R.MsensPole(plant=loc_plant, moduli=loc_moduli)
     
-    Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, loc_plant)
+    #Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, loc_plant)
     
-    mylambda = mat(eig(Abar)[0])
+    mylambda = mat(eig(R.Abar)[0])
     
     Psi = zeros((dlbk_dZ.shape[2]))
     

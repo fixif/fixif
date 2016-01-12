@@ -22,7 +22,7 @@ from func_aux import _dynMethodAdder
 
 import numpy as np
 
-from numpy import c_, r_, eye, zeros
+from numpy import c_, r_, eye, zeros, all
 from numpy.linalg import inv
 
 class SIF(FIPObject):
@@ -120,8 +120,8 @@ class SIF(FIPObject):
           
         return np.vectorize(lambda x:int(not SIF._isTrivial(x, eps))) (X)
    
-    @staticmethod
-    def _build_Z(my9matrix):
+
+    def _build_Z(self, my9matrix):
             
         """
         build Z or dZ depending on provided matrix tuple
@@ -129,9 +129,9 @@ class SIF(FIPObject):
             
         J, K, L, M, N, P, Q, R, S = [np.matrix(X) for X in my9matrix]
             
-        return np.bmat([[-J, M, N], 
-                        [ K, P, Q], 
-                        [ L, R, S]])   
+        self._Z =  np.bmat([[-J, M, N], 
+                            [ K, P, Q], 
+                            [ L, R, S]])   
 
     def _build_dZ(self):
             
@@ -157,42 +157,89 @@ class SIF(FIPObject):
                                         \end{aligned}\right.
         """
             
-        return SIF._nonTrivial(self._Z, self._eps)
+        self._dZ = SIF._nonTrivial(self._Z, self._eps)
     
     # AZ, BZ, CZ, DZ
     # and reset Wo and Wc because when this function is called, it means either we are initializing the structure
     # or we have refreshed any of JtoS matrix which invalidates calculation of Wc and Wo
     def _build_AZtoDZ(self):
 
-		self._Wo = None
-		self._Wc = None
+        # reset Wc and Wo attributes without recalculation
+        self._Wo = None
+        self._Wc = None
         
-        AZ = self.K * self._invJ * self.M + self.P
-        BZ = self.K * self._invJ * self.N + self.Q
-        CZ = self.L * self._invJ * self.M + self.R
-        DZ = self.L * self._invJ * self.N + self.S
+        self._AZ = self.K * self._invJ * self.M + self.P
+        self._BZ = self.K * self._invJ * self.N + self.Q
+        self._CZ = self.L * self._invJ * self.M + self.R
+        self._DZ = self.L * self._invJ * self.N + self.S
         
-        temp_dSS = dSS(AZ,BZ,CZ,DZ)
-        
-        return (AZ, BZ, CZ, DZ, temp_dSS)
+        self._Z_dSS = dSS(self._AZ,self._BZ,self._CZ,self._DZ)
     
     def _build_W(self, opt):
-    	
-    	if opt == 'o':
-    		self._Wo = self._Z_dSS.Wo
-    	elif opt == 'c':
-    		self._Wc = self._Z_dSS.Wc
+        
+        if opt == 'o':
+            self._Wo = self._Z_dSS.Wo
+        elif opt == 'c':
+            self._Wc = self._Z_dSS.Wc
     
     def _build_M1M2N1N2(self):
         
-        M1 = c_[self.K*self._invJ, eye(self._n), zeros((self._n, self._p))]
-        M2 = c_[self.L*self._invJ, zeros((self._p, self._n)), eye(self._p)]
-        N1 = r_[self._invJ*self.M, eye(self._n), zeros((self._m, self._n))]
-        N2 = r_[self._invJ*self.N, zeros((self._n, self._m)), eye(self._m)]
-        
-        return (M1, M2, N1, N2)
+        self._M1 = c_[self.K*self._invJ, eye(self._n), zeros((self._n, self._p))]
+        self._M2 = c_[self.L*self._invJ, zeros((self._p, self._n)), eye(self._p)]
+        self._N1 = r_[self._invJ*self.M, eye(self._n), zeros((self._m, self._n))]
+        self._N2 = r_[self._invJ*self.N, zeros((self._n, self._m)), eye(self._m)]
     
-    def __init__(self, JtoS, eps=1.e-8, father_obj=None, **event_spec): # name can be specified in e_desc
+    def _build_fromZ(self):
+        
+        self._build_dZ()
+        self._build_AZtoDZ()
+        self._build_M1M2N1N2()
+    
+    def _build_plantSIF(self):
+    
+        """
+        This function sets intermediate matrixes
+        for sensitivity measurements
+        """
+    
+        # dimensions of self.plant system
+    
+        l, m2, n, p2 = self.size
+        np, p, m = self.plant.size
+        
+        m1 = m - m2 
+        p1 = p - p2
+        
+        if p1 <= 0 or m1 <= 0:
+            raise(ValueError, "dimension error : check self.plant and realization dimension")
+        
+        
+        B1 = self.plant.B[:, 0:p1]
+        B2 = self.plant.B[:, p1:p]
+        C1 = self.plant.C[0:m1, :]
+        C2 = self.plant.C[m1:m, :]
+    
+        D11 = self.plant.D[0:m1, 0:p1] # correct bug from matlab code
+        D12 = self.plant.D[0:m1, p1:p]
+        D21 = self.plant.D[m1:m, 0:p1]
+        D22 = self.plant.D[m1:m, p1:p]
+    
+        if not (all(D22 == zeros(D22.shape))):
+            raise(ValueError, "D22 needs to be null")
+        
+         # closed-loop related matrices
+        self._Abar = r_[ c_[self.plant.A + B2*self.DZ*C2, B2*self.CZ], c_[self.BZ*C2, self.AZ] ]
+        self._Bbar = r_[ B1 + B2*self.DZ*D21, self.BZ*D21 ]
+        self._Cbar = c_[ C1 + D12*self.DZ*C2, D12*self.CZ ]
+        self._Dbar = D11 + D12*self.DZ*D21
+        
+         # intermediate matrices
+        self._M1bar = r_[ c_[B2*self.L*self.invJ, zeros((np, n)), B2], c_[self.K*self.invJ, eye(n), zeros((n, p2))] ]
+        self._M2bar = c_[ D12*self.L*self.invJ, zeros((m1, n)), D12 ]
+        self._N1bar = r_[ c_[self.invJ*self.N*C2, self.invJ*self.M], c_[zeros((n, np)), eye(n)], c_[C2, zeros((m2, n))] ]
+        self._N2bar = r_[ self.invJ*self.N*D21, zeros((n, p1)), D21 ]
+    
+    def __init__(self, JtoS, eps=1.e-8, plant=None, father_obj=None, **event_spec): # name can be specified in e_desc
 
         # Define default event if not specified
         # default : SIF instance created from user interface
@@ -214,22 +261,33 @@ class SIF(FIPObject):
         # set and check sizes
         self._l, self._m, self._n, self._p = self.__check_set_dimensions__(JtoS)
         
-        self._Z = SIF._build_Z(JtoS)
+        self._build_Z(JtoS)
 
         self._eps = eps
 
-        # dZ from Z
-        self._dZ = self._build_dZ()
-        
         self._invJ = inv(JtoS[0])
 
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Z_dSS = self._build_AZtoDZ()  
+        # dZ from Z
+        #self._build_dZ()
+        # build AZ_to_DZ (implies setting or resetting wo and wc to None)
+        #self._build_AZtoDZ()  
+        #self._build_M1M2N1N2()
+        
+        # build
+        # _dZ 
+        # _AZ to _DZ plus associated state space _Z_dSS (implies setting _wo and _wc to None)
+        # _M1 _M2 _N1 _N2
 
-        # buildAZ_to_DZ implies resetting wo and wc to None
-        #self._Wc = None
-        #self._Wo = None
+        self._build_fromZ()
 
-        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
+        # default plant
+        if plant is not None :
+        	self.plant = plant # calculate intermediate matrixes
+        else:
+            self._plant = None
+            # all following matrixes are relative to a SIF-plant couple
+            # they are built when self.plant setter is used
+            self._Abar, self._Bbar, self._Cbar, self._Dbar, self._M1bar, self._M2bar, self._N1bar, self._N2bar = [None]*8
 
         # sensitivity measures
         # important note
@@ -240,8 +298,7 @@ class SIF(FIPObject):
         # or we recalculate the value from scratch (same scenario as if value not instantiated)
         # or we use the existing value and UYW matrixes to get new value
         
-        # ATM we can only set plant after obj creation
-        self._plant = None
+
 
         self._measureTypes = ['OL','CL']
         
@@ -264,116 +321,94 @@ class SIF(FIPObject):
         
          if target not in words:
             raise(ValueError, '{0} type not recognized (use {1})'.format(fname, ' OR '.join(words)))
-        
 
-        
     # Functions to calculate measures. 
     # We keep updated closed-loop measures with stored plant at SIF instance level 
         
     def MsensH(self, measureType='OL', plant=None):
-    	
+        
         """
-        If plant is specified here, CL will *always* be recalculated (we don't compare input with existing _plant)
+        If plant is specified here, CL will *always* be recalculated (we don't compare input with existing self._plant)
         We need manual possible input of type because, we may want access to the stored CL MsensH without recalculating it. 
             
-        inst.MsensH(measureType='CL')
+        inst.MsensH(measureType='CL') gives the stored value for closed-loop case without recalculation (if there's a value) 
+        or calculates from stored plant (if there's no value)
         """
             
         self._check_MeasureType('MsensH', measureType, self._measureTypes)
         
-        cur_plant = None
-        
-        # force CL calculation if there's a plant
+        # force CL calculation if there's a plant defined in call
         if plant is not None :
                 
-            self._plant = plant
+            self.plant = plant # calculate or recalculate intermediate bar matrixes
             measureType = 'CL'
             is_plant_modified = True
-            cur_plant = plant
                 
         else:
                 
             is_plant_modified = False
                 
-            if measureType == 'CL':
-                    
-                if self._plant is None:
-                     raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
-                                
-                cur_plant = self._plant
+            if measureType == 'CL' and self.plant is None:
+                raise(ValueError, 'Cannot provide MsensH closed-loop measure as no plant is defined')
                  
         if (self._MsensH[measureType] is None) or (is_plant_modified):
                 
-              self._MsensH[measureType] = self.calc_MsensH(loc_plant = cur_plant)
+              self._MsensH[measureType] = self.calc_MsensH(measureType, self.plant)
 
         return self._MsensH[measureType]
         
-    def MsensPole(self, measureType = 'OL', plant = None, moduli=1):
+    def MsensPole(self, measureType='OL', plant=None, moduli=1):
           
         self._check_MeasureType('MsensPole', measureType, self._measureTypes)
             
-        cur_plant = None
-            
         if plant is not None:
                 
-            self._plant = plant
+            self.plant = plant # calculate or recalculate intermediate bar matrixes
             measureType = 'CL'
             is_plant_modified = True
-            cur_plant = plant
                 
         else:
                 
             is_plant_modified = False
                 
-            if measureType == 'CL':
-                    
-                if self._plant is None:
-                    raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
-                                
-                cur_plant = self._plant
+            if measureType == 'CL' and self.plant is None:
+                raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
                                 
         if (self._MsensPole[measureType] is None) or (is_plant_modified):
                 
-            self._MsensPole[measureType] = self.calc_MsensPole(loc_plant = cur_plant, moduli = moduli)
+            self._MsensPole[measureType] = self.calc_MsensPole(measureType, self.plant, moduli)
 
         return self._MsensPole[measureType]
             
             
-    def RNG(self, measureType = 'OL', plant=None):
+    def RNG(self, measureType='OL', plant=None, tol=1.e-8):
             
         self._check_MeasureType('RNG', measureType, self._measureTypes)
             
-        cur_plant = None
-            
         if plant is not None:
                 
-            self._plant = plant
+            self.plant = plant # trigger recalculation of plantSIF intermediate matrixes by calling setter
             measureType = 'CL'
             is_plant_modified = True
-            cur_plant = plant
                                 
         else:
                 
             is_plant_modified = False
                 
-            if measureType == 'CL':
-                    
-                if self._plant is None:
-                    raise(ValueError, 'Cannot provide RNG closed-loop measuer as no plant is defined')
-                    
-                cur_plant = self._plant
+            if measureType == 'CL' and self.plant is None:
+                raise(ValueError, 'Cannot provide RNG closed-loop measure as no plant is defined')
                     
         if (self._RNG[measureType] is None) or is_plant_modified:
                 
-            self._RNG[measureType] = self.calc_RNG(loc_plant = cur_plant)
+            self._RNG[measureType] = self.calc_RNG(measureType, self.plant, tol)
                 
         return self._RNG[measureType]
             
-    def Mstability(self, plant=None):
-            
+    def Mstability(self, plant=None, moduli=1):
+        
         if plant is not None:
                 
-            self._plant = plant
+            self.plant = plant
             is_plant_modified = True
                 
         else:
@@ -382,15 +417,25 @@ class SIF(FIPObject):
             
             if self._plant is None:
                 raise(ValueError, 'Cannot provide Mstability measure as no plant is defined')
-                   
+                  
         if (self._Mstability is None) or is_plant_modified:
                 
-            self._Mstability = self.calc_Mstability(self._plant)
+            self._Mstability = self.calc_Mstability(self._plant, moduli)
         
         return self._Mstability
     
     # Used when the Z.setter is used
     
+    # Order of calculations is fundamental here, otherwise we are not efficient :
+    # RNG needs no other measure calculated
+    # MsensH needs no other measure calculated
+    # MsensPole needs MsensH calculation
+    # Mstability needs MsensPole calculation
+    
+    # So, to MsensH and MsensPole are free once you want Mstability.
+    # MsensH is free once you want MsensPole
+    
+    # Hypothesis : plant is kept UNCHANGED from start to end of routine
     
     def _recalc_sensitivity(self):
         
@@ -413,33 +458,39 @@ class SIF(FIPObject):
             self.Mstability()
     
     def _translate_sensitivity_UYW(self, UYW):
-    	
-    	U, Y, W = UYW
-    	
-    	for cur_type in self._measureTypes:
-    		
-    		if not(self._RNG[cur_type] is None):
-    			
-    			
-    	
+        
+        U, Y, W = UYW
+        
+        for cur_type in self._measureTypes:
+            
+            if not(self._RNG[cur_type] is None):
+                
+                pass
+                
+        
     def _translate_Z(self, UYW):
-    	
-    	"""
-    	If the UYW transform can be used, use it on existing Z to get new_Z
-    	"""
-    	
-    	pass
+        
+        """
+        If the UYW transform can be used, use it on existing Z to get new_Z
+        """
+        
+        pass
         
     # if plant is new then we renew plant in SIF to have data updated @ same time.
     # a SIF cannot keep two value for two different plant at the same time
         
     @property
     def plant(self):
-        return _plant(self)
+        return self._plant
+        
+    # if plant is modified, then all matrixes relative to SIF-plant couple are recalculated (keep them
+    # up-to-date and ready to use for all sensitivity calculations
         
     @plant.setter
     def plant(self, mymat):
-        self._plant = mymat    
+        self._plant = mymat
+        self._build_plantSIF()
+        
 
     # Only matrix Z is kept in memory
     # JtoS extracted from Z matrix, dJtodS from dZ resp.
@@ -470,18 +521,18 @@ class SIF(FIPObject):
 
     @property
     def Wo(self):
-    	
-    	if self._Wo is None:
-    		self._build_W('o')
-    	
+        
+        if self._Wo is None:
+            self._build_W('o')
+        
         return self._Wo
     
     @property
     def Wc(self):
-    	
-    	if self._Wc is None:
-    		self._build_W('c')
-    	
+        
+        if self._Wc is None:
+            self._build_W('c')
+        
         return self._Wc
 
     # M1 to N2 are used in sensitivity calculations
@@ -501,6 +552,45 @@ class SIF(FIPObject):
     @property
     def N2(self):
         return self._N2
+
+    # Only for coherence we define properties for all plantSIF matrixes event if slower.
+    # May be useful in the future
+    
+    #Abar to Dbar
+    
+    @property
+    def Abar(self):
+        return self._Abar
+    
+    @property
+    def Bbar(self):
+        return self._Bbar
+    
+    @property
+    def Cbar(self):
+        return self._Cbar
+    
+    @property
+    def Dbar(self):
+        return self._Dbar
+    
+    #M1bar to N2bar
+    
+    @property
+    def M1bar(self):
+        return self._M1bar
+    
+    @property
+    def M2bar(self):
+        return self._M2bar
+    
+    @property
+    def N1bar(self):
+        return self._N1bar
+    
+    @property
+    def N2bar(self):
+        return self._N2bar
     
     # Z, dZ getters
 
@@ -519,11 +609,9 @@ class SIF(FIPObject):
     @Z.setter
     def Z(self, mymat):
         self._Z = mymat
-        self._dZ = self._build_dZ(self._eps)
-        self._invJ = inv(self.J)
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
-        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
-        
+        self._invJ = inv(self.J) 
+        self._build_fromZ()
+  
     @dZ.setter
     def dZ(self, mymat):
         self._dZ = mymat
@@ -589,60 +677,59 @@ class SIF(FIPObject):
         return self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m]
 
     # JtoS setters
+    # J to N : we rebuild all matrixes
 
     @J.setter
     def J(self, mymat):
         self._Z[ 0 : self._l, 0 : self._l ] = - mymat
-        self._dZ = self._build_dZ()
         self._invJ = inv(mymat)
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
-        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
+        self._build_fromZ()
+
     @K.setter
     def K(self, mymat):
         self._Z[ self._l : self._l+self._n, 0 : self._l ] = mymat
-        self._dZ = self._build_dZ()
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
-        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
+        self._build_fromZ()
+        
     @L.setter
     def L(self, mymat):
         self._Z[ self._l+self._n : self._l+self._n+self._p, 0:self._l ] = mymat
-        self._dZ = self._build_dZ()
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
-        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
+        self._build_fromZ()
+
     @M.setter
     def M(self, mymat):
         self._Z[ 0 : self._l, self._l : self._l + self._n ] = mymat
-        self._dZ = self._build_dZ(self._eps)
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
-        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
+        self._build_fromZ()
+        
     @N.setter
     def N(self, mymat):
         self._Z[ 0 : self._l, self._l+self._n : self._l+self._n+self._m] = mymat
-        self._dZ = self._build_dZ()
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ()
-        self._M1, self._M2, self._N1, self._N2 = self._build_M1M2N1N2()
+        self._build_fromZ()
+    
+    # no need to rebuild M1M2N1N2 in the following cases
+    
     @P.setter
     def P(self, mymat):
         self._Z[ self._l : self._l+self._n, self._l : self._l + self._n ] = mymat
-        self._dZ = self._build_dZ()
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
+        self._build_dZ()
+        self._build_AZtoDZ() 
     @Q.setter
     def Q(self, mymat):
         self._Z[ self._l : self._l+self._n, self._l+self._n : self._l+self._n+self._m] = mymat
-        self._dZ = self._build_dZ()
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
+        self._build_dZ()
+        self._build_AZtoDZ() 
     @R.setter
     def R(self, mymat):
         self._Z[ self._l+self._n : self._l+self._n+self._p, self._l : self._l + self._n ] = mymat
-        self._dZ = self._build_dZ()
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
+        self._build_dZ()
+        self._build_AZtoDZ() 
     @S.setter
     def S(self, mymat):
         self._Z[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m] = mymat
-        self._dZ = self._build_dZ()
-        self._AZ, self._BZ, self._CZ, self._DZ, self._Wo, self._Wc = self._build_AZtoDZ() 
+        self._build_dZ()
+        self._build_AZtoDZ() 
 
     #dJtodS setters
+    # we only modify dZ matrix so no need to rebuild anything
 
     @dJ.setter
     def dJ(self, mymat):

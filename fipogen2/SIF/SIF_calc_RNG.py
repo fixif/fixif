@@ -21,7 +21,7 @@ from calc_plantSIF import calc_plantSIF
 
 __all__ = ['calc_RNG']
 
-def calc_RNG(R, loc_plant=None, tol=1.e-8):
+def calc_RNG(R, measureType, loc_plant, tol):
     """
     Calculation of the RNG criterion
     """
@@ -51,7 +51,7 @@ def calc_RNG(R, loc_plant=None, tol=1.e-8):
     W01Z = computeWeight(R.Z, tol, rem=(loc_plant is None))
     dZ = diagflat( W01Z*mat(ones((l0+n0+m0, 1))))
     
-    if loc_plant is None:
+    if measureType == 'OL':
     
         #W01Z = computeWeight(R.Z, tol, rem=True)
         
@@ -63,15 +63,15 @@ def calc_RNG(R, loc_plant=None, tol=1.e-8):
     
     else:
 
-        Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, loc_plant)
-        Wobar = dSS(Abar, Bbar, Cbar, Dbar).Wo
+        #Abar, Bbar, Cbar, Dbar, M1bar, M2bar, N1bar, N2bar = calc_plantSIF(R, loc_plant)
+        Wobar = dSS(R.Abar, R.Bbar, R.Cbar, R.Dbar).Wo
         
         #W01Z = computeWeight(R.Z, tol, rem=False)
         #dZ = diag( W01Z*mat(ones((l0+n0+m0, 1))))
 
-        G = trace( dZ * (M2bar.transpose()*M2bar + M1bar.transpose() * Wobar * M1bar) )
+        G = trace( dZ * (R.M2bar.transpose()*R.M2bar + R.M1bar.transpose() * Wobar * R.M1bar) )
         
-        M1M2Wobar = M2bar.transpose() * M2bar + M1bar.transpose() * Wobar * M1bar
+        M1M2Wobar = R.M2bar.transpose() * R.M2bar + R.M1bar.transpose() * Wobar * R.M1bar
 
         return G, dZ, M1M2Wobar
     
