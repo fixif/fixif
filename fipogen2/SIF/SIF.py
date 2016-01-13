@@ -239,26 +239,20 @@ class SIF(FIPObject):
         self._N1bar = r_[ c_[self.invJ*self.N*C2, self.invJ*self.M], c_[zeros((n, np)), eye(n)], c_[C2, zeros((m2, n))] ]
         self._N2bar = r_[ self.invJ*self.N*D21, zeros((n, p1)), D21 ]
     
-    def _translate_Z_AZtoDZ_W(self, UYW):
+    def _translate_Z_AZtoDZ_W(self, U, Y, W, invU):
         
         """
         Calculate Z, AZtoDZ and W in the same function to factorize invU calculation
         """
         
-        U,Y,W = UYW
-        
-        U = mat(U)
-        Y = mat(Y)
-        W = mat(W)
-        
-        invU = inv(U)
-        
         # _build_Z
         #             J           K              L         M           N         P              Q            R         S
         self._build_Z(Y*self.J*W, invU*self.K*W, self.L*W, Y*self.M*U, Y*self.N, invU*self.P*U, invU*self.Q, self.R*U, self.S)
     
+        self._invJ = inv(self.J)
     
         # _build_AZtoDZ
+        
         self._AZ = invU*self._AZ*U
         self._BZ = invU*self._BZ
         self._CZ = self._CZ*U
@@ -266,6 +260,8 @@ class SIF(FIPObject):
         
         self._Z_dSS = dSS(self._AZ,self._BZ,self._CZ,self._DZ)
         
+        
+        # update Wo and Wc if they exist
         if self._Wo is not None:
             self._Wo = transpose(U)*self._Wo*U
         
@@ -341,6 +337,10 @@ class SIF(FIPObject):
         self._MsensPole = {key:None for key in self._measureTypes}
         self._RNG = {key:None for key in self._measureTypes}
         
+        
+        # the values of those parameters needs to be kept
+        # because we have to test those against the user's input or program input
+        # to know if spitting out the old result is correct or if a recalculation is needed
         self._MsensPole_moduli = None
         self._RNG_tol = None
         
@@ -349,6 +349,10 @@ class SIF(FIPObject):
         
         # define two different cases : or we can use UYW transform, or we cannot
         # this should be modified in each subclass AFTER using the init routine of SIF class
+        # if a class variable is used it implies using a metaclass
+        # if an object attribute is used it implies that it's not the cleanest way, 
+        # programmatically wise but avoids error (changing val at instance level does not,
+        # by reference change the value at the superclass level
         is_use_UYW_transform = True
 
     @staticmethod
@@ -383,7 +387,7 @@ class SIF(FIPObject):
                 
         elif measureType == 'CL' and self.plant is None:
             
-            raise(ValueError, 'Cannot provide MsensH closed-loop measure as no plant is defined')
+            raise(NameError, 'Cannot provide MsensH closed-loop measure as no plant is defined')
                  
         if (self._MsensH[measureType] is None) or (is_calc_modified):
                 
@@ -405,7 +409,7 @@ class SIF(FIPObject):
                 
         elif measureType == 'CL' and self.plant is None:
             
-            raise(ValueError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
+            raise(NameError, 'Cannot provide MsensPole closed-loop measure as no plant is defined')
         
         if not(moduli == self._MsensPole_moduli): # dangerous if not integer value
             
@@ -433,7 +437,7 @@ class SIF(FIPObject):
 
         elif measureType == 'CL' and self.plant is None:
             
-            raise(ValueError, 'Cannot provide RNG closed-loop measure as no plant is defined')
+            raise(NameError, 'Cannot provide RNG closed-loop measure as no plant is defined')
         
         if not(tol == self._RNG_tol):
              
@@ -455,9 +459,9 @@ class SIF(FIPObject):
             self.plant = plant
             is_calc_modified = True
                 
-        elif self._plant is None:
+        elif self.plant is None:
             
-            raise(ValueError, 'Cannot provide Mstability measure as no plant is defined')
+            raise(NameError, 'Cannot provide Mstability measure as no plant is defined')
         
         if not(moduli == self._MsensPole_moduli):
              
@@ -474,23 +478,25 @@ class SIF(FIPObject):
     
     # Hypothesis : plant is kept UNCHANGED from start to end of routine
     
+    # Sensitivity criterions are recalculated if they already exist. If they don't, they're untouched
+    
     def _recalc_sensitivity(self):
         
         for cur_type in self._measureTypes:
         
-            if not(self._MsensH[cur_type] is None):
+            if self._MsensH[cur_type] is not None:
                 self._MsensH[cur_type] = None
                 self.MsensH(measureType=cur_type)
                 
-            if not(self._MsensPole[cur_type] is None):
+            if self._MsensPole[cur_type] is not None:
                 self._MsensPole[cur_type] = None
                 self.MsensPole(measureType=cur_type)
                 
-            if not(self._RNG[cur_type] is None):
+            if self._RNG[cur_type] is not None:
                 self._RNG[cur_type] = None
                 self.RNG(measureType=cur_type)
                 
-        if not(self._Mstability is None):
+        if self._Mstability is not None:
             self._Mstability = None
             self.Mstability()
     
@@ -499,36 +505,65 @@ class SIF(FIPObject):
     # new values of sensitivity measurements
     
     # Order of calculations is fundamental here, otherwise we are not efficient :
-	# RNG needs no other measure calculated
-	# MsensH needs no other measure calculated
-	# MsensPole needs MsensH calculation
-	# Mstability needs MsensPole calculation
-	
-	# So, to MsensH and MsensPole are free once you want Mstability.
-	# MsensH is free once you want MsensPole
+    # RNG needs no other measure calculated
+    # MsensH needs no other measure calculated
+    # MsensPole needs MsensH calculation
+    # Mstability needs MsensPole calculation
+    
+    # So, to MsensH and MsensPole are free once you want Mstability.
+    # MsensH is free once you want MsensPole
     
     def _translate_realization(self, UYW):
+        """
+        This function calculates an equivalent realization by updating all instance attributes 
+        that needs to be updated
         
-        self._translate_Z_AZtoDZ_W(UYW)
+        As a first step we update Z by transforming it,
+        then the associated state space
+        then Wo and Wc if they exist (and they should already exist otherwise they are going to be recalculated then transformed, for example for RNG)
+        but if RNG has already been calculated, then they exist.
+        We should then try to see if there is a UYW transform that needs old value of Wo and Wc, and that needs not to be calculated by initial routine
         
-        # mimic matlab code (could it destroy information during the process ??)
+        """
+        
+        
+        U,Y,W = UYW
+        
+        U = mat(U)
+        Y = mat(Y)
+        W = mat(W)
+        
+        invU = inv(U)
+        
+        self._translate_Z_AZtoDZ_W(U, Y, W, invU)
+        
+        # mimic matlab code (could it destroy information during the process, if some coeffs go under the threshold after translation to equivalent form ??)
         self._build_dZ()
         
-        # rebuild remaining matrixes
+        # rebuild remaining matrixes used in sensitivity calculations
         self._buildM1M2N1N2()
     
         # if there's a plant, let's rebuild all bar matrixes
         if self.plant is not None:
             self._build_plantSIF()
-        
-        # rebuild plant matrixes (or erase in that case, because we don't use the usual path for recalculation ???)
+
+        # we don't call _set_check_dimensions bacause SIF dimension should remain the same
         
         for cur_type in self._measureTypes:
             
-            if not(self._RNG[cur_type] is None):
+            # uses 
+            # - previous value of self._RNG[cur_type]
+            # - new value of Wo calculated from UYW transform
+            # - previous value of dZ
+            # - previous value of M1M2Wobar for CL calculation
+            if self._RNG[cur_type] is not None: # use instance attribute here, otherwise we're going to calculate it self.RNG()(set to None initially)
+                self.transform_UYW_RNG(cur_type, U, Y, W, invU)
                 
-                pass
-                
+            if self._MsensH[cur_type] is not None:
+            	self.MsensH(measureType=cur_type) # UYW transform for MsensH not defined
+            	
+            if self._MsensPole[cur_type] is not None:
+            	self.transform_UYW_MsensPole(cur_type, U, Y, W, invU)
         
 
         
@@ -650,6 +685,7 @@ class SIF(FIPObject):
     
     # Z, dZ getters
 
+    # needs to be set to define properties relying on it
     _l, _m, _n, _p = (0, 0, 0, 0)
 
     @property
