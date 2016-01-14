@@ -21,32 +21,34 @@ from calc_transform_UYW import calc_transform_UYW
 
 __all__ = ['transform_UYW_MsensPole']
 
-def transform_UYW_MsensPole(R, UYW):
-    
-    U, Y, W = UYW
-    
-    dlk_dZ = R.MsensH[type][2]
-        
-    lS, mS, nS, pS = R.size
-    
-    k = dlk_dZ.shape[2]
+def transform_UYW_MsensPole(R, measureType, T1, T2):
 
-    T1, T2 = calc_transform_UYW(UYW)
+    dlk_dZ = R._MsensPole[measureType][2]
+    dlambda_dZ = R._MsensPole[measureType][1]# dlambdabar_dZ if measureType == 'CL'
     
-    for i in range(0, k):
+#     k = dlk_dZ.shape[2]
+    
+#     l = Y.shape[1]
+#     n = U.shape[1]
+#         
+#     T1 = eye(l+n+R._p)
+#     T1[0:l, 0:l] = Y
+#     T1[l:l+n, l:l+n] = invU
+#     
+#     T2 = eye(l+n+R._m)
+#     T2[0:l, 0:l] = W
+#     T2[l:l+n, l:l+n] = U
+    
+    for i in range(0, dlk_dZ.shape[2]):
         dlk_dZ[:,:,i] = transpose(inv(T1)) * dlk_dZ[:,:,i] * transpose(inv(T2))
     
-    dlambda_dZ = mat(np.fromfunction(lambda i, j: norm(dlk_dZ[i,j,:], 'fro'), (l+n+pS, l+n+mS)))
-    
-    #for i in range(0, l+n+pS):
-    #    for j in range(0, l+n+mS):
-    #        dlambda_dZ[i,j] = norm(dlk_dZ[i,j,:], 'fro')
+    dlambda_dZ = mat(np.fromfunction(lambda i, j: norm(dlk_dZ[i,j,:], 'fro'), (l+n+R._p, l+n+R._m)))
     
     # Measure
        
     M = norm(multiply(dlambda_dZ, R.dZ), 'fro')
     M = M*M
     
-    return M    
+    R._MsensPole[measureType][0] = M
             
     
