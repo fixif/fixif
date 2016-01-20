@@ -40,7 +40,7 @@ class RhoDFIIt(State_Space):
         if delta is None:
             self._delta = mat(zeros(gamma.shape))
         else:
-            self._delta = delta
+            self._delta = mat(delta)
         
         self._num = num
         self._den = den
