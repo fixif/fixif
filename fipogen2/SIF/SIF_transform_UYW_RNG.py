@@ -60,6 +60,7 @@ def transform_UYW_RNG(R, measureType, T1):
 #         T1, T2 = calc_transform_UYW(R, U, Y, W, invU)
 
         # WARNING PROBLEM TODO THIS VALUE HAS NOT BEEN UPDATED AND IS NOT COHERENT WITH THE REST
+        # YES IT IS indeed according to Thibault
         M1M2Wobar = R._RNG[measureType][2]
         
         # JOA I don't understand that the matrix M1M2Wobar is not modified by the UYW transform
