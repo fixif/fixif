@@ -65,52 +65,52 @@ class ModalDelta(SIF):
         
         return A, B, C, D
   
-    def canon_modal_v2(self):
-    	
-    	pass
+#     def canon_modal_v2(self):
+#     	
+#     	pass
   
-    def relaxedl2scaling(mySIF, Umax=None, delta=None):
-        
-        # change of behaviour vs. old code : if Umax is specified it overrides other data
-        
-        if Umax is None:
-        
-            if not hasattr(mySIF, 'FPIS'):
-                Umax = 1 # any power of 2
-            else:
-                Umax = mySIF.FPIS.Umax
-        
-        if delta is None:
-            delta = 1
-            
-        # SISO test
-        
-        l, m, n, p = mySIF.size()
-        
-        if not (not(m == 1) and not(p == 1)):
-            raise('The system must be SISO!')
-        
-        # alpha
-        
-        if not hasattr(mySIF, 'FPIS'):
-            alphaX = mat(- ( log2(Umax) - floor(log2(Umax)) )*ones((n, 1)))
-            alphaT = mat(- ( log2(Umax) - floor(log2(Umax)) )*ones((l, 1)))
-        else:
-            alphaX = mat( mySIF.FPIS.betaX - (mySIF.FPIS.betaU + log2(Umax) - floor(log2(Umax)))*ones(n, 1))
-            alphaT = mat( mySIF.FPIS.betaT - (mySIF.FPIS.betaU + log2(Umax) - floor(log2(Umax)))*ones(l, 1))
+#     def relaxedl2scaling(mySIF, Umax=None, delta=None):
+#         
+#         # change of behaviour vs. old code : if Umax is specified it overrides other data
+#         
+#         if Umax is None:
+#         
+#             if not hasattr(mySIF, 'FPIS'):
+#                 Umax = 1 # any power of 2
+#             else:
+#                 Umax = mySIF.FPIS.Umax
+#         
+#         if delta is None:
+#             delta = 1
+#             
+#         # SISO test
+#         
+#         l, m, n, p = mySIF.size()
+#         
+#         if not (not(m == 1) and not(p == 1)):
+#             raise('The system must be SISO!')
+#         
+#         # alpha
+#         
+#         if not hasattr(mySIF, 'FPIS'):
+#             alphaX = mat(- ( log2(Umax) - floor(log2(Umax)) )*ones((n, 1)))
+#             alphaT = mat(- ( log2(Umax) - floor(log2(Umax)) )*ones((l, 1)))
+#         else:
+#             alphaX = mat( mySIF.FPIS.betaX - (mySIF.FPIS.betaU + log2(Umax) - floor(log2(Umax)))*ones(n, 1))
+#             alphaT = mat( mySIF.FPIS.betaT - (mySIF.FPIS.betaU + log2(Umax) - floor(log2(Umax)))*ones(l, 1))
             
         # U, V, W transformation matrixes
         
-        def toto(self, M, alpha = None, beta = None):
-            
-            if alpha is not None:
-                
-                d = delta*sqrt(diagflat(M))
+#         def toto(self, M, alpha = None, beta = None):
+#             
+#             if alpha is not None:
+#                 
+#                 d = delta*sqrt(diagflat(M))
                 
                 #WORK_MARKER
                 
         
-        return SIF, Y ,W
+#         return SIF, Y ,W
         
   
     def __init__(self, A, B, C, D, Delta = None, isDeltaExact = False, father=None, **event_spec):
