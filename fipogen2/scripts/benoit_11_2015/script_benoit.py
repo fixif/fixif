@@ -2,8 +2,7 @@
 #!usr/bin/env python
 
 from sys import path
-path.append('../../')
-path.append('../../../start/fipogen-v1/oSoP')
+path.append('/Users/benoitlopez/Documents/Thèse/fipogen/start/fipogen-v1')
 
 
 import LTI
@@ -113,7 +112,7 @@ def SIFH_to_SIFHstar(z,w):
 
 
 
-D=loadmat("Examples_Florent")
+D=loadmat("scripts/benoit_11_2015/ARITH23_BLTH_ex.mat")
 for sifName in ["SIF_DFI", "SIF_LWDF", "SIF_SS", "SIF_rho"]:
 	print "\n\n---------------- Structure "+sifName+" ----------------\n\n"
 	Z_DFI=[D[sifName][0][0][i] for i in range(4,13)]
