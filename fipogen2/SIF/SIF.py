@@ -247,7 +247,7 @@ class SIF(FIPObject):
         
         # _build_Z
         #             J                     K                        L              M                     N              P                        Q                 R              S
-        self._build_Z(self.Y*self.J*self.W, self.invU*self.K*self.W, self.L*self.W, self.Y*self.M*self.U, self.Y*self.N, self.invU*self.P*self.U, self.invU*self.Q, self.R*self.U, self.S)
+        self._build_Z((self.Y*self.J*self.W, self.invU*self.K*self.W, self.L*self.W, self.Y*self.M*self.U, self.Y*self.N, self.invU*self.P*self.U, self.invU*self.Q, self.R*self.U, self.S))
     
         self._invJ = inv(self.J)
     
@@ -544,7 +544,7 @@ class SIF(FIPObject):
         self._build_dZ()
         
         # rebuild remaining matrixes used in sensitivity calculations
-        self._buildM1M2N1N2()
+        self._build_M1M2N1N2()
     
         # if there's a plant, let's rebuild all bar matrixes
         if self.plant is not None:
@@ -890,20 +890,20 @@ class SIF(FIPObject):
     def U(self, mymat):
         if (mymat.shape[0] != mymat.shape[1]) or mymat.shape[0] != self._n :
             raise(ValueError, 'Wrong dimension for U')
-        self._U = mat(mymat)
+        self._U = np.matrix(mymat)
         self._invU = inv(self._U)
         
     @Y.setter
     def Y(self, mymat):
         if (mymat.shape[0] != mymat.shape[1]) or mymat.shape[0] != self._l :
             raise(ValueError, 'Wrong dimension for Y')
-        self._Y = mat(mymat)       
+        self._Y = np.matrix(mymat)       
         
     @W.setter
     def W(self, mymat):
         if (mymat.shape[0] != mymat.shape[1]) or mymat.shape[0] != self._l :
             raise(ValueError, 'Wrong dimension for W')
-        self._W = mat(mymat)  
+        self._W = np.matrix(mymat)  
 
     def __check_set_dimensions__(self, JtoS):
         

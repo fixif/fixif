@@ -110,8 +110,8 @@ def algorithmCfloat(R, funcName, fileName=None):
     cDict['calculations']['inter'] = u""
     
     for i in range(0, l):
-    	print(l)
-    	print(i)
+    	#print(l)
+    	#print(i)
     	cDict["calculations"]["inter"] += "\t" + "double " + strT[i] + " = " + _scalprodCdouble(c_[R.M[i,:], R.N[i,:], -R.J[i,0:i-2]], strXn + strU + strT[0:i-2]) + ";\n"
     
     
@@ -148,7 +148,7 @@ def algorithmCfloat(R, funcName, fileName=None):
     
     cRender = cTemplate.render(**cDict)
     
-    print(cRender)
+    #print(cRender)
 
     if fileName is None:
     	fileName = funcName + '.c'

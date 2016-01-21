@@ -12,9 +12,11 @@ __status__ = "Beta"
 
 from LTI import dSS
 
+from Structures import RhoDFIIt
+
 from numpy import matrix as mat
 from numpy import eye, c_, r_, zeros, multiply, all, diagflat, trace, ones, where, logical_or, ravel
-from numpy import transpose, fmod, log2
+from numpy import transpose, fmod, log2, random
 from numpy.linalg import norm, inv, eig
 
 from scipy import optimize
@@ -23,7 +25,8 @@ from copy import copy, deepcopy
 
 __all__ = ['optimizeForm']
 
-def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=None, weigthingMethod=None, measureWeights=None, optMethod=None):
+
+def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=None, weightingMethod=None, measureWeights=None, optMethod=None, bestVals=None):
     
     """
     Generic optimization routine for all SIF subclasses
@@ -48,7 +51,7 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
     def_opt_measures = {'MsensH', 'MsensPole', 'RNG', 'Mstability'}
 
     # supported forms of filter for optimization
-    def_opt_forms = {'DFI', 'DFII', 'State_Space', 'rhoDFIIt'}
+    def_opt_forms = {'DFI', 'DFII', 'State_Space', 'RhoDFIIt'}
 
     # check input args, set defaults values if not provided, give user feedback on what's happening
 
@@ -74,13 +77,13 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
     # special case if number of measures is 1
     elif len(measures) == 1:
         print('weightingMethod : N/A, single parameter')
-        weigthingMethod = 'equalWeight'
+        weightingMethod = 'equalWeight'
         
     elif weightingMethod is not None:
         print('weightingMethod : {}'.format(weightingMethod))
         
     else:
-        print('weightingMethod : not defined, using default : {}'.format(def_opt_weigthingMethod))
+        print('weightingMethod : not defined, using default : {}'.format(def_opt_weightingMethod))
         print('weightingMethod : measureWeights will be IGNORED')
         weightingMethod = def_opt_weightingMethod
 
@@ -88,7 +91,7 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
     if weightingMethod == 'equalWeight':
         measureWeights = [1./len(measures) for i in measures]
         
-    elif weigthingMethod == 'simpleWeight':
+    elif weightingMethod == 'simpleWeight':
         if sum(measureWeights != 1): # risky
             raise(ValueError, 'measureWeights : simpleWeight : sum of measures should be equal to 1')
         if len(measureWeights) != len(measures):
@@ -112,14 +115,11 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
     # from this we get a private variable named
     # those tests could be skipped by using a metaclass or a new class to inherit from
 
-    # get name of base classes
-    base_class_names = [myclass.__name__ for myclass in R.__class__.__bases__]
-    
-    if ('DFI'  or 'DFII' or 'State_Space') in base_class_names:
+    if R.__class__.__name__ in {'DFI', 'DFII', 'State_Space'}:
         _formOpt = 'UYW'
-    elif 'rhoDFIIt' in base_class_names:
+    elif R.__class__.__name__ == 'RhoDFIIt':
         _formOpt = 'gammaDelta' # in a later iteration if we define a dictionary correctly for instance.__init__, could be more generic like "brute"
-#     elif 'Modal_delta' in base_class_names:
+#     elif R.__class__.__name__ == 'Modal_delta':
 #         _formOpt = 'delta'
     else:
         raise(NameError, 'unsupported form of filter, supported forms are {}'.format(' , '.join(def_opt_forms)))
@@ -132,23 +132,28 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
         
         if _formOpt == 'UYW':
             # U,Y,W transform
-            startVals = [eye(R._n), eye(R._l), eye(R._l)] # could be uniformized by replacing existing or non-existing value of U, Y, W
+            print('startValues : replacing stored values with default UYW values')
+            #R.U = multiply(10,eye(R._n)) # be carfeul to use property so that nparray is transformed into matrix
+            #print('l={0} m={1} n={2} p={3}'.format(R._l, R._m, R._n, R._p))
+            #R.U = multiply(3, ones((R._n,R._n)))
+            R.U = random.rand(R._n, R._n)
+            R.Y = eye(R._l)
+            R.W = eye(R._l)
         
         elif _formOpt == 'gammaDelta': #or _formOpt == 'delta'
             raise(ValueError, 'gamma,delta needs to be defined at instance creation, cannot supply default values (to be implemented)')
            
     # use data already in instance attributes 
     elif startVals is None:
-        
         print('startValues : using stored values')
         
-        if _formOpt == 'UYW':
-            startVals = [self.U, self.Y, self.W] 
-        elif _formOpt == 'gammaDelta':
-            startVals = [R._gamma, R._delta]
+    if _formOpt == 'UYW':
+        startVals = [R.U, R.Y, R.W] 
+    elif _formOpt == 'gammaDelta':
+        startVals = [R._gamma, R._delta]
 
     
-    def _getOptParameter(vals, weights, weigthingMethod, best_vals = None):
+    def _getOptParameter(vals, weights, weightingMethod, best_vals = None):
         
         """
         This function returns a unique float which represents our optimization objective parameter,
@@ -228,7 +233,7 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
         elif _formOpt == 'gammaDelta':
         
             #create new object with current gamma and delta
-            tmp_obj = rhoDFIIt(R._num, R._den, gamma=tmp_optVals[0], delta=tmp_optVals[1]) # TODO strore isGammaExact, isDeltaExact in rhoDFIIt instance
+            tmp_obj = RhoDFIIt(R._num, R._den, gamma=tmp_optVals[0], delta=tmp_optVals[1]) # TODO strore isGammaExact, isDeltaExact in RhoDFIIt instance
         
         # if _formOpt == 'UYW', no recalculation needed here
         # if _formOpt == 'gammaDelta', calculation from scratch of measures
@@ -239,10 +244,9 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
         opt_crit = _getOptParameter(tmp_opt_crit, measureWeights, weightingMethod, bestVals)
         
         return opt_crit
-        
-
+    
     R_loc = deepcopy(R)
-        
+    
     init_crit_vals = []
     
     for measure in measures:
@@ -251,26 +255,27 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
     print('Starting point for optimization :')
     print('measureType : {}'.format(measureType))
     print('Used criterions / Start Value : ')
-    for i in range(0,measures):
+    for i in range(0, len(measures)):
         print('{0:10} = {1:10}'.format(measures[i], init_crit_vals[i]))
     
     # recursive call for each parameter :
     # using the same init_vals
     # then once all best values of parameters are acquired, optimize for all parameters @ same time
-    if len(measures) > 1 and bestVals is None:
+    if len(measures) > 1:
         #best independent criterions values for separate optimization
         opt_forms = []
         bestVals = []
         # Optimize for each variable separately, starting from *init_vals*
         for measure in measures:
             # do we need to copy the object here ?
-            R_loc_2 = deepcopy(R)
-            R_ind = optimizeForm(R_loc_2, measure, startVals=None, measureType=measureType, optMethod=optMethod, bestVals = None) # start with same stored initial values of parameters
-            ind_opt_forms.append(R_ind)
+
+            R_ind = R_loc.optimizeForm(measure, startVals=None, measureType=measureType, optMethod=optMethod, bestVals = None) # start with same stored initial values of parameters
+            # reset R_loc
+            R_loc = deepcopy(R)
+            opt_forms.append(R_ind)
             bestVals.append(_calc_crit(R_ind, measure, measureType))
-       
-        R_loc_3 = deepcopy(R)
-        R_opt = optimizeForm(R_loc_3, measures, startVals = None, measureType=measureType, weigthingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)
+
+        R_opt = R_loc.optimizeForm(measures, startVals = None, measureType=measureType, weightingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)
         
         opt_forms.append(R_opt)
         
@@ -280,7 +285,12 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
         
         #change list of arrays into unique, 1-D array as needed by scipy.optimize
         
-        x0 = ravel([m.A1 for m in startVals])
+        print(startVals)
+        
+        x0 = ravel([m.A1 for m in startVals if  m.A1.size != 0])
+        
+        print(x0)
+        print(x0.shape)
         
         minimizer_kwargs = {'args':R_loc}
         
@@ -289,20 +299,14 @@ def optimizeForm(R, measures, startVals=None, stop_condition=None,  measureType=
             # this parameter is passed to scipy.minimize
             #minimizer_kwargs['method'] = 'BFGS'
             # removed parameter T
-            opt_result = optimize.basinhopping(_func_opt, x0, niter=2000, stepsize=0.5, minimizer_kwargs=minimizer_kwargs, take_step=None, accept_test=None, callback=None, interval=50, disp=True, niter_success=None)
+            opt_result = optimize.basinhopping(_func_opt, x0, niter=10, stepsize=0.5, minimizer_kwargs=minimizer_kwargs, take_step=None, accept_test=None, callback=None, interval=50, disp=True, niter_success=None)
         
         #reshape all matrixes
-        
-        
+        # TODO
             
-    print(opt_result)       
+        print(opt_result)       
         
-    return R_opt
-           
-
-        
-            
-            
-        
+        return R_opt
+   
         
        
