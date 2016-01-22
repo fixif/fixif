@@ -47,6 +47,12 @@ class RhoDFIIt(State_Space):
 
         self._gamma = mat(gamma)
         
+        #those values needs to be stored because they are going to be used as reference by optimizeForm
+        self._isGammaExact = isGammaExact
+        self._isDeltaExact = isDeltaExact
+        self._opt = opt
+        
+        
         Va = transpose(mat(self._den))/self._den[0,0]
         Vb = transpose(mat(self._num))/self._den[0,0]
         
