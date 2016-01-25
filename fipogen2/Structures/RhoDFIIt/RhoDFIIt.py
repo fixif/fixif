@@ -84,8 +84,8 @@ class RhoDFIIt(State_Space):
         
         my_cond = cond(Tbar,2)/cond(Tbar,-2) # (larger / smaller) singular value like cond() of MATLAB
         
-        if (my_cond > cond_limit):
-            raise(ValueError, 'Cannot compute matrix inverse') 
+        #if (my_cond > cond_limit):
+        #    raise(ValueError, 'Cannot compute matrix inverse') 
         
         #Valpha_bar, Vbeta_bar
         
