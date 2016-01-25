@@ -29,7 +29,8 @@ else
     % get datas
     dZ = S.dataMeasure{1};
     % compute the new measure
-    M1 = [ S.R.K*inv(S.R.J) eye(S.R.n) zeros(S.R.n,S.R.m) ];
+    % M1 = [ S.R.K*inv(S.R.J) eye(S.R.n) zeros(S.R.n,S.R.m) ]; % JOA maybe there's a problem on this line S.R.m not coherent with previous defs
+    M1 = [ S.R.K*inv(S.R.J) eye(S.R.n) zeros(S.R.n,S.R.p) ]; 
     M2 = [ S.R.L*inv(S.R.J) zeros(S.R.p,S.R.n) eye(S.R.p) ];
     G = trace( dZ * ( M2'*M2 + M1'*S.R.Wo*M1 ) );
     
@@ -44,4 +45,4 @@ end
 %See also: <@FWR/RNG>
 
 %References:
-%	\cite{Hila07c} T. Hilaire, D. Ménard, and O. Sentieys. Roundoff noise analysis of finite wordlength realizations with the implicit state-space framework. In 15th European Signal Processing Conference (EUSIPOC'07), September 2007.
+%	\cite{Hila07c} T.ï¿½Hilaire, D.ï¿½Mï¿½nard, and O.ï¿½Sentieys. Roundoff noise analysis of finite wordlength realizations with the implicit state-space framework. In 15th European Signal Processing Conference (EUSIPOC'07), September 2007.
