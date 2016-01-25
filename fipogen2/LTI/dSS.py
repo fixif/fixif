@@ -346,11 +346,18 @@ class dSS(FIPObject):
                 M = self._C * self.Wc * self._C.transpose() + self._D * self._D.transpose()
                 # less errors when Wc is big and Wo is small
                 #M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
-            except:
-                res = inf
-                raise ValueError, "Impossible to compute H2-norm of current discrete state space. Default value is 'inf'" 
-            else:
                 res = sqrt(M.trace())
+            except:
+                try:
+                    M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
+                    res = sqrt(M.trace())
+                except:
+                    res = inf
+                    raise ValueError, "Impossible to compute H2-norm of current discrete state space. Default value is 'inf'" 
+#                 else:
+# 
+#             else:
+#                 res = sqrt(M.trace())
 
             #self._norm_h2 = res
 
