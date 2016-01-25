@@ -39,7 +39,7 @@ if isempty(S.dataMeasure)
 else
     % transform dlk_dZ
     dlbk_dZ = S.dataMeasure{1};
-    k = size(dlk_dZ,3);
+    k = size(dlk_dZ,3); % MAYBE BUG HERE ??? JOA
     l=length(Y); n=length(U);
     T1 = eye(l+n+S.R.p);  T1(1:l,1:l)=Y; T1(l+1:l+n,l+1:l+n)=inv(U);
     T2 = eye(l+n+S.R.m);  T2(1:l,1:l)=W; T2(l+1:l+n,l+1:l+n)=U;
@@ -51,7 +51,7 @@ else
     for k=1:size(dlbk_dZ,3)
         Psi(k) = norm( R.WZ, 'fro') * norm( dlbk_dZ(:,:,k) .* Z.rZ, 'fro');
     end
-    M = min( (1-abs(lambda)) ./ Psi );
+    M = min( (1-abs(lambda)) ./ Psi ); % LAMBDA IS NOT DEFINED ????
 end
 
 
@@ -84,5 +84,5 @@ end
 %See also: <@FWR/Mstability>, <@FWS/MsensPole_cl>
 
 %References:
-%	\cite{Hila08b} T. Hilaire, P. Chevrel, and J. Whidborne. Finite wordlength controller realizations using the specialized implicit form. Technical Report RR-6759, INRIA, 2008.
+%	\cite{Hila08b} T.ï¿½Hilaire, P.ï¿½Chevrel, and J.ï¿½Whidborne. Finite wordlength controller realizations using the specialized implicit form. Technical Report RR-6759, INRIA, 2008.
 
