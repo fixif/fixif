@@ -79,4 +79,5 @@ def _dynMethodAdder(t_class):
         finally:
             f.close()
 
+    #print('DYNMETHOD ADDER WAS USED ON {}'.format(t_class.__name__))
         
