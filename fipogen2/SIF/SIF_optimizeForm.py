@@ -134,7 +134,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
         if _formOpt == 'UYW':
             # U,Y,W transform
-            print('startValues : using default U, Y, W values')
+            print('startVals : using default U, Y, W values')
             #R.U = multiply(10,eye(R._n)) # be carfeul to use property so that nparray is transformed into matrix
             #print('l={0} m={1} n={2} p={3}'.format(R._l, R._m, R._n, R._p))
             #R.U = multiply(3, ones((R._n,R._n)))
@@ -149,7 +149,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
         elif _formOpt == 'gammaDelta': #or _formOpt == 'delta'
             
-            print('startValues : using default gamma and delta values')
+            print('startVals : using default gamma and delta values')
             
             # starting with 2's, not zeros, not ones
             #[gamma, delta]
@@ -172,7 +172,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         elif _formOpt == 'gammaDelta':
             startVals = [R._gamma, R._delta]
 
-    print('startValues : {}'.format(startVals))
+    print('startVals : {}'.format(startVals))
         
     #change list of arrays into unique, 1-D array as needed by scipy.optimize
     x0 = ravel([m.A1 for m in startVals if  m.A1.size != 0])
@@ -376,12 +376,12 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         elif restartScenario == ['all']:
 
             print(line)
-            print('startValues / multiparameter : Using all possible best startValues for multiparameter optimization')
+            print('startVals / multiparameter : Using all individual criterion final values for multiparameter optimization')
             
             for i in range(0, len(measures)):
                 
                 print(line)
-                print('startValues / multiparameter : Using best values found for {} as starting parameters'.format(measures[i]))
+                print('startVals / multiparameter : Using best values found for {} as starting parameters'.format(measures[i]))
                 print(line)
                 
                 if _formOpt == 'UYW':
@@ -400,7 +400,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             for restartS in restartScenario:
             
                 print(line)
-                print('startValues / multiparameter : Using best values found for {} as starting parameters'.format(restartS))
+                print('startVals / multiparameter : Using best values found for {} as starting parameters'.format(restartS))
                 print(line)
        
                 ind = measures.index(restartS)
