@@ -23,7 +23,7 @@ myRhoDFIIt = RhoDFIIt(TFobj.num, TFobj.den, gamma=cur_gamma, delta=cur_delta, is
 # problem to calculate MsensH with starting parameters from MsensPole
 #myOptimizedRhoDFIIt = myRhoDFIIt.optimizeForm(['MsensH', 'MsensPole'], optMethod = 'basinHoping', restartScenario='all')
 
-myOptimizedRhoDFIIt = myRhoDFIIt.optimizeForm(['MsensH', 'MsensPole'], optMethod = 'basinHoping', restartScenario=['MsensH'])
+myOptimizedRhoDFIIt = myRhoDFIIt.optimizeForm(['MsensH', 'MsensPole'], optMethod = 'basinHoping', restartScenario=['MsensH', 'MsensPole'])
 
 # problem to get MsensH with starting parameters from MsensPole
 myOptimizedRhoDFIIt_all = myRhoDFIIt.optimizeForm(['MsensH', 'MsensPole', 'RNG'], optMethod = 'basinHoping', restartScenario=['all'])
