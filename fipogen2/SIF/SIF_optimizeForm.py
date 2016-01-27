@@ -213,6 +213,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             return vals[0]
            
         elif weightingMethod == 'equalWeight' or weightingMethod == 'simpleWeight':
+            
             return sum([weights[i]*vals[i]/best_vals[i] for i in range(0, len(vals))])    
         
 
@@ -310,14 +311,17 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
         if iter_count == 1:
             
-            print(line)         
+            print('\n'+line)         
             print('Initial values (first iteration) :')
             print(line)
+            
+            if len(measures)>1:
+                print('Overall criterion = {}'.format(opt_crit))
             
             for i in range(0, len(measures)):
                 print('{0:10} = {1:10}'.format(measures[i], tmp_opt_crit[i]))            
         
-        	print(line)
+            print(line)
         
         if iter_count%1000 == 0:
             
@@ -438,14 +442,36 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             # It may be due to the fact that we use initial parameters = zeros (I think a formula like (x -x 0)/delta_params is used or delta_params/(x -x0) so
             # that if the dividing factor is small, parameters can skyrocket.
 
+            #niter = 2000 and stepsize = 0.01 gives good result but not stable
+
             opt_result = optimize.basinhopping(_func_opt, x0, niter=2000, stepsize=0.01, minimizer_kwargs=minimizer_kwargs, take_step=None, accept_test=None, callback=None, interval=1, disp=False, niter_success=1)
         
 
         iter_count = 0
         
-        print(opt_result)
+        #print(opt_result)
         
         R_opt = _generate_updated_instance(R_loc, _rebuild_matrixes(startVals, opt_result.x))
+        
+        
+        tmp_opt_crit = []
+        
+        for measure in measures:
+            tmp_opt_crit.append(_calc_crit(R_opt, measure, measureType))         
+     
+            
+        print(line)         
+        print('Result values (after last iteration) :')
+        print(line)
+        
+        if len(measures)>1:
+            print('Overall criterion : {}'.format(opt_result.fun))
+        
+        for i in range(0, len(measures)):
+            print('{0:10} = {1:10}'.format(measures[i], tmp_opt_crit[i]))            
+        
+        print(line+'\n')
+
         
         return R_opt
    
