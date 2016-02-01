@@ -50,7 +50,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
     def_opt_weightingMethods = {'equalWeight', 'customWeight'}
     def_opt_weightingMethod = 'equalWeight'
     
-    def_opt_methods = {'basinHoping', 'min', 'simple', 'brute'}
+    def_opt_methods = {'basinHoping', 'differentialEvolution', 'brute'}
     def_opt_method = 'basinHoping'
 
     def_opt_measures = {'MsensH', 'MsensPole', 'RNG', 'Mstability'}
@@ -285,6 +285,10 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         #create new object with current gamma and delta        
         elif _formOpt == 'gammaDelta':
             #print('Sum of all parameters : {} '.format(sum(x)))
+            
+            if isinstance(input_R, list):
+            	print(input_R)
+            
             input_R.__class__.__init__(output_R, input_R._num, input_R._den, gamma=optVals[0], delta=optVals[1], isGammaExact=input_R._isGammaExact, isDeltaExact=input_R._isDeltaExact, opt=input_R._opt)
     
         return output_R
@@ -355,7 +359,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         for measure in measures:
             # do we need to copy the object here ?
             print(line)
-            print('Optimizing for indivudual parameter : {}'.format(measure))
+            print('Optimizing for single parameter : {}'.format(measure))
             print(line)
             R_ind = R_loc.optimizeForm([measure], startVals=None, measureType=measureType, optMethod=optMethod) # start with same stored initial values of parameters
             # reset R_loc
@@ -443,9 +447,21 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             # that if the dividing factor is small, parameters can skyrocket.
 
             #niter = 2000 and stepsize = 0.01 gives good result but not stable
-
+            minimizer_kwargs = {'args':R_loc, 'bounds':bounds}
             opt_result = optimize.basinhopping(_func_opt, x0, niter=2000, stepsize=0.01, minimizer_kwargs=minimizer_kwargs, take_step=None, accept_test=None, callback=None, interval=1, disp=False, niter_success=1)
         
+        elif optMethod == 'differentialEvolution':
+        
+            # QUICK HACK HERE
+            # THE POLISHING STEP GIVES A BUG SO WE DON'T USE IT.
+            # see for example
+            # https://github.com/scipy/scipy/issues/4880
+            # WARNING FOR "RESULT AT THE FIRST STEP WITH THIS METHOD"
+            # it's given after a first tset of parameters by the optimizer so not always the same.
+            # also not possible to set initial value and multiparmaeter opt is dependent from starting paramters.
+        
+            minimizer_kwargs = [R_loc]
+            opt_result = optimize.differential_evolution(_func_opt, bounds, args=minimizer_kwargs, maxiter = 50000, polish=False)
 
         iter_count = 0
         
