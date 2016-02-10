@@ -16,8 +16,8 @@ from numpy import matrix as mat
 from numpy import eye, c_, r_, zeros, multiply, all, diagflat, trace, ones, where, logical_or
 from numpy import transpose, fmod, log2
 from numpy.linalg import norm, inv, eig
-from calc_transform_UYW import calc_transform_UYW
-#from calc_plantSIF import calc_plantSIF
+
+
 
 __all__ = ['transform_UYW_RNG']
 
@@ -29,7 +29,7 @@ def transform_UYW_RNG(R, measureType, T1):
     W is not used in this function (could be removed from calling args)
     """
     
-    dZ = R._RNG[measureType][1] # do not call function, refer to instance's attribute
+    #dZ = R._RNG[measureType][1] # do not call function, refer to instance's attribute
     
     if measureType == 'OL':
     
@@ -46,7 +46,7 @@ def transform_UYW_RNG(R, measureType, T1):
     
         # modify instance Attribute, bypass function
         # modify matrix G
-        R._RNG[measureType][0] = trace( dZ * (transpose(R.M2)*R.M2 + transpose(R.M1)*R.Wo*R.M1)) # needs Wo for current (ie. UYW transformed) system
+        R._RNG[measureType][0] = trace( R._RNG[measureType][1] * (transpose(R.M2)*R.M2 + transpose(R.M1)*R.Wo*R.M1)) # needs Wo for current (ie. UYW transformed) system
         
     else: # measureType == 'CL'
         
@@ -61,9 +61,11 @@ def transform_UYW_RNG(R, measureType, T1):
 
         # WARNING PROBLEM TODO THIS VALUE HAS NOT BEEN UPDATED AND IS NOT COHERENT WITH THE REST
         # YES IT IS indeed according to Thibault
-        M1M2Wobar = R._RNG[measureType][2]
+        
+        #M1M2Wobar = R._RNG[measureType][2]
         
         # JOA I don't understand that the matrix M1M2Wobar is not modified by the UYW transform
         # modify matrix G, CL measureType
-        R._RNG[measureType][0] = trace(inv(T1) * dZ * inv(transpose(T1)) * M1M2Wobar )
+
+        R._RNG[measureType][0] = trace(inv(T1) * R._RNG[measureType][1] * inv(transpose(T1)) * R._RNG[measureType][2] )
         
