@@ -35,6 +35,7 @@ def calc_RNG(R, measureType, tol):
         for row, col in zip(rows, cols):
             W[row, col] = 0
         
+        # WARNING FIXME this doesnt work
         if rem:
             
             rows, cols = where(abs(W) > tol) # inutile ?? already verified condition
@@ -45,11 +46,17 @@ def calc_RNG(R, measureType, tol):
         
         return W
     
-    l0, m0, n0, p0 = R.size
+    #
+    #l0, m0, n0, p0 = R.size
 
+    # WARNING FIXME doesn't work
     # exclude powers of 2 if there is no plant, otherwise don't
-    W01Z = computeWeight(R.Z, tol, (measureType == 'OL'))
-    dZ = diagflat( W01Z*mat(ones((l0+n0+m0, 1))))
+    
+    #W01Z = computeWeight(R.Z, tol, (measureType == 'OL'))
+    W01Z = computeWeight(R.Z, tol, False)
+    
+    
+    dZ = diagflat( W01Z*mat(ones((R._l + R._n + R._m, 1))))
     
     if measureType == 'OL':
     
@@ -58,7 +65,7 @@ def calc_RNG(R, measureType, tol):
     
         G = trace( dZ * ( R.M2.transpose()*R.M2 + R.M1.transpose()*R.Wo*R.M1 ) )
     
-        return G, dZ
+        return [G, dZ]
     
     else:
 
@@ -68,10 +75,10 @@ def calc_RNG(R, measureType, tol):
         #W01Z = computeWeight(R.Z, tol, rem=False)
         #dZ = diag( W01Z*mat(ones((l0+n0+m0, 1))))
 
-        G = trace( dZ * (R.M2bar.transpose()*R.M2bar + R.M1bar.transpose() * Wobar * R.M1bar) )
-        
         M1M2Wobar = R.M2bar.transpose() * R.M2bar + R.M1bar.transpose() * Wobar * R.M1bar
 
-        return G, dZ, M1M2Wobar
+        G = trace( dZ * M1M2Wobar )
+        
+        return [G, dZ, M1M2Wobar]
     
     

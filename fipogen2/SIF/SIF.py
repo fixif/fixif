@@ -22,7 +22,7 @@ from func_aux import _dynMethodAdder
 
 import numpy as np
 
-from numpy import c_, r_, eye, zeros, all
+from numpy import c_, r_, eye, zeros, all, transpose
 from numpy.linalg import inv
 
 class SIF(FIPObject):
@@ -356,15 +356,34 @@ class SIF(FIPObject):
         # by reference change the value at the superclass level
         #self.is_use_UYW_transform = True
 
+        # in fact there are many different cases here : either we can use the UYW transform
+        # self._formOpt = 'UYW'
+        # or we can use the gammaDelta transform
+        # self._formOpt = 'gammaDelta'
+        # or we can use the delta transform
+        # 'delta'
+        
+        # this parameter has to be set in each SIF subclass
+        
+        self._formOpt = None
+
+        #_dynMethodAdder(SIF)
+
     @staticmethod
     def _check_MeasureType(fname, target, words):
         
          if target not in words:
             raise(ValueError, '{0} type not recognized (use {1})'.format(fname, ' OR '.join(words)))
 
+    # Function to set default UYW matrixes, called in inheriting classes after init
+    def _set_default_UYW(self):
+    	
+    	self.U = np.matrix(eye(self._n))
+    	self.Y = np.matrix(eye(self._l))
+    	self.W = self.Y
+
     # Functions to calculate measures. 
     # We keep updated closed-loop measures with stored plant at SIF instance level 
-        
         
     # MsensH
     def MsensH(self, measureType='OL', plant=None):
@@ -578,13 +597,15 @@ class SIF(FIPObject):
                 self.transform_UYW_RNG(cur_type, T1)
                 
             if self._MsensH[cur_type] is not None:
-                self.MsensH(measureType=cur_type) # UYW transform for MsensH not defined
+            	self.transform_UYW_MsensH(cur_type, T1, T2) # FIXME uses bruteforce method ATM
+            	#self._MsensH[cur_type] = None
+                #self.MsensH(measureType=cur_type) # UYW transform for MsensH not defined
                 
             if self._MsensPole[cur_type] is not None:
                 self.transform_UYW_MsensPole(cur_type, T1, T2)
                 
         if self._Mstability is not None:
-            self._transform_UYW_Mstability(T1, T2)
+            self.transform_UYW_Mstability(T1, T2)
 
         
     @property
@@ -719,6 +740,7 @@ class SIF(FIPObject):
     # Z, dZ getters
 
     # needs to be set to define properties relying on it
+    # FIXME thib : find another solution
     _l, _m, _n, _p = (0, 0, 0, 0)
 
     @property
