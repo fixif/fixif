@@ -68,9 +68,20 @@ N1bar = [ inv(R.J)*R.N*C2 inv(R.J)*R.M;
           zeros(n,np) eye(n);
           C2 zeros(m2,n) ];
 
-
 % measures          
-[dlambdabar_dZ, dlbk_dZ] = deigdZ( Abar, M1bar, N1bar, size(R.Z), moduli);          
+[dlambdabar_dZ, dlbk_dZ] = deigdZ( Abar, M1bar, N1bar, size(R.Z), moduli);  
+
+% disp('MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM')
+% 
+% for i=1:size(dlbk_dZ,3)
+% 
+% disp(dlbk_dZ(:,:,i))
+% disp('********************')
+% 
+% end
+% 
+% disp('MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM')
+
 M = norm( dlambdabar_dZ .* R.rZ, 'fro' )^2;
 
 

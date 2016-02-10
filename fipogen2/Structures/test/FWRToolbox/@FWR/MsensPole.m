@@ -29,6 +29,7 @@ N1 = [ inv(R.J)*R.M; eye(R.n); zeros(R.m,R.n) ];
 
 % measures
 [dlambda_dZ, dlk_dZ] = deigdZ( R.AZ, M1, N1, size(R.Z) );
+
 M = norm( dlambda_dZ .* R.rZ, 'fro' )^2;
 
 
@@ -72,7 +73,7 @@ M = norm( dlambda_dZ .* R.rZ, 'fro' )^2;
 %See also: <@FWR/MsensPole_cl>, <@FWR/Mstability>, <@FWR/deigdZ>, <@FWS/MsensPole>
 
 %References:
-%	\cite{Hila06b}	T. Hilaire, P. Chevrel, and J.-P. Clauzel. Pole
+%	\cite{Hila06b}	T.ï¿½Hilaire, P.ï¿½Chevrel, and J.-P. Clauzel. Pole
 %	sensitivity stability related measure of FWL realization with the
 %	implicit state-space formalism. In 5th IFAC Symposium on Robust Control Design (ROCOND'06), July 2006.\\
-%	\cite{Hila07b}	T. Hilaire, P. Chevrel, and J. Whidborne. A unifying framework for finite wordlength realizations. IEEE Trans. on Circuits and Systems, 8(54), August 2007.
+%	\cite{Hila07b}	T.ï¿½Hilaire, P.ï¿½Chevrel, and J.ï¿½Whidborne. A unifying framework for finite wordlength realizations. IEEE Trans. on Circuits and Systems, 8(54), August 2007.
