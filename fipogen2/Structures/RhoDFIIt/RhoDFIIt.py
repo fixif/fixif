@@ -52,6 +52,11 @@ class RhoDFIIt(State_Space):
         self._isDeltaExact = isDeltaExact
         self._opt = opt
         
+        # use the 'gammaDelta' method to get new form from old form
+        # this value can be modified if we decide to keep delta constant
+        self._formOpt = 'gammaDelta'
+        #self._formOpt = 'gamma'
+        
         
         Va = transpose(mat(self._den))/self._den[0,0]
         Vb = transpose(mat(self._num))/self._den[0,0]
