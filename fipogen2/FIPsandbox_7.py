@@ -23,6 +23,12 @@ myRhoDFIIt = RhoDFIIt(TFobj.num, TFobj.den, gamma=cur_gamma, delta=cur_delta, is
 # problem to calculate MsensH with starting parameters from MsensPole
 #myOptimizedRhoDFIIt = myRhoDFIIt.optimizeForm(['MsensH', 'MsensPole'], optMethod = 'basinHoping', restartScenario='all')
 
+# mgrid or lgrid seems to be too memory-greedy (AKA shitty).
+# we should modifiy it inside scipy to be able to bruteforce correctly
+#myOptimizedRhoDFIIt = myRhoDFIIt.optimizeForm(['MsensH'], optMethod = 'brute')
+
+#myOptimizedRhoDFIIt = myRhoDFIIt.optimizeForm(['MsensH', 'MsensPole'], optMethod = 'brute', restartScenario=['MsensH', 'MsensPole'])
+
 myOptimizedRhoDFIIt = myRhoDFIIt.optimizeForm(['MsensH'], optMethod = 'differentialEvolution')
 
 myOptimizedRhoDFIIt = myRhoDFIIt.optimizeForm(['MsensH', 'MsensPole'], optMethod = 'differentialEvolution', restartScenario=['MsensH', 'MsensPole'])
