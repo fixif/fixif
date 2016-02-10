@@ -279,7 +279,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         #translate using UYW matrixes
         if _formOpt == 'UYW':
                         
-            output_R.U, output_R.Y, output_R.W = tmp_optVals
+            output_R.U, output_R.Y, output_R.W = optVals
             output_R._translate_realization()
 
         #create new object with current gamma and delta        
@@ -335,7 +335,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
     
     R_loc = deepcopy(R)
     
-    init_crit_vals = []
+    #init_crit_vals = []
     
     #for measure in measures:
     #    init_crit_vals.append(_calc_crit(R_loc, measure, measureType))
@@ -462,6 +462,14 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
             minimizer_kwargs = [R_loc]
             opt_result = optimize.differential_evolution(_func_opt, bounds, args=minimizer_kwargs, maxiter = 50000, polish=False)
+
+        elif optMethod == 'brute':
+        
+            # there seems to be no way to specifiy a starting point for the optimizer...
+        
+            minimizer_kwargs = [R_loc]
+            
+            opt_result = optimize.brute(_func_opt, bounds, args = minimizer_kwargs)
 
         iter_count = 0
         
