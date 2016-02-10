@@ -54,8 +54,6 @@ def _dynMethodAdder(t_class):
     os.chdir(path_mod)
     file_names = glob(f_name_prefix + '*' + f_name_suffix)
     os.chdir(path_start)
-    
-    #print(file_names)
   
     for f_name in file_names:
       
