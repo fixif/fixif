@@ -25,26 +25,26 @@ def calc_RNG(R, measureType, tol):
     """
     Calculation of the RNG criterion
     """
-    def computeWeight(X, tol, rem):
-        
-        W = ones(X.shape)
-        
-        #could use R._isTrivial
-        rows, cols = where(logical_or((abs(X) < tol),(abs(X-1) < tol),(abs(X+1) < tol)))
-        
-        for row, col in zip(rows, cols):
-            W[row, col] = 0
-        
-        # WARNING FIXME this doesnt work
-        if rem:
-            
-            rows, cols = where(abs(W) > tol) # inutile ?? already verified condition
-        
-            for row, col in zip(rows, cols): # test could be included earlier
-                if fmod(log2(abs(X[row, col])), 1) < tol:
-                    W[row, col] = 0
-        
-        return W
+#     def computeWeight(X, tol, rem):
+#         
+#         W = ones(X.shape)
+#         
+#         #could use R._isTrivial
+#         rows, cols = where(logical_or((abs(X) < tol),(abs(X-1) < tol),(abs(X+1) < tol)))
+#         
+#         for row, col in zip(rows, cols):
+#             W[row, col] = 0
+#         
+#         # WARNING FIXME this doesnt work
+#         if rem:
+#             
+#             rows, cols = where(abs(W) > tol) # inutile ?? already verified condition
+#         
+#             for row, col in zip(rows, cols): # test could be included earlier
+#                 if fmod(log2(abs(X[row, col])), 1) < tol:
+#                     W[row, col] = 0
+#         
+#         return W
     
     #
     #l0, m0, n0, p0 = R.size
@@ -53,10 +53,14 @@ def calc_RNG(R, measureType, tol):
     # exclude powers of 2 if there is no plant, otherwise don't
     
     #W01Z = computeWeight(R.Z, tol, (measureType == 'OL'))
-    W01Z = computeWeight(R.Z, tol, False)
+    #W01Z = computeWeight(R.Z, tol, False)
     
     
-    dZ = diagflat( W01Z*mat(ones((R._l + R._n + R._m, 1))))
+    dZ = diagflat( R._dZ*mat(ones((R._l + R._n + R._m, 1))))
+    
+    #print('calc_RNG ' + measureType + ' $$$$$$$$$$$$$$$$$$$$$')
+    #print(dZ)
+    #print('$$$$$$$$$$$$$$$$$$$$$$')
     
     if measureType == 'OL':
     

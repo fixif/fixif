@@ -339,7 +339,6 @@ class SIF(FIPObject):
         # because we have to test those against the user's input or program input
         # to know if spitting out the old result is correct or if a recalculation is needed
         self._MsensPole_moduli = None
-        self._RNG_tol = None
 
         # set UYW attributes
         # those attributes are not used unless UYW transformation is possible on the form
@@ -448,7 +447,7 @@ class SIF(FIPObject):
             
     
     #RNG       
-    def RNG(self, measureType='OL', plant=None, tol=1.e-8):
+    def RNG(self, measureType='OL', plant=None, eps=None, is_rebuild_dZ = False):
             
         self._check_MeasureType('RNG', measureType, self._measureTypes)
             
@@ -464,14 +463,18 @@ class SIF(FIPObject):
             
             raise(NameError, 'Cannot provide RNG closed-loop measure as no plant is defined')
         
-        if not(tol == self._RNG_tol):
+        if (eps != self._eps) and not(eps is None):
              
-            self._RNG_tol = tol
-            is_calc_modified = True           
+            self._eps = eps
+            is_calc_modified = True
+            is_rebuild_dZ = True
+        
+        if is_rebuild_dZ:
+        	self._build_dZ()
                     
         if (self._RNG[measureType] is None) or is_calc_modified:
                 
-            self._RNG[measureType] = self.calc_RNG(measureType, tol)
+            self._RNG[measureType] = self.calc_RNG(measureType, self._eps)
                 
         return self._RNG[measureType]
     
@@ -543,7 +546,7 @@ class SIF(FIPObject):
     # So, to MsensH and MsensPole are free once you want Mstability.
     # MsensH is free once you want MsensPole
     
-    def _translate_realization(self):
+    def _translate_realization(self, is_rebuild_dZ = False):
         """
         This function calculates an equivalent realization by updating all instance attributes 
         that needs to be updated
@@ -560,7 +563,8 @@ class SIF(FIPObject):
         self._translate_Z_AZtoDZ_W()
         
         # mimic matlab code (could it destroy information during the process, if some coeffs go under the threshold after translation to equivalent form ??)
-        self._build_dZ()
+        if is_rebuild_dZ:
+            self._build_dZ()
         
         # rebuild remaining matrixes used in sensitivity calculations
         self._build_M1M2N1N2()
@@ -593,11 +597,11 @@ class SIF(FIPObject):
             # - new value of Wo calculated from UYW transform
             # - previous value of dZ
             # - previous value of M1M2Wobar for CL calculation
-            if self._RNG[cur_type] is not None: # use instance attribute here, not  self.RNG() otherwise we're going to calculate it. set to None initially)
+            if self._RNG[cur_type] is not None: # use instance attribute here, not  self.RNG() otherwise we're going to calculate it. set to None initially)             
                 self.transform_UYW_RNG(cur_type, T1)
                 
             if self._MsensH[cur_type] is not None:
-            	self.transform_UYW_MsensH(cur_type, T1, T2) # FIXME uses bruteforce method ATM
+            	self.transform_UYW_MsensH(cur_type) # FIXME uses bruteforce method ATM
             	#self._MsensH[cur_type] = None
                 #self.MsensH(measureType=cur_type) # UYW transform for MsensH not defined
                 

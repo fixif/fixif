@@ -21,10 +21,12 @@ from numpy.linalg import norm, inv, eig
 
 __all__ = ['transform_UYW_MsensH']
 
-def transform_UYW_MsensH(R, measureType, T1, T2):
+def transform_UYW_MsensH(R, measureType):
 
     """
     Transform mSensH with formula at page 165 of Thib's thesis
+    Currently uses bruteforce calculation because formula for
+    MsensH[measureType][1] is unknown
     """
     
     #mat1 = kron(transpose(inv(T1)), mat(eye(R._p)))
