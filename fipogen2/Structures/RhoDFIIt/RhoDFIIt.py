@@ -10,8 +10,7 @@ from numpy import zeros, all, poly, matrix, sqrt, prod, transpose, diagflat, r_,
 from numpy import matrix as mat
 from numpy.linalg import cond, inv
 
-
-
+#FIXME this seems like an error should depend on SIF class see why we did this with thib
 class RhoDFIIt(State_Space):
 
     @staticmethod
@@ -53,9 +52,10 @@ class RhoDFIIt(State_Space):
         self._opt = opt
         
         # use the 'gammaDelta' method to get new form from old form
-        # this value can be modified if we decide to keep delta constant
+        # this value can be modified if we decide to keep gamma constant
+        self._avail_formOpt = {'gammaDelta', 'delta'}
         self._formOpt = 'gammaDelta'
-        #self._formOpt = 'gamma'
+        #self._formOpt = 'delta'
         
         
         Va = transpose(mat(self._den))/self._den[0,0]

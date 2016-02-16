@@ -1,3 +1,4 @@
+#coding=UTF8
 from SIF import SIF
 
 # dirty but quick fix otherwise doesn't work
@@ -37,8 +38,12 @@ class State_Space(SIF):
         
         SIF.__init__(self, JtoS, eps, State_Space_father_obj, **State_Space_event)
         
-        # set value of _formOpt
-        self._formOpt = 'UYW'
+        
+        # define available optimization processes, only if not already defined in subclass
+        if not(hasattr(self, '_avail_formOpt')) and not(hasattr(self, '_formOpt')):
+            
+            self._avail_formOpt = {'UYW'}
+            self._formOpt = 'UYW'
         
         # this implies setting start (default) values for U, Y, W
         # (we have l = 0)
