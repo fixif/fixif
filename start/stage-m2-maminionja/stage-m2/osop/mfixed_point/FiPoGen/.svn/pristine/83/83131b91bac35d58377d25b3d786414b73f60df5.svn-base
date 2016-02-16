@@ -1,0 +1,58 @@
+\documentclass{minimal}
+\usepackage[a4paper,margin=1cm,landscape]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,arrows}
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[
+	every node/.style={rectangle,rounded corners=0.7mm, draw, scale = 0.7,
+		text centered, font=\boldmath,anchor=north},
+     dec1/.style={
+		color=red!80, 
+		rounded corners=1mm, 
+		fill=white,
+		text=red!80},
+    dec2/.style={
+		color=blue!80,
+		fill=white,
+		 text=blue!80},
+    decM/.style={
+		color=black,
+		fill=green!60,
+		text=black},
+    adder/.style={
+		color=red,
+		top color=red,
+		bottom color=red!30,
+		shading angle={45},
+        text=white},
+    mult/.style={
+		color=green!80!black,
+		top color=green!80!black,
+		bottom color=green!10,
+		shading angle={45},
+		text=black},
+     cst/.style={
+		color=orange!80, 
+		top color=orange!80,
+		bottom color=yellow!70!black!20,
+		shading angle={45},
+		text=black},
+     var/.style={
+		color=yellow!95!black,
+		top color=yellow!95!black,
+		bottom color=yellow!10,
+		shading angle={45},
+		text=black},
+    fpf/.style={
+    		draw=none},
+    level distance=0.4cm, growth parent anchor=south, thick
+]
+\node (Sortie) [adder] {$S$}
+$TP_code
+;
+        
+\end{tikzpicture}
+\end{center}
+\end{document}

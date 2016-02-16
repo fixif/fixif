@@ -1,0 +1,220 @@
+\documentclass{minimal}
+\usepackage[a4paper,margin=1cm,landscape]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,arrows}
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[
+     dec1/.style={rectangle, draw=red!80, rounded corners=1mm, fill=white,
+        text centered, anchor=north, text=red!80, scale = 0.7},
+    dec2/.style={rectangle, draw=blue!80, rounded corners=1mm, fill=white,
+        text centered, anchor=north, text=blue!80, scale = 0.7},
+    decM/.style={rectangle, draw=black, rounded corners=1mm, fill=green!60,
+        text centered, anchor=north, text=black, scale = 0.7},
+    adder/.style={circle, draw, fill=red!60,
+        text centered, anchor=north, text=black, scale = 0.7},
+    mult/.style={circle, draw, fill=green!60,
+        text centered, anchor=north, text=black, scale = 0.7},
+     cst/.style={rectangle, rounded corners=0.7mm, draw, fill=orange!40,
+        text centered, anchor=north, text=black, scale = 0.7},
+     var/.style={rectangle, rounded corners=0.7mm, draw, fill=yellow!30,
+        text centered, anchor=north, text=black, scale = 0.7},
+     fpf/.style = {scale = 0.7},
+    level distance=0.4cm, growth parent anchor=south
+]
+\node (Sortie) [adder] {$S$}
+child{[sibling distance=10.000000cm]
+	node(Add_284211) [adder] {$+$}
+	child{[sibling distance=5.000000cm]
+		node(Add_284210) [adder] {$+$}
+		child{[sibling distance=4.000000cm]
+			node(Add_284203) [adder] {$+$}
+			child{[sibling distance=3.000000cm]
+				node(Add_284100) [adder] {$+$}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultyn4 lsb  10_M) [decM] {$\gg 16 $}
+					child{[level distance=0.4cm]
+						node(Multyn4 lsb  10) [mult] {$\times$}
+						child{
+							node(Cst8) [cst] {-20887}
+						edge from parent node[fpf, left] {(-1,-16)}
+						}
+						child{
+							node(Var8) [var] {$y[n-4]$}
+						edge from parent node[fpf, right] {(5,-10)}
+						}
+					}
+					edge from parent node[fpf, left,sloped,above] {(5,-10)}
+				}
+				child{[sibling distance=1cm]
+					node(DMultyn3 lsb  8) [dec1] {$F$}
+					child{[level distance=0.0cm]
+						node(DMultyn3 lsb  8_M) [decM] {$\gg 16 $}
+						child{[level distance=0.4cm]
+							node(Multyn3 lsb  8) [mult] {$\times$}
+							child{
+								node(Cst7) [cst] {26781}
+							edge from parent node[fpf, left] {(1,-14)}
+							}
+							child{
+								node(Var7) [var] {$y[n-3]$}
+							edge from parent node[fpf, right] {(5,-10)}
+							}
+						}
+						edge from parent node[fpf, right] {(7,-8)}
+					}
+					edge from parent node[fpf, right,sloped,above] {(5,-10)}
+				}
+				edge from parent node[fpf, left,sloped,above] {(5,-10)}
+			}
+			child{[sibling distance=1cm]
+				node(DMultyn1 lsb  7) [dec1] {$F$}
+				child{[level distance=0.0cm]
+					node(DMultyn1 lsb  7_M) [decM] {$\gg 16 $}
+					child{[level distance=0.4cm]
+						node(Multyn1 lsb  7) [mult] {$\times$}
+						child{
+							node(Cst5) [cst] {23520}
+						edge from parent node[fpf, left] {(2,-13)}
+						}
+						child{
+							node(Var5) [var] {$y[n-1]$}
+						edge from parent node[fpf, right] {(5,-10)}
+						}
+					}
+					edge from parent node[fpf, right] {(8,-7)}
+				}
+				edge from parent node[fpf, right,sloped,above] {(5,-10)}
+			}
+			edge from parent node[fpf, left,sloped,above] {(5,-10)}
+		}
+		child{[sibling distance=1cm]
+			node(DMultyn2 lsb  7) [dec1] {$F$}
+			child{[level distance=0.0cm]
+				node(DMultyn2 lsb  7_M) [decM] {$\gg 16 $}
+				child{[level distance=0.4cm]
+					node(Multyn2 lsb  7) [mult] {$\times$}
+					child{
+						node(Cst6) [cst] {-26282}
+					edge from parent node[fpf, left] {(2,-13)}
+					}
+					child{
+						node(Var6) [var] {$y[n-2]$}
+					edge from parent node[fpf, right] {(5,-10)}
+					}
+				}
+				edge from parent node[fpf, right] {(8,-7)}
+			}
+			edge from parent node[fpf, right,sloped,above] {(5,-10)}
+		}
+		edge from parent node[fpf, left,sloped,above] {(5,-10)}
+	}
+	child{[sibling distance=6.000000cm]
+		node(DAdd_283308) [dec1] {$>>6 $}
+		child{
+			node(Add_283308) [adder] {$+$}
+		child{[sibling distance=5.000000cm]
+			node(DAdd_282207) [dec1] {$>>1 $}
+			child{
+				node(Add_282207) [adder] {$+$}
+			child{[sibling distance=3.000000cm]
+				node(Add_265685) [adder] {$+$}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultun1 lsb  17_M) [decM] {$\gg 16 $}
+					child{[level distance=0.4cm]
+						node(Multun1 lsb  17) [mult] {$\times$}
+						child{
+							node(Cst1) [cst] {22280}
+						edge from parent node[fpf, left] {(-7,-22)}
+						}
+						child{
+							node(Var1) [var] {$u[n-1]$}
+						edge from parent node[fpf, right] {(4,-11)}
+						}
+					}
+					edge from parent node[fpf, left,sloped,above] {(-2,-17)}
+				}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultun3 lsb  17_M) [decM] {$\gg 16 $}
+					child{[level distance=0.4cm]
+						node(Multun3 lsb  17) [mult] {$\times$}
+						child{
+							node(Cst3) [cst] {22280}
+						edge from parent node[fpf, left] {(-7,-22)}
+						}
+						child{
+							node(Var3) [var] {$u[n-3]$}
+						edge from parent node[fpf, right] {(4,-11)}
+						}
+					}
+					edge from parent node[fpf, right,sloped,above] {(-2,-17)}
+				}
+				edge from parent node[fpf, left,sloped,above] {(-2,-17)}
+			}
+			child{[sibling distance=3.000000cm]
+				node(DAdd_86696) [dec1] {$>>2 $}
+				child{
+					node(Add_86696) [adder] {$+$}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultun lsb  19_M) [decM] {$\gg 16 $}
+					child{[level distance=0.4cm]
+						node(Multun lsb  19) [mult] {$\times$}
+						child{
+							node(Cst0) [cst] {22280}
+						edge from parent node[fpf, left] {(-9,-24)}
+						}
+						child{
+							node(Var0) [var] {$u[n]$}
+						edge from parent node[fpf, right] {(4,-11)}
+						}
+					}
+					edge from parent node[fpf, left,sloped,above] {(-4,-19)}
+				}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultun4 lsb  19_M) [decM] {$\gg 16 $}
+					child{[level distance=0.4cm]
+						node(Multun4 lsb  19) [mult] {$\times$}
+						child{
+							node(Cst4) [cst] {22280}
+						edge from parent node[fpf, left] {(-9,-24)}
+						}
+						child{
+							node(Var4) [var] {$u[n-4]$}
+						edge from parent node[fpf, right] {(4,-11)}
+						}
+					}
+					edge from parent node[fpf, right,sloped,above] {(-4,-19)}
+				}
+					edge from parent node[fpf, right] {(-4,-19)}				}
+				edge from parent node[fpf, right,sloped,above] {(-2,-17)}
+			}
+				edge from parent node[fpf, left] {(-2,-17)}			}
+			edge from parent node[fpf, left,sloped,above] {(-1,-16)}
+		}
+		child{[sibling distance=1cm, level distance=0cm]
+			node(DMultun2 lsb  16_M) [decM] {$\gg 16 $}
+			child{[level distance=0.4cm]
+				node(Multun2 lsb  16) [mult] {$\times$}
+				child{
+					node(Cst2) [cst] {16710}
+				edge from parent node[fpf, left] {(-6,-21)}
+				}
+				child{
+					node(Var2) [var] {$u[n-2]$}
+				edge from parent node[fpf, right] {(4,-11)}
+				}
+			}
+			edge from parent node[fpf, right,sloped,above] {(-1,-16)}
+		}
+			edge from parent node[fpf, right] {(-1,-16)}		}
+		edge from parent node[fpf, right,sloped,above] {(5,-10)}
+	}
+	edge from parent node[fpf, right] {(5,-10)}
+}
+
+;
+        
+\end{tikzpicture}
+\end{center}
+\end{document}

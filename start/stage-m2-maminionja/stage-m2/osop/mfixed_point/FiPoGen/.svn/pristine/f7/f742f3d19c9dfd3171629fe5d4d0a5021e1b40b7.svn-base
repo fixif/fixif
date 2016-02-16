@@ -1,0 +1,26 @@
+<form method="POST" action="/Sum">
+	<textarea name="sum" type="text" rows="6" cols="10"></textarea><br/><br/>
+	<input name="bits_clean" type="checkbox"/> Clean bits using &delta;	 <br/>
+	&delta; = <select name="d1">
+		<option value="ceil">ceil</option>
+		<option value="floor">floor</option>
+	</select> 
+	(log2(<select name="d2">
+		<option value="N">N</option>
+		<option value="N-1">N-1</option>
+	</select> )) + <input name="d3" type="text"/><br/>
+	<select name="roundoff">
+		<option value="nearest">Nearest</option>
+		<option value="truncature">Truncature</option>
+		<option value="jpg">jpeg</option>
+	</select> <br/><br/>
+
+	<input name="color" type="checkbox" checked/> Color <br/>
+
+	<select name="image">
+		<option value="pdf">pdf</option>
+		<option value="png">png</option>
+		<option value="jpg">jpeg</option>
+	</select> <br/>
+	<input type="submit" />
+</form>
