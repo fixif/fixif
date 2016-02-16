@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 from LTI import dSS
 
 from numpy import eye, zeros
+from numpy import matrix as mat
 
 class State_Space(SIF):
 
@@ -35,3 +36,14 @@ class State_Space(SIF):
         JtoS = eye((l)), zeros((n,l)), zeros((m,l)), zeros((l,n)), zeros((l,p)), A, B, C, D
         
         SIF.__init__(self, JtoS, eps, State_Space_father_obj, **State_Space_event)
+        
+        # set value of _formOpt
+        self._formOpt = 'UYW'
+        
+        # this implies setting start (default) values for U, Y, W
+        # (we have l = 0)
+        # self.U = mat([])
+        # self.Y = mat([])
+        # self.W = mat(eye(n))
+        
+        self._set_default_UYW()

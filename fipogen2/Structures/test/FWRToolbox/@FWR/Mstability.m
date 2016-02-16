@@ -65,12 +65,11 @@ Abar = [ Sysp.A + B2*R.DZ*C2 B2*R.CZ;
          R.BZ*C2 R.AZ];
 lambda = eig(Abar)';
 
-
-
 % measure
 for k=1:size(dlbk_dZ,3)
     Psi(k) = norm( R.WZ, 'fro') * norm( dlbk_dZ(:,:,k) .* R.rZ, 'fro');
 end
+
 M = min( (1-abs(lambda)) ./ Psi );
 
 

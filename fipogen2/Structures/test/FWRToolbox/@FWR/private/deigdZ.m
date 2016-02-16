@@ -28,16 +28,16 @@ end
 My = inv(Mx)';
 lambda=diag(Dlambda)';
 
-
 % sensitivity matrix
 dlk_dZ = zeros( sizeZ(1), sizeZ(2), size(Dlambda,1) );
+
 for k=1:size(Dlambda,1)
     if (moduli==1)
-        % MAYBE A PROBLEM HERE BECAUSE ALL VALUES BUT FIRST ARE ALWAYS ZERO
         dlk_dZ(:,:,k) = M1' * ( 1/abs(lambda(k)) * real(conj( lambda(k) * conj(My(:,k))*transpose(Mx(:,k)) )) ) * M2';
     else
         dlk_dZ(:,:,k) = M1' * ( conj(My(:,k))*transpose(Mx(:,k)) ) * M2';
     end
+       
 end
 
 % dlambda_dZ

@@ -38,31 +38,22 @@ def calc_MsensH(R, loc_measureType):
         Sg = dSS(Ag, Bg, Cg, Dg)        
         Sh = dSS(Ah, Bh, Ch, Dh)
         
-        is_SISO_opt = False # disabled, code not complete
-        
-        if Dg.shape[0]*Dh.shape[1] == 1 & is_SISO_opt :
+        MX = zeros(W.shape)
             
-            print('SISO system')
-            N, MX = _w_norm_prod_SISO(Ag,Bg,Cg,Dg, Ah,Bh,Ch,Dh, W)
-        
-        else:
+        Sh_subsys_line = []
             
-            MX = zeros(W.shape)
+        for j in range(0, W.shape[1]):
+            Sh_subsys_line.append(Sh[j,:])
             
-            Sh_subsys_line = []
-            
+        for i in range(0, W.shape[0]):
             for j in range(0, W.shape[1]):
-                Sh_subsys_line.append(Sh[j,:])
+                if not(W[i, j] == 0):
+                    MX[i, j] = (Sg[:,i]*Sh_subsys_line[j]).norm('h2')
             
-            for i in range(0, W.shape[0]):
-                  for j in range(0, W.shape[1]):
-                       if not(W[i, j] == 0):
-                           MX[i, j] = (Sg[:,i]*Sh_subsys_line[j]).norm('h2')
-            
-            MX = multiply(MX, W)
+        MX = multiply(MX, W)
         
-            N = norm(MX, 'fro')
-            N = N*N # inlining x5 speedup... http://stackoverflow.com/questions/25254541/why-is-numpy-power-60x-slower-than-in-lining
+        N = norm(MX, 'fro')
+        N = N*N # inlining x5 speedup... http://stackoverflow.com/questions/25254541/why-is-numpy-power-60x-slower-than-in-lining
         
         return N, MX
     
@@ -77,5 +68,5 @@ def calc_MsensH(R, loc_measureType):
         
         M, MZ = _w_norm_prod(R.Abar,R.M1bar,R.Cbar,R.M2bar, R.Abar,R.Bbar,R.N1bar,R.N2bar, R.dZ)
         
-    return M, MZ
+    return [M, MZ]
       

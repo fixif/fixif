@@ -22,7 +22,7 @@ from func_aux import _dynMethodAdder
 
 import numpy as np
 
-from numpy import c_, r_, eye, zeros, all
+from numpy import c_, r_, eye, zeros, all, transpose
 from numpy.linalg import inv
 
 class SIF(FIPObject):
@@ -239,23 +239,23 @@ class SIF(FIPObject):
         self._N1bar = r_[ c_[self.invJ*self.N*C2, self.invJ*self.M], c_[zeros((n, np)), eye(n)], c_[C2, zeros((m2, n))] ]
         self._N2bar = r_[ self.invJ*self.N*D21, zeros((n, p1)), D21 ]
     
-    def _translate_Z_AZtoDZ_W(self, U, Y, W, invU):
+    def _translate_Z_AZtoDZ_W(self):
         
         """
         Calculate Z, AZtoDZ and W in the same function to factorize invU calculation
         """
         
         # _build_Z
-        #             J           K              L         M           N         P              Q            R         S
-        self._build_Z(Y*self.J*W, invU*self.K*W, self.L*W, Y*self.M*U, Y*self.N, invU*self.P*U, invU*self.Q, self.R*U, self.S)
+        #             J                     K                        L              M                     N              P                        Q                 R              S
+        self._build_Z((self.Y*self.J*self.W, self.invU*self.K*self.W, self.L*self.W, self.Y*self.M*self.U, self.Y*self.N, self.invU*self.P*self.U, self.invU*self.Q, self.R*self.U, self.S))
     
         self._invJ = inv(self.J)
     
         # _build_AZtoDZ
         
-        self._AZ = invU*self._AZ*U
-        self._BZ = invU*self._BZ
-        self._CZ = self._CZ*U
+        self._AZ = self.invU*self._AZ*self.U
+        self._BZ = self.invU*self._BZ
+        self._CZ = self._CZ*self.U
         #self._DZ = self._DZ not modified by transformation
         
         self._Z_dSS = dSS(self._AZ,self._BZ,self._CZ,self._DZ)
@@ -263,10 +263,10 @@ class SIF(FIPObject):
         
         # update Wo and Wc if they exist
         if self._Wo is not None:
-            self._Wo = transpose(U)*self._Wo*U
+            self._Wo = transpose(self.U)*self._Wo*self.U
         
         if self._Wc is not None:
-            self._Wc = invU*self._Wc*transpose(invU)
+            self._Wc = self.invU*self._Wc*transpose(self.invU)
         
     
     def __init__(self, JtoS, eps=1.e-8, plant=None, father_obj=None, **event_spec): # name can be specified in e_desc
@@ -296,12 +296,6 @@ class SIF(FIPObject):
         self._eps = eps
 
         self._invJ = inv(JtoS[0])
-
-        # dZ from Z
-        #self._build_dZ()
-        # build AZ_to_DZ (implies setting or resetting wo and wc to None)
-        #self._build_AZtoDZ()  
-        #self._build_M1M2N1N2()
         
         # build
         # _dZ 
@@ -319,41 +313,60 @@ class SIF(FIPObject):
             # they are built when self.plant setter is used
             self._Abar, self._Bbar, self._Cbar, self._Dbar, self._M1bar, self._M2bar, self._N1bar, self._N2bar = [None]*8
 
-
-
         # sensitivity measures
-        # important note
-        # those are not calculated at instance creation because it consumes time and we don't
-        # know what there is to do at instance creation.
-        # So all measures are initialized as None.
-        # when the optimization routine is used, there are two possible ways
-        # or we recalculate the value from scratch (same scenario as if value not instantiated)
-        # or we use the existing value and UYW matrixes to get new value
 
-        self._measureTypes = ['OL','CL']
+        # Not calculated at instance creation, consumes time and not always useful
+        # All measures are initialized as None.
         
-        # OL & CL
+        # When the optimization routine is used, two possible ways :
+        # - recalculate the value from scratch 
+        # - use the existing value and UYW matrixes to get new value (if is_use_UYW_transform set to true)
+
+        # Open-Loop and Closed-Loop
+        
+        
+        
+        self._measureTypes = ['OL','CL']
+
         self._MsensH = {key:None for key in self._measureTypes}
         self._MsensPole = {key:None for key in self._measureTypes}
         self._RNG = {key:None for key in self._measureTypes}
-        
+
+        # CL only
+        self._Mstability = None        
         
         # the values of those parameters needs to be kept
         # because we have to test those against the user's input or program input
         # to know if spitting out the old result is correct or if a recalculation is needed
         self._MsensPole_moduli = None
-        self._RNG_tol = None
+
+        # set UYW attributes
+        # those attributes are not used unless UYW transformation is possible on the form
+        self._U = None
+        self._invU = None
+        self._Y = None
+        self._W = None
         
-        # CL only
-        self._Mstability = None
-        
-        # define two different cases : or we can use UYW transform, or we cannot
+        # two different cases : or we can use UYW transform, or we cannot
         # this should be modified in each subclass AFTER using the init routine of SIF class
         # if a class variable is used it implies using a metaclass
         # if an object attribute is used it implies that it's not the cleanest way, 
         # programmatically wise but avoids error (changing val at instance level does not,
         # by reference change the value at the superclass level
-        is_use_UYW_transform = True
+        #self.is_use_UYW_transform = True
+
+        # in fact there are many different cases here : either we can use the UYW transform
+        # self._formOpt = 'UYW'
+        # or we can use the gammaDelta transform
+        # self._formOpt = 'gammaDelta'
+        # or we can use the delta transform
+        # 'delta'
+        
+        # this parameter has to be set in each SIF subclass
+        
+        self._formOpt = None
+
+        #_dynMethodAdder(SIF)
 
     @staticmethod
     def _check_MeasureType(fname, target, words):
@@ -361,17 +374,25 @@ class SIF(FIPObject):
          if target not in words:
             raise(ValueError, '{0} type not recognized (use {1})'.format(fname, ' OR '.join(words)))
 
+    # Function to set default UYW matrixes, called in inheriting classes after init
+    def _set_default_UYW(self):
+    	
+    	self.U = np.matrix(eye(self._n))
+    	self.Y = np.matrix(eye(self._l))
+    	self.W = self.Y
+
     # Functions to calculate measures. 
     # We keep updated closed-loop measures with stored plant at SIF instance level 
         
+    # MsensH
     def MsensH(self, measureType='OL', plant=None):
         
         """
         If plant is specified here, CL will *always* be recalculated (we don't compare input with existing self._plant)
-        We need manual possible input of type because, we may want access to the stored CL MsensH without recalculating it. 
+        We need input of measureType with plant = None, to get access to the stored CL value without recalculating it. 
             
         inst.MsensH(measureType='CL') gives the stored value for closed-loop case without recalculation (if there's a value) 
-        or calculates from stored plant (if there's no value)
+        or calculates from stored plant (if there's no stored value)
         """
             
         self._check_MeasureType('MsensH', measureType, self._measureTypes)
@@ -394,7 +415,9 @@ class SIF(FIPObject):
               self._MsensH[measureType] = self.calc_MsensH(measureType)
 
         return self._MsensH[measureType]
-        
+      
+      
+    #MsensPole   
     def MsensPole(self, measureType='OL', plant=None, moduli=1):
           
         self._check_MeasureType('MsensPole', measureType, self._measureTypes)
@@ -422,8 +445,9 @@ class SIF(FIPObject):
 
         return self._MsensPole[measureType]
             
-            
-    def RNG(self, measureType='OL', plant=None, tol=1.e-8):
+    
+    #RNG       
+    def RNG(self, measureType='OL', plant=None, eps=None, is_rebuild_dZ = False):
             
         self._check_MeasureType('RNG', measureType, self._measureTypes)
             
@@ -439,17 +463,23 @@ class SIF(FIPObject):
             
             raise(NameError, 'Cannot provide RNG closed-loop measure as no plant is defined')
         
-        if not(tol == self._RNG_tol):
+        if (eps != self._eps) and not(eps is None):
              
-            self._RNG_tol = tol
-            is_calc_modified = True           
+            self._eps = eps
+            is_calc_modified = True
+            is_rebuild_dZ = True
+        
+        if is_rebuild_dZ:
+        	self._build_dZ()
                     
         if (self._RNG[measureType] is None) or is_calc_modified:
                 
-            self._RNG[measureType] = self.calc_RNG(measureType, tol)
+            self._RNG[measureType] = self.calc_RNG(measureType, self._eps)
                 
         return self._RNG[measureType]
-            
+    
+    
+    #Mstability        
     def Mstability(self, plant=None, moduli=1):
         
         is_calc_modified = False
@@ -476,9 +506,12 @@ class SIF(FIPObject):
     
 
     
-    # Hypothesis : plant is kept UNCHANGED from start to end of routine
+    # Hypothesis : plant is kept UNCHANGED from start to end of _recalc routine
     
-    # Sensitivity criterions are recalculated if they already exist. If they don't, they're untouched
+    # Sensitivity criterions are recalculated if they already exist. If they exist as None, they're untouched
+    
+    # This is not needed because if we use the "dumb" method we need to recalculate everything from the start
+    # so we're going to use the regular __init__ from class
     
     def _recalc_sensitivity(self):
         
@@ -513,7 +546,7 @@ class SIF(FIPObject):
     # So, to MsensH and MsensPole are free once you want Mstability.
     # MsensH is free once you want MsensPole
     
-    def _translate_realization(self, UYW):
+    def _translate_realization(self, is_rebuild_dZ = False):
         """
         This function calculates an equivalent realization by updating all instance attributes 
         that needs to be updated
@@ -526,28 +559,36 @@ class SIF(FIPObject):
         
         """
         
-        
-        U,Y,W = UYW
-        
-        U = mat(U)
-        Y = mat(Y)
-        W = mat(W)
-        
-        invU = inv(U)
-        
-        self._translate_Z_AZtoDZ_W(U, Y, W, invU)
+        #translate from self.U, self.Y, self.W, self.invU
+        self._translate_Z_AZtoDZ_W()
         
         # mimic matlab code (could it destroy information during the process, if some coeffs go under the threshold after translation to equivalent form ??)
-        self._build_dZ()
+        if is_rebuild_dZ:
+            self._build_dZ()
         
         # rebuild remaining matrixes used in sensitivity calculations
-        self._buildM1M2N1N2()
+        self._build_M1M2N1N2()
     
         # if there's a plant, let's rebuild all bar matrixes
         if self.plant is not None:
             self._build_plantSIF()
 
         # we don't call _set_check_dimensions bacause SIF dimension should remain the same
+        
+        
+        for cur_type in self._measureTypes:
+            # no need to check for Mstability because if it is present, then MsensPole has been calculated for CL case
+            if (self._RNG[cur_type] is not None) or (self._MsensPole[cur_type] is not None):
+                is_calc_T1T2 = True
+                break
+        else:
+            
+            is_calc_T1T2 = False
+        
+        # not necessary if we only need MsensH
+        if is_calc_T1T2:
+            
+            T1, T2 = self.calc_transform_UYW()
         
         for cur_type in self._measureTypes:
             
@@ -556,19 +597,20 @@ class SIF(FIPObject):
             # - new value of Wo calculated from UYW transform
             # - previous value of dZ
             # - previous value of M1M2Wobar for CL calculation
-            if self._RNG[cur_type] is not None: # use instance attribute here, otherwise we're going to calculate it self.RNG()(set to None initially)
-                self.transform_UYW_RNG(cur_type, U, Y, W, invU)
+            if self._RNG[cur_type] is not None: # use instance attribute here, not  self.RNG() otherwise we're going to calculate it. set to None initially)             
+                self.transform_UYW_RNG(cur_type, T1)
                 
             if self._MsensH[cur_type] is not None:
-            	self.MsensH(measureType=cur_type) # UYW transform for MsensH not defined
-            	
+            	self.transform_UYW_MsensH(cur_type) # FIXME uses bruteforce method ATM
+            	#self._MsensH[cur_type] = None
+                #self.MsensH(measureType=cur_type) # UYW transform for MsensH not defined
+                
             if self._MsensPole[cur_type] is not None:
-            	self.transform_UYW_MsensPole(cur_type, U, Y, W, invU)
-        
+                self.transform_UYW_MsensPole(cur_type, T1, T2)
+                
+        if self._Mstability is not None:
+            self.transform_UYW_Mstability(T1, T2)
 
-        
-    # if plant is new then we renew plant in SIF to have data updated @ same time.
-    # a SIF cannot keep two value for two different plant at the same time
         
     @property
     def plant(self):
@@ -683,9 +725,26 @@ class SIF(FIPObject):
     def N2bar(self):
         return self._N2bar
     
+    @property
+    def U(self):
+        return self._U
+    
+    @property
+    def Y(self):
+        return self._Y
+    
+    @property
+    def W(self):
+        return self._W
+    
+    @property
+    def invU(self):
+        return self._invU
+    
     # Z, dZ getters
 
     # needs to be set to define properties relying on it
+    # FIXME thib : find another solution
     _l, _m, _n, _p = (0, 0, 0, 0)
 
     @property
@@ -852,6 +911,25 @@ class SIF(FIPObject):
         self._dZ[ self._l+self._n : self._l+self._n+self._p, self._l+self._n : self._l+self._n+self._m] = mymat  
 
 
+    # U, Y, W attributes
+    @U.setter
+    def U(self, mymat):
+        if (mymat.shape[0] != mymat.shape[1]) or mymat.shape[0] != self._n :
+            raise(ValueError, 'Wrong dimension for U')
+        self._U = np.matrix(mymat)
+        self._invU = inv(self._U)
+        
+    @Y.setter
+    def Y(self, mymat):
+        if (mymat.shape[0] != mymat.shape[1]) or mymat.shape[0] != self._l :
+            raise(ValueError, 'Wrong dimension for Y')
+        self._Y = np.matrix(mymat)       
+        
+    @W.setter
+    def W(self, mymat):
+        if (mymat.shape[0] != mymat.shape[1]) or mymat.shape[0] != self._l :
+            raise(ValueError, 'Wrong dimension for W')
+        self._W = np.matrix(mymat)  
 
     def __check_set_dimensions__(self, JtoS):
         

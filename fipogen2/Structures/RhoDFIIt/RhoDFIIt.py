@@ -40,12 +40,23 @@ class RhoDFIIt(State_Space):
         if delta is None:
             self._delta = mat(zeros(gamma.shape))
         else:
-            self._delta = delta
+            self._delta = mat(delta)
         
         self._num = num
         self._den = den
 
         self._gamma = mat(gamma)
+        
+        #those values needs to be stored because they are going to be used as reference by optimizeForm
+        self._isGammaExact = isGammaExact
+        self._isDeltaExact = isDeltaExact
+        self._opt = opt
+        
+        # use the 'gammaDelta' method to get new form from old form
+        # this value can be modified if we decide to keep delta constant
+        self._formOpt = 'gammaDelta'
+        #self._formOpt = 'gamma'
+        
         
         Va = transpose(mat(self._den))/self._den[0,0]
         Vb = transpose(mat(self._num))/self._den[0,0]
@@ -78,8 +89,8 @@ class RhoDFIIt(State_Space):
         
         my_cond = cond(Tbar,2)/cond(Tbar,-2) # (larger / smaller) singular value like cond() of MATLAB
         
-        if (my_cond > cond_limit):
-            raise(ValueError, 'Cannot compute matrix inverse') 
+        #if (my_cond > cond_limit):
+        #    raise(ValueError, 'Cannot compute matrix inverse') 
         
         #Valpha_bar, Vbeta_bar
         

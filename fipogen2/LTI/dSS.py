@@ -338,27 +338,38 @@ class dSS(FIPObject):
         
         """
 
-        res = None
-
         if type == 'h2':
 
             try:
                 M = self._C * self.Wc * self._C.transpose() + self._D * self._D.transpose()
                 # less errors when Wc is big and Wo is small
                 #M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
+                #res = sqrt(M.trace())
             except:
-                res = inf
-                raise ValueError, "Impossible to compute H2-norm of current discrete state space. Default value is 'inf'" 
+            	
+                try:
+                    M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
+                    #res = sqrt(M.trace())
+                except:
+                    
+                    print("dSS, h2-norm : Impossible to compute M. Default value is 'inf'")
+                    return inf
+        
+            trM = M.trace()
+        
+            # we could use seterr from numpy here to catch invalid value in sqrt. use a simpler hack instead.
+            if trM < 0:
+        	
+            	print('dSS, h2-norm : M.trace() < 0. Default value is inf')
+                return inf
+           
             else:
-                res = sqrt(M.trace())
-
-            #self._norm_h2 = res
+            	
+        	    return sqrt(M.trace())
 
         else:
             
-            raise('norm type not supported (yet)')
-
-        return res
+            raise(NameError, 'norm type not supported (yet)')
 
 
 

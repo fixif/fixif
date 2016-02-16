@@ -16,8 +16,8 @@ from numpy import matrix as mat
 from numpy import eye, c_, r_, zeros, multiply, all, diagflat, trace, ones, where, logical_or
 from numpy import transpose, fmod, log2
 from numpy.linalg import norm, inv, eig
-from calc_transform_UYW import calc_transform_UYW
-#from calc_plantSIF import calc_plantSIF
+
+
 
 __all__ = ['transform_UYW_RNG']
 
@@ -29,7 +29,11 @@ def transform_UYW_RNG(R, measureType, T1):
     W is not used in this function (could be removed from calling args)
     """
     
-    dZ = R._RNG[measureType][1] # do not call function, refer to instance's attribute
+    #dZ = R._RNG[measureType][1] # do not call function, refer to instance's attribute
+    #print('transform_UYW_RNG ' + measureType + ' $$$$$$$$$$$')
+    #print(R._RNG[measureType][1])
+    #print('$$$$$$$$$$$$$$$')
+    
     
     if measureType == 'OL':
     
@@ -39,17 +43,16 @@ def transform_UYW_RNG(R, measureType, T1):
         # BIG PROBLEM zeros(n,m) differs from existing definition of M1 zeros(n,p)
         # let's say it's an error and rely on our current implementation at SIF class level
         #M1 = c_[R.K*R.invJ, eye(n), zeros((n, m))]
-        
         #M2 = c_[R.L*R.invJ, zeros((p, n)), eye(p)]
     
-        # WARNING : need to check that Wo is calculated in a coherent state with the rest of the values
+        # WARNING : need to check that Wo is calculated in a coherent state with the rest of the values (ok, it's a trace so tr(ABC) = tr(CAB))
     
         # modify instance Attribute, bypass function
         # modify matrix G
-        R._RNG[measureType][0] = trace( dZ * (transpose(R.M2)*R.M2 + transpose(R.M1)*R.Wo*R.M1)) # needs Wo for current (ie. UYW transformed) system
+        R._RNG[measureType][0] = trace( R._RNG[measureType][1] * (transpose(R.M2)*R.M2 + transpose(R.M1)*R.Wo*R.M1)) # needs Wo for current (ie. UYW transformed) system
         
     else: # measureType == 'CL'
-        
+
         #l = Y.shape[1]
         #n = U.shape[1]
         
@@ -60,9 +63,12 @@ def transform_UYW_RNG(R, measureType, T1):
 #         T1, T2 = calc_transform_UYW(R, U, Y, W, invU)
 
         # WARNING PROBLEM TODO THIS VALUE HAS NOT BEEN UPDATED AND IS NOT COHERENT WITH THE REST
-        M1M2Wobar = R._RNG[measureType][2]
+        # YES IT IS indeed according to Thibault
         
-        # JOA I don't understand that the matrix M1M2Wobar is not modified by the UYW transform
+        #M1M2Wobar = R._RNG[measureType][2]
+        
+        # FIXME CHECK JOA I don't understand that the matrix M1M2Wobar is not modified by the UYW transform
         # modify matrix G, CL measureType
-        R._RNG[measureType][0] = trace(inv(T1) * dZ * inv(transpose(T1)) * M1M2Wobar )
+
+        R._RNG[measureType][0] = trace(inv(T1) * R._RNG[measureType][1] * inv(transpose(T1)) * R._RNG[measureType][2] )
         

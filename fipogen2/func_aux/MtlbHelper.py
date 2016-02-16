@@ -2,6 +2,8 @@
 
 import numpy.testing as npt
 
+from numpy import where
+
 from scipy.io import loadmat, savemat
 import os, sys
 
@@ -186,15 +188,40 @@ class MtlbHelper(object):
                 npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
             except AssertionError as e:
                 
+                print('+++++++++++++++ {0:12} mismatch'.format(var))
+
+                
                 if is_debug:
-                    print(e)
-                    print('+++++++++++++++')
+
+                    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
                     print(var)
                     print('+++++++++++++++')            
                     print('Matlab variable')
                     print('+++++++++++++++')
-                    print(str(tmp_dict[var]))
+                    print(tmp_dict[var])
                     print('+++++++++++++++')
                     print('Python variable')
                     print('+++++++++++++++')
-                    print(str(local_varz_dict[var]))                
+                    print(local_varz_dict[var])     
+                    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')  
+
+                if var in {'OP_dlk_dZ', 'CP_dlbk_dZ'}:
+                    
+                    print('warning (false positive) : discrepancy could be due to different order of eigenvalues')
+                    print('if norm is the same, it is a strong indication of the former source of discrepancy')
+                    
+                else:
+                	
+ 			    	print(e)               	
+                    
+#                     tmp_var_mtlb = tmp_dict[var]
+#                     tmp_var_pyth = local_varz_dict[var]
+#                     
+#                     diff_mat = []
+#                     
+#                     for k in xrange(0, tmp_var_mtlb.shape[2]):
+#                         diff_mat = tmp_var_mtlb[:,:,k] - tmp_var_pyth[:,:,k]
+#                     
+#                         for row, col in zip(*where(diff_mat >= 1.e-5)):
+#                             print('{} , {} : {} / {}'.format(row, col, tmp_var_mtlb[row,col,k], tmp_var_pyth[row,col,k]))
+                    
