@@ -13,6 +13,7 @@ from oSoP.Constant import Constant
 
 from scipy.io import loadmat
 import numpy as np
+from numpy.linalg import inv
 
 def convertToFix(M,w):
 	M_cst = convertToFixAux(M,w)
@@ -33,11 +34,34 @@ def convertToFixAux(M,w):
 			mM.append(convertToFixAux(M[i],w))
 	return mM
 
+def WCPG_txy(S):
+	#O_JM=np.bmat(np.c_[np.zeros((S._l,S._l)),S.invJ*S.M])
+	#O_KJMP=np.bmat(np.c_[np.zeros((S._n,S._l)),S.K*S.invJ*S.M+S.P])
+	#Ab = S.K*S.invJ*S.M+S.P
+	#Bb = S.K*S.invJ*S.N+S.Q
+	print S._AZ
+	print S._BZ
+	Cb = np.bmat(np.r_[S.invJ*S.M,S._AZ,S._CZ])
+	Db = np.bmat(np.r_[S.invJ*S.N,S._BZ,S._DZ])
+	print Cb
+	print Db
+	#print Cb
+	#print Db
+	#Cb = np.bmat([np.zeros((S._p,S._l)),S.L*S.invJ*S.M+S.R])
+	#Db = np.bmat([S.L*S.invJ*S.N+S.S])
+	SS = LTI.dSS(S._AZ,S._BZ,Cb,Db)
+	return SS.WCPG
+
 
 def SIFH_to_SIFHstar(z,w):
+	#SS=SIF.SIF(z)
+	#print SS._CZ
+	#z[2]=np.bmat(np.r_[np.identity(z[0].shape[0]),np.zeros(z[1].shape),z[2]])
+	#z[7]=np.bmat(np.r_[np.zeros(z[3].shape),np.identity(z[5].shape[0]),z[7]])
+	#z[8]=np.bmat(np.r_[np.zeros(z[4].shape),np.zeros(z[6].shape),z[8]])
 	S = SIF.SIF(z)
-
-	# Nouveau J
+	#print S._CZ
+	
 	if S._l !=0:
 		J_tmp = [[S.J[i,j] for j in range(S.J.shape[1])]for i in range(S.J.shape[0])]
 		J_tilde = convertToFix(J_tmp,w)
@@ -94,18 +118,25 @@ def SIFH_to_SIFHstar(z,w):
 	S_t = np.bmat([[S_tilde-S.S, np.zeros((S._p, S._l+S._n)), IdenY]])
 	
 	print "\n### Z exact ###\n"
-	print "WCPG exact : "
-	print(LTI.dSS(S._AZ,S._BZ,S._CZ,S._DZ).WCPG)
+	print "Rayon spectral:"
+	print max(abs(np.linalg.eig(S.AZ)[0]))
+	print "\nWCPG exact : "
+	print (LTI.dSS(S._AZ,S._BZ,S._CZ,S._DZ).WCPG)
+	print WCPG_txy(S)
 	#print S.J,S.K,S.L,S.M,S.N,S.P,S.Q,S.R,S.S
 	print "\n### Z degrade ###\n"
 	if S._l != 0:
 		SIF_tilde =SIF.SIF((J_tilde,K_tilde,L_tilde,M_tilde,N_tilde,P_tilde,Q_tilde,R_tilde,S_tilde))
-		print "WCPG arrondi : "
+		print "Rayon spectral:"
+		print max(abs(np.linalg.eig(SIF_tilde.AZ)[0]))
+		print "\nWCPG arrondi : "
 		print(LTI.dSS(SIF_tilde._AZ,SIF_tilde._BZ,SIF_tilde._CZ,SIF_tilde._DZ).WCPG)
 		return SIF.SIF((J,K,L,M,N,P,Q,R,S_t))
 	else:
 		SIF_tilde =SIF.SIF((J_tilde,K_tilde,L_tilde,M_tilde,N_tilde,P_tilde,Q_tilde,R_tilde,S_tilde))
-		print "WCPG arrondi : "
+		print "Rayon spectral:"
+		print max(abs(np.linalg.eig(SIF_tilde.AZ)[0]))
+		print "\nWCPG arrondi : "
 		print(LTI.dSS(SIF_tilde._AZ,SIF_tilde._BZ,SIF_tilde._CZ,SIF_tilde._DZ).WCPG)
 		return SIF.SIF((J,K,L,M,N,P,Q,R,S_t))
 	
@@ -113,10 +144,14 @@ def SIFH_to_SIFHstar(z,w):
 
 
 D=loadmat("scripts/benoit_11_2015/ARITH23_BLTH_ex.mat")
-for sifName in ["SIF_DFI", "SIF_LWDF", "SIF_SS", "SIF_rho"]:
-	print "\n\n---------------- Structure "+sifName+" ----------------\n\n"
-	Z_DFI=[D[sifName][0][0][i] for i in range(4,13)]
-	newSIF = SIFH_to_SIFHstar(Z_DFI, 8)
+for sifName in ["SIF_LWDF", "SIF_SS", "SIF_rho"]:
+	print "\n\n---------------- Structure "+sifName+" ----------------\n"
+	Z=[]
+	for i in range(4,13):
+		if D[sifName][0][0][i].dtype == np.dtype('uint8'):
+			D[sifName][0][0][i].dtype = np.dtype('int8')
+		Z.append(D[sifName][0][0][i])
+	newSIF = SIFH_to_SIFHstar(Z, 8)
 	print "\n### Z erreur ###\n"
 	print "WCPG erreur : "
 	print(LTI.dSS(newSIF._AZ,newSIF._BZ,newSIF._CZ,newSIF._DZ).WCPG)
