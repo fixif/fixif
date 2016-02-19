@@ -1,14 +1,15 @@
 #coding=utf8
 #!usr/bin/env python
 
-from sys import path
-
+import sys, os
+sys.path.insert(0, os.path.abspath('.'))
 
 import LTI
 import SIF
 
 from scipy.io import loadmat
 import numpy as np
+
 
 
 D=loadmat("scripts/benoit_11_2015/ARITH23_BLTH_ex.mat")
@@ -24,5 +25,15 @@ N1 = np.bmat(np.r_[S.invJ*S.M,S._AZ,S._CZ])
 N2 = np.bmat(np.r_[S.invJ*S.N,S._BZ,S._DZ])
 
 print "\n###  WCPG Hu  ###"
+
+print(N1)
+print(N2)
+
+# with the print function calling the variables the bug is not there
+# maybe the C wrapper needs to use more INCREF on incoming variables so that those
+# are not trashed by the python VM during the call, either by
+# the python program or before entering into wrapper WCPG routine
+# (which should not be the case, as we use intermediate variables
+
 wcpgHu = LTI.dSS(S._AZ,S._BZ,N1,N2).WCPG
 print wcpgHu
