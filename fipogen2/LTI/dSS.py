@@ -21,7 +21,7 @@ from TRK.FIPObject        import FIPObject
 
 from numpy                import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
 #from numpy.ctypeslib      import as_array
-from numpy                import matrix as mat
+from numpy                import matrix as mat, Inf
 from numpy                import eye, zeros, r_, c_, sqrt
 
 from numpy.linalg         import inv, det, solve
@@ -315,7 +315,13 @@ class dSS(FIPObject):
               else:
                 e = ValueError(Woc + " : " + "The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
                 e.info = ve.info
-              raise e
+              
+              if (Woc == 'Wo'):
+              	self._Wo = Inf
+              elif (Woc == 'Wc'):
+              	self._Wo = Inf
+              	
+              print('dSS : {} : computation failed. Default value is inf'.format(Woc))
         
         else: raise "unknown _W_method to calculate observers"
 
@@ -352,7 +358,7 @@ class dSS(FIPObject):
                     #res = sqrt(M.trace())
                 except:
                     
-                    print("dSS, h2-norm : Impossible to compute M. Default value is 'inf'")
+                    print("dSS : h2-norm : Impossible to compute M. Default value is 'inf'")
                     return inf
         
             trM = M.trace()
@@ -360,7 +366,7 @@ class dSS(FIPObject):
             # we could use seterr from numpy here to catch invalid value in sqrt. use a simpler hack instead.
             if trM < 0:
         	
-            	print('dSS, h2-norm : M.trace() < 0. Default value is inf')
+            	print('dSS : h2-norm : M.trace() < 0. Default value is inf')
                 return inf
            
             else:

@@ -1,0 +1,7 @@
+\beamer@endinputifotherversion {3.12pt}
+\beamer@sectionintoc {1}{Contexte et Sujet}{3}{0}{1}
+\beamer@sectionintoc {2}{Le probl\IeC {\`e}me \IeC {\`a} r\IeC {\'e}soudre}{7}{0}{2}
+\beamer@sectionintoc {3}{Comment je vais r\IeC {\'e}soudre le probl\IeC {\`e}me?}{10}{0}{3}
+\beamer@sectionintoc {4}{T\IeC {\^a}ches \IeC {\`a} accomplir}{13}{0}{4}
+\beamer@sectionintoc {5}{Proc\IeC {\'e}dure de recette}{15}{0}{5}
+\beamer@sectionintoc {6}{\'Ech\IeC {\'e}ancier}{18}{0}{6}

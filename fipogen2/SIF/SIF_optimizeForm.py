@@ -25,6 +25,8 @@ from scipy import optimize
 
 from copy import copy, deepcopy
 
+from numpy.random import seed, rand
+
 __all__ = ['optimizeForm']
 
 iter_count = 0
@@ -37,7 +39,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
     For multi-parameter optimization this function is called recursively.
     
     """
-    # hack, ugly bout working
+    # hack, ugly but working
     global iter_count
 
     # Text Output line
@@ -119,20 +121,23 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
     # determine method used to get new form and new measures from existing ones
     # those tests could be skipped by using a metaclass or a new class to inherit from
 
-    if R.__class__.__name__ in {'DFI', 'DFII', 'State_Space'}:
-        _formOpt = 'UYW'
-    elif R.__class__.__name__ == 'RhoDFIIt':
-        _formOpt = 'gammaDelta' # in a later iteration if we define a dictionary correctly for instance.__init__, could be more generic like "brute"
+    #if R.__class__.__name__ in {'DFI', 'DFII', 'State_Space'}:
+    #    _formOpt = 'UYW'
+    #elif R.__class__.__name__ == 'RhoDFIIt':
+    #    _formOpt = 'gammaDelta' # in a later iteration if we define a dictionary correctly for instance.__init__, could be more generic like "brute"
 #     elif R.__class__.__name__ == 'Modal_delta':
 #         _formOpt = 'delta'
-    else:
-        raise(NameError, 'unsupported form of filter, supported forms are {}'.format(' , '.join(def_opt_forms)))
+    #else:
+        
+    #    raise(NameError, 'unsupported form of filter, supported forms are {}'.format(' , '.join(def_opt_forms)))
     
+    # randomize bounds ?
+    is_randomize_bounds = False
     
     # init_vals
     if startVals == 'default':
         
-        if _formOpt == 'UYW':
+        if R._formOpt == 'UYW':
             # U,Y,W transform
             print('startVals : using default U, Y, W values')
             #R.U = multiply(10,eye(R._n)) # be carfeul to use property so that nparray is transformed into matrix
@@ -147,7 +152,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
             #startVals = [random.rand(R._n, R._n), eye(R._l), eye(R._l)]]
         
-        elif _formOpt == 'gammaDelta': #or _formOpt == 'delta'
+        elif R._formOpt == 'gammaDelta': #or _formOpt == 'delta'
             
             print('startVals : using default gamma and delta values')
             
@@ -155,8 +160,44 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             #[gamma, delta]
             def_gamma_delta = ones((R._num.shape[0], R._den.shape[1]-1))
             startVals = multiply(2, [def_gamma_delta, def_gamma_delta])
+        
+        elif R._formOpt == 'delta':
+
+            print('startVals : using default delta values')
+            
+            def_delta = ones((R._num.shape[0], R._den.shape[1]-1))
+            startVals = multiply(2, def_delta)
             
             #raise(ValueError, 'gamma,delta needs to be defined at instance creation, cannot supply default values (to be implemented)')
+    
+    elif startVals == 'random':
+        
+        # for test purposes
+        #seed(25499)        
+        
+        if R._formOpt == 'UYW':
+            
+            print('startVals : usung random U, Y, W values')
+            
+            startVals = [mat(rand(*R.U.shape)), mat(rand(*R.Y.shape)), mat(rand(*R.W.shape))]
+            is_randomize_bounds = True
+            
+        elif R._formOpt == 'gammaDelta':
+            
+            print('startVals : usung random gamma and delta values')
+            
+            loc_gamma = mat(rand((R._num.shape[0], R._den.shape[1]-1)))
+            loc_delta = mat(rand((R._num.shape[0], R._den.shape[1]-1)))
+            
+            startVals = [loc_gamma, loc_delta]
+            
+        elif R._formOpt == 'delta':
+            
+            print('startVals : usung random delta values')
+            
+            loc_delta = mat(rand((R._num.shape[0], R._den.shape[1]-1)))
+            
+            startVals = loc_delta
            
     # use data already in instance attributes 
     elif startVals is not None:
@@ -167,29 +208,47 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
         print('startVals : using values stored in obj instance')
         
-        if _formOpt == 'UYW':
+        if R._formOpt == 'UYW':
             startVals = [R.U, R.Y, R.W] 
-        elif _formOpt == 'gammaDelta':
+        elif R._formOpt == 'gammaDelta':
             startVals = [R._gamma, R._delta]
+        elif R._formOpt == 'delta':
+            startVals = [R._delta]
 
     print('startVals : {}'.format(startVals))
         
     #change list of arrays into unique, 1-D array as needed by scipy.optimize
-    x0 = ravel([m.A1 for m in startVals if  m.A1.size != 0])
+    x0 = ravel([m.A1 for m in startVals if m.A1.size != 0])
     
     #bounds
     if bounds is None:
         
         print('bounds : using default values')
         
-        if _formOpt == 'UYW':
-            bounds = [(0.01, 100)]*len(x0)
+        if R._formOpt == 'UYW':
+            bounds = [[0.01, 100]]*len(x0)
             
-        elif _formOpt == 'gammaDelta':
-            bounds = [(0.05, 10)]*len(x0)
+        elif R._formOpt == 'gammaDelta':
+            bounds = [[0.05, 10]]*len(x0)
+            
+        elif R._formOpt == 'delta':
+            bounds = [[0.05, 10]]*len(x0)
 
     else:
         print('bounds : using supplied values')
+     
+    # we try to avoid singular matrixes when using the basinHoping algorithm
+	# at first step, this algorithm tries to explores the max bounds for all parameters
+	# if the bounds are the same, we get a singular matrix for U at step 1
+	# we enlarge the bounds by using 1 - rand on min val and 1 + rand on max val 
+    # using random bounds on UYW nevertheless, seems to no be a wise idea, optimization-wise
+    if is_randomize_bounds:
+	
+		for ind, bound_el in enumerate(bounds):
+					
+			bounds[ind][0] = multiply(bounds[ind][0], 1 - rand())
+			bounds[ind][1] = multiply(bounds[ind][1], 1 + rand()) 
+     
         
     print("bounds = {}".format(bounds))
 
@@ -277,19 +336,26 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         output_R = deepcopy(input_R)
         
         #translate using UYW matrixes
-        if _formOpt == 'UYW':
+        if R._formOpt == 'UYW':
                         
             output_R.U, output_R.Y, output_R.W = optVals
             output_R._translate_realization()
 
         #create new object with current gamma and delta        
-        elif _formOpt == 'gammaDelta':
+        elif R._formOpt == 'gammaDelta':
             #print('Sum of all parameters : {} '.format(sum(x)))
             
             if isinstance(input_R, list):
-            	print(input_R)
+                print(input_R)
             
             input_R.__class__.__init__(output_R, input_R._num, input_R._den, gamma=optVals[0], delta=optVals[1], isGammaExact=input_R._isGammaExact, isDeltaExact=input_R._isDeltaExact, opt=input_R._opt)
+    
+        elif R._optForm == 'delta':
+            
+            if isinstance(input_R, list):
+                print(input_R)
+            
+            input_R.__class__.__init__(output_R, input_R._num, input_R._den, gamma=input_R._gamma, delta=optVals[0], isGammaExact=input_R._isGammaExact, isDeltaExact=input_R._isDeltaExact, opt=input_R._opt)            
     
         return output_R
     
@@ -333,7 +399,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
         return opt_crit
     
-    R_loc = deepcopy(R)
+    #R_loc = deepcopy(R)
     
     #init_crit_vals = []
     
@@ -361,9 +427,13 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             print(line)
             print('Optimizing for single parameter : {}'.format(measure))
             print(line)
-            R_ind = R_loc.optimizeForm([measure], startVals=None, measureType=measureType, optMethod=optMethod) # start with same stored initial values of parameters
+            #R_ind = R_loc.optimizeForm([measure], startVals=None, measureType=measureType, optMethod=optMethod) # start with same stored initial values of parameters
+            
+            R_ind = R.optimizeForm([measure], startVals=None, measureType=measureType, optMethod=optMethod) # start with same stored initial values of parameters
+            
             # reset R_loc
-            R_loc = deepcopy(R)
+            #R_loc = deepcopy(R)
+            
             opt_forms.append(R_ind)
             bestVals.append(_calc_crit(R_ind, measure, measureType))
 
@@ -378,7 +448,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
 
         if restartScenario == ['default']:
             
-            R_opt = R_loc.optimizeForm(measures, startVals=None, measureType=measureType, weightingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)
+            R_opt = R.optimizeForm(measures, startVals=None, measureType=measureType, weightingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)
             opt_forms.append(R_opt)
             
         elif restartScenario == ['all']:
@@ -392,14 +462,16 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
                 print('startVals / multiparameter : Using best values found for {} as starting parameters'.format(measures[i]))
                 print(line)
                 
-                if _formOpt == 'UYW':
+                if R._formOpt == 'UYW':
                     loc_startVals = [opt_forms[i].U, opt_forms[i].Y, opt_form[i].W]
-                elif _formOpt == 'gammaDelta':
+                elif R._formOpt == 'gammaDelta':
                     loc_startVals = [opt_forms[i]._gamma, opt_forms[i]._delta]
+                elif R._formOpt == 'delta':
+                    loc_startVals = [opt_forms[i]._delta]
                 
-                R_opt = R_loc.optimizeForm(measures, startVals=loc_startVals, measureType=measureType, weightingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)
+                R_opt = R.optimizeForm(measures, startVals=loc_startVals, measureType=measureType, weightingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)
                 
-                R_loc = deepcopy(R)
+                #R_loc = deepcopy(R)
                 
                 opt_forms.append(R_opt)
                 
@@ -413,12 +485,14 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
        
                 ind = measures.index(restartS)
             
-                if _formOpt == 'UYW':
-                    loc_startVals = [opt_forms[ind].U, opt_forms[ind].Y, opt_form[ind].W]
-                elif _formOpt == 'gammaDelta':
-                    loc_startVals = [opt_forms[ind]._gamma, opt_forms[ind]._delta]            
+                if R._formOpt == 'UYW':
+                    loc_startVals = [opt_forms[ind].U, opt_forms[ind].Y, opt_forms[ind].W]
+                elif R._formOpt == 'gammaDelta':
+                    loc_startVals = [opt_forms[ind]._gamma, opt_forms[ind]._delta]
+                elif R._formOpt == 'delta':
+                    loc_startVals = [opt_forms[ind]._delta]
         
-                R_opt = R_loc.optimizeForm(measures, startVals=loc_startVals, measureType=measureType, weightingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)            
+                R_opt = R.optimizeForm(measures, startVals=loc_startVals, measureType=measureType, weightingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)            
         
                 opt_forms.append(R_opt)            
         
@@ -433,7 +507,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         #hack
 
         
-        minimizer_kwargs = {'args':R_loc, 'bounds':bounds}
+        minimizer_kwargs = {'args':R, 'bounds':bounds}
         
         if optMethod == 'basinHoping':
             
@@ -447,7 +521,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             # that if the dividing factor is small, parameters can skyrocket.
 
             #niter = 2000 and stepsize = 0.01 gives good result but not stable
-            minimizer_kwargs = {'args':R_loc, 'bounds':bounds}
+            minimizer_kwargs = {'args':R, 'bounds':bounds}
             opt_result = optimize.basinhopping(_func_opt, x0, niter=2000, stepsize=0.01, minimizer_kwargs=minimizer_kwargs, take_step=None, accept_test=None, callback=None, interval=1, disp=False, niter_success=1)
         
         elif optMethod == 'differentialEvolution':
@@ -460,14 +534,14 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             # it's given after a first tset of parameters by the optimizer so not always the same.
             # also not possible to set initial value and multiparmaeter opt is dependent from starting paramters.
         
-            minimizer_kwargs = [R_loc]
-            opt_result = optimize.differential_evolution(_func_opt, bounds, args=minimizer_kwargs, maxiter = 50000, polish=False)
+            minimizer_kwargs = [R]
+            opt_result = optimize.differential_evolution(_func_opt, bounds, args=minimizer_kwargs, maxiter = 50000, polish=False, mutation = (1.,1.999))
 
         elif optMethod == 'brute':
         
             # there seems to be no way to specifiy a starting point for the optimizer...
         
-            minimizer_kwargs = [R_loc]
+            minimizer_kwargs = [R]
             
             opt_result = optimize.brute(_func_opt, bounds, args = minimizer_kwargs)
 
@@ -475,7 +549,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
         #print(opt_result)
         
-        R_opt = _generate_updated_instance(R_loc, _rebuild_matrixes(startVals, opt_result.x))
+        R_opt = _generate_updated_instance(R, _rebuild_matrixes(startVals, opt_result.x))
         
         
         tmp_opt_crit = []

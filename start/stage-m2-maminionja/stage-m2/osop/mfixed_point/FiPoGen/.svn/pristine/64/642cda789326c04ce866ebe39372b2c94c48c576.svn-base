@@ -1,0 +1,32 @@
+\documentclass{minimal}
+\usepackage[a4paper,margin=1cm,landscape]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,arrows}
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[
+     dec1/.style={rectangle, draw=red!80, rounded corners=1mm, fill=white,
+        text centered, anchor=north, text=red!80, scale = 0.7},
+    dec2/.style={rectangle, draw=blue!80, rounded corners=1mm, fill=white,
+        text centered, anchor=north, text=blue!80, scale = 0.7},
+    decM/.style={rectangle, draw=black, rounded corners=1mm, fill=green!60,
+        text centered, anchor=north, text=black, scale = 0.7},
+    adder/.style={circle, draw, fill=red!60,
+        text centered, anchor=north, text=black, scale = 0.7},
+    mult/.style={circle, draw, fill=green!60,
+        text centered, anchor=north, text=black, scale = 0.7},
+     cst/.style={rectangle, rounded corners=0.7mm, draw, fill=orange!40,
+        text centered, anchor=north, text=black, scale = 0.7},
+     var/.style={rectangle, rounded corners=0.7mm, draw, fill=yellow!30,
+        text centered, anchor=north, text=black, scale = 0.7},
+     fpf/.style = {scale = 0.7},
+    level distance=0.4cm, growth parent anchor=south
+]
+\node (Sortie) [adder] {$S$}
+$TP_code
+;
+        
+\end{tikzpicture}
+\end{center}
+\end{document}

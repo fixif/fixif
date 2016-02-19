@@ -107,6 +107,8 @@ def gen_data(data_type, data_source, opt):
         obj_list = []
         for obj in list_obj:
             
+            # FIXME works, but generates an array that has a bigger size than expected,
+            # depdending on number of inputs and outputs
             num, den = ss2tf(obj.A, obj.B, obj.C, obj.D)
             print("********************************************************")
             print('A')

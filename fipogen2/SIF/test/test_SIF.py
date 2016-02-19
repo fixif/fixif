@@ -56,7 +56,7 @@ class test_SIF(unittest.TestCase):
         #self.ndigit = 10
         #self.ndigit = 8
         #self.ndigit = 5
-        self.ndigit = 0
+        self.ndigit = 3
         
         
         self.eps = 1.e-8    
@@ -150,7 +150,7 @@ class test_SIF(unittest.TestCase):
         
         n_obj = len(self.list_dSS)
         
-        for i_obj, dSSobj in enumerate(self.list_dSS[293:294]):
+        for i_obj, dSSobj in enumerate(self.list_dSS):
             
             print ("obj {0: >3d} / {1} ****************************************************".format(i_obj, n_obj), end="")
             
@@ -257,9 +257,12 @@ class test_SIF(unittest.TestCase):
             else:
                 print(' : No suitable plant found, skipping tests involving plant')        
          
-            self.engMtlb.compare(mtlb_cmd, varz, fipVarz, decim = self.ndigit)
+            err_num = self.engMtlb.compare(mtlb_cmd, varz, fipVarz, decim = self.ndigit)
         
             self.engMtlb.cleanenv()
+    
+            if err_num == 0:
+            	print('SUCCESS')
     
     def test_UYW_transform(self):
     
@@ -282,7 +285,7 @@ class test_SIF(unittest.TestCase):
  
         for i_obj, dSSobj in enumerate(self.list_dSS):
         
-            print ("obj {0: >3d} / {1}".format(i_obj, n_obj), end="\n")
+            print ("obj {0: >3d} / {1} ****************************************************".format(i_obj, n_obj), end="\n")
     
             SIFobj = State_Space(dSSobj.A,dSSobj.B,dSSobj.C,dSSobj.D)
                 
@@ -426,26 +429,21 @@ class test_SIF(unittest.TestCase):
                     err_num[ind] += 1
       
                     # ad-hoc debug
-                    if names_check[ind] == 'RNG(CL)[1]':
+                    if names_check[ind] == 'Mstability':
                     	
-                        print('RNG(CL)[1] translated ****************')
-                        print(item[0])
-                        print('RNG(CL)[1] bruteforce ****************')      
-                        print(item[1])
-                        print('**************************************')  
-                            
+                        print('Mstability translated : {}'.format(item[0]))
+                        print('Mstability bruteforce : {}'.format(item[1]))      
+
             if error_count == 0:
                 print('SUCCESS')
             else:
                 print('{} not equal in transformed and direct calculation with {} digits'.format(err_str, self.ndigit))
-            
-            print('$$$$$$$$$$$$$$$$$$$$$$$$$$$')
       
             # erase attribute and ask for property = brute force calculation (no transformation)
     
         num_cases = [len(self.list_dSS)]*len(names_check_W + names_check_OL) + [num_dSSplant]*len(names_check_CL) 
     
-        print('Total number of errors :')
+        print('Total number of errors with {}-digit precision :'.format(self.ndigit))
         for ind, item in enumerate(names_all):
             print('{0:20} : {1:4} / {2:4}'.format(item, err_num[ind], num_cases[ind]))
             

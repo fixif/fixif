@@ -3,6 +3,7 @@
 """
 This class describes the SIF object
 """
+from genericpath import exists
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -340,6 +341,13 @@ class SIF(FIPObject):
         # to know if spitting out the old result is correct or if a recalculation is needed
         self._MsensPole_moduli = None
 
+
+        # Those parameters has to be defined in each subclass
+        # list of available methods for optimization of current form
+        #self._avail_formOpt = None
+        # currently used method for optimization
+        #self._formOpt = None
+
         # set UYW attributes
         # those attributes are not used unless UYW transformation is possible on the form
         self._U = None
@@ -364,7 +372,7 @@ class SIF(FIPObject):
         
         # this parameter has to be set in each SIF subclass
         
-        self._formOpt = None
+        #self._formOpt = None
 
         #_dynMethodAdder(SIF)
 
@@ -376,10 +384,10 @@ class SIF(FIPObject):
 
     # Function to set default UYW matrixes, called in inheriting classes after init
     def _set_default_UYW(self):
-    	
-    	self.U = np.matrix(eye(self._n))
-    	self.Y = np.matrix(eye(self._l))
-    	self.W = self.Y
+        
+        self.U = np.matrix(eye(self._n))
+        self.Y = np.matrix(eye(self._l))
+        self.W = self.Y
 
     # Functions to calculate measures. 
     # We keep updated closed-loop measures with stored plant at SIF instance level 
@@ -470,7 +478,7 @@ class SIF(FIPObject):
             is_rebuild_dZ = True
         
         if is_rebuild_dZ:
-        	self._build_dZ()
+            self._build_dZ()
                     
         if (self._RNG[measureType] is None) or is_calc_modified:
                 
@@ -601,8 +609,8 @@ class SIF(FIPObject):
                 self.transform_UYW_RNG(cur_type, T1)
                 
             if self._MsensH[cur_type] is not None:
-            	self.transform_UYW_MsensH(cur_type) # FIXME uses bruteforce method ATM
-            	#self._MsensH[cur_type] = None
+                self.transform_UYW_MsensH(cur_type) # FIXME uses bruteforce method ATM
+                #self._MsensH[cur_type] = None
                 #self.MsensH(measureType=cur_type) # UYW transform for MsensH not defined
                 
             if self._MsensPole[cur_type] is not None:
@@ -1042,6 +1050,26 @@ class SIF(FIPObject):
         mystr += "Z = \n"+ str(self._Z) + "\n"
         
         mystr += "dZ = \n" + str(self._dZ) + "\n"
+        
+        if hasattr(self, '_avail_formOpt'):
+            
+            mystr += 'Available methods for optimization : \n'
+            
+            for meth in self._avail_formOpt:
+                mystr += meth + "\n"
+                
+            mystr += 'Chosen method for optimization : \n'
+            
+            mystr += self._formOpt + "\n"
+            
+        if hasattr(self, '_formOpt'):
+        
+            if _self._formOpt == "UYW":
+            
+                mystr += "U = \n" + str(self.U) + "\n"
+                mystr += "Y = \n" + str(self.Y) + "\n" 
+                mystr += "W = \n" + str(self.W) + "\n"
+        
         
         #TODO show matrix Z (see matlab display method for FWR object)
         

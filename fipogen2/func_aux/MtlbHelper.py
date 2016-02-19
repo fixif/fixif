@@ -174,6 +174,8 @@ class MtlbHelper(object):
 #             print('+++++++++++++++')
 #             print(str(local_varz_dict[var]))
 
+        err_num = 0
+
         for var in varz:
         
             #print("Shape of tmp_dict[" + var + "]")
@@ -187,6 +189,8 @@ class MtlbHelper(object):
             try:
                 npt.assert_almost_equal(tmp_dict[var], local_varz_dict[var], decimal=decim)
             except AssertionError as e:
+                
+                err_num += 1
                 
                 print('+++++++++++++++ {0:12} mismatch'.format(var))
 
@@ -213,6 +217,8 @@ class MtlbHelper(object):
                 else:
                 	
  			    	print(e)               	
+        
+        return err_num
                     
 #                     tmp_var_mtlb = tmp_dict[var]
 #                     tmp_var_pyth = local_varz_dict[var]

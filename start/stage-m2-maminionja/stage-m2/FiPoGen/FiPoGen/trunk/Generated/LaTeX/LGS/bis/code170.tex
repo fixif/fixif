@@ -1,0 +1,115 @@
+\documentclass{minimal}
+\usepackage[a4paper,margin=1cm,landscape]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,arrows}
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[
+	every node/.style={scale = 0.7},
+	TreeNode/.style={rectangle,rounded corners=0.7mm, draw,
+		text centered, font=\boldmath,anchor=north},
+     form/.style={TreeNode,
+		color=red!80, 
+		fill=white, 
+		text=red!80},
+    form2/.style={TreeNode,
+		color=blue!80, 
+		fill=white, 
+		text=blue!80},
+    decM/.style={TreeNode,
+		color=green!80!black,
+		top color=green!80!black,
+		bottom color=green!10,
+		shading angle={45},
+		text=black},
+    adder/.style={TreeNode,
+		color=red,
+		top color=red,
+		bottom color=red!30,
+		shading angle={45},
+        text=white},
+    mult/.style={TreeNode,
+		color=green!80!black,
+		top color=green!80!black,
+		bottom color=green!10,
+		shading angle={45},
+		text=black},
+     cst/.style={TreeNode,
+		color=orange!80, 
+		top color=orange!80,
+		bottom color=yellow!70!black!20,
+		shading angle={45},
+		text=black},
+     var/.style={TreeNode,
+		color=yellow!95!black,
+		top color=yellow!95!black,
+		bottom color=yellow!10,
+		shading angle={45},
+		text=black},
+	 op/.style={TreeNode,
+		color=green!30,
+		top color=red!60,
+		bottom color=green!30,
+		shading angle={45},
+		text=black},
+    level distance=0.4cm, growth parent anchor=south, thick
+]
+\node (Sortie) [adder] {$S$}
+child{[sibling distance=4.000000cm]
+	node(DAdd_24) [form] {$F$}
+	child{
+		node(Add_24) [adder] {$+$}
+	child{[sibling distance=3.000000cm]
+		node(Add_23) [adder] {$+$}
+		child{[sibling distance=1cm]
+			node(Multt164k1 lsb  21) [mult] {$\times$}
+			child{
+				node(Cst2) [cst] {-27152}
+			edge from parent node[left] {(-1,-16)}
+			}
+			child{
+				node(Var2) [var] {$t164[k+1]$}
+			edge from parent node[right] {(10,-5)}
+			}
+			edge from parent node[left,sloped,above] {(10,-21)}
+		}
+		child{[sibling distance=1cm]
+			node(DMultt163k1 lsb  20) [form] {$F$}
+			child{[level distance=0.4cm]
+				node(Multt163k1 lsb  20) [mult] {$\times$}
+				child{
+					node(Cst1) [cst] {-32768}
+				edge from parent node[left] {(0,-15)}
+				}
+				child{
+					node(Var1) [var] {$t163[k+1]$}
+				edge from parent node[right] {(10,-5)}
+				}
+				edge from parent node[right] {(11,-20)}
+			}
+			edge from parent node[right,sloped,above] {(10,-21)}
+		}
+		edge from parent node[left,sloped,above] {(10,-21)}
+	}
+	child{[sibling distance=1cm]
+		node(Multt162k1 lsb  21) [mult] {$\times$}
+		child{
+			node(Cst0) [cst] {22731}
+		edge from parent node[left] {(-1,-16)}
+		}
+		child{
+			node(Var0) [var] {$t162[k+1]$}
+		edge from parent node[right] {(10,-5)}
+		}
+		edge from parent node[right,sloped,above] {(10,-21)}
+	}
+		edge from parent node[right] {(10,-21)}	}
+	edge from parent node[right] {(10,-5)}
+}
+
+;
+        
+\end{tikzpicture}
+\end{center}
+\end{document}

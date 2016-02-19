@@ -1,0 +1,59 @@
+<html lang="en-US">
+
+<head>
+	<meta charset="UTF-8"/>
+	<title>FiPoGen: Fixed-Point Code Generator</title>
+	<link rel='stylesheet' href='{{base_url}}style.css' type='text/css'/>
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,200">
+	{% block script %}{% endblock %}
+</head>
+
+<body>
+
+<!-- banner with title -->
+<div id="banner">
+	<h1 id="title">
+		<a href="{{base_url}}index.html"><span class="firstpart">FiPo</span>Gen</a>
+	</h1>
+	<p id="tagline">A Fixed-point arithmetic code generator for filters/controlers</p>
+	<div id="logo"><img src="{{base_url}}logo.jpg"/></div>
+</div>
+
+<!-- menu -->
+<div id='cssmenu'>
+	<ul>
+		<li class='active'><a href='{{base_url}}index.html'><span>Home</span></a></li>
+		<li class='active has-sub'><a href='#'><span>Fixed-Point Arithmetic</span></a>
+			<ul>
+				<li class='active'><a href='#'><span>Reference</span></a></li>
+				<li class='active'><a href='{{base_url}}FPF.html'><span>FPF</span></a></li>
+				<li class='active'><a href='#'><span>SoP</span></a></li>
+				<li class='active'><a href='#'><span>Sum</span></a></li>
+				<li class='active last'><a href='#'><span>Constant</span></a></li>
+			</ul>
+		</li>
+		<li class='active'><a href='#'><span>Linear filter/controller</span></a></li>
+		<li class='active'><a href='#'><span>About FiPoGen</span></a></li>
+		<li class='active last'><a href='#'><span>Contact</span></a></li>
+	</ul>
+</div>
+
+
+<!-- breadcrumb ?? -->
+
+
+<!-- main -->
+<div id="main">
+{% block content%}{% endblock%}
+</div>
+
+<!-- footer -->
+<div id="footer">
+	<br/><hr/>
+	<p>&copy; 2013 blablba.</p>
+</div>
+
+
+</body>
+
+</html>

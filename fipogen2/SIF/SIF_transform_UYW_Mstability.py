@@ -13,7 +13,7 @@ __status__ = "Beta"
 from LTI import dSS
 
 from numpy import matrix as mat
-from numpy import eye, c_, r_, zeros, multiply, all, diagflat, trace, ones, where, logical_or, divide, conj
+from numpy import eye, c_, r_, zeros, multiply, all, diagflat, trace, ones, where, logical_or, divide, conj, min
 from numpy import transpose, fmod, log2
 from numpy.linalg import norm, inv, eig
 

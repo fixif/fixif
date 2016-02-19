@@ -1,0 +1,8 @@
+Pour installer python, sans l'access root:
+télécharger depuis https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tar.xz
+ou bien https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tar.xz
+
+faire :
+./configure prefix= /installDIRpath
+make install
+
