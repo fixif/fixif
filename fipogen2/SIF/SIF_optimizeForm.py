@@ -246,10 +246,9 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
 	
 		for ind, bound_el in enumerate(bounds):
 					
-			bounds[ind][0] = multiply(bounds[ind][0], 1 - rand())
-			bounds[ind][1] = multiply(bounds[ind][1], 1 + rand()) 
+			bounds[ind][0] = multiply(bounds[ind][0], 1 - rand()*0.01)
+			bounds[ind][1] = multiply(bounds[ind][1], 1 + rand()*0.01) 
      
-        
     print("bounds = {}".format(bounds))
 
     # check restartScenario
@@ -263,7 +262,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         
         """
         This function returns a unique float which represents our optimization objective parameter,
-        related to all values, weighted by weightingMethod
+        related to bestValues and weighted by weightingMethod (if more than 1 parameter)
         Currently there's only one method when there is more than 1 parameter.
         For 1 parameter the function simply returns vals[0]
         """
@@ -330,6 +329,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         This functions generates a new instance of an existing object using either
         - UYW matrixes
         - gamma and delta
+        - delta
         stored in optVals
         """
         
@@ -345,15 +345,15 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         elif R._formOpt == 'gammaDelta':
             #print('Sum of all parameters : {} '.format(sum(x)))
             
-            if isinstance(input_R, list):
-                print(input_R)
+            #if isinstance(input_R, list):
+                #print(input_R)
             
             input_R.__class__.__init__(output_R, input_R._num, input_R._den, gamma=optVals[0], delta=optVals[1], isGammaExact=input_R._isGammaExact, isDeltaExact=input_R._isDeltaExact, opt=input_R._opt)
     
         elif R._optForm == 'delta':
             
-            if isinstance(input_R, list):
-                print(input_R)
+            #if isinstance(input_R, list):
+                #print(input_R)
             
             input_R.__class__.__init__(output_R, input_R._num, input_R._den, gamma=input_R._gamma, delta=optVals[0], isGammaExact=input_R._isGammaExact, isDeltaExact=input_R._isDeltaExact, opt=input_R._opt)            
     
@@ -431,9 +431,6 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             
             R_ind = R.optimizeForm([measure], startVals=None, measureType=measureType, optMethod=optMethod) # start with same stored initial values of parameters
             
-            # reset R_loc
-            #R_loc = deepcopy(R)
-            
             opt_forms.append(R_ind)
             bestVals.append(_calc_crit(R_ind, measure, measureType))
 
@@ -471,8 +468,6 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
                 
                 R_opt = R.optimizeForm(measures, startVals=loc_startVals, measureType=measureType, weightingMethod=weightingMethod, measureWeights=measureWeights, optMethod=optMethod, bestVals=bestVals)
                 
-                #R_loc = deepcopy(R)
-                
                 opt_forms.append(R_opt)
                 
         else:
@@ -499,12 +494,6 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         return opt_forms
         
     else:
-        
-
-        
-        #print(x0)
-        #print(x0.shape)
-        #hack
 
         
         minimizer_kwargs = {'args':R, 'bounds':bounds}
@@ -531,7 +520,7 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
             # see for example
             # https://github.com/scipy/scipy/issues/4880
             # WARNING FOR "RESULT AT THE FIRST STEP WITH THIS METHOD"
-            # it's given after a first tset of parameters by the optimizer so not always the same.
+            # it's given after a first set of parameters by the optimizer so not always the same.
             # also not possible to set initial value and multiparmaeter opt is dependent from starting paramters.
         
             minimizer_kwargs = [R]
@@ -540,6 +529,8 @@ def optimizeForm(R, measures, startVals=None, bounds = None, stop_condition=None
         elif optMethod == 'brute':
         
             # there seems to be no way to specifiy a starting point for the optimizer...
+            # this solver tries to construct a n-dimensional map of all parameter which
+            # consumes all memory, so there's a MemoryError
         
             minimizer_kwargs = [R]
             
