@@ -138,6 +138,7 @@
 	    \def\templabelleft{left}
 	    \def\templabelright{right}
 	    \def\templabelaboveright{aboveright}
+	    \def\templabelbelowright{belowright}
 	    \pgfutil@tempdima=\dspoperatorlabelspacing
 	    %
 	    \ifx\label\templabelabove
@@ -171,6 +172,13 @@
 	    \ifx\label\templabelaboveright
 				\advance\pgf@y by \radius
 				\advance\pgf@x by \pgfutil@tempdima
+	    \fi
+	    %
+	    \ifx\label\templabelbelowright
+	    			\advance\pgf@y by -\radius
+	    			\advance\pgf@x by \pgfutil@tempdima
+				\advance\pgf@y by -0.75\ht\pgfnodeparttextbox
+				%\advance\pgf@y by 
 	    \fi
 	  }
 	}
