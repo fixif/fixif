@@ -4,14 +4,13 @@
 
 from SIF import SIF
 from LTI import TF, dSS
-from Structures import State_Space
 
 from numpy import zeros, all, poly, matrix, sqrt, prod, transpose, diagflat, r_, c_, ones, atleast_2d, eye
 from numpy import matrix as mat
 from numpy.linalg import cond, inv
 
 #FIXME this seems like an error should depend on SIF class see why we did this with thib
-class RhoDFIIt(State_Space):
+class RhoDFIIt(SIF):
 
     @staticmethod
     def F2(x):
