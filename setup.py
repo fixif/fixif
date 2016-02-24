@@ -13,8 +13,9 @@ setup(
     description='Finite Word-length Realization toolbox.',
     long_description=open('README.txt').read(),
     install_requires=[
-        "numpy >= 1.6.1",
-        "scipy >= 0.9.0",
-        "slycot >= 0.1.0"
+        "numpy >= 1.10.4",
+        "scipy >= 0.17.0",
+        "slycot >= 0.2.0",
+        "pytest >= 2.8.7'
     ],
 ) 
