@@ -17,7 +17,7 @@ __status__ = "Beta"
 from random import randint
 from numpy import array, zeros, absolute, eye, isnan, logical_and
 from numpy import matrix as mat
-from numpy.linalg import norm
+from numpy.linalg import norm, eigvals
 from numpy.testing import assert_allclose
 from numpy.random import seed
 from sys import exc_info  # to keep trace of trace stack
@@ -40,7 +40,8 @@ def my_assert_relativeclose ( actual, desired, rtol, strActual, strDesired, strM
 Test with %s
 %s = %s
 %s = %s
--------------------------------------------""" % (strMethod, strActual, repr(actual), strDesired, repr(desired)))
+diff = %s
+-------------------------------------------""" % (strMethod, strActual, repr(actual), strDesired, repr(desired), repr(actual-desired)))
 		raise e
 
 
@@ -64,17 +65,24 @@ class TestLTI:
 			dSS( [[1, 2], [3, 4]], 1, 2, 3 )
 			dSS( [[1, 2], [3, 4]], [1, 2], 2, 3)
 			dSS( [[1, 2], [3, 4]], [1, 2], [[1, 2], [1, 2]], 3)
-		# test for correct sizes of random dSS
+
 		for i in range(50):
 			n = randint(2, 20)
 			p = randint(2, 15)
 			q = randint(2, 15)
 			S = random_dSS(n, p, q)
+
+			# test for correct sizes of random dSS
 			assert (S.n, S.p, S.q) == (n, p, q)
 			assert S.A.shape == (n, n)
-			assert S.B.shape == (n, p)
-			assert S.C.shape == (q, n)
-			assert S.D.shape == (q, p)
+			assert S.B.shape == (n, q)
+			assert S.C.shape == (p, n)
+			assert S.D.shape == (p, q)
+
+			# test for spectral radius lower than 1
+			assert max(abs(eigvals(S.A))) < 1
+
+
 
 
 	def test_Gramians ( self ):
@@ -86,7 +94,7 @@ class TestLTI:
 	  
 		"""
 
-		relative_tolerance_linalg = 1e-5
+		relative_tolerance_linalg = 1e-2
 		relative_tolerance_slycot1 = 1e-5
 
 		# test number
@@ -144,35 +152,22 @@ class TestLTI:
 		"""
 
 		def calc_wcpg_approx ( S, nit ):
+			"""Very bad WCPG approximation (we hope to get the first digits....)
+			Only used to compare with true, reliable Anastasia's WCPG"""
 
-			w = mat(zeros((S.q, S.p)))
-			res = mat(zeros((S.q, S.p)))
+			res = mat(zeros((S.p, S.q)))
 			powerA = mat(eye(S.n, S.n))
 
 			for i in range(0, nit):
-				# res += numpy.absolute(self._C * matrix_power(A, i) * B)
-
 				res += absolute(S.C * powerA * S.B)
 				powerA = powerA * S.A
 
-			w = res + absolute(S.D)
+			return res + absolute(S.D)
 
-			#   			try:
-			# 		  		for i in range(1, nit):
-			# 					#res += numpy.absolute(self._C * matrix_power(A, i) * B)
-			# 					res += absolute(S.C * S.A**i * S.B)
-			# 			except:
-			# 				raise ValueError, 'Impossible to compute WCPG at rank i = ' + str(i) + "\n"
-			# 	 		else:
-			# 				 w = res + absolute(S.D)
-
-			return w
 
 		nit = 1000
 		rel_tol_wcpg = 1e-5
 		nloc = 0
-
-		seed(1)
 
 		for i in range(50):
 
@@ -182,40 +177,7 @@ class TestLTI:
 			q = randint(2, 5)
 			S = random_dSS(n, p, q)
 
-			#print "NaN check"
-
-			# Python overreacts on this when mixed with test (if), so let's decouple
-			a = isnan(S.A).any()
-			b = isnan(S.B).any()
-			c = isnan(S.C).any()
-			d = isnan(S.D).any()
-
-			if (a):
-				print( "A :" + str(sum(isnan(S.A))) + " NaN inside, python side" )
-			if (b):
-				print( "B :" + str(sum(isnan(S.B))) + " NaN inside, python side" )
-			if (c):
-				print( "C :" + str(sum(isnan(S.C))) + " NaN inside, python side" )
-			if (d):
-				print( "D :" + str(sum(isnan(S.D))) + " NaN inside, python side" )
-
 			wcpg = calc_wcpg_approx(S, nit)
-
-
-			# if testLTI.is_debug_print:
-			#
-			# 	print "=== WCPG approx ==="
-			# 	print str(wcpg)
-			# 	print "=== A ==="
-			# 	print S.A
-			# 	print "=== B ==="
-			# 	print S.B
-			# 	print "=== C ==="
-			# 	print S.C
-			# 	print "=== D ==="
-			# 	print S.D
-			# 	print "=== WCPG dprec  ==="
-			# 	print str(S.WCPG)
 
 			my_assert_relativeclose(array(S.WCPG()),
 									array(wcpg),

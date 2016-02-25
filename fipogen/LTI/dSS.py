@@ -17,19 +17,15 @@ __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
 
-from numpy                  import inf, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
-#from numpy.ctypeslib      import as_array
+from numpy                  import inf, empty, float64, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
 from numpy                  import matrix as mat, Inf
 from numpy                  import eye, zeros, r_, c_, sqrt
 from numpy.linalg           import inv, det, solve
 from numpy.linalg.linalg    import LinAlgError
 from scipy.linalg           import solve_discrete_lyapunov
 from slycot                 import sb03md
-from copy import copy
-
-# WCPG C func wrapped in python
-#import _pyWCPG
-
+from copy                   import copy
+from scipy.weave            import inline
 class dSS:
 
 	r"""
@@ -41,12 +37,12 @@ class dSS:
 	.. math::
 
 		\left\lbrace \begin{aligned}
-		 X(k+1) &= AX(k) + BU(k) \\
-		 Y(k)   &= CX(k) + DU(k)
+		 x(k+1) &= Ax(k) + Bu(k) \\
+		 y(k)   &= Cx(k) + Du(k)
 		 \end{aligned}\right.
 
 
-	with :math:`A \in \mathbb{R}^{n \times n}, B \in \mathbb{R}^{n \times p}, C \in \mathbb{R}^{q \times n} \text{ and } D \in \mathbb{R}^{q \times p}`.
+	with :math:`A \in \mathbb{R}^{n \times n}, B \in \mathbb{R}^{n \times q}, C \in \mathbb{R}^{p \times n} \text{ and } D \in \mathbb{R}^{p \times q}`.
 
 
 	**Dimensions of the state space :**
@@ -58,15 +54,15 @@ class dSS:
 
 	==  ==================
 	n   number of states
-	p   number of inputs
-	q   number of outputs
+	p   number of outputs
+	q   number of inputs
 	==  ==================
 
 	   Additional data available, computed once when asked for :
 	   dSS.Wo, dSS.Wc, dSS.norm_h2, dSS.WCPG
 
-	   - Observers : Wo and Wc
-	   - "Norms"   : H2-norm (norm_h2), Worst Case Peak Gain (WCPG) (see doc for each)
+	   - Gramians : Wo and Wc
+	   - "Norms"   : H2-norm (H2norm), Worst Case Peak Gain (WCPG) (see doc for each)
 
 	"""
 
@@ -202,7 +198,7 @@ class dSS:
 					e = LinAlgError(ve.message)
 					e.info = ve.info
 				else:
-					e = LinAlgError( "Wo : " + "scipy Linalg failed to compute eigenvalues of Lyapunov equation")
+					e = LinAlgError( "Wo: scipy Linalg failed to compute eigenvalues of Lyapunov equation")
 					e.info = ve.info
 				raise e
 
@@ -220,7 +216,7 @@ class dSS:
 					e = ValueError(ve.message)
 					e.info = ve.info
 				else:
-					e = ValueError(Woc + " : " + "The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+					e = ValueError("Wo: The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
 					e.info = ve.info
 				raise e
 
@@ -250,7 +246,7 @@ class dSS:
 		..Example::
 
 			>>>mydSS = random_dSS() ## define a new state space from random data
-			>>>mydSS.calc_Wc(linalg') # use numpy
+			>>>mydSS.calc_Wc('linalg') # use numpy
 			>>>mydSS.calc_Wc('slycot1') # use slycot
 			>>>mydSS.calc_Wo() # use the default method defined in dSS
 
@@ -273,7 +269,7 @@ class dSS:
 					e = LinAlgError(ve.message)
 					e.info = ve.info
 				else:
-					e = LinAlgError( "Wo : " + "scipy Linalg failed to compute eigenvalues of Lyapunov equation")
+					e = LinAlgError( "Wc: scipy Linalg failed to compute eigenvalues of Lyapunov equation")
 					e.info = ve.info
 				raise e
 
@@ -291,7 +287,7 @@ class dSS:
 					e = ValueError(ve.message)
 					e.info = ve.info
 				else:
-					e = ValueError(Woc + " : " + "The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+					e = ValueError("Wc: The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
 					e.info = ve.info
 				raise e
 
@@ -360,7 +356,23 @@ class dSS:
 		"""
 		# compute the WCPG value if it's not already done
 		if self._WCPG is None:
-			self._WCPG = _pyWCPG.pyWCPG(array(self._A), array(self._B), array(self._C), array(self._D), self._n, self._p, self._q)
+
+			try:
+
+				A = array(self._A)
+				B = array(self._B)
+				C = array(self._C)
+				D = array(self._D)
+				n,p,q = self.size
+				W = empty( (p, q), dtype=float64)
+
+				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q);"
+				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'
+				inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support_code, libraries=["WCPG"])
+
+				self._WCPG = W
+			except:
+				raise ValueError( "Impossible to compute WCPG matrix. Is WCPG library really installed ?")
 
 		return self._WCPG
 
@@ -417,7 +429,7 @@ class dSS:
 		if (d1 != outputs or d2 != inputs):
 			raise ValueError( 'D should be consistent with C and B' )
 
-		return n, inputs, outputs
+		return n, outputs, inputs
 
 
 	#======================================================================================#
@@ -426,28 +438,26 @@ class dSS:
 		Display the state-space
 		"""
 
-		str_mat = "State Space\nA=" + repr(self._A) + "\nB=" + repr(self._B) + "\nC=" + repr(self._C) + "\nD=" + repr(self._D) + "\n\n"
+		def tostr(M, name):
+			if M is not None:
+				return name + "= " + repr(M) + "\n"
+			else:
+				return name + " is not computed\n"
+
+		str_mat = """State Space (%d states, %d outputs and %d inputs)
+		A= %s
+		B= %s
+		C= %s
+		D= %s
+		"""% (self._n, self._p, self._q, repr(self._A), repr(self._B), repr(self._C), repr(self._D) )
 
 		# Observers Wo, Wc
-		if (self._Wc != None):
-			str_mat += "Wc = " + repr(self._Wc) + "\n"
-		else:
-			str_mat += "Wc not computed" + "\n"
+		str_mat += tostr( self._Wc, 'Wc')
+		str_mat += tostr( self._Wo, 'Wo')
 
-		if (self._Wo != None):
-			str_mat += "Wo = " + repr(self._Wo) + "\n"
-		else:
-			str_mat += "Wo not computed" + "\n"
-
-		if (self._H2norm != None):
-			str_mat += "\nnorm_h2 = " + repr(self._H2norm) + "\n"
-		else:
-			str_mat += "\nnorm_h2 not computed" + "\n"
-
-		if (self._WCPG != None):
-			str_mat += "\nWCPG = " + repr(self._WCPG) + "\n"
-		else:
-			str_mat += "WCPG not computed" + "\n"
+		# norms
+		str_mat += tostr( self._H2norm, 'H2-norm')
+		str_mat += tostr( self._WCPG, 'WCPG')
 
 		return str_mat
 
