@@ -16,7 +16,6 @@ setup(
         "numpy >= 1.10.4",
         "scipy >= 0.17.0",
         "slycot >= 0.2.0",
-        "pytest >= 2.8.7',
-	    "pyWCPG >= 0.1.0"
+        "pytest >= 2.8.7'
     ],
 ) 
