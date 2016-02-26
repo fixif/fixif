@@ -20,7 +20,7 @@ __status__ = "Beta"
 from numpy                  import inf, empty, float64, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
 from numpy                  import matrix as mat, Inf
 from numpy                  import eye, zeros, r_, c_, sqrt
-from numpy.linalg           import inv, det, solve
+from numpy.linalg           import inv, det, solve, eigvals
 from numpy.linalg.linalg    import LinAlgError
 from scipy.linalg           import solve_discrete_lyapunov
 from slycot                 import sb03md
@@ -32,7 +32,7 @@ class dSS:
 
 	The dSS class describes a discrete state space realization
 
-	 A state space system :math:`(A,B,C,D)` is defined by
+	A state space system :math:`(A,B,C,D)` is defined by
 
 	.. math::
 
@@ -230,7 +230,7 @@ class dSS:
 
 		:math:`W_c` is solution of equation :
 		.. math::
-		    A * W_c * A^T + B * B^T = W_c
+			A * W_c * A^T + B * B^T = W_c
 
 		Available methods :
 
@@ -359,12 +359,18 @@ class dSS:
 
 			try:
 
+
 				A = array(self._A)
 				B = array(self._B)
 				C = array(self._C)
 				D = array(self._D)
 				n,p,q = self.size
 				W = empty( (p, q), dtype=float64)
+
+				Lp2 = abs(eigvals(self._A))
+				Lp2.sort()
+				print( "WCPG(): -> rho(A)=%g"%max(Lp2))
+
 
 				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q);"
 				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'

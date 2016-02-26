@@ -45,145 +45,135 @@ diff = %s
 		raise e
 
 
-class TestLTI:
+def test_construction( ):
 	"""
-	Test class for dSS class
+	Test the constructor
+	"""
+	# test non-consistency size
+	with pytest.raises(ValueError):
+		dSS( [[1, 2], [3, 4], [5, 6]], 1, 2, 3 )
+		dSS( [[1, 2], [3, 4]], 1, 2, 3 )
+		dSS( [[1, 2], [3, 4]], [1, 2], 2, 3)
+		dSS( [[1, 2], [3, 4]], [1, 2], [[1, 2], [1, 2]], 3)
+
+	for i in range(50):
+		n = randint(2, 20)
+		p = randint(2, 15)
+		q = randint(2, 15)
+		S = random_dSS(n, p, q)
+
+		# test for correct sizes of random dSS
+		assert (S.n, S.p, S.q) == (n, p, q)
+		assert S.A.shape == (n, n)
+		assert S.B.shape == (n, q)
+		assert S.C.shape == (p, n)
+		assert S.D.shape == (p, q)
+
+		# test for spectral radius lower than 1
+		assert max(abs(eigvals(S.A))) < 1
+
+
+
+
+def test_Gramians ( ):
+	"""
+	Test calculation of :math:`W_o` and :math:`W_c` with different methods, namely
+
+	- python intrinsic ``linalg``
+	- ``slycot`` method from xxx
+
 	"""
 
-	#is_debug_print = False
+	relative_tolerance_linalg = 1e-3
+	relative_tolerance_slycot1 = 1e-5
 
-	# global message handler
-	#msgH = []
+	# test number
+	nloc = 0
 
-	def test_construction( self ):
-		"""
-		Test the constructor
-		"""
-		# test non-consistency size
-		with pytest.raises(ValueError):
-			dSS( [[1, 2], [3, 4], [5, 6]], 1, 2, 3 )
-			dSS( [[1, 2], [3, 4]], 1, 2, 3 )
-			dSS( [[1, 2], [3, 4]], [1, 2], 2, 3)
-			dSS( [[1, 2], [3, 4]], [1, 2], [[1, 2], [1, 2]], 3)
+	for i in range(50):
 
-		for i in range(50):
-			n = randint(2, 20)
-			p = randint(2, 15)
-			q = randint(2, 15)
-			S = random_dSS(n, p, q)
+		nloc += 1
+		n = randint(2, 40)
+		p = randint(2, 15)
+		q = randint(2, 15)
+		S = random_dSS(n, p, q)
 
-			# test for correct sizes of random dSS
-			assert (S.n, S.p, S.q) == (n, p, q)
-			assert S.A.shape == (n, n)
-			assert S.B.shape == (n, q)
-			assert S.C.shape == (p, n)
-			assert S.D.shape == (p, q)
+		# test with 'linalg' method
+		dSS._W_method = 'linalg'
+		my_assert_relativeclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()),
+								array(S.Wc),
+								rtol=relative_tolerance_linalg,
+								strActual="A*Wc*A' + B*B'",
+								strDesired='Wc',
+								strMethod='linalg (test #%d)' % nloc)
+		my_assert_relativeclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C),
+								array(S.Wo),
+								rtol=relative_tolerance_linalg,
+								strActual="A'*Wo*A + C'*C",
+								strDesired='Wo',
+								strMethod='linalg (test #%d)' % nloc)
 
-			# test for spectral radius lower than 1
-			assert max(abs(eigvals(S.A))) < 1
+		# We have to explicitely remove Wo and Wc from S so that those are calculated again
+		S._Wo = None
+		S._Wc = None
 
+		# test for 'slycot1' method
+		# with slycot we expect a 8-digit accuracy
 
+		dSS._W_method = 'slycot1'
+		my_assert_relativeclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()),
+								array(S.Wc),
+								rtol=relative_tolerance_slycot1,
+								strActual="A*Wc*A' + B*B'",
+								strDesired='Wc',
+								strMethod='slycot1 (test #%d)' % nloc)
 
+		my_assert_relativeclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C),
+								array(S.Wo),
+								rtol=relative_tolerance_slycot1,
+								strActual="A'*Wo*A + C'*C",
+								strDesired='Wo',
+								strMethod='slycot1 (test #%d)' % nloc)
 
-	def test_Gramians ( self ):
-		"""
-		Test calculation of :math:`W_o` and :math:`W_c` with different methods, namely
-	  
-		- python intrinsic ``linalg``
-		- ``slycot`` method from xxx
-	  
-		"""
+def test_wcpg ( ):
 
-		relative_tolerance_linalg = 1e-2
-		relative_tolerance_slycot1 = 1e-5
+	"""
+	Test Worst Case Peak Gain calculation
+	"""
 
-		# test number
-		nloc = 0
+	def calc_wcpg_approx ( S, nit ):
+		"""Very bad WCPG approximation (we hope to get the first digits....)
+		Only used to compare with true, reliable Anastasia's WCPG"""
 
-		for i in range(50):
+		res = mat(zeros((S.p, S.q)))
+		powerA = mat(eye(S.n, S.n))
 
-			nloc += 1
-			n = randint(2, 40)
-			p = randint(2, 15)
-			q = randint(2, 15)
-			S = random_dSS(n, p, q)
+		for i in range(0, nit):
+			res += absolute(S.C * powerA * S.B)
+			powerA = powerA * S.A
 
-			# test with 'linalg' method
-			dSS._W_method = 'linalg'
-			my_assert_relativeclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()),
-									array(S.Wc),
-									rtol=relative_tolerance_linalg,
-									strActual="A*Wc*A' + B*B'",
-									strDesired='Wc',
-									strMethod='linalg (test #%d)' % nloc)
-			my_assert_relativeclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C),
-									array(S.Wo),
-									rtol=relative_tolerance_linalg,
-									strActual="A'*Wo*A + C'*C",
-									strDesired='Wo',
-									strMethod='linalg (test #%d)' % nloc)
-
-			# We have to explicitely remove Wo and Wc from S so that those are calculated again
-			S._Wo = None
-			S._Wc = None
-
-			# test for 'slycot1' method
-			# with slycot we expect a 8-digit accuracy
-
-			dSS._W_method = 'slycot1'
-			my_assert_relativeclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()),
-									array(S.Wc),
-									rtol=relative_tolerance_slycot1,
-									strActual="A*Wc*A' + B*B'",
-									strDesired='Wc',
-									strMethod='slycot1 (test #%d)' % nloc)
-
-			my_assert_relativeclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C),
-									array(S.Wo),
-									rtol=relative_tolerance_slycot1,
-									strActual="A'*Wo*A + C'*C",
-									strDesired='Wo',
-									strMethod='slycot1 (test #%d)' % nloc)
-
-	def test_wcpg ( self ):
-
-		"""
-		Test Worst Case Peak Gain calculation
-		"""
-
-		def calc_wcpg_approx ( S, nit ):
-			"""Very bad WCPG approximation (we hope to get the first digits....)
-			Only used to compare with true, reliable Anastasia's WCPG"""
-
-			res = mat(zeros((S.p, S.q)))
-			powerA = mat(eye(S.n, S.n))
-
-			for i in range(0, nit):
-				res += absolute(S.C * powerA * S.B)
-				powerA = powerA * S.A
-
-			return res + absolute(S.D)
+		return res + absolute(S.D)
 
 
-		nit = 1000
-		rel_tol_wcpg = 1e-5
-		nloc = 0
+	nit = 5000
+	rel_tol_wcpg = 1e-3
+	nloc = 0
 
-		for i in range(50):
+	for i in range(20):
 
-			nloc += 1
-			n = randint(2, 5)
-			p = randint(2, 5)
-			q = randint(2, 5)
-			S = random_dSS(n, p, q)
+		nloc += 1
+		n = randint(5, 10)
+		p = randint(1, 5)
+		q = randint(1, 5)
+		S = random_dSS(n, p, q)
 
-			wcpg = calc_wcpg_approx(S, nit)
-
-			my_assert_relativeclose(array(S.WCPG()),
-									array(wcpg),
-									rtol=rel_tol_wcpg,
-									strActual="WCPG dprec",
-									strDesired="WCPG approx",
-									strMethod="compare methods")
+		wcpg = calc_wcpg_approx(S, nit)
+		W = S.WCPG()
+		my_assert_relativeclose(array(W),
+								array(wcpg),
+								rtol=rel_tol_wcpg,
+								strActual="WCPG dprec",
+								strDesired="WCPG approx",
+								strMethod="compare methods")
 
 

@@ -21,7 +21,7 @@ from numpy.random           import rand, randn
 from random                 import randint
 from numpy.linalg           import solve, LinAlgError
 
-
+from numpy.linalg import norm, eigvals
 
 def random_dSS( n = None, p = 1, q = 1, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.01, pDmask = 0.3, pDzero = 0.2):
 	"""
@@ -134,7 +134,7 @@ def random_dSS( n = None, p = 1, q = 1, pRepeat = 0.01, pReal = 0.5, pBCmask = 0
 			Dmask = rand(p, q) < pDmask
 			if not Dmask.all():  # Retry if we get all zeros.
 				break
-    
+
 
 	# Apply masks.
 	B = B * Bmask
