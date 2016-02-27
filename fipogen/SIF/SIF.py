@@ -40,6 +40,8 @@ def isTrivial ( x, epsilon ):
 
 	return value is boolean
 	"""
+	if x==0:
+		return True
 	p = round( log(abs(x),2) )
 	alpha = log(abs(x),2) - p
 
