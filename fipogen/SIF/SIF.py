@@ -104,6 +104,7 @@ class SIF():
 		self._l, self._n, self._p, self._q = self._check_dimensions(JtoS)
 		self._build_Z(JtoS)
 		self._invJ = inv(JtoS[0])
+		self._build_fromZ()
 
 		# default plant
 		self.plant = plant  # calculate intermediate matrixes
@@ -253,6 +254,10 @@ class SIF():
 	@property
 	def DZ ( self ):
 		return self._dSS._D
+
+	@property
+	def dSS(self):
+		return self._dSS
 
 	# Wo and Wc are from AZ to DZ state space
 	@property

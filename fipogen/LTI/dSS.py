@@ -367,11 +367,6 @@ class dSS:
 				n,p,q = self.size
 				W = empty( (p, q), dtype=float64)
 
-				Lp2 = abs(eigvals(self._A))
-				Lp2.sort()
-				print( "WCPG(): -> rho(A)=%g"%max(Lp2))
-
-
 				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q);"
 				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'
 				inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support_code, libraries=["WCPG"])
