@@ -14,16 +14,14 @@ __maintainer__ = "Joachim Kruithof"
 __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
-from random import randint
 from numpy import array, zeros, absolute, eye, isnan, logical_and
 from numpy import matrix as mat
 from numpy.linalg import norm, eigvals
 from numpy.testing import assert_allclose
-from numpy.random import seed
+from numpy.random import seed, randint
 from sys import exc_info  # to keep trace of trace stack
 
-from LTI import dSS
-from LTI import random_dSS
+from fipogen.LTI import dSS, random_dSS, get_random_dSS
 
 import pytest
 
@@ -52,15 +50,18 @@ def test_construction( ):
 	# test non-consistency size
 	with pytest.raises(ValueError):
 		dSS( [[1, 2], [3, 4], [5, 6]], 1, 2, 3 )
+	with pytest.raises(ValueError):
 		dSS( [[1, 2], [3, 4]], 1, 2, 3 )
-		dSS( [[1, 2], [3, 4]], [1, 2], 2, 3)
-		dSS( [[1, 2], [3, 4]], [1, 2], [[1, 2], [1, 2]], 3)
+	with pytest.raises(ValueError):
+		dSS( [[1, 2], [3, 4]], [[1], [2]], 2, 3)
+	with pytest.raises(ValueError):
+		dSS( [[1, 2], [3, 4]], [[1], [2]], [[1, 2], [1, 2]], 3)
 
 	for i in range(50):
-		n = randint(2, 20)
-		p = randint(2, 15)
-		q = randint(2, 15)
-		S = random_dSS(n, p, q)
+		n=randint(2,20)
+		p=randint(2,15)
+		q=randint(2,15)
+		S = get_random_dSS(n,p,q)
 
 		# test for correct sizes of random dSS
 		assert (S.n, S.p, S.q) == (n, p, q)
@@ -74,8 +75,8 @@ def test_construction( ):
 
 
 
-
-def test_Gramians ( ):
+@pytest.mark.parametrize( "S", random_dSS( 130, True, n=(2, 40), p=(2,15), q=(2,15)) )
+def test_Gramians ( S ):
 	"""
 	Test calculation of :math:`W_o` and :math:`W_c` with different methods, namely
 
@@ -87,55 +88,34 @@ def test_Gramians ( ):
 	relative_tolerance_linalg = 1e-3
 	relative_tolerance_slycot1 = 1e-5
 
-	# test number
-	nloc = 0
 
-	for i in range(50):
+	# test with 'linalg' method
+	dSS._W_method = 'linalg'
+	assert_allclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()), array(S.Wc), rtol=relative_tolerance_linalg)
+	assert_allclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C), array(S.Wo), rtol=relative_tolerance_linalg)
 
-		nloc += 1
-		n = randint(2, 40)
-		p = randint(2, 15)
-		q = randint(2, 15)
-		S = random_dSS(n, p, q)
+	# We have to explicitely remove Wo and Wc from S so that those are calculated again
+	S._Wo = None
+	S._Wc = None
 
-		# test with 'linalg' method
-		dSS._W_method = 'linalg'
-		my_assert_relativeclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()),
-								array(S.Wc),
-								rtol=relative_tolerance_linalg,
-								strActual="A*Wc*A' + B*B'",
-								strDesired='Wc',
-								strMethod='linalg (test #%d)' % nloc)
-		my_assert_relativeclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C),
-								array(S.Wo),
-								rtol=relative_tolerance_linalg,
-								strActual="A'*Wo*A + C'*C",
-								strDesired='Wo',
-								strMethod='linalg (test #%d)' % nloc)
+	# test for 'slycot1' method (with slycot we expect a 8-digit accuracy)
+	dSS._W_method = 'slycot1'
+	assert_allclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()), array(S.Wc), rtol=relative_tolerance_slycot1)
+	assert_allclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C), array(S.Wo), rtol=relative_tolerance_slycot1)
 
-		# We have to explicitely remove Wo and Wc from S so that those are calculated again
-		S._Wo = None
-		S._Wc = None
+	# test with non-existing method
+	dSS._W_method = 'toto'
+	S._Wc = None
+	S._Wo = None
+	with pytest.raises(ValueError):
+		t = S.Wc
+	with pytest.raises(ValueError):
+		t = S.Wo
 
-		# test for 'slycot1' method
-		# with slycot we expect a 8-digit accuracy
 
-		dSS._W_method = 'slycot1'
-		my_assert_relativeclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()),
-								array(S.Wc),
-								rtol=relative_tolerance_slycot1,
-								strActual="A*Wc*A' + B*B'",
-								strDesired='Wc',
-								strMethod='slycot1 (test #%d)' % nloc)
 
-		my_assert_relativeclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C),
-								array(S.Wo),
-								rtol=relative_tolerance_slycot1,
-								strActual="A'*Wo*A + C'*C",
-								strDesired='Wo',
-								strMethod='slycot1 (test #%d)' % nloc)
-
-def test_wcpg ( ):
+@pytest.mark.parametrize( "S", random_dSS( 30, True, (5,10), (1,5), (1,5)) )
+def test_wcpg ( S ):
 
 	"""
 	Test Worst Case Peak Gain calculation
@@ -156,24 +136,18 @@ def test_wcpg ( ):
 
 
 	nit = 5000
-	rel_tol_wcpg = 1e-3
-	nloc = 0
+	rel_tol_wcpg = 1e-2
 
-	for i in range(20):
+	wcpg = calc_wcpg_approx(S, nit)
+	W = S.WCPG()
 
-		nloc += 1
-		n = randint(5, 10)
-		p = randint(1, 5)
-		q = randint(1, 5)
-		S = random_dSS(n, p, q)
-
-		wcpg = calc_wcpg_approx(S, nit)
-		W = S.WCPG()
-		my_assert_relativeclose(array(W),
-								array(wcpg),
-								rtol=rel_tol_wcpg,
-								strActual="WCPG dprec",
-								strDesired="WCPG approx",
-								strMethod="compare methods")
+	assert_allclose( array(W), array(wcpg), rtol=rel_tol_wcpg)
 
 
+#TODO: il reste à tester:
+# H2norm
+# DC-gain
+# addition
+# multiplication
+# sous-système
+# str et repr

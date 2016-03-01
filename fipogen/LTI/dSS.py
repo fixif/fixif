@@ -1,4 +1,4 @@
-# coding=utf8
+# coding: utf8
 
 # Reference file header
 
@@ -17,19 +17,18 @@ __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
 
-from numpy                  import inf, empty, float64, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
-from numpy                  import matrix as mat, Inf
-from numpy                  import eye, zeros, r_, c_, sqrt
-from numpy.linalg           import inv, det, solve, eigvals
-from numpy.linalg.linalg    import LinAlgError
-from scipy.linalg           import solve_discrete_lyapunov
-from slycot                 import sb03md
-from copy                   import copy
-from scipy.weave            import inline
+from numpy					import inf, empty, float64, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
+from numpy					import matrix as mat, Inf
+from numpy					import eye, zeros, r_, c_, sqrt
+from numpy.linalg			import inv, det, solve, eigvals
+from numpy.linalg.linalg	import LinAlgError
+from scipy.linalg			import solve_discrete_lyapunov
+from slycot					import sb03md
+from copy					import copy
+from scipy.weave			import inline
+
 class dSS:
-
 	r"""
-
 	The dSS class describes a discrete state space realization
 
 	A state space system :math:`(A,B,C,D)` is defined by
@@ -37,20 +36,17 @@ class dSS:
 	.. math::
 
 		\left\lbrace \begin{aligned}
-		 x(k+1) &= Ax(k) + Bu(k) \\
-		 y(k)   &= Cx(k) + Du(k)
-		 \end{aligned}\right.
-
+		x(k+1) &= Ax(k) + Bu(k) \\
+		y(k)   &= Cx(k) + Du(k)
+		\end{aligned}\right.
 
 	with :math:`A \in \mathbb{R}^{n \times n}, B \in \mathbb{R}^{n \times q}, C \in \mathbb{R}^{p \times n} \text{ and } D \in \mathbb{R}^{p \times q}`.
-
 
 	**Dimensions of the state space :**
 
 	.. math::
 		:align: left
-
-		 n,p,q \in \mathbb{N}
+		n,p,q \in \mathbb{N}
 
 	==  ==================
 	n   number of states
@@ -58,11 +54,11 @@ class dSS:
 	q   number of inputs
 	==  ==================
 
-	   Additional data available, computed once when asked for :
-	   dSS.Wo, dSS.Wc, dSS.norm_h2, dSS.WCPG
+	Additional data available, computed once when asked for :
+	dSS.Wo, dSS.Wc, dSS.norm_h2, dSS.WCPG
 
-	   - Gramians : Wo and Wc
-	   - "Norms"   : H2-norm (H2norm), Worst Case Peak Gain (WCPG) (see doc for each)
+	- Gramians : Wo and Wc
+	- "Norms"   : H2-norm (H2norm), Worst Case Peak Gain (WCPG) (see doc for each)
 
 	"""
 
@@ -71,15 +67,12 @@ class dSS:
 
 	def __init__(self, A, B, C, D):
 		"""
-
 		Construction of a discrete state space
 
 		.. TODO
 
-		  force docstring to appear in doc because calling spec is important
-
-		  add special section to document event_spec and examples
-
+			force docstring to appear in doc because calling spec is important
+			add special section to document event_spec and examples
 		"""
 
 		self._A = mat(A)  # User input
@@ -159,7 +152,7 @@ class dSS:
 
 		:math:`W_o` is solution of equation :
 		.. math::
-		   A^T * W_o * A + C^T * C = W_o
+			A^T * W_o * A + C^T * C = W_o
 
 		Available methods :
 
@@ -181,10 +174,11 @@ class dSS:
 
 		.. warning::
 
-		   solve_discrete_lyapunov does not work as intended, see http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
-		   Precision is not good (4 digits, failed tests)
+			solve_discrete_lyapunov does not work as intended, see http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
+			Precision is not good (4 digits, failed tests)
 
 		"""
+
 		if method is None:
 			method = dSS._W_method
 
@@ -252,8 +246,8 @@ class dSS:
 
 		.. warning::
 
-		   solve_discrete_lyapunov does not work as intended, see http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
-		   Precision is not good (4 digits, failed tests)
+			solve_discrete_lyapunov does not work as intended, see http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
+			Precision is not good (4 digits, failed tests)
 
 		"""
 		if method is None:
@@ -306,7 +300,7 @@ class dSS:
 
 		.. math::
 
-		   \langle \langle H \rangle \rangle = \sqrt{tr ( C*W_c * C^T + D*D^T )}
+			\langle \langle H \rangle \rangle = \sqrt{tr ( C*W_c * C^T + D*D^T )}
 
 
 		"""
@@ -314,7 +308,7 @@ class dSS:
 		if self._H2norm is not None:
 			return self._H2norm
 
-		#otherwise try to compute it
+		# otherwise try to compute it
 		try:
 			# less errors when Wc is big and Wo is small
 			M = self._C * self.Wc * self._C.transpose() + self._D * self._D.transpose()
@@ -338,28 +332,22 @@ class dSS:
 	def WCPG(self):
 
 		r"""
-
 		Compute the Worst Case Peak Gain of the state space
 
 		.. math::
-
-		   \langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
+			\langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
 
 		Using algorithm developed in paper :
-
 		[CIT001]_
 
 		.. [CIT001]
-
-		   Lozanova & al., calculation of WCPG
+			Lozanova & al., calculation of WCPG
 
 		"""
 		# compute the WCPG value if it's not already done
 		if self._WCPG is None:
 
 			try:
-
-
 				A = array(self._A)
 				B = array(self._B)
 				C = array(self._C)
@@ -369,8 +357,9 @@ class dSS:
 
 				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q);"
 				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'
-				inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support_code, libraries=["WCPG"])
-
+				err = inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support_code, libraries=["WCPG"])
+				if err==0:
+					print(self)
 				self._WCPG = W
 			except:
 				raise ValueError( "Impossible to compute WCPG matrix. Is WCPG library really installed ?")
@@ -382,12 +371,10 @@ class dSS:
 	def calc_DC_gain(self):
 
 		r"""
-
 		Compute the DC-gain of the filter
 
 		.. math::
-
-		   \langle H \rangle = C * (I_n - A)^{-1} * B + D
+			\langle H \rangle = C * (I_n - A)^{-1} * B + D
 
 		"""
 		# compute the DC gain if it is not already done

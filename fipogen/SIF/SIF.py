@@ -15,7 +15,7 @@ __maintainer__ = "Joachim Kruithof"
 __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
-from LTI import dSS
+from fipogen.LTI import dSS
 
 import numpy as np
 
