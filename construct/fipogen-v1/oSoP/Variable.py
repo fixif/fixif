@@ -42,11 +42,11 @@ class Variable(object):
 		"""
 		# check for good combination of given arguments
 		#TODO: assert or raise error ?
-		if not ((value_inf != None and value_sup != None and wl and not (signed or fpf or integer_inf or integer_sup)) \
-				    or (value_inf != None and value_sup != None and wl and signed != None and not (fpf or integer_inf or integer_sup)) \
-				    or (value_inf != None and value_sup != None and fpf and integer_inf != None and integer_sup != None and not (wl or (signed != None))) \
-				    or (value_inf != None and value_sup != None and fpf and not (wl or (signed != None) or integer_inf or integer_sup)) \
-				    or (fpf and not (value_inf or value_sup or wl or (signed != None) or integer_inf or integer_sup))):
+		if not ((value_inf is not None and value_sup is not None and wl and not (signed or fpf or integer_inf or integer_sup)) \
+				    or (value_inf is not None and value_sup is not None and wl and signed is not None and not (fpf or integer_inf or integer_sup)) \
+				    or (value_inf is not None and value_sup is not None and fpf and integer_inf is not None and integer_sup is not None and not (wl or (signed is not None))) \
+				    or (value_inf is not None and value_sup is not None and fpf and not (wl or (signed is not None) or integer_inf or integer_sup)) \
+				    or (fpf and not (value_inf or value_sup or wl or (signed is not None) or integer_inf or integer_sup))):
 			raise ValueError("Bad combination of arguments")
 		
 		# check for non-sense values
@@ -60,7 +60,7 @@ class Variable(object):
 			signed = fpf._signed
 			
 		# default sign is True
-		if signed == None and fpf == None :
+		if signed is None and fpf is None :
 			signed=True
 		
 		if fpf and not (value_inf or value_sup or integer_inf or integer_sup): # if only a FPF is given		

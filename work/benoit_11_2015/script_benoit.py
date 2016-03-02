@@ -1,94 +1,21 @@
 #coding=utf8
 #!usr/bin/env python
 
-
-from LTI import dSS
-from SIF import SIF
+from SIF.SIF_tilde_error import *
 
 from oSoP.Constant import Constant
+from oSoP.oSoP_Generator import best_oSoP_gen_from_dict
 
 from scipy.io import loadmat
-import numpy as np
-from numpy.linalg import inv
-
-def convertToFix(M,w):
-	if 0 in M.shape:
-		return np.zeros(M.shape)
-	M_tmp = [[M[i,j] for j in range(M.shape[1])]for i in range(M.shape[0])]
-	M_cst = convertToFixAux(M_tmp,w)
-	M_tilde=np.matrix([[M_cst[i][j] for j in range(len(M_tmp[0]))] for i in range(len(M_tmp))])
-	return np.matrix(M_tilde)
 
 
-def convertToFixAux(M,w):
-	mM=[]
-	if not isinstance(M,list) and not isinstance(M,np.matrix):
-	#Si M n'est ni une liste ni un tableau numpy
-		if M in [-1,0,1]:
-			return M
-		else:
-			return Constant(M,w).approx
-	else:
-		for i in range(len(M)):
-			mM.append(convertToFixAux(M[i],w))
-	return mM
+from sys import path
+path.append('/Users/benoitlopez/Documents/Thèse/fipogen/construct/fipogen-v1/Examples/These')
+from ex_gen import *
 
-def WCPG_txy(S):
-	N1 = np.bmat(np.r_[S.invJ*S.M,S.AZ,S.CZ])
-	N2 = np.bmat(np.r_[S.invJ*S.N,S.BZ,S.DZ])
-	SS = dSS(S.AZ,S.BZ,N1,N2)
-	return SS.WCPG()
-
-
-def SIFH_to_SIFHstar(z,w):
-	S = SIF(z)
-
-	# Nouveau J
-	J_tilde = convertToFix(S.J,w)
-	J = np.bmat([[S.J,np.zeros(S.J.shape)],[J_tilde-S.J,J_tilde]])
-	# Nouveau K
-	K_tilde = convertToFix(S.K,w)
-	K = np.bmat([[S.K,np.zeros(S.K.shape)],[K_tilde-S.K,K_tilde]])
-	# Nouveau L
-	L_tilde = convertToFix(S.L,w)
-	L = np.bmat([[L_tilde-S.L,L_tilde]])
-	# Nouveau M
-	M_tilde = convertToFix(S.M,w)
-	M = np.bmat([[S.M,np.zeros(S.M.shape)],[M_tilde-S.M,M_tilde]])
-	# Nouveau N
-	IdenT=np.identity(S.l)
-	N_tilde = convertToFix(S.N,w) 
-	N = np.bmat([[S.N, np.zeros((S.l,S.l+S.n+S.p))],[N_tilde-S.N, IdenT,np.zeros((S.l,S.n+S.p))]])
-	# Nouveau P
-	P_tilde = convertToFix(S.P,w)
-	P = np.bmat([[S.P,np.zeros(S.P.shape)],[P_tilde-S.P,P_tilde]])
-	# Nouveau Q
-	IdenX=np.identity(S.n)
-	Q_tilde = convertToFix(S.Q,w)
-	Q = np.bmat([[S.Q, np.zeros((S.n,S.l+S.n+S.p))],[Q_tilde-S.Q, np.zeros((S.n,S.l)), IdenX,np.zeros((S.n,S.p))]])
-	# Nouveau R
-	R_tilde = convertToFix(S.R,w)
-	R = np.bmat([[R_tilde-S.R,R_tilde]])
-	# Nouveau S
-	IdenY=np.identity(S.p)
-	S_tilde = convertToFix(S.S,w)
-	S_t = np.bmat([[S_tilde-S.S, np.zeros((S.p, S.l+S.n)), IdenY]])
-	
-	print "\n### Z exact ###"
-	print "\nWCPG : \n - Wy :"
-	print ( S.dSS.WCPG() )
-	print "\n - Wtxy :"
-	print WCPG_txy(S)
-	#print S.J,S.K,S.L,S.M,S.N,S.P,S.Q,S.R,S.S
-	print "\n### Z degrade ###\n\nWCPG : \n - Wy :"
-	SIF_tilde = SIF((J_tilde,K_tilde,L_tilde,M_tilde,N_tilde,P_tilde,Q_tilde,R_tilde,S_tilde))
-	print(SIF_tilde.dSS.WCPG())
-	print "\n - Wtxy :"
-	print WCPG_txy(SIF_tilde)
-	return SIF((J,K,L,M,N,P,Q,R,S_t))
 	
 
-
+options_DFI = {'wl_var':8, 'wl_cst':8, 'wl_op':16, 'formatting':False}
 
 D=loadmat("ARITH23_BLTH_ex.mat")
 for sifName in ["SIF_LWDF", "SIF_SS", "SIF_rho"]:
@@ -98,8 +25,15 @@ for sifName in ["SIF_LWDF", "SIF_SS", "SIF_rho"]:
 		if D[sifName][0][0][i].dtype == np.dtype('uint8'):
 			D[sifName][0][0][i].dtype = np.dtype('int8')
 		Z.append(D[sifName][0][0][i])
-	newSIF = SIFH_to_SIFHstar(Z, 16)
+
+	S = SIF(Z)
+	Stilde, Serror = SIFH_to_SIFHstar(S, 8)
+
 	print "\n### Z erreur ###\n"
 	print "WCPG erreur : "
-	print(newSIF.dSS.WCPG())
+	print(Serror.dSS.WCPG())
+
+
+
+
 

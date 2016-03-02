@@ -221,7 +221,6 @@ def best_oSoP_gen_from_dict(D):
 	if isinstance(D,list):
 		Osop =[]
 		for i,d in enumerate(D):
-			print i
 			Osop.append(best_oSoP_gen_from_dict(d))
 		return Osop
 	else:
@@ -275,7 +274,7 @@ def best_oSoP_gen_from_dict(D):
 					M=Multiplier(constants[i], constants_wordlength[i], variables[i], variables[i]._name,\
 						multipliers_wordlength[i], i, RndOff=RndOff, lsb_final=lsb_final)
 				except:
-					pass
+					print "Erreur création multiplieur"
 			if M:
 				multipliers.append(M)
 		#multipliers = [Multiplier(constants[i], constants_wordlength[i], variables[i], variables[i]._name,\
@@ -317,9 +316,9 @@ def best_oSoP_gen_from_dict(D):
 
 			LT=[]
 			best_mean = 10000
-			if  7>N >1:
-				best_osop = oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, formatting=formatting)
-			elif N ==1:
+			# if  7>N >1:
+			# 	best_osop = oSoP_Generator2(multipliers, max_lsb, fpf_add, var_final, formatting=formatting)
+			if N ==1:
 				best_osop = oSoP(multipliers[0])
 			else:
 				osop = multipliers[0]
