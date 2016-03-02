@@ -14,18 +14,57 @@ __maintainer__ = "Joachim Kruithof"
 __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
-from LTI import dSS
+from fipogen.LTI import dSS
 
 from numpy                  import zeros, dot, eye, pi, cos, sin
-from numpy.random           import rand, randn
-from random                 import randint
+from numpy.random           import rand, randn, randint
 from numpy.linalg           import solve, LinAlgError
+from numpy import matrix as mat
 
-from numpy.linalg import norm, eigvals
 
-def random_dSS( n = None, p = 1, q = 1, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.01, pDmask = 0.3, pDzero = 0.2):
+
+def random_dSS( number = 1, stable = True, n = (5,10), p = (1,5), q = (1,5), pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
 	"""
-	Generate a n-th order random stable state-space, with q inputs and p outputs
+	Generate some n-th order random (stable or not) state-spaces, with q inputs and p outputs
+	copy/Adapted from control-python library (thanks guys): https://sourceforge.net/projects/python-control/
+	possibly already adpated from Mathworks or Octave
+
+	Parameters:
+		- number: number of state-space to generate
+		- stable: indicate if the state-spaces are stable or not
+		- n: tuple (mini,maxi) number of states (default:  random between 5 and 10)
+		- p: number of outputs (default: 1)
+		- q: number of inputs (default: 1)
+
+		- pRepeat: Probability of repeating a previous root (default: 0.01)
+		- pReal: Probability of choosing a real root (default: 0.5). Note that when choosing a complex root, the conjugate gets chosen as well. So the expected proportion of real roots is pReal / (pReal + 2 * (1 - pReal))
+		- pBCmask: Probability that an element in B or C will not be masked out (default: 0.9)
+		- pDmask: Probability that an element in D will not be masked out (default: 0.8)
+		- pDzero: Probability that D = 0 (default: 0.5)
+
+	Returns:
+		- a dSS object if only ONE (number=1) state-space is generated, otherwise returns a generator
+	"""
+	for i in range(number):
+		if stable:
+			yield get_random_dSS( randint(*n), randint(*p), randint(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
+		else:
+			n=randint(n)
+			p=randint(p)
+			q=randint(q)
+			l=randint(l)
+			A = mat(rand(n,n))
+			B = mat(rand(n,q))
+			C = mat(rand(p,n))
+			D = mat(rand(p,q))
+			yield dSS(A,B,C,D)
+
+
+
+
+def get_random_dSS(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
+	"""
+	Generate ONE n-th order random  state-spaces, with q inputs and p outputs
 	copy/Adapted from control-python library (thanks guys): https://sourceforge.net/projects/python-control/
 	possibly already adpated from Mathworks or Octave
 
@@ -36,16 +75,13 @@ def random_dSS( n = None, p = 1, q = 1, pRepeat = 0.01, pReal = 0.5, pBCmask = 0
 
 		- pRepeat: Probability of repeating a previous root (default: 0.01)
 		- pReal: Probability of choosing a real root (default: 0.5). Note that when choosing a complex root, the conjugate gets chosen as well. So the expected proportion of real roots is pReal / (pReal + 2 * (1 - pReal))
-		- pBCmask: Probability that an element in B or C will not be masked out (default: 0.01)
-		- pDmask: Probability that an element in D will not be masked out (default: 0.3)
-		- pDzero: Probability that D = 0 (default: 0.2)
+		- pBCmask: Probability that an element in B or C will not be masked out (default: 0.90)
+		- pDmask: Probability that an element in D will not be masked out (default: 0.8)
+		- pDzero: Probability that D = 0 (default: 0.5)
 
 	Returns:
 		- a dSS object
 	"""
-	if n is None:
-		n = randint(5, 10)
-
 	# Check for valid input arguments.
 	if n < 1 or n % 1:
 		raise ValueError( "states must be a positive integer.  #states = %g." % n)
@@ -53,7 +89,7 @@ def random_dSS( n = None, p = 1, q = 1, pRepeat = 0.01, pReal = 0.5, pBCmask = 0
 		raise ValueError( "inputs must be a positive integer.  #inputs = %g." % q)
 	if p < 1 or p % 1:
 		raise ValueError( "outputs must be a positive integer.  #outputs = %g." % p)
-                
+
 	# Make some poles for A.  Preallocate a complex array.
 	poles = zeros(n) + zeros(n) * 0.j
 	i = 0
@@ -120,12 +156,12 @@ def random_dSS( n = None, p = 1, q = 1, pRepeat = 0.01, pReal = 0.5, pBCmask = 0
 		Bmask = rand(n, q) < pBCmask
 		if not Bmask.all():  # Retry if we get all zeros.
 			break
-    
+
 	while True:
 		Cmask = rand(p, n) < pBCmask
 		if not Cmask.all():  # Retry if we get all zeros.
 			break
-    
+
 	if rand() < pDzero:
 		Dmask = zeros((p, q))
 

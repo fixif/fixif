@@ -16,7 +16,7 @@ __status__ = "Beta"
 
 import pytest
 
-from SIF import SIF
+from fipogen.SIF import SIF
 from numpy import matrix as mat
 
 #from Structures import DFI, DFII, State_Space, RhoDFIIt
