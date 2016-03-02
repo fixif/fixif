@@ -10,7 +10,7 @@ import numpy as np
 
 
 
-D=loadmat("ARITH23_BLTH_ex.mat")
+D=loadmat("../work/benoit_11_2015/ARITH23_BLTH_ex.mat")
 
 Z=[D["SIF_SS"][0][0][i] for i in range(4,13)]
 S=SIF(Z)
