@@ -255,13 +255,14 @@ def best_oSoP_gen_from_dict(D):
 			Adder.formatting = False
 			Multiplier.formatting = False		
 			lsb_final = 0
+			Adder.wl = adders_wordlength
 		
 		if not isinstance(constants_wordlength,list):
 			constants_wordlength = [constants_wordlength]*N
 		if not isinstance(multipliers_wordlength,list):
 			multipliers_wordlength = [multipliers_wordlength]*N
 
-		Adder.wl_add = adders_wordlength
+		
 		var_final = Variable(fpf = fpf_final)
 		
 		# Multipliers creation from args

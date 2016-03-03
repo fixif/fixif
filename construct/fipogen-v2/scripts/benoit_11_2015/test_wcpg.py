@@ -27,7 +27,13 @@ N2 = np.bmat(np.r_[S.invJ*S.N,S._BZ,S._DZ])
 print "\n###  WCPG Hu  ###"
 
 print(N1)
+for i in range(N1.shape[0]):
+	for j in range(N1.shape[1]):
+		print N1[i,j]
+	print ""
 print(N2)
+for i in range(N2.shape[0]):
+	print N2[i,0]
 
 # with the print function calling the variables the bug is not there
 # maybe the C wrapper needs to use more INCREF on incoming variables so that those
