@@ -17,7 +17,7 @@ from math import log
 
 
 from sys import path
-path.append('/Users/benoitlopez/Documents/Thèse/fipogen/construct/fipogen-v1/Examples/These')
+path.append('../../construct/fipogen-v1/Examples/These')
 from ex_gen import *
 
 
@@ -32,7 +32,9 @@ Es={}
 
 
 D=loadmat("ARITH23_BLTH_ex.mat")
-for sifName in ["SIF_SS", "SIF_rho"]:
+listSIF = ["SIF_SS", "SIF_rho", "SIF_LWDF"]
+#listSIF = ["SIF_LWDF"]
+for sifName in listSIF:
 	print "\n\n---------------- Structure "+sifName+" ----------------\n"
 	Et[sifName] = []
 	Es[sifName] = []
@@ -121,4 +123,7 @@ plt.plot(range(4,33),Et["SIF_SS"], "b*-")
 plt.plot(range(4,33),Et["SIF_rho"], "b*-")
 plt.plot(range(4,33),Es["SIF_SS"],"g*-")
 plt.plot(range(4,33),Es["SIF_rho"],"r*-")
+plt.plot(range(4,33),Et["SIF_LWDF"],"m*-")
+plt.plot(range(4,33),Es["SIF_LWDF"],"y*-")
+
 plt.show()

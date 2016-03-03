@@ -86,8 +86,15 @@ class Variable(object):
 				self._integer_inf = int(integer_inf) or int(c_inf.integer)
 				self._integer_sup = 0
 			else:
-				c_inf = Constant(value_inf, signed = signed, fpf = fpf)
-				c_sup = Constant(value_sup, signed = signed, fpf = fpf)
+				#HACK à la con pour séance BenThib020316
+				try:
+					c_inf = Constant(value_inf, signed = signed, fpf = fpf)
+				except:
+					c_inf = Constant(-2**(fpf.msb-1), signed=signed, fpf=fpf)
+				try:
+					c_sup = Constant(value_sup, signed = signed, fpf = fpf)
+				except:
+					c_sup = Constant(2**(fpf.msb-1)-2**fpf.lsb, signed = signed, fpf = fpf)
 
 				# if msb_inf != msb_sup
 				if c_inf.FPF.msb < c_sup.FPF.msb:

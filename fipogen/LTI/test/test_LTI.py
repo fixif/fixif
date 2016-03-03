@@ -57,18 +57,13 @@ def test_construction( ):
 	with pytest.raises(ValueError):
 		dSS( [[1, 2], [3, 4]], [[1], [2]], [[1, 2], [1, 2]], 3)
 
-	for i in range(50):
-		n=randint(2,20)
-		p=randint(2,15)
-		q=randint(2,15)
-		S = get_random_dSS(n,p,q)
-
+@pytest.mark.parametrize( "S", random_dSS( 30, True, n=(2, 40), p=(2,15), q=(2,15)) )
+def test_random_dSS( S ):
 		# test for correct sizes of random dSS
-		assert (S.n, S.p, S.q) == (n, p, q)
-		assert S.A.shape == (n, n)
-		assert S.B.shape == (n, q)
-		assert S.C.shape == (p, n)
-		assert S.D.shape == (p, q)
+		assert S.A.shape == (S.n, S.n)
+		assert S.B.shape == (S.n, S.q)
+		assert S.C.shape == (S.p, S.n)
+		assert S.D.shape == (S.p, S.q)
 
 		# test for spectral radius lower than 1
 		assert max(abs(eigvals(S.A))) < 1

@@ -16,7 +16,7 @@ __email__ = "joachim.kruithopf@lip6.fr"
 __status__ = "Beta"
 
 from fipogen.LTI import dSS
-
+from fipogen.func_aux.dynMethodAdder import dynMethodAdder
 import numpy as np
 
 from numpy import c_, r_, eye, zeros, all, transpose
@@ -49,7 +49,7 @@ def isTrivial ( x, epsilon ):
 
 
 
-
+dynMethodAdder
 class SIF():
 	"""
 	Special Implicit Form (formely FWR, Finite Wordlength Realization)
@@ -293,6 +293,10 @@ class SIF():
 
 
 	#  JtoS getters
+	@property
+	def JtoS(self):
+		return self.J, self.K, self.L, self.M, self.N, self.P, self.Q, self.R, self.S
+
 	@property
 	def J ( self ):
 		return -self._Z[0: self._l, 0: self._l]
