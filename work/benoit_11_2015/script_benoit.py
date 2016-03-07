@@ -9,16 +9,8 @@ from oSoP.oSoP_Generator import best_oSoP_gen_from_dict
 from scipy.io import loadmat
 
 
-from sys import path
-path.append('/Users/benoitlopez/Documents/Thèse/fipogen/construct/fipogen-v1/Examples/These')
-from ex_gen import *
-
-	
-
-options_DFI = {'wl_var':8, 'wl_cst':8, 'wl_op':16, 'formatting':False}
-
 D=loadmat("ARITH23_BLTH_ex.mat")
-for sifName in ["SIF_LWDF", "SIF_SS", "SIF_rho"]:
+for sifName in ["SIF_LWDF", "SIF_SS", "SIF_rho", "SIF_DFI"]:
 	print "\n\n---------------- Structure "+sifName+" ----------------\n"
 	Z=[]
 	for i in range(4,13):
@@ -27,7 +19,8 @@ for sifName in ["SIF_LWDF", "SIF_SS", "SIF_rho"]:
 		Z.append(D[sifName][0][0][i])
 
 	S = SIF(Z)
-	Stilde, Serror = SIFH_to_SIFHstar(S, 8)
+	Stilde, Serror = SIFH_to_SIFHstar(S, 8, True)
+
 
 	print "\n### Z erreur ###\n"
 	print "WCPG erreur : "

@@ -10,10 +10,12 @@ __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
 __credits__ = ["Thibault Hilaire", "Joachim Kruithof"]
 
 __license__ = "CECILL-C"
-__version__ = "1.0a"
-__maintainer__ = "Joachim Kruithof"
-__email__ = "joachim.kruithopf@lip6.fr"
+__version__ = "0.4"
+__maintainer__ = "Thibault Hilaire"
+__email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
+
+
 
 from fipogen.LTI import dSS
 from fipogen.func_aux.dynMethodAdder import dynMethodAdder

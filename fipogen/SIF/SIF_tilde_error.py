@@ -1,6 +1,16 @@
 #coding=utf8
 #!usr/bin/env python
 
+__author__ = "Benoit Lopez, Thibault Hilaire"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__ = ["Benoit Lopez", "Thibault Hilaire"]
+
+__license__ = "CECILL-C"
+__version__ = "0.4"
+__maintainer__ = "Thibault Hilaire"
+__email__ = "thibault.hilaire@lip6.fr"
+__status__ = "Beta"
+
 
 from LTI import dSS
 from SIF import SIF
@@ -86,4 +96,3 @@ def SIFH_to_SIFHstar(S,w, prints = False):
 	return SIF_tilde, SIF_err
 
 
-	

@@ -1,7 +1,5 @@
 # coding: utf8
 
-# Reference file header
-
 """
 This file contains Object and methods for a Discrete State Space
 """
@@ -11,9 +9,9 @@ __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
 __credits__ = ["Thibault Hilaire", "Joachim Kruithof", "Anastasia Lozanova"]
 
 __license__ = "CECILL-C"
-__version__ = "1.0a"
-__maintainer__ = "Joachim Kruithof"
-__email__ = "joachim.kruithopf@lip6.fr"
+__version__ = "0.4"
+__maintainer__ = "Thibault Hilaire"
+__email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
@@ -26,6 +24,10 @@ from scipy.linalg			import solve_discrete_lyapunov
 from slycot					import sb03md
 from copy					import copy
 from scipy.weave			import inline
+from scipy.signal import ss2tf
+
+
+
 
 class dSS:
 	r"""
@@ -192,7 +194,7 @@ class dSS:
 					e = LinAlgError(ve.message)
 					e.info = ve.info
 				else:
-					e = LinAlgError( "Wo: scipy Linalg failed to compute eigenvalues of Lyapunov equation")
+					e = LinAlgError( "dSS: Wo: scipy Linalg failed to compute eigenvalues of Lyapunov equation")
 					e.info = ve.info
 				raise e
 
@@ -210,12 +212,12 @@ class dSS:
 					e = ValueError(ve.message)
 					e.info = ve.info
 				else:
-					e = ValueError("Wo: The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+					e = ValueError("dSS: Wo: The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
 					e.info = ve.info
 				raise e
 
 		else:
-			raise ValueError("unknown method to calculate observers (method=%s)"%method)
+			raise ValueError("dSS: Unknown method to calculate observers (method=%s)"%method)
 
 
 	def calc_Wc(self, method=None):
@@ -263,7 +265,7 @@ class dSS:
 					e = LinAlgError(ve.message)
 					e.info = ve.info
 				else:
-					e = LinAlgError( "Wc: scipy Linalg failed to compute eigenvalues of Lyapunov equation")
+					e = LinAlgError( "dSS: Wc: scipy Linalg failed to compute eigenvalues of Lyapunov equation")
 					e.info = ve.info
 				raise e
 
@@ -281,12 +283,12 @@ class dSS:
 					e = ValueError(ve.message)
 					e.info = ve.info
 				else:
-					e = ValueError("Wc: The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
+					e = ValueError("dSS: Wc: The QR algorithm failed to compute all the eigenvalues (see LAPACK Library routine DGEES).")
 					e.info = ve.info
 				raise e
 
 		else:
-			raise ValueError("unknown method to calculate observers (method=%s)"%method)
+			raise ValueError("dSS: Unknown method to calculate observers (method=%s)"%method)
 
 
 	#======================================================================================#
@@ -318,8 +320,7 @@ class dSS:
 				M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
 				self._H2norm = sqrt(M.trace())
 			except:
-				print("dSS : h2-norm : Impossible to compute M. Default value is 'inf'")
-				self._H2norm = inf
+				raise ValueError( "dSS: h2-norm : Impossible to compute M. Default value is 'inf'" )
 
 		return self._H2norm
 
@@ -362,7 +363,7 @@ class dSS:
 					print(self)
 				self._WCPG = W
 			except:
-				raise ValueError( "Impossible to compute WCPG matrix. Is WCPG library really installed ?")
+				raise ValueError( "dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
 
 		return self._WCPG
 
@@ -382,7 +383,7 @@ class dSS:
 			try:
 				self._DC_gain = self._C * inv(identity(self._n) - self._A) * self._B + self._D
 			except:
-				raise ValueError( 'Impossible to compute DC-gain from current discrete state space' )
+				raise ValueError( 'dSS: Impossible to compute DC-gain from current discrete state space' )
 
 		return self._DC_gain
 
@@ -397,25 +398,25 @@ class dSS:
 		# A
 		a1, a2 = self._A.shape
 		if a1 != a2:
-			raise ValueError( 'A is not a square matrix' )
+			raise ValueError( 'dSS: A is not a square matrix' )
 		n = a1
 
 		# B
 		b1, b2 = self._B.shape
 		if b1 != n:
-			raise ValueError( 'A and B should have the same number of rows' )
+			raise ValueError( 'dSS: A and B should have the same number of rows' )
 		inputs = b2
 
 		# C
 		c1, c2 = self._C.shape
 		if c2 != n:
-			raise ValueError( 'A and C should have the same number of columns')
+			raise ValueError( 'dSS: A and C should have the same number of columns')
 		outputs = c1
 
 		# D
 		d1, d2 = self._D.shape
 		if (d1 != outputs or d2 != inputs):
-			raise ValueError( 'D should be consistent with C and B' )
+			raise ValueError( 'dSS: D should be consistent with C and B' )
 
 		return n, outputs, inputs
 
@@ -432,20 +433,23 @@ class dSS:
 			else:
 				return name + " is not computed\n"
 
-		str_mat = """State Space (%d states, %d outputs and %d inputs)
+		def plural(n):
+			return 's' if n>0 else ''
+
+		str_mat = """State Space (%d state%s, %d output%s and %d input%s)
 		A= %s
 		B= %s
 		C= %s
 		D= %s
-		"""% (self._n, self._p, self._q, repr(self._A), repr(self._B), repr(self._C), repr(self._D) )
+		"""% (self._n, plural(self._n), self._p, plural(self._p), self._q, plural(self._q), repr(self._A), repr(self._B), repr(self._C), repr(self._D) )
 
 		# Observers Wo, Wc
-		str_mat += tostr( self._Wc, 'Wc')
-		str_mat += tostr( self._Wo, 'Wo')
+		#str_mat += tostr( self._Wc, 'Wc')
+		#str_mat += tostr( self._Wo, 'Wo')
 
 		# norms
-		str_mat += tostr( self._H2norm, 'H2-norm')
-		str_mat += tostr( self._WCPG, 'WCPG')
+		#str_mat += tostr( self._H2norm, 'H2-norm')
+		#str_mat += tostr( self._WCPG, 'WCPG')
 
 		return str_mat
 
@@ -459,7 +463,7 @@ class dSS:
 		To be able to multiply matrixes, systems must respect some constraints
 		"""
 
-		# we must verify the following conditions for matrix multiplication
+		# TODO: we must verify the following conditions for matrix multiplication
 		# n2 = n1
 		# p2 = q1
 		# q2 = p1
@@ -470,15 +474,17 @@ class dSS:
 		n2, p2, q2 = other.size
 
 		if (not(n1 == n2)):
-			raise ValueError( "states spaces must have same number of states n")
+			raise ValueError( "dSS: States spaces must have same number of states n")
 		elif (not(p1 == n2)):
-			raise ValueError( "second state space should have same number of states as first state number of inputs")
+			raise ValueError( "dSS: second state space should have same number of states as first state number of inputs")
 		elif (not(n1 == q2)):
-			raise ValueError( "second state space should have same number of outputs as first state number of states")
+			raise ValueError( "dSS: second state space should have same number of outputs as first state number of states")
 		elif (not(p1 == q2)):
-			raise ValueError( "second state space should have number of outputs equal to first state space number of inputs")
+			raise ValueError( "dSS: second state space should have number of outputs equal to first state space number of inputs")
 		elif (not(q1 == p2)):
-			raise ValueError( "second state space number of inputs should be equal to first state space number of outputs")
+			raise ValueError( "dSS: second state space number of inputs should be equal to first state space number of outputs")
+
+		#TODO: possible simplification if self.A==other.A ??
 
 		amul = r_[c_[ self.A, self.B*other.C ], c_[ zeros((n2, n1)), other.A ]]
 		bmul = r_[ self.B*other.D, other.B ]
@@ -498,3 +504,14 @@ class dSS:
 
 		return dSS(self._A, self._B[:,args[0][1]], self._C[args[0][0],:], self._D[args[0][0],args[0][1]])
 
+
+	def to_dTF(self):
+		"""
+		Transform a SISO state-space into a transfer function
+
+		"""
+		if self._p!=1 or self._q!= 1:
+			raise ValueError( 'dSS: the state-space must be SISO to be converted in transfer function')
+		from fipogen.LTI import dTF
+		num,den = ss2tf( self._A, self._B, self._C, self._D)
+		return dTF( num[0], den )

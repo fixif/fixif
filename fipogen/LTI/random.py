@@ -4,17 +4,17 @@
 This file contains a function to generate random Discrete State Spaces
 """
 
-__author__ = "control-python, Thibault Hilaire, Joachim Kruithof"
+__author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
-__credits__ = ["control-python", "Thibault Hilaire", "Joachim Kruithof"]
+__credits__ = ["Richard Murray", "Thibault Hilaire", "Joachim Kruithof"]
 
 __license__ = "CECILL-C"
-__version__ = "1.0a"
-__maintainer__ = "Joachim Kruithof"
-__email__ = "joachim.kruithopf@lip6.fr"
+__version__ = "0.4"
+__maintainer__ = "Thibault Hilaire"
+__email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from fipogen.LTI import dSS
+from fipogen.LTI import dSS, dTF
 
 from numpy                  import zeros, dot, eye, pi, cos, sin
 from numpy.random           import rand, randn, randint
@@ -43,30 +43,61 @@ def random_dSS( number = 1, stable = True, n = (5,10), p = (1,5), q = (1,5), pRe
 		- pDzero: Probability that D = 0 (default: 0.5)
 
 	Returns:
-		- a dSS object if only ONE (number=1) state-space is generated, otherwise returns a generator
+		- returns a generator of dSS objects (to use in a for loop for example)
+
+	..Example::
+		>>> sys = list( random_dSS( 12, True, (10,20)) )
+		>>> for S in random_dSS( 12, True, (10,20)):
+		>>>		print( S )
+
+
 	"""
 	for i in range(number):
 		if stable:
 			yield get_random_dSS( randint(*n), randint(*p), randint(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
 		else:
-			n=randint(n)
-			p=randint(p)
-			q=randint(q)
-			l=randint(l)
-			A = mat(rand(n,n))
-			B = mat(rand(n,q))
-			C = mat(rand(p,n))
-			D = mat(rand(p,q))
+			nn=randint(*n)
+			pp=randint(*p)
+			qq=randint(*q)
+			A = mat(rand(nn,nn))
+			B = mat(rand(nn,qq))
+			C = mat(rand(pp,nn))
+			D = mat(rand(pp,qq))
 			yield dSS(A,B,C,D)
 
+
+
+
+def random_dTF( number = 1, order = (5,10) ):
+	"""
+	Generate some n-th order random (stable or not) SISO transfer functions
+
+	Parameters:
+		- number: number of state-space to generate
+		- order: tuple (mini,maxi) order of the filter (default:  random between 5 and 10)
+
+	Returns:
+		- returns a generator of dTF objects (to use in a for loop for example)
+
+	..Example::
+		>>> sys = list( random_dTF( 12, (10,20)) )
+		>>> for S in random_dTF( 12, (10,20)):
+		>>>		print( S.num )
+
+	"""
+	for i in range(number):
+		n = randint(*order)
+		num = mat(rand(1,n))
+		den = mat(rand(1,n))
+		yield dTF( num, den)
 
 
 
 def get_random_dSS(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
 	"""
 	Generate ONE n-th order random  state-spaces, with q inputs and p outputs
-	copy/Adapted from control-python library (thanks guys): https://sourceforge.net/projects/python-control/
-	possibly already adpated from Mathworks or Octave
+	copy/Adapted from control-python library (Richard Murray): https://sourceforge.net/projects/python-control/ (thanks guys!)
+	possibly already adpated/copied from Mathworks or Octave
 
 	Parameters:
 		- n: number of states (default:  random between 5 and 10)

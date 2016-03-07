@@ -29,7 +29,7 @@ u_max = 1.
 
 Et={}
 Es={}
-
+Ett={}
 
 D=loadmat("ARITH23_BLTH_ex.mat")
 listSIF = ["SIF_SS", "SIF_rho", "SIF_LWDF"]
@@ -38,6 +38,7 @@ for sifName in listSIF:
 	print "\n\n---------------- Structure "+sifName+" ----------------\n"
 	Et[sifName] = []
 	Es[sifName] = []
+	Ett[sifName] = []
 	Z=[]
 	for i in range(4,13):
 		if D[sifName][0][0][i].dtype == np.dtype('uint8'):
@@ -116,14 +117,12 @@ for sifName in listSIF:
 		Estar = Serror.dSS.WCPG()[0,1:]*Eps.transpose()[1:,0]
 		print Etilde,Estar[0,0], Estar[0,0]/Etilde
 		print Serror.dSS.WCPG()*Eps.transpose()
-		Et[sifName].append(log(Etilde))
-		Es[sifName].append(log(Estar[0,0]))
+		Et[sifName].append(Etilde)
+		Es[sifName].append(Estar[0,0])
+		Ett[sifName].append(Etilde+Estar[0,0])
 
-plt.plot(range(4,33),Et["SIF_SS"], "b*-")
-plt.plot(range(4,33),Et["SIF_rho"], "b*-")
-plt.plot(range(4,33),Es["SIF_SS"],"g*-")
-plt.plot(range(4,33),Es["SIF_rho"],"r*-")
-plt.plot(range(4,33),Et["SIF_LWDF"],"m*-")
-plt.plot(range(4,33),Es["SIF_LWDF"],"y*-")
+plt.plot(range(4,33),Ett["SIF_SS"], "b*-")
+plt.plot(range(4,33),Ett["SIF_rho"], "r*-")
+plt.plot(range(4,33),Ett["SIF_LWDF"],"g*-")
 
 plt.show()

@@ -4,14 +4,14 @@
 This file contains tests for the SIF functions & class
 """
 
-__author__ = "Joachim Kruithof"
+_author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
-__credits__ = ["Joachim Kruithof"]
+__credits__ = ["Thibault Hilaire", "Joachim Kruithof", "Benoit Lopez", "Anastasia Lozanova"]
 
 __license__ = "CECILL-C"
-__version__ = "1.0a"
-__maintainer__ = "Joachim Kruithof"
-__email__ = "joachim.kruithopf@lip6.fr"
+__version__ = "0.4"
+__maintainer__ = "Thibault Hilaire"
+__email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 import pytest
