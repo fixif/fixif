@@ -360,6 +360,7 @@ class dSS(object):
 				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'
 				err = inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support_code, libraries=["WCPG"])
 				if err==0:
+					# change numpy display formatter, so that we can display the full coefficient in hex (equivalent to printf("%a",...) in C)
 					set_printoptions(formatter={'float_kind':lambda x:x.hex()})
 					print(self)
 					raise ValueError( "WCPG: cannot compute WCPG")
