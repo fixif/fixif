@@ -16,7 +16,7 @@ __status__ = "Beta"
 
 
 from numpy					import inf, empty, float64, shape, identity, absolute, dot, eye, array, asfarray, ones  # , astype
-from numpy					import matrix as mat, Inf
+from numpy					import matrix as mat, Inf, set_printoptions
 from numpy					import eye, zeros, r_, c_, sqrt
 from numpy.linalg			import inv, det, solve, eigvals
 from numpy.linalg.linalg	import LinAlgError
@@ -360,7 +360,9 @@ class dSS(object):
 				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'
 				err = inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support_code, libraries=["WCPG"])
 				if err==0:
+					set_printoptions(formatter={'float_kind':lambda x:x.hex()})
 					print(self)
+					raise ValueError( "WCPG: cannot compute WCPG")
 				self._WCPG = W
 			except:
 				raise ValueError( "dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
