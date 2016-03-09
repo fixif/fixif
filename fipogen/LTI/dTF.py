@@ -19,7 +19,7 @@ from scipy.signal import tf2ss
 
 
 
-class dTF:
+class dTF(object):
 
 	def __init__(self, num, den):
 		"""

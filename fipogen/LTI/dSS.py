@@ -29,7 +29,7 @@ from scipy.signal import ss2tf
 
 
 
-class dSS:
+class dSS(object):
 	r"""
 	The dSS class describes a discrete state space realization
 

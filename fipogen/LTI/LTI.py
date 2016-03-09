@@ -17,7 +17,7 @@ __status__ = "Beta"
 
 from fipogen.LTI import dTF, dSS
 
-class LTI:
+class LTI(object):
 	"""
 	A LTI (Linear Time Invariant) object is described either a transfer function and state-space
 	"""

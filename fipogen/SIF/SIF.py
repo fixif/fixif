@@ -52,7 +52,7 @@ def isTrivial ( x, epsilon ):
 
 
 dynMethodAdder
-class SIF():
+class SIF(object):
 	"""
 	Special Implicit Form (formely FWR, Finite Wordlength Realization)
 
@@ -111,7 +111,7 @@ class SIF():
 		self._build_fromZ()
 
 		# default plant
-		self.plant = plant  # calculate intermediate matrixes
+		self._plant = plant  # calculate intermediate matrixes
 
 		# build _dZ, the associated state space _dSS (contains AZ, BZ, CZ, DZ, gramians, etc.), _M1 _M2 _N1 _N2 and the *_bar matrices
 		self._build_dZ( dJtodS )
@@ -522,11 +522,8 @@ class SIF():
 		def plural ( n ):
 			return 's' if n>1 else ''
 
-		mystr = "q = {0} input{1} \n".format(self._q, plural(self._q))
-		mystr += "p = {0} output{1} \n".format(self._p, plural(self._p))
-		mystr += "n = {0} state{1} \n".format(self._n, plural(self._n))
-		mystr += "l = {0} intermediate variable{1} \n".format(self._l, plural(self._l))
-
+		mystr = "l={0}, n={1}, p={2}, q={3} ({0} intermediate variable{4}, {1} state{5}, {3} input{7}, {2} input{6})\n".format(
+			self._l, self._n, self._p, self._q, plural(self._l), plural(self._n), plural(self._p), plural(self._q))
 		mystr += "Z = \n" + str(self._Z) + "\n"
 
 		mystr += "dZ = \n" + str(self._dZ) + "\n"
