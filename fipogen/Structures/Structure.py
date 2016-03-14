@@ -44,7 +44,7 @@ class Structure(object):
 
 	@property
 	def fullName(self):
-		return self._name + " - " + ",".join( '%s: %s'%(key,str(val)) for key,val in self._options.items() )
+		return self._name + " - " + ", ".join( '%s:%s'%(key,str(val)) for key,val in self._options.items() )
 
 
 	@staticmethod

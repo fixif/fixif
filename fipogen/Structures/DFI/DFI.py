@@ -10,10 +10,10 @@ from numpy.linalg import inv
 class DFI(Structure):
 
 	_name = "Direct Form I"              # name of the structure
-	_possibleOptions = { "nbSum" : (1,2) }       # the only option is nbSum, that can be 1 or 2
+	_possibleOptions = { "nbSum" : (1,2), "transposed" : (False,True) }       # the only option is nbSum, that can be 1 or 2
 	_acceptMIMO = False
 
-	def __init__(self, filter, nbSum=1):
+	def __init__(self, filter, nbSum=1, transposed=True):
 		"""
 		Two options are available
 
@@ -23,7 +23,7 @@ class DFI(Structure):
 		"""
 
 		# check the args
-		self.manageOptions(nbSum=nbSum)
+		self.manageOptions(nbSum=nbSum, transposed=transposed)
 
 		# convert everything to mat
 		n = filter.dTF.order
@@ -66,6 +66,16 @@ class DFI(Structure):
 		# elif opt == 2:
 		#
 		# 	JtoS = mat(eye(2)), invT*gamma4, mat([1,1]), gamma1*T, r_[atleast_2d(num[0,0]),atleast_2d(0)], invT*gamma2*T, invT*gamma3, mat(zeros((1, nnum+nden))), atleast_2d(0)
+
+		# transposed form
+		#TODO: put it in a method, so that any SISO SIF can be "transposed"
+		if transposed:
+			K,M = M.transpose(), K.transpose()
+			P = P.transpose()
+			R,Q = Q.transpose(), R.transpose()
+			L,N = N.transpose(),L.transpose()
+			J = J.transpose()       # no need to really do this, since J in scalar
+			S = S.transpose()       # no need to really do this, since S in scalar
 
 		# build SIF
 		self.SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
