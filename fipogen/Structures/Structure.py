@@ -17,58 +17,81 @@ __status__ = "Beta"
 import os
 from glob import glob
 import imp
+from itertools import izip, product
 
 class Structure(object):
 	"""
 	- name: name of the structure
 	"""
 
-	options = None
-	parameters = None
-
-
-	def initStructure(self, name):
-		"""
-		Plays the same role of the constructor, BUT it's nicer to call, and now there is no way to build a Structure (only object of derived class)
-		"""
-		self._name = name
+	_possibleOptions = None         # dictionary of options and their possible values (ex. { 'isScaled': (True,False) })
+									#   key: name of the option
+									#   value: list of possible values
+	_name = ""                      # name of the structures
+	_acceptMIMO = False                   # indicates if the structure can support MIMO filters
 
 
 	def __str__(self):
 		"""
 		Return string describing the structured SIF
 		"""
-		return "Structured realization (" + self._name + ")\n" + str(self.SIF)
+		return "Structured realization (" + self.fullName + ")\n" + str(self.SIF)
 
 
 	@property
 	def name(self):
 		return self._name
 
+	@property
+	def fullName(self):
+		return self._name + " - " + ",".join( '%s: %s'%(key,str(val)) for key,val in self._options.items() )
+
 
 	@staticmethod
 	def iterStructures(lti):
+		"""
+		Iterate over all the possible structures, to build (and return through a generator) all the possible realization
+		of a given LTI filter (lti)
+		Parameters
+		----------
+		- lti: the filter (LTI object) we want to implement
+
+		Returns
+		-------
+		a generator
+
+		>>>> f = LTI( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
+		>>>> for R in Structure.iterStructures(f):
+		>>>>    print(R)
+
+		print the filter f implemeted in all the existing structures wih all the possible options
+		(ie Direct Form I (with nbSum=1 and also nbSum=2), State-Space (balanced, canonical observable form, canonical controlable, etc.), etc.)
+
+		"""
 		for cls in Structure.__subclasses__():
-			yield cls(lti)
+			if not lti.isSISO() and cls._acceptMIMO==False:
+				continue
+			if cls._possibleOptions:
+				# list of all the possible values for dictionnary
+				# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
+				vl = ( dict(izip(cls._possibleOptions, x)) for x in product(*cls._possibleOptions.itervalues()) )
+				for options in vl:
+					yield cls(lti, **options)
+			else:
+				yield cls(lti)
 
 
+	def manageOptions(self, **options):
+		"""
+		Check the options and store them
+		"""
+		self._options = options
+		for opt,val in options.items():
+			if self._possibleOptions is None:
+				raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
+			if opt not in self._possibleOptions:
+				raise ValueError( self.__class__.__name__ + ": the input argument " + opt + " doesn't exist")
+			if val not in self._possibleOptions[opt]:
+				raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
 
 
-
-
-#
-#
-# # auto-discovery
-# # find here to find existing structures and to import them
-# if __name__ != '__main__':	# because __file__ does not exist in that case, but this should never happen
-# 	# get the path of this file
-# 	structures_path = os.path.dirname( __file__ )
-# 	# iterate on each subfolder (each one should contains a structure class)
-# 	#try:
-# 	for f in glob(structures_path+'/*/'):
-# 		f = os.path.normpath(f)
-# 		module = f.split(os.sep)[-1]
-# 		imp.load_source( module, f+os.sep+module+'.py')
-# 	#except Exception as e:
-# 		#raise e
-# 		#raise ValueError("Structure: failed to import structure in folder '%s' "%f)

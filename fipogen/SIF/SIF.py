@@ -528,25 +528,6 @@ class SIF(object):
 
 		mystr += "dZ = \n" + str(self._dZ) + "\n"
 
-		# if hasattr(self, '_avail_formOpt'):
-		#
-		# 	mystr += 'Available methods for optimization : \n'
-		#
-		# 	for meth in self._avail_formOpt:
-		# 		mystr += meth + "\n"
-		#
-		# 	mystr += 'Chosen method for optimization : \n'
-		#
-		# 	mystr += self._formOpt + "\n"
-		#
-		# if hasattr(self, '_formOpt'):
-		#
-		# 	if self._formOpt == "UYW":
-		#
-		# 		mystr += "U = \n" + str(self.U) + "\n"
-		# 		mystr += "Y = \n" + str(self.Y) + "\n"
-		# 		mystr += "W = \n" + str(self.W) + "\n"
-
 		return mystr
 
 

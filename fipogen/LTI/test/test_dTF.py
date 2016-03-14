@@ -14,7 +14,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from numpy.testing import assert_allclose
+
 
 from fipogen.LTI import dTF
 from fipogen.LTI.random import random_dTF
@@ -44,5 +44,4 @@ def test_to_dSS( H ):
 	S = H.to_dSS()
 	HH = S.to_dTF()
 
-	assert_allclose( H.num, HH.num)
-	assert_allclose( H.den, HH.den)
+	H.assert_close( HH )

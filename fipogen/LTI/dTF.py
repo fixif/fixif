@@ -13,11 +13,12 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from numpy import ndenumerate, array
+from numpy import ndenumerate, array, zeros
 from numpy import matrix as mat
 from scipy.signal import tf2ss
+from scipy.linalg import norm
 
-
+from numpy.testing import assert_allclose
 
 class dTF(object):
 
@@ -45,7 +46,7 @@ class dTF(object):
 		if den.shape!=num.shape:
 			raise ValueError( 'Numerator and denomintator must have same length !')
 
-		self._order = num.shape[1]
+		self._order = num.shape[1]-1
 
 
 
@@ -90,3 +91,27 @@ class dTF(object):
 		from fipogen.LTI import dSS
 		A,B,C,D = tf2ss( array(self.num)[0,:], array(self.den)[0,:] )
 		return dSS(A,B,C,D)
+
+
+	def assert_close(self, other, rtol=1e-7):
+		"""
+		asserts that self is "close" to other
+		ie the numerator and denominator are close
+		Parameters
+		----------
+		other: dTF object
+		"""
+		# add zeros for the smallest (in size) numerator so that the comparison can be done
+		max_order = max( self.order, other.order)+1
+		snum = zeros((1,max_order))
+		snum[ :1, :self.num.shape[1] ] = self.num
+		onum = zeros((1,max_order))
+		onum[ :1, :other.num.shape[1] ] = other.num
+		sden = zeros((1,max_order))
+		sden[ :1, :self.den.shape[1] ] = self.den
+		oden = zeros((1,max_order))
+		oden[ :1, :other.den.shape[1] ] = other.den
+
+		assert( norm(snum-onum)<1e-7 )
+		assert( norm(sden-oden)<1e-7 )
+

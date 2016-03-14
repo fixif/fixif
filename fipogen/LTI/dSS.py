@@ -26,7 +26,7 @@ from copy					import copy
 from scipy.weave			import inline
 from scipy.signal import ss2tf
 
-
+from numpy.testing import assert_allclose
 
 
 class dSS(object):
@@ -518,3 +518,17 @@ class dSS(object):
 		from fipogen.LTI import dTF
 		num,den = ss2tf( self._A, self._B, self._C, self._D)
 		return dTF( num[0], den )
+
+
+	def assert_close(self, other, rtol=1e-7):
+		# at this point, it should exist an invertible matrix T such that
+		# self.A == inv(T) * other.A * T
+		# self.B == inv(T) * other.B
+		# self.C == other.C * T
+		# self.D == other.D
+
+		#TODO: this is probably not enough...
+		assert_allclose( self.C*self.B, other.C*other.B, rtol)
+		assert_allclose( self.C*self.A*self.B, other.C*other.A*other.B, rtol)
+		assert_allclose( self.C*self.A*self.A*self.B, other.C*other.A*other.A*other.B, rtol)
+		assert_allclose( self.D, other.D, rtol)

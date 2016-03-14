@@ -150,17 +150,8 @@ def test_to_dTF( S ):
 	H = S.to_dTF()
 	SS = H.to_dSS()
 
-	# at this point, it should exist an invertible matrix T such that
-	# S.A == inv(T) * SS.A * T
-	# S.B == inv(T) * SS.B
-	# S.C == SS.C * T
-	# S.D == SS.D
+	S.assert_close( SS )
 
-	#TODO: this is probably not enough...
-	assert_allclose( S.C*S.B, SS.C*SS.B)
-	assert_allclose( S.C*S.A*S.B, SS.C*SS.A*SS.B)
-	assert_allclose( S.C*S.A*S.A*S.B, SS.C*SS.A*SS.A*SS.B)
-	assert_allclose( S.D, SS.D)
 
 
 
