@@ -55,7 +55,7 @@ def test_random_dSS( S ):
 
 
 
-@pytest.mark.parametrize( "S", random_dSS( 130, True, n=(2, 40), p=(2,15), q=(2,15)) )
+@pytest.mark.parametrize( "S", random_dSS( 130, stable=True, n=(2, 40), p=(2,15), q=(2,15)) )
 def test_Gramians ( S ):
 	"""
 	Test calculation of :math:`W_o` and :math:`W_c` with the two different methods (``linalg`` from scipy and ``slycot``from Slycot)

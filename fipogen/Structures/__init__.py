@@ -1,3 +1,3 @@
-from Structure import Structure
+from Structure import Structure, iterStructures
 from DFI.DFI import DFI
 from State_Space.State_Space import State_Space

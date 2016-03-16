@@ -47,39 +47,6 @@ class Structure(object):
 		return self._name + " - " + ", ".join( '%s:%s'%(key,str(val)) for key,val in self._options.items() )
 
 
-	@staticmethod
-	def iterStructures(lti):
-		"""
-		Iterate over all the possible structures, to build (and return through a generator) all the possible realization
-		of a given LTI filter (lti)
-		Parameters
-		----------
-		- lti: the filter (LTI object) we want to implement
-
-		Returns
-		-------
-		a generator
-
-		>>>> f = LTI( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
-		>>>> for R in Structure.iterStructures(f):
-		>>>>    print(R)
-
-		print the filter f implemeted in all the existing structures wih all the possible options
-		(ie Direct Form I (with nbSum=1 and also nbSum=2), State-Space (balanced, canonical observable form, canonical controlable, etc.), etc.)
-
-		"""
-		for cls in Structure.__subclasses__():
-			if not lti.isSISO() and cls._acceptMIMO==False:
-				continue
-			if cls._possibleOptions:
-				# list of all the possible values for dictionnary
-				# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
-				vl = ( dict(izip(cls._possibleOptions, x)) for x in product(*cls._possibleOptions.itervalues()) )
-				for options in vl:
-					yield cls(lti, **options)
-			else:
-				yield cls(lti)
-
 
 	def manageOptions(self, **options):
 		"""
@@ -95,3 +62,36 @@ class Structure(object):
 				raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
 
 
+
+
+def iterStructures(lti):
+	"""
+	Iterate over all the possible structures, to build (and return through a generator) all the possible realization
+	of a given LTI filter (lti)
+	Parameters
+	----------
+	- lti: the filter (LTI object) we want to implement
+
+	Returns
+	-------
+	a generator
+
+	>>>> f = LTI( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
+	>>>> for R in Structure.iterStructures(f):
+	>>>>    print(R)
+
+	print the filter f implemeted in all the existing structures wih all the possible options
+	(ie Direct Form I (with nbSum=1 and also nbSum=2), State-Space (balanced, canonical observable form, canonical controlable, etc.), etc.)
+
+	"""
+	for cls in Structure.__subclasses__():
+		if not lti.isSISO() and cls._acceptMIMO==False:
+			continue
+		if cls._possibleOptions:
+			# list of all the possible values for dictionnary
+			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
+			vl = ( dict(izip(cls._possibleOptions, x)) for x in product(*cls._possibleOptions.itervalues()) )
+			for options in vl:
+				yield cls(lti, **options)
+		else:
+			yield cls(lti)

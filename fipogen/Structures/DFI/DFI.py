@@ -43,6 +43,7 @@ class DFI(Structure):
 			L = mat( atleast_2d(1) )
 			M = mat( c_[ num[0,1:], -den[0,1:] ] )
 			N = atleast_2d(num[0,0])
+
 		else:
 			J = mat( [[1,0],[-1,1]])
 			K = c_[ zeros((2*n,1)), r_[ zeros((n,1)), atleast_2d(1), zeros((n-1, 1)) ]]
@@ -50,22 +51,6 @@ class DFI(Structure):
 			M = r_[  c_[ num[0,1:], zeros((1,n))], c_[ zeros((1,n)), -den[0,1:]]  ]
 			N = mat( [ [num[0,0]], [0] ])
 
-
-	# transformation to 'optimize' the code
-
-		# T = mat(rot90(eye(2*nnum)))
-		#
-		# invT = inv(T)
-		#
-		# # build SIF
-		#
-		# if opt == 1:
-		#
-		# 	JtoS = atleast_2d(den[0,0]), invT*gamma4, atleast_2d(1), gamma1*T, atleast_2d(num[0,0]), invT*gamma2*T, invT*gamma3, mat(zeros((1, nnum+nden))), atleast_2d(0)
-		#
-		# elif opt == 2:
-		#
-		# 	JtoS = mat(eye(2)), invT*gamma4, mat([1,1]), gamma1*T, r_[atleast_2d(num[0,0]),atleast_2d(0)], invT*gamma2*T, invT*gamma3, mat(zeros((1, nnum+nden))), atleast_2d(0)
 
 		# transposed form
 		#TODO: put it in a method, so that any SISO SIF can be "transposed"
@@ -77,7 +62,29 @@ class DFI(Structure):
 			J = J.transpose()       # no need to really do this, since J in scalar
 			S = S.transpose()       # no need to really do this, since S in scalar
 
+		else:
+			# transformation to 'optimize' the code, ie to make P upper triangular, so that there is no need to keep x(k+1) and x(k) in the same time in memory
+			T = mat(rot90(eye(2*n)))
+			invT = inv(T)
+
+			K = invT*K
+			M = M*T
+			P = invT*P*T
+			Q = invT*Q
+
+		# name of the intermediate variables
+		var_name = [ 't' ] if nbSum==1 else [ 't_1', 't_2' ]
+		# states
+		if transposed:
+			var_name.extend( 'u(k-%d)'%i for i in range(n,0,-1) )
+			var_name.extend( 'y(k-%d)'%i for i in range(n,0,-1) )
+		else:
+			var_name.extend( 'u(k-%d)'%i for i in range(1,n+1) )
+			var_name.extend( 'y(k-%d)'%i for i in range(1,n+1) )
+		# output
+		var_name.append( 'y(k)')
+
 		# build SIF
 		self.SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
-
+		#TODO: do something with the var_name !! (ie add it in the Structure class)
 
