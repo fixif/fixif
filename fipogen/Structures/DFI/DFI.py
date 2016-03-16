@@ -53,12 +53,11 @@ class DFI(Structure):
 
 
 		# transposed form
-		#TODO: put it in a method, so that any SISO SIF can be "transposed"
 		if transposed:
-			K,M = M.transpose(), K.transpose()
+			K, M = M.transpose(), K.transpose()
 			P = P.transpose()
-			R,Q = Q.transpose(), R.transpose()
-			L,N = N.transpose(),L.transpose()
+			R, Q = Q.transpose(), R.transpose()
+			L, N = N.transpose(),L.transpose()
 			J = J.transpose()       # no need to really do this, since J in scalar
 			S = S.transpose()       # no need to really do this, since S in scalar
 
@@ -76,11 +75,10 @@ class DFI(Structure):
 		var_name = [ 't' ] if nbSum==1 else [ 't_1', 't_2' ]
 		# states
 		if transposed:
+			var_name.extend( 'x_%d(k)'%i for i in range(1,n+1) )
+		else:
 			var_name.extend( 'u(k-%d)'%i for i in range(n,0,-1) )
 			var_name.extend( 'y(k-%d)'%i for i in range(n,0,-1) )
-		else:
-			var_name.extend( 'u(k-%d)'%i for i in range(1,n+1) )
-			var_name.extend( 'y(k-%d)'%i for i in range(1,n+1) )
 		# output
 		var_name.append( 'y(k)')
 

@@ -51,7 +51,7 @@ def isTrivial ( x, epsilon ):
 
 
 
-dynMethodAdder
+#dynMethodAdder
 class SIF(object):
 	"""
 	Special Implicit Form (formely FWR, Finite Wordlength Realization)
