@@ -68,7 +68,7 @@ def random_dSS( number = 1, stable = True, n = (5,10), p = (1,5), q = (1,5), pRe
 
 
 
-def random_dTF( number = 1, order = (5,10) ):
+def random_dTF( number = 1, order = (5,10), stable=False ):
 	"""
 	Generate some n-th order random (stable or not) SISO transfer functions
 
@@ -88,7 +88,13 @@ def random_dTF( number = 1, order = (5,10) ):
 	for i in range(number):
 		n = randint(*order)
 		num = mat(rand(1,n))
-		den = mat(rand(1,n))
+		if stable:
+			#Q&D
+			#TODO: generate random real polynom with zeros in the unit circle
+			S = get_random_dSS(n-1, 1, 1)
+			den = S.to_dTF().den
+		else:
+			den = mat(rand(1,n))
 		yield dTF( num, den)
 
 

@@ -21,7 +21,7 @@ from numpy					import eye, zeros, r_, c_, sqrt
 from numpy.linalg			import inv, det, solve, eigvals
 from numpy.linalg.linalg	import LinAlgError
 from scipy.linalg			import solve_discrete_lyapunov
-from slycot					import sb03md
+from slycot					import sb03md, ab09ad
 from copy					import copy
 from scipy.weave			import inline
 from scipy.signal import ss2tf
@@ -520,7 +520,7 @@ class dSS(object):
 		return dTF( num[0], den )
 
 
-	def assert_close(self, other, rtol=1e-7):
+	def assert_close(self, other):
 		# at this point, it should exist an invertible matrix T such that
 		# self.A == inv(T) * other.A * T
 		# self.B == inv(T) * other.B
@@ -528,7 +528,24 @@ class dSS(object):
 		# self.D == other.D
 
 		#TODO: this is probably not enough...
-		assert_allclose( self.C*self.B, other.C*other.B, rtol)
-		assert_allclose( self.C*self.A*self.B, other.C*other.A*other.B, rtol)
-		assert_allclose( self.C*self.A*self.A*self.B, other.C*other.A*other.A*other.B, rtol)
-		assert_allclose( self.D, other.D, rtol)
+		assert_allclose( self.C*self.B, other.C*other.B, atol=1e-12)
+		assert_allclose( self.C*self.A*self.B, other.C*other.A*other.B, atol=1e-12)
+		assert_allclose( self.C*self.A*self.A*self.B, other.C*other.A*other.A*other.B, atol=1e-12)
+		assert_allclose( self.D, other.D, atol=1e-12)
+
+
+	def balanced(self):
+		"""
+		Returns an equivalent balanced state-space system
+
+		Use ab09ad method from Slicot to get balanced state-space
+		see http://slicot.org/objects/software/shared/doc/AB09AD.html
+
+		Returns
+		- a dSS object
+		"""
+
+		Nr, Ar, Br, Cr, hsv = ab09ad( 'D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr= self.n, tol=0.0)
+		if Nr==0:
+			raise ValueError("dSS: balanced: The selected order nr is greater than the order of a minimal realization of the given system. It was set automatically to a value corresponding to the order of a minimal realization of the system")
+		return dSS( Ar, Br, Cr, self.D)

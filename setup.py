@@ -17,6 +17,7 @@ setup(
 		"scipy >= 0.17.0",
 		"slycot >= 0.2.0",
 		"pytest >= 2.8.7',
-		"sphinx >= 1.3"
+		"sphinx >= 1.3",
+		"matlabengineforpython"
 	],
 ) 

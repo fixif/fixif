@@ -1,7 +1,23 @@
 #coding=utf8
 
+"""
+This file contains Direct Form I structure
+
+"""
+
+__author__ = "Thibault Hilaire, Joachim Kruithof"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__ = ["Thibault Hilaire", "Joachim Kruithof"]
+
+__license__ = "CECILL-C"
+__version__ = "0.4"
+__maintainer__ = "Thibault Hilaire"
+__email__ = "thibault.hilaire@lip6.fr"
+__status__ = "Beta"
+
+
 from fipogen.SIF import SIF
-from fipogen.Structures.Structure import Structure
+from fipogen.Structures import Structure
 
 from numpy import matrix as mat
 from numpy import diagflat, zeros, eye, rot90, ones, r_, c_, atleast_2d

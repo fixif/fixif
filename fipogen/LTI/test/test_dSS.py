@@ -26,6 +26,21 @@ from fipogen.LTI.random import random_dSS
 import pytest
 
 
+def my_assert_allclose(A, strA, B, strB, atol=None, rtol=None):
+
+	D={}
+	if atol:
+		D['atol'] = atol
+	if rtol:
+		D['rtol'] = rtol
+
+	try:
+		assert_allclose(A,B,**D)
+	except Exception as e:
+		print( strA+"="+str(A) )
+		print( strB+"="+str(B) )
+		raise e
+
 
 def test_construction( ):
 	"""
@@ -88,6 +103,7 @@ def test_Gramians ( S ):
 	with pytest.raises(ValueError):
 		t = S.Wo
 
+	dSS._W_method = 'slycot1'
 
 
 @pytest.mark.parametrize( "S", random_dSS( 20, True, (5,10), (1,5), (1,5), pBCmask=0.1) )
@@ -152,7 +168,13 @@ def test_to_dTF( S ):
 
 	S.assert_close( SS )
 
-
+@pytest.mark.parametrize( "S", random_dSS( 20, stable=True, n=(1,15), p=(1,5), q=(1,5) ))
+def test_balanced( S ):
+	Sb = S.balanced()
+	# check if S and Sb represent the same systems
+	S.assert_close( Sb)
+	# check if Sb is really balanced
+	my_assert_allclose( Sb.Wo,'Wo', Sb.Wc, 'Wc', atol=1e-6 )
 
 
 #TODO: il reste à tester:

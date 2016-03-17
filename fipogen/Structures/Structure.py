@@ -44,7 +44,7 @@ class Structure(object):
 
 	@property
 	def fullName(self):
-		return self._name + " - " + ", ".join( '%s:%s'%(key,str(val)) for key,val in self._options.items() )
+		return self._name + " (" + ", ".join( '%s:%s'%(key,str(val)) for key,val in self._options.items() ) + ")"
 
 
 
@@ -60,6 +60,7 @@ class Structure(object):
 				raise ValueError( self.__class__.__name__ + ": the input argument " + opt + " doesn't exist")
 			if val not in self._possibleOptions[opt]:
 				raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
+
 
 
 
