@@ -20,7 +20,7 @@ from fipogen.LTI.random import random_dTF, random_dSS
 import pytest
 
 
-@pytest.mark.parametrize( "H", random_dTF( 20, stable=True ))
+@pytest.mark.parametrize( "H", random_dTF( 20 ))
 def test_buildAllPossibleRealizationsFromdTF( H ):
 	"""
 	Check all the SISO structures (including MIMO structures)
@@ -28,20 +28,20 @@ def test_buildAllPossibleRealizationsFromdTF( H ):
 	"""
 	print('')
 
-	for R in iterStructures( LTI( tf=H) ):
+	for R in iterStructures( LTI( tf=H, stable=False) ):
 		print ( R.fullName +"\t")
 		H.assert_close( R.SIF.dSS.to_dTF() )
 
 
 
-@pytest.mark.parametrize( "S", random_dSS( 20, stable=True, n=(5,15), p=(1,10), q=(1,10) ))
+@pytest.mark.parametrize( "S", random_dSS( 20, stable=True, n=(5,15), p=(1,2), q=(1,2) ))
 def test_buildAllPossibleRealizationsFromdSS( S ):
 	"""
 	Check all the possible realizations
 	Check that the corresponding system (state-space) corresponds to the initial one
 	"""
 	print('')
-	for R in iterStructures( LTI( ss=S),  ):
+	for R in iterStructures( LTI( ss=S, stable=True)  ):
 		print ( R.fullName +"\t")
 		S.assert_close( R.SIF.dSS )
 

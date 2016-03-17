@@ -20,7 +20,7 @@ class LTI(object):
 	"""
 	A LTI (Linear Time Invariant) object is described either a transfer function and state-space
 	"""
-	def __init__(self, num=None, den=None, A=None, B=None, C=None, D=None, tf=None, ss=None):
+	def __init__(self, num=None, den=None, A=None, B=None, C=None, D=None, tf=None, ss=None, stable=None):
 		"""
 		Create a LTI from numerator and denominator OR from A,B,C,D matrices
 		Parameters
@@ -43,6 +43,13 @@ class LTI(object):
 			self._dSS = ss
 		else:
 			raise ValueError( 'LTI: the values given to the LTI constructor are not correct')
+
+		# is the filter stable?
+		if stable is None:
+			#TODO: compute the eigenvalues to know if it is stable or not
+			self._stable = False
+		else:
+			self._stable = stable
 
 
 	@property
@@ -69,3 +76,10 @@ class LTI(object):
 			return True
 		else:
 			return False
+
+
+	def isStable(self):
+		"""
+		Returns True if the filter is known to be stable
+		"""
+		return self._stable

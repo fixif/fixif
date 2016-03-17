@@ -15,6 +15,7 @@ __status__ = "Beta"
 
 from numpy import ndenumerate, array, zeros
 from numpy import matrix as mat
+from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
 from scipy.linalg import norm
 
@@ -81,15 +82,28 @@ class dTF(object):
 		return str_tf
 
 
-	def to_dSS(self):
+	def to_dSS(self, form="ctrl"):
 		"""
 		Transform the transfer function into a state-space
+		Parameters:
+		    - form: controllable canonical form ('ctrl') or observable canonical form ('obs')
 
 		"""
 		#TODO: code it without scipy
-		#TODO: option to choose controlability/observability canonical form
+
 		from fipogen.LTI import dSS
-		A,B,C,D = tf2ss( array(self.num)[0,:], array(self.den)[0,:] )
+		if form=='ctrl':
+			A = mat( diagflat(ones((1, self.order-1)), 1) )
+			A[self.order-1,:] = fliplr( -self.den[0,1:] )
+			B = mat( r_[ zeros((self.order-1, 1)), atleast_2d(1) ] )
+			C = mat( fliplr( self.num[0,1:] ) - fliplr( self.den[0,1:] )*self.num[0,0] )
+			D = mat( atleast_2d(self.num[0,0]) )
+		elif form=='obs':
+			#TODO!!
+			A,B,C,D = tf2ss( array(self.num)[0,:], array(self.den)[0,:] )
+		else:
+			raise ValueError( 'dTF.to_dSS: the form "%s" is invalid (must be "ctrl" or "obs")'%form )
+
 		return dSS(A,B,C,D)
 
 

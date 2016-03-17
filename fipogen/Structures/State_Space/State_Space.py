@@ -26,9 +26,7 @@ from numpy import matrix as mat
 class State_Space(Structure):
 
 	_name = "State-Space"
-	#_possibleOptions = { 'form': (None, 'balanced', 'ctrl', 'obs')}
-	_possibleOptions = { 'form': (None,'balanced')}
-	_acceptMIMO = True
+	_possibleOptions = { 'form': (None, 'balanced', 'ctrl', 'obs')}
 
 
 	def __init__(self, filter, form=None ):
@@ -39,15 +37,17 @@ class State_Space(Structure):
 		# check the args
 		self.manageOptions(form=form)
 
-		S = filter.dSS
-		if form=='balanced':
-			S = S.balanced()
-
+		if form==None:
+			S = filter.dSS
+		elif form=='balanced':
+			S = filter.dSS.balanced()
+		elif form=='ctrl' or form=='obs':
+			S = filter.dTF.to_dSS(form)
 
 		n,p,q = S.size
 		l = 0
 
-		JtoS = ( eye((l)), zeros((n,l)), zeros((p,l)), zeros((l,n)), zeros((l,q)), filter.dSS.A, filter.dSS.B, filter.dSS.C, filter.dSS.D )
+		JtoS = ( eye((l)), zeros((n,l)), zeros((p,l)), zeros((l,n)), zeros((l,q)), S.A, S.B, S.C, S.D )
 		dJtodS = [ ones( X.shape ) for X in JtoS ]
 
 
@@ -67,3 +67,20 @@ class State_Space(Structure):
 		# # self.w = mat(eye(n))
 		#
 		# self._set_default_uyw()
+
+
+	@staticmethod
+	def canAccept( filter, form):
+		"""
+		The forms 'ctrl' and 'obs' cannot be applied for SISO filters
+		otherwise, it can always be used
+		"""
+		if form==None:
+			return True
+		if form=='balanced':
+			return filter.isStable()
+		if form=='ctrl' or form=='obs':
+			return filter.isSISO()
+
+		# should never happend
+		return False

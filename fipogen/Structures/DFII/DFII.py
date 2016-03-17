@@ -86,3 +86,10 @@ class DFII(Structure):
 		self.SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
 		#TODO: do something with the var_name !! (ie add it in the Structure class)
 
+
+	@staticmethod
+	def canAccept( filter, **options):
+		"""
+		return True only if the filter is SISO
+		"""
+		return filter.isSISO()

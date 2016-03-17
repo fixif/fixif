@@ -28,7 +28,7 @@ class Structure(object):
 									#   key: name of the option
 									#   value: list of possible values
 	_name = ""                      # name of the structures
-	_acceptMIMO = False                   # indicates if the structure can support MIMO filters
+
 
 
 	def __str__(self):
@@ -46,6 +46,15 @@ class Structure(object):
 	def fullName(self):
 		return self._name + " (" + ", ".join( '%s:%s'%(key,str(val)) for key,val in self._options.items() ) + ")"
 
+
+	@staticmethod
+	def canAccept( filter, **options):
+		"""
+		Each structure should redefine this method
+		It returns True if the structure can be applied for that filter and these options
+		(for example, some structures can be applied for SISO filters, or stable filters, or even, depending on the options, it can or it cannot)
+		"""
+		return True
 
 
 	def manageOptions(self, **options):
@@ -86,13 +95,13 @@ def iterStructures(lti):
 
 	"""
 	for cls in Structure.__subclasses__():
-		if not lti.isSISO() and cls._acceptMIMO==False:
-			continue
 		if cls._possibleOptions:
 			# list of all the possible values for dictionnary
 			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
 			vl = ( dict(izip(cls._possibleOptions, x)) for x in product(*cls._possibleOptions.itervalues()) )
 			for options in vl:
-				yield cls(lti, **options)
+				if cls.canAccept( lti, **options):
+					yield cls(lti, **options)
 		else:
-			yield cls(lti)
+			if cls.canAccept( lti):
+				yield cls(lti)

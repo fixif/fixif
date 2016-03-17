@@ -545,7 +545,7 @@ class dSS(object):
 		- a dSS object
 		"""
 
-		Nr, Ar, Br, Cr, hsv = ab09ad( 'D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr= self.n, tol=0.0)
+		Nr, Ar, Br, Cr, hsv = ab09ad( 'D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr=self.n, tol=1e-18)
 		if Nr==0:
 			raise ValueError("dSS: balanced: The selected order nr is greater than the order of a minimal realization of the given system. It was set automatically to a value corresponding to the order of a minimal realization of the system")
 		return dSS( Ar, Br, Cr, self.D)

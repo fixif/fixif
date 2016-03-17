@@ -27,7 +27,6 @@ class DFI(Structure):
 
 	_name = "Direct Form I"              # name of the structure
 	_possibleOptions = { "nbSum" : (1,2), "transposed" : (False,True) }       # the only option is nbSum, that can be 1 or 2
-	_acceptMIMO = False
 
 	def __init__(self, filter, nbSum=1, transposed=True):
 		"""
@@ -102,3 +101,9 @@ class DFI(Structure):
 		self.SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
 		#TODO: do something with the var_name !! (ie add it in the Structure class)
 
+	@staticmethod
+	def canAccept( filter, **options):
+		"""
+		return True only if the filter is SISO
+		"""
+		return filter.isSISO()

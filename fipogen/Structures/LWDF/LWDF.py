@@ -58,3 +58,9 @@ class LWDF(Structure):
 		#self.SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
 
 
+	@staticmethod
+	def canAccept( filter):
+		"""
+		return True only if the filter is a Butterworth filter
+		"""
+		return filter.isButter()
