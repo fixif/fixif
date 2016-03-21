@@ -14,13 +14,13 @@ __status__ = "Beta"
 
 
 from fipogen.LTI import LTI
-from fipogen.Structures import iterStructures
-from fipogen.LTI.random import random_dTF, random_dSS
+from fipogen.Structures import iterStructures,LWDF
+from fipogen.LTI.random import iter_random_dTF, iter_random_dSS, iter_random_Butter
 
 import pytest
 
 
-@pytest.mark.parametrize( "H", random_dTF( 20 ))
+@pytest.mark.parametrize( "H", iter_random_dTF(20))
 def test_buildAllPossibleRealizationsFromdTF( H ):
 	"""
 	Check all the SISO structures (including MIMO structures)
@@ -34,7 +34,7 @@ def test_buildAllPossibleRealizationsFromdTF( H ):
 
 
 
-@pytest.mark.parametrize( "S", random_dSS( 20, stable=True, n=(5,15), p=(1,2), q=(1,2) ))
+@pytest.mark.parametrize( "S", iter_random_dSS(20, stable=True, n=(5, 15), p=(1, 2), q=(1, 2)))
 def test_buildAllPossibleRealizationsFromdSS( S ):
 	"""
 	Check all the possible realizations
@@ -45,3 +45,13 @@ def test_buildAllPossibleRealizationsFromdSS( S ):
 		print ( R.fullName +"\t")
 		S.assert_close( R.SIF.dSS )
 
+
+
+@pytest.mark.parametrize( "H", iter_random_Butter(20, form='lowpass'))
+def test_LWDF( H ):
+	"""
+	Check the LWDF structure
+	check that the correspong transfer function is equal to the initial transfer function
+	"""
+	R = LWDF( H)
+	H.dTF.assert_close( R.SIF.dSS.to_dTF(), eps=1e-4 )

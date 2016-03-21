@@ -17,7 +17,7 @@ __status__ = "Beta"
 
 
 from fipogen.LTI import dTF
-from fipogen.LTI.random import random_dTF
+from fipogen.LTI.random import iter_random_dTF
 
 import pytest
 
@@ -34,12 +34,12 @@ def test_construction( ):
 		dTF( [1, 2, 3], [1, 2] )		# num should not be longer than den
 
 
-@pytest.mark.parametrize( "H", random_dTF( 20 ))
+@pytest.mark.parametrize( "H", iter_random_dTF(20))
 def test_str( H ):
 	str(H)
 
 
-@pytest.mark.parametrize( "H", random_dTF( 20 ))
+@pytest.mark.parametrize( "H", iter_random_dTF(20))
 def test_to_dSS( H ):
 	S = H.to_dSS()
 	HH = S.to_dTF()

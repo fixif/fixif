@@ -14,16 +14,17 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from fipogen.LTI import dSS, dTF
+from fipogen.LTI import dSS, dTF, Butter
 
 from numpy                  import zeros, dot, eye, pi, cos, sin
-from numpy.random           import rand, randn, randint
+from numpy.random           import rand, randn, randint, choice, random_sample
 from numpy.linalg           import solve, LinAlgError
 from numpy import matrix as mat
 
 
 
-def random_dSS( number = 1, stable = True, n = (5,10), p = (1,5), q = (1,5), pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
+
+def iter_random_dSS(number = 1, stable = True, n = (5, 10), p = (1, 5), q = (1, 5), pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
 	"""
 	Generate some n-th order random (stable or not) state-spaces, with q inputs and p outputs
 	copy/Adapted from control-python library (thanks guys): https://sourceforge.net/projects/python-control/
@@ -46,15 +47,15 @@ def random_dSS( number = 1, stable = True, n = (5,10), p = (1,5), q = (1,5), pRe
 		- returns a generator of dSS objects (to use in a for loop for example)
 
 	..Example::
-		>>> sys = list( random_dSS( 12, True, (10,20)) )
-		>>> for S in random_dSS( 12, True, (10,20)):
+		>>> sys = list( iter_random_dSS( 12, True, (10,20)) )
+		>>> for S in iter_random_dSS( 12, True, (10,20)):
 		>>>		print( S )
 
 
 	"""
 	for i in range(number):
 		if stable:
-			yield get_random_dSS( randint(*n), randint(*p), randint(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
+			yield random_dSS(randint(*n), randint(*p), randint(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
 		else:
 			nn=randint(*n)
 			pp=randint(*p)
@@ -68,7 +69,7 @@ def random_dSS( number = 1, stable = True, n = (5,10), p = (1,5), q = (1,5), pRe
 
 
 
-def random_dTF( number = 1, order = (5,10), stable=False ):
+def iter_random_dTF(number = 1, order = (5, 10)):
 	"""
 	Generate some n-th order random (stable or not) SISO transfer functions
 
@@ -80,28 +81,73 @@ def random_dTF( number = 1, order = (5,10), stable=False ):
 		- returns a generator of dTF objects (to use in a for loop for example)
 
 	..Example::
-		>>> sys = list( random_dTF( 12, (10,20)) )
-		>>> for S in random_dTF( 12, (10,20)):
+		>>> sys = list( iter_random_dTF( 12, (10,20)) )
+		>>> for S in iter_random_dTF( 12, (10,20)):
 		>>>		print( S.num )
 
 	"""
 	for i in range(number):
 		n = randint(*order)
-		num = mat(rand(1,n))
-		if stable:
-			#Q&D
-			#TODO: generate random real polynom with zeros in the unit circle
-			S = get_random_dSS(n-1, 1, 1)
-			den = S.to_dTF().den
-		else:
-			den = mat(rand(1,n))
-		yield dTF( num, den)
+		yield random_dTF( n )
 
 
 
-def get_random_dSS(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
+
+def iter_random_Butter( number=1, n=(5,10), Wc=(0.1,0.8), W1=(0.1,0.5), W2=(0.5,0.8), form=None, onlyEven=True):
 	"""
-	Generate ONE n-th order random  state-spaces, with q inputs and p outputs
+	Generate some n-th order Butterworh filters
+	Parameters
+		----------
+		number: number of Butterworth filters generated
+		n: (int) The order of the filter
+		Wc: used if btype is 'lowpass' or 'highpass'
+			Wc is a tuple (min,max) for the cut frequency
+		W1 and W2: used if btype is ‘bandpass’, ‘bandstop’
+			W1 and W2 are tuple (min,max) for the two start/stop frequencies
+		btype: (string) {None, ‘lowpass’, ‘highpass’, ‘bandpass’, ‘bandstop’}. Gives the type of filter. If None, the type is randomized
+	"""
+	for i in range(number):
+		# choose the form
+		if form is None:
+			f = choice( ("lowpass", "highpass", "bandpass", "bandstop") )
+		else:
+			f = form
+		# choose Wn
+		if f in ("bandpass", "bandstop"):
+			# choose 2 frequencies
+			if W2[1] <= W1[0]:
+				raise ValueError( "iter_random_Butter: W1 should be lower than W2")
+			Wn1 = (W1[1] - W1[0]) * random_sample() + W1[0]
+			Wn2 = (W2[1] - W2[0]) * random_sample() + W2[0]
+			while Wn2<=Wn1:
+				Wn2 = (W2[1] - W2[0]) * random_sample() + W2[0]
+			W=[Wn1,Wn2]
+		else:
+			# choose 1 frequency
+			W = (Wc[1] - Wc[0]) * random_sample() + Wc[0]
+		# choose order
+		order = randint(*n)
+		if onlyEven and order%2==0:
+			order += 1
+
+		yield Butter( order, W, f)
+
+
+
+def random_dTF( n):
+	"""
+	Generate a n-th order random transfer function (non necesseraly stable)
+	Parameters:
+	    - n: order of the transfer function
+	"""
+	num = mat(rand(1,n))
+	den = mat(rand(1,n))
+	return dTF( num, den)
+
+
+def random_dSS(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
+	"""
+	Generate ONE n-th order random  stable state-spaces, with q inputs and p outputs
 	copy/Adapted from control-python library (Richard Murray): https://sourceforge.net/projects/python-control/ (thanks guys!)
 	possibly already adpated/copied from Mathworks or Octave
 

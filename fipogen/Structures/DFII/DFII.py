@@ -27,7 +27,7 @@ class DFII(Structure):
 
 	_name = "Direct Form II"              # name of the structure
 	_possibleOptions = { "transposed" : (False,True) }       # Direct Form II transposed or Direct Form II (non-transposed)
-	_acceptMIMO = False
+
 
 	def __init__(self, filter, transposed=True):
 		"""
@@ -83,12 +83,12 @@ class DFII(Structure):
 		var_name.append( 'y(k)')
 
 		# build SIF
-		self.SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
+		self._SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
 		#TODO: do something with the var_name !! (ie add it in the Structure class)
 
 
 	@staticmethod
-	def canAccept( filter, **options):
+	def canAcceptFilter(filter, **options):
 		"""
 		return True only if the filter is SISO
 		"""

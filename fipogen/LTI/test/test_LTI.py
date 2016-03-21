@@ -18,8 +18,9 @@ __status__ = "Beta"
 from numpy.testing import assert_allclose
 
 from fipogen.LTI import dTF, dSS, LTI
-from fipogen.LTI.random import random_dTF
+from fipogen.LTI.random import iter_random_dTF
 from numpy.linalg           import solve
+from fipogen.LTI.random import iter_random_Butter
 
 import pytest
 
@@ -50,4 +51,6 @@ def test_construction( ):
 	L=LTI( A=[[1, 2], [3, 4]], B=[[1], [2]], C=[[1, 2]], D=3, num=[1, 2, 3], den=[0, 6 ,7])
 
 
-
+@pytest.mark.parametrize( "H", iter_random_Butter(20, onlyEven=True))
+def test_butter( H ):
+	print(H.dTF)

@@ -107,7 +107,7 @@ class dTF(object):
 		return dSS(A,B,C,D)
 
 
-	def assert_close(self, other, rtol=1e-7):
+	def assert_close(self, other, eps=1e-7):
 		"""
 		asserts that self is "close" to other
 		ie the numerator and denominator are close
@@ -126,6 +126,6 @@ class dTF(object):
 		oden = zeros((1,max_order))
 		oden[ :1, :other.den.shape[1] ] = other.den
 
-		assert( norm(snum-onum)<1e-7 )
-		assert( norm(sden-oden)<1e-7 )
+		assert( norm(snum-onum)<eps )
+		assert( norm(sden-oden)<eps )
 

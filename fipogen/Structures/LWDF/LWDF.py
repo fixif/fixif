@@ -27,8 +27,8 @@ from numpy.linalg import inv
 
 
 
-#from matlab.engine import connect_matlab
-#eng = connect_matlab()
+from matlab.engine import connect_matlab
+eng = connect_matlab()
 #eng.addpath('construct','fwrtoolbox')
 
 
@@ -36,7 +36,7 @@ class LWDF(Structure):
 
 	_name = "Lattice Wave Digital Filter"              # name of the structure
 	_possibleOptions = None       # the only option is nbSum, that can be 1 or 2
-	_acceptMIMO = False
+
 
 	def __init__(self, filter):
 		"""
@@ -46,21 +46,19 @@ class LWDF(Structure):
 		# check the args
 		self.manageOptions()
 
-		# convert everything to mat
-		n = filter.dTF.order
-		num = mat(filter.dTF.num)
-		den = mat(filter.dTF.den)
 
 
-
+		# call matlab
+		eng.eval('R=ButterLWDF2FWR( %d, %f);'%(filter.n, filter.Wn), nargout=0)
+		R = eng.eval('struct(R)')
 
 		# build SIF
-		#self.SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
+		self._SIF = SIF( (mat(R['J']), mat(R['K']), mat(R['L']), mat(R['M']), mat(R['N']), mat(R['P']), mat(R['Q']), mat(R['R']), mat(R['S'])) )
 
 
 	@staticmethod
-	def canAccept( filter):
+	def canAcceptFilter(filter):
 		"""
-		return True only if the filter is a Butterworth filter
+		return True only if the filter is a ODD Butterworth filter
 		"""
-		return filter.isButter()
+		return filter.isButter() and (filter.n%2)==1

@@ -2,6 +2,17 @@
 
 """
 This file contains Object and methods for a structure
+
+
+To Build a structure, we should
+- build a class derived from Structure class
+- set the name (_name)
+- set the options (dictionary _possibleOptions)
+- if the structure cannot handle some filters (MIMO filters, for example), override the canAcceptFilter method
+- in the constructor:
+  - run manageOptions (that check if the options are correct, and store the options of the instance)
+  - set the SIF (_SIF)
+
 """
 
 __author__ = "Thibault Hilaire"
@@ -48,7 +59,7 @@ class Structure(object):
 
 
 	@staticmethod
-	def canAccept( filter, **options):
+	def canAcceptFilter(filter, **options):
 		"""
 		Each structure should redefine this method
 		It returns True if the structure can be applied for that filter and these options
@@ -71,7 +82,9 @@ class Structure(object):
 				raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
 
 
-
+	@property
+	def SIF(self):
+		return self._SIF
 
 
 def iterStructures(lti):
@@ -100,8 +113,8 @@ def iterStructures(lti):
 			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
 			vl = ( dict(izip(cls._possibleOptions, x)) for x in product(*cls._possibleOptions.itervalues()) )
 			for options in vl:
-				if cls.canAccept( lti, **options):
+				if cls.canAcceptFilter(lti, **options):
 					yield cls(lti, **options)
 		else:
-			if cls.canAccept( lti):
+			if cls.canAcceptFilter(lti):
 				yield cls(lti)

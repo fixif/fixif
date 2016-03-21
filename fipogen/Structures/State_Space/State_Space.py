@@ -51,7 +51,7 @@ class State_Space(Structure):
 		dJtodS = [ ones( X.shape ) for X in JtoS ]
 
 
-		self.SIF = SIF( JtoS, dJtodS )
+		self._SIF = SIF( JtoS, dJtodS )
 
 
 		# # define available optimization processes, only if not already defined in subclass
@@ -70,7 +70,7 @@ class State_Space(Structure):
 
 
 	@staticmethod
-	def canAccept( filter, form):
+	def canAcceptFilter(filter, form):
 		"""
 		The forms 'ctrl' and 'obs' cannot be applied for SISO filters
 		otherwise, it can always be used
