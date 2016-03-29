@@ -14,7 +14,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from fipogen.LTI import dSS, dTF, Butter
+from fipogen.LTI import dSS, dTF, Butter, LTI
 
 from numpy                  import zeros, dot, eye, pi, cos, sin
 from numpy.random           import rand, randn, randint, choice, random_sample
@@ -130,13 +130,30 @@ def iter_random_Butter( number=1, n=(5,10), Wc=(0.1,0.8), W1=(0.1,0.5), W2=(0.5,
 		if onlyEven and order%2==0:
 			order += 1
 
-		yield Butter( order, W, f)
+		yield Butter( order, W, f, name='Butterworth-random')
+
+
+
+def random_LTI( n, p, q):
+	"""
+	Generate a n-th order stable with q inputs and p outputs
+
+	Parameters
+	----------
+		- n: order
+		- p: number of outputs
+		- q: number of inputs
+
+	Returns a LTI object
+	"""
+
+	return LTI( ss=random_dSS(n, p, q), name='random' )
 
 
 
 def random_dTF( n):
 	"""
-	Generate a n-th order random transfer function (non necesseraly stable)
+	Generate a n-th order random transfer function (not necessary stable)
 	Parameters:
 	    - n: order of the transfer function
 	"""

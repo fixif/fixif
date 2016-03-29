@@ -22,7 +22,10 @@ class LTI(object):
 	"""
 	A LTI (Linear Time Invariant) object is described either a transfer function and state-space
 	"""
-	def __init__(self, num=None, den=None, A=None, B=None, C=None, D=None, tf=None, ss=None, stable=None):
+
+	_name = ''      # name of the LTI filter
+
+	def __init__(self, num=None, den=None, A=None, B=None, C=None, D=None, tf=None, ss=None, stable=None, name=''):
 		"""
 		Create a LTI from numerator and denominator OR from A,B,C,D matrices
 		Parameters
@@ -34,6 +37,7 @@ class LTI(object):
 		"""
 		self._dSS = None
 		self._dTF = None
+		self._name = name
 
 		if A is not None and B is not None and C is not None and D is not None:
 			self._dSS = dSS( A, B, C, D)
@@ -70,6 +74,10 @@ class LTI(object):
 			self._dTF = self._dSS.to_dTF()
 		return self._dTF
 
+	@property
+	def name(self):
+		return self._name
+
 
 	def isSISO(self):
 		"""
@@ -98,7 +106,7 @@ class LTI(object):
 
 class Butter(LTI):
 
-	def __init__(self, n, Wn, btype='low'):
+	def __init__(self, n, Wn, btype='low', name='Butterworth'):
 		"""
 		Create a Butterworth filter
 		Parameters
@@ -117,6 +125,7 @@ class Butter(LTI):
 		self._dSS = None
 		num, den = butter(n, Wn, btype)
 		self._dTF = dTF( num, den)
+		self._name = name
 
 		self.n = n
 		self.Wn = Wn

@@ -12,8 +12,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from LTI import dSS
-from SIF import SIF
+from fipogen.LTI import dSS
+from fipogen.SIF import SIF
 
 from oSoP.Constant import Constant
 import numpy as np

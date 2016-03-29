@@ -35,7 +35,7 @@ eng = connect_matlab()
 class LWDF(Structure):
 
 	_name = "Lattice Wave Digital Filter"              # name of the structure
-	_possibleOptions = None       # the only option is nbSum, that can be 1 or 2
+	_possibleOptions = None
 
 
 	def __init__(self, filter):
@@ -45,8 +45,6 @@ class LWDF(Structure):
 
 		# check the args
 		self.manageOptions()
-
-
 
 		# call matlab
 		eng.eval('R=ButterLWDF2FWR( %d, %f);'%(filter.n, filter.Wn), nargout=0)
