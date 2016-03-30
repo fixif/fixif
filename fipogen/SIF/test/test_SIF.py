@@ -18,52 +18,19 @@ import pytest
 
 from fipogen.SIF import SIF
 from numpy import matrix as mat
+from fipogen.Structures import iterStructures
+from fipogen.LTI.random import iter_random_dSS, iter_random_dTF
+from fipogen.LTI import LTI
 
-#from Structures import DFI, DFII, State_Space, RhoDFIIt
 
 #from func_aux.get_data import get_data
 #from func_aux.MtlbHelper import MtlbHelper
 
-from scipy import signal
 
-from numpy import zeros, ones
-
-from numpy.random import seed, rand #TODO: use the same random generator ?
-from random import randint, shuffle
+from numpy.random import seed, rand, randint, shuffle
 from numpy.testing import assert_allclose
 
 
-# class Test_SIF():
-# 	"""
-# 	Test class for SIF class
-# 	"""
-#
-# 	def setUp(self):
-# 		"""
-# 		Setup matlab engine for all matlab comparison tests
-# 		Generate sample data for tests
-# 		"""
-#
-# 		self.engMtlb = MtlbHelper()
-#
-# 		# a lot of tests fails in that case
-# 		#self.ndigit = 10
-# 		#self.ndigit = 8
-# 		#self.ndigit = 5
-# 		self.ndigit = 3
-#
-#
-# 		self.eps = 1.e-8
-#
-# 		self.list_dTF = get_data("TF", "signal", "butter", is_refresh=False)# + get_data("TF", "random")
-# 		#self.list_dTF = get_data("TF", "random") ,BUG
-# 		#print("Number of dTF objects : " + str(len(self.list_dTF)) + "\n")
-# 		#self.list_dSS = get_data("SS", "signal", "butter")# + get_data("SS", "random")
-# 		self.list_dSS = get_data("SS", "random", is_refresh=False)
-# 		#print("Number of dSS objects : " + str(len(self.list_dSS)) + "\n")
-# 		# TODO add PLANT generator to test closed-loop variants
-#
-#
 
 def test_construction():
 
@@ -113,6 +80,12 @@ def test_construction():
 		assert mySIF.p == p
 		assert mySIF.q == q
 
+		assert len(mySIF._varNameT) == l
+		assert len(mySIF._varNameX) == n
+		assert len(mySIF._varNameY) == p
+		assert len(mySIF._varNameU) == q
+
+
 		# test the construction with not consistent matrices
 		# when the 4 sizes are all different
 		if len( set( (l,n,p,q) ) ) == 4:
@@ -123,16 +96,24 @@ def test_construction():
 
 
 
-	# def test_algo(self):
-	#
-	# 	num, den = signal.butter(4,0.05)
-	# 	mySIF = DFI(num, den)
-	# 	mySIF.algorithmLaTeX('testlegend')
-	# 	mySIF.algorithmCfloat("myFunction", "cFile")
+@pytest.mark.parametrize( "S", iter_random_dSS(4))
+def test_algoMIMO(S):
+
+	for R in iterStructures( LTI( ss=S) ):
+		#R.algorithmLaTeX('testlegend')
+		print( R.SIF.algorithmCdouble("myFunction") )
+
+@pytest.mark.parametrize("H", iter_random_dTF(4))
+def test_algoSISO(H):
+
+	for R in iterStructures(LTI(tf=H)):
+		# R.algorithmLaTeX('testlegend')
+		print(R.SIF.algorithmCdouble("myFunction"))
 
 
 
-	# def test_allSens(self):
+
+		# def test_allSens(self):
 	#
 	# 	def _build_dict_ABCD(dSSobj_target, dSSobj_plant):
 	#

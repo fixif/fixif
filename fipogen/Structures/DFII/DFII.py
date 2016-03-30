@@ -72,19 +72,14 @@ class DFII(Structure):
 			P = invT*P*T
 			Q = invT*Q
 
-		# name of the intermediate variables
-		var_name = [ 't' ]
-		# states
+		# name of the intermediate variables and states
 		if transposed:
-			var_name.extend( 'x_%d(k)'%i for i in range(1,n+1) )
+			varName = [ ('t',), tuple( 'x_%d(k)'%i for i in range(1,n+1) ) ]
 		else:
-			var_name.extend( 'v(k-%d)'%i for i in range(n,0,-1) )
-			# output
-		var_name.append( 'y(k)')
+			varName = [ ('t',), tuple( 'v(k-%d)'%i for i in range(n,0,-1) ) ]
 
 		# build SIF
-		self._SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
-		#TODO: do something with the var_name !! (ie add it in the Structure class)
+		self._SIF = SIF( (J, K, L, M, N, P, Q, R, S), varNameTX = varName)
 
 
 	@staticmethod

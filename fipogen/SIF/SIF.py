@@ -50,24 +50,36 @@ def isTrivial ( x, epsilon ):
 	return abs(alpha) < epsilon*(1-epsilon/2)
 
 
+def genVarName(baseName, nbVar):
+	"""
+	Generate a list of variable name, based on the basedName and the number of variable
+	genVarName( 'u', nbVar) returns:
+	- 'u(k)' if nbVar == 1
+	- otherwise [ 'u_1(k)', 'u_2(k)', ..., 'u_n(k)' ]
+	"""
+	if nbVar == 1:
+		return [ baseName + '(k)' ]
+	else:
+		return [ baseName+"_{%d}(k)"%(i+1) for i in range(nbVar) ]
+
+
 
 @dynMethodAdder
 class SIF(object):
 	"""
 	Special Implicit Form (formely FWR, Finite Wordlength Realization)
 
-	'l','m','n','p' : dimensions of the realization, set from JtoS, and checked with __check_set_dimensions__
+	- 'l','m','n','p' : dimensions of the realization, set from JtoS, and checked with __check_set_dimensions__
+		- 'l' intermediate variables
+		- 'n' states
+		- 'p' outputs
+		- 'q' inputs
 
-	- 'l' intermediate variables
-	- 'n' states
-	- 'p' outputs
-	- 'q' inputs
 
+	- 'J, K, L, M, N, P, Q, R, S' matrices 'J' to 'S' (excluding 'O')
+	- 'Z' is a big matrix regrouping all matrixes from 'J' to 'S'
 
-	'J, K, L, M, N, P, Q, R, S' matrices 'J' to 'S' (excluding 'O')
-	'Z' is a big matrix regrouping all matrixes from 'J' to 'S'
-
-	'dJ, dK, dL, dM, dN, dP, dQ, dR, dS' are matrixes :math:`\delta J` to :math:`\delta S`
+	- 'dJ, dK, dL, dM, dN, dP, dQ, dR, dS' are matrixes :math:`\delta J` to :math:`\delta S`
 	thoses matrices represent exactly implemented parameters :
 	.. math::
 		\delta(Z)_{ij} \left\lbrace\begin{aligned}
@@ -76,7 +88,7 @@ class SIF(object):
 		\end{aligned}\right.
 	'dZ' is :math:`\delta Z`
 
-	'AZ, BZ, CZ, DZ' matrixes :math:`A_Z, B_Z, C_Z, D_Z` and associated state-space dSS
+	- 'AZ, BZ, CZ, DZ' matrixes :math:`A_Z, B_Z, C_Z, D_Z` and associated state-space dSS
 
 	When a SIF object is created, it is *not* possible to change its dimensions 'l,m,p,q' nor fields 'AZ,BZ,CZ,DZ'
 	JOJO : Fields 'Z, dZ' are constructed from 'J' to 'S' and 'dJ' to 'dS' respectively, so those are
@@ -86,12 +98,14 @@ class SIF(object):
 
 	'AZ, BZ, CZ, DZ' are deduced accordingly
 
+	- varNameT, varNameX, varNameU, varNameY : lists of the name of the intermediate variables (varNameT), the states (varNameX), the inputs (varNameU) and the outputs (varNameY)
+
 	"""
 
 	epsilondZ = 1e-8    # used to deduced dJ, dK, dL, dM, dN, dP, dQ, dR and dS matrices when they are not specified
 
 
-	def __init__ ( self, JtoS, dJtodS=None, plant=None):
+	def __init__ ( self, JtoS, dJtodS=None, plant=None, varNameTX=None):
 		"""
 		the SIF object is built from the matrices J, K, L, M, N, P, Q, R and S
 		Parameters
@@ -116,7 +130,15 @@ class SIF(object):
 		# build _dZ, the associated state space _dSS (contains AZ, BZ, CZ, DZ, gramians, etc.), _M1 _M2 _N1 _N2 and the *_bar matrices
 		self._build_dZ( dJtodS )
 
-
+		# name of the variables t, x, u and y
+		if varNameTX is None:
+			self._varNameT = genVarName( 't', self._l)
+			self._varNameX = genVarName( 'x', self._n)
+		else:
+			self._varNameT = varNameTX[0]
+			self._varNameX = varNameTX[1]
+		self._varNameU = genVarName( 'u', self._q)
+		self._varNameY = genVarName( 'y', self._p)
 
 
 
@@ -461,8 +483,6 @@ class SIF(object):
 	@dS.setter
 	def dS ( self, mymat ):
 		self._dZ[self._l + self._n: self._l + self._n + self._p, self._l + self._n: self._l + self._n + self._q] = mymat
-
-
 
 
 	def _check_dimensions ( self, JtoS ):

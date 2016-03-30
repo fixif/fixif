@@ -86,20 +86,18 @@ class DFI(Structure):
 			P = invT*P*T
 			Q = invT*Q
 
-		# name of the intermediate variables
-		var_name = [ 't' ] if nbSum==1 else [ 't_1', 't_2' ]
-		# states
+		# name of the intermediate variables and states
+		var_T = ('t',) if nbSum==1 else ('t_1', 't_2')
 		if transposed:
-			var_name.extend( 'x_%d(k)'%i for i in range(1,n+1) )
+			var_X = tuple( 'x_%d(k)'%i for i in range(1,n+1) )
 		else:
-			var_name.extend( 'u(k-%d)'%i for i in range(n,0,-1) )
-			var_name.extend( 'y(k-%d)'%i for i in range(n,0,-1) )
-		# output
-		var_name.append( 'y(k)')
+			var_X = [ 'u(k-%d)'%i for i in range(n,0,-1) ]
+			var_X.extend( 'y(k-%d)'%i for i in range(n,0,-1) )
+			var_X = tuple(var_X)
 
 		# build SIF
-		self._SIF = SIF( (J, K, L, M, N, P, Q, R, S) )
-		#TODO: do something with the var_name !! (ie add it in the Structure class)
+		self._SIF = SIF( (J, K, L, M, N, P, Q, R, S), varNameTX = ( var_T, var_X) )
+
 
 	@staticmethod
 	def canAcceptFilter(filter, **options):

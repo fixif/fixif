@@ -10,8 +10,8 @@ To Build a structure, we should
 - set the options (dictionary _possibleOptions)
 - if the structure cannot handle some filters (MIMO filters, for example), override the canAcceptFilter method
 - in the constructor:
-  - run manageOptions (that check if the options are correct, and store the options of the instance)
-  - set the SIF (_SIF)
+	- run manageOptions (that check if the options are correct, and store the options of the instance)
+	- set the SIF (_SIF)
 
 """
 
@@ -25,10 +25,9 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-import os
-from glob import glob
-import imp
+
 from itertools import izip, product
+
 
 class Structure(object):
 	"""
@@ -85,6 +84,7 @@ class Structure(object):
 	@property
 	def SIF(self):
 		return self._SIF
+
 
 
 def iterStructures(lti):
