@@ -1,7 +1,7 @@
 # coding: utf8
 
 """
-This file contains Object and methods for a LTI System
+This file contains Object and methods for a Linear Time Invariant System (called Filter)
 """
 
 __author__ = "Thibault Hilaire"
@@ -14,20 +14,17 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from fipogen.LTI import dSS,dTF
-from scipy.signal import butter
+from fipogen.LTI import dSS,dTF, random_dSS
+from numpy.random import seed as numpy_seed, randint
 
-
-class LTI(object):
+class Filter(object):
 	"""
 	A LTI (Linear Time Invariant) object is described either a transfer function and state-space
 	"""
 
-	_name = ''      # name of the LTI filter
-
 	def __init__(self, num=None, den=None, A=None, B=None, C=None, D=None, tf=None, ss=None, stable=None, name=''):
 		"""
-		Create a LTI from numerator and denominator OR from A,B,C,D matrices
+		Create a Filter from numerator and denominator OR from A,B,C,D matrices
 		Parameters
 		----------
 		num, den: numerator and denominator of the transfer function
@@ -48,7 +45,7 @@ class LTI(object):
 		elif ss is not None:
 			self._dSS = ss
 		else:
-			raise ValueError( 'LTI: the values given to the LTI constructor are not correct')
+			raise ValueError( 'Filter: the values given to the Filter constructor are not correct')
 
 		# is the filter stable?
 		if stable is None:
@@ -69,7 +66,7 @@ class LTI(object):
 	@property
 	def dTF(self):
 		if not self.isSISO():
-			raise ValueError( 'LTI: cannot convert a MIMO filter to dTF (not yet)')
+			raise ValueError( 'Filter: cannot convert a MIMO filter to dTF (not yet)')
 		if self._dTF is None:
 			self._dTF = self._dSS.to_dTF()
 		return self._dTF
@@ -100,33 +97,58 @@ class LTI(object):
 		"""
 		Returns True if the filter is known to be a Butterworth filter
 		"""
+		from fipogen.LTI import Butter
 		return self.__class__ == Butter
 
 
+	def __repr__(self):
+		return self._name
 
-class Butter(LTI):
 
-	def __init__(self, n, Wn, btype='low', name='Butterworth'):
-		"""
-		Create a Butterworth filter
-		Parameters
+
+def iter_random_Filter( number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True):
+	"""
+	Generate some n-th order stable random filter
+	Parameters
 		----------
-		N: (int) The order of the filter
-		W: (array-like) A scalar or length-2 sequence giving the critical frequencies. For a Butterworth filter, this is the point at which the gain drops to 1/sqrt(2) that of the passband (the “-3 dB point”). For digital filters, Wn is normalized from 0 to 1, where 1 is the Nyquist frequency, pi radians/sample. (Wn is thus in half-cycles / sample.) For analog filters, Wn is an angular frequency (e.g. rad/s).
+		- number: number of Butterworth filters generated
+		- n: (int) The order of the filter
+		- n: tuple (mini,maxi) number of states (default:  random between 5 and 10)
+		- p: number of outputs (default: 1)
+		- q: number of inputs (default: 1)
+		- seeded: (boolean) indicates if the random dSS should be done with a particular seed or not (in order to be reproductible, the seed is stored in the name of the filter)
 
-		btype: (string) {‘lowpass’, ‘highpass’, ‘bandpass’, ‘bandstop’}. Gives the type of filter (default is ‘lowpass’)
+	"""
+	seeds = [randint(0, 1e9) if seeded else None for i in range(number)]  # generate a particular seed for each random dSS, or None (if seeded is set to False)
+	for s in seeds:
+		yield random_Filter(n=n, p=p, q=q, seed=s)
 
-		see `http://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.signal.butter.html`
 
-		Returns a Butter object (LTI)
-		"""
-		self._stable = True
-		self._butterworth = True
-		self._dSS = None
-		num, den = butter(n, Wn, btype)
-		self._dTF = dTF( num, den)
-		self._name = name
 
-		self.n = n
-		self.Wn = Wn
-		self.btype = btype
+
+
+def random_Filter(n, p, q, seed=None):
+	"""
+	Generate a n-th order stable filter, with q inputs and p outputs
+
+	Parameters
+	----------
+		- n: tuple (mini,maxi) number of states (default:  random between 5 and 10)
+		- p: number of outputs (default: 1)
+		- q: number of inputs (default: 1)
+		- seed: if not None, indicates the seed toi use for the random part (in order to be reproductible, the seed is stored in the name of the filter)
+
+	Returns a Filter object
+	"""
+	# change the seed if asked
+	if seed:
+		numpy_seed(seed)
+		name = 'RandomFilter-%d'%seed
+	else:
+		name = 'RandomFilter'
+	# choose random size
+	nn = randint(*n)
+	pp = randint(*p)
+	qq = randint(*q)
+	# return a Filter from a random dSS
+	return Filter( ss=random_dSS(nn, pp, qq), name=name, stable=True)
