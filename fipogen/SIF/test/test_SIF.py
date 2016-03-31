@@ -19,8 +19,7 @@ import pytest
 from fipogen.SIF import SIF
 from numpy import matrix as mat
 from fipogen.Structures import iterStructures
-from fipogen.LTI.random import iter_random_dSS, iter_random_dTF
-from fipogen.LTI import LTI
+from fipogen.LTI import Filter, iter_random_dTF, iter_random_dSS
 
 
 #from func_aux.get_data import get_data
@@ -99,14 +98,14 @@ def test_construction():
 @pytest.mark.parametrize( "S", iter_random_dSS(4))
 def test_algoMIMO(S):
 
-	for R in iterStructures( LTI( ss=S) ):
+	for R in iterStructures(Filter(ss=S)):
 		#R.algorithmLaTeX('testlegend')
 		print( R.SIF.algorithmCdouble("myFunction") )
 
 @pytest.mark.parametrize("H", iter_random_dTF(4))
 def test_algoSISO(H):
 
-	for R in iterStructures(LTI(tf=H)):
+	for R in iterStructures(Filter(tf=H)):
 		# R.algorithmLaTeX('testlegend')
 		print(R.SIF.algorithmCdouble("myFunction"))
 

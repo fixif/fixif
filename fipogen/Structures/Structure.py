@@ -90,16 +90,16 @@ class Structure(object):
 def iterStructures(lti):
 	"""
 	Iterate over all the possible structures, to build (and return through a generator) all the possible realization
-	of a given LTI filter (lti)
+	of a given Filter filter (lti)
 	Parameters
 	----------
-	- lti: the filter (LTI object) we want to implement
+	- lti: the filter (Filter object) we want to implement
 
 	Returns
 	-------
 	a generator
 
-	>>>> f = LTI( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
+	>>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
 	>>>> for R in Structure.iterStructures(f):
 	>>>>    print(R)
 

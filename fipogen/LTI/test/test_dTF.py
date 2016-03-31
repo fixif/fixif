@@ -16,8 +16,7 @@ __status__ = "Beta"
 
 
 
-from fipogen.LTI import dTF
-from fipogen.LTI.random import iter_random_dTF
+from fipogen.LTI import dTF, iter_random_dTF
 
 import pytest
 

@@ -20,8 +20,7 @@ from numpy.linalg import eigvals
 from numpy.testing import assert_allclose
 from numpy.random import seed, randint
 
-from fipogen.LTI import dSS
-from fipogen.LTI.random import iter_random_dSS
+from fipogen.LTI import dSS, iter_random_dSS
 
 import pytest
 

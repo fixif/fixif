@@ -1,6 +1,7 @@
 #coding=utf8
 
 # This class describes a SISO transfer function
+from numpy.random.mtrand import randint, rand
 
 _author__ = "Thibault Hilaire"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -13,7 +14,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from numpy import ndenumerate, array, zeros
+from numpy import ndenumerate, array, zeros, matrix, matrix
 from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
@@ -86,7 +87,7 @@ class dTF(object):
 		"""
 		Transform the transfer function into a state-space
 		Parameters:
-		    - form: controllable canonical form ('ctrl') or observable canonical form ('obs')
+			- form: controllable canonical form ('ctrl') or observable canonical form ('obs')
 
 		"""
 		#TODO: code it without scipy
@@ -129,3 +130,39 @@ class dTF(object):
 		assert( norm(snum-onum)<eps )
 		assert( norm(sden-oden)<eps )
 
+
+
+
+
+def iter_random_dTF(number , order = (5, 10)):
+	"""
+	Generate some n-th order random (stable or not) SISO transfer functions
+
+	Parameters:
+		- number: number of state-space to generate
+		- order: tuple (mini,maxi) order of the filter (default:  random between 5 and 10)
+
+	Returns:
+		- returns a generator of dTF objects (to use in a for loop for example)
+
+	..Example::
+		>>> sys = list( iter_random_dTF( 12, (10,20)) )
+		>>> for S in iter_random_dTF( 12, (10,20)):
+		>>>		print( S.num )
+
+	"""
+	for i in range(number):
+		yield random_dTF( order )
+
+
+
+def random_dTF( order = (5, 10) ):
+	"""
+	Generate a n-th order random transfer function (not necessary stable)
+	Parameters:
+		- order: tuple (mini,maxi) order of the filter (default:  random between 5 and 10)
+	"""
+	n = randint(*order)
+	num = mat(rand(1,n))
+	den = mat(rand(1,n))
+	return dTF( num, den)

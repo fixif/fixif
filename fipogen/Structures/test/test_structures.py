@@ -12,10 +12,11 @@ __status__ = "Beta"
 
 
 
+from fipogen.Structures import iterStructures, LWDF
+from fipogen.LTI import Filter, iter_random_Filter
+from fipogen.LTI import iter_random_Butter
+from fipogen.LTI import iter_random_dTF
 
-from fipogen.LTI import LTI
-from fipogen.Structures import iterStructures,LWDF
-from fipogen.LTI.random import iter_random_dTF, iter_random_dSS, iter_random_Butter
 
 import pytest
 
@@ -28,22 +29,22 @@ def test_buildAllPossibleRealizationsFromdTF( H ):
 	"""
 	print('')
 
-	for R in iterStructures( LTI( tf=H, stable=False) ):
+	for R in iterStructures(Filter(tf=H, stable=False)):
 		print ( R.fullName +"\t")
 		H.assert_close( R.SIF.dSS.to_dTF() )
 
 
 
-@pytest.mark.parametrize( "S", iter_random_dSS(20, stable=True, n=(5, 15), p=(1, 2), q=(1, 2)))
-def test_buildAllPossibleRealizationsFromdSS( S ):
+@pytest.mark.parametrize( "F", iter_random_Filter(20, n=(5, 15), p=(1, 5), q=(1, 5)))
+def test_buildAllPossibleRealizationsFromdSS( F ):
 	"""
 	Check all the possible realizations
 	Check that the corresponding system (state-space) corresponds to the initial one
 	"""
 	print('')
-	for R in iterStructures( LTI( ss=S, stable=True)  ):
+	for R in iterStructures( F ):
 		print ( R.fullName +"\t")
-		S.assert_close( R.SIF.dSS )
+		F.dSS.assert_close( R.SIF.dSS )
 
 
 
