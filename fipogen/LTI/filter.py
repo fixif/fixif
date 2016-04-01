@@ -22,7 +22,7 @@ class Filter(object):
 	A LTI (Linear Time Invariant) object is described either a transfer function and state-space
 	"""
 
-	def __init__(self, num=None, den=None, A=None, B=None, C=None, D=None, tf=None, ss=None, stable=None, name=''):
+	def __init__(self, num=None, den=None, A=None, B=None, C=None, D=None, tf=None, ss=None, stable=None, name='noname'):
 		"""
 		Create a Filter from numerator and denominator OR from A,B,C,D matrices
 		Parameters

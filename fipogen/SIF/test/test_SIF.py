@@ -18,7 +18,7 @@ import pytest
 
 from fipogen.SIF import SIF
 from numpy import matrix as mat
-from fipogen.Structures import iterStructures
+from fipogen.Structures import iterAllRealizations
 from fipogen.LTI import Filter, iter_random_dTF, iter_random_dSS
 
 

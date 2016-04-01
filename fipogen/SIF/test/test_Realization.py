@@ -19,7 +19,7 @@ import pytest
 
 from fipogen.SIF import Realization
 from numpy import matrix as mat, zeros,eye
-from fipogen.Structures import iterStructures
+from fipogen.Structures import iterAllRealizations
 from fipogen.LTI import Filter, iter_random_dSS, iter_random_dTF
 
 
@@ -50,14 +50,14 @@ def test_construction(S):
 @pytest.mark.parametrize( "S", iter_random_dSS(4))
 def test_algoMIMO(S):
 
-	for R in iterStructures(Filter(ss=S)):
+	for R in iterAllRealizations(Filter(ss=S)):
 		#R.algorithmLaTeX('testlegend')
 		print( R.SIF.algorithmCdouble("myFunction") )
 
 @pytest.mark.parametrize("H", iter_random_dTF(4))
 def test_algoSISO(H):
 
-	for R in iterStructures(Filter(tf=H)):
+	for R in iterAllRealizations(Filter(tf=H)):
 		# R.algorithmLaTeX('testlegend')
 		print(R.SIF.algorithmCdouble("myFunction"))
 

@@ -16,7 +16,6 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fipogen.SIF import Realization
 from fipogen.Structures import Structure
 
 from numpy import matrix as mat
@@ -109,4 +108,4 @@ def acceptDFI(filter, **options):
 
 # build the Direct Form I
 # as an instance of the class structure
-DFI = Structure( name="Direct Form I", options={ "nbSum" : (1,2), "transposed" : (False,True) }, make=makeDFI, accept=acceptDFI)
+DFI = Structure( shortName='DFI', fullName="Direct Form I", options={ "nbSum" : (1,2), "transposed" : (False,True) }, make=makeDFI, accept=acceptDFI)

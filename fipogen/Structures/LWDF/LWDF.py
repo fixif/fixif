@@ -18,45 +18,43 @@ __status__ = "Beta"
 
 
 
-from fipogen.SIF import SIF
+
 from fipogen.Structures import Structure
-
 from numpy import matrix as mat
-from numpy import diagflat, zeros, eye, rot90, ones, r_, c_, atleast_2d
-from numpy.linalg import inv
-
-
-
 from matlab.engine import connect_matlab
-eng = connect_matlab()
-#eng.addpath('construct','fwrtoolbox')
+
+# global variable to store the matlab engine
+#TODO: put it in a dedicated module, so that everyone can access to it
+eng = None
 
 
-class LWDF(Structure):
-
-	_name = "Lattice Wave Digital Filter"              # name of the structure
-	_possibleOptions = None
 
 
-	def __init__(self, filter):
-		"""
+def makeLWDF( filter):
+	"""
 
-		"""
+	"""
+	# connect to matlab if not already connected
+	global eng
+	if eng is None:
+		eng = connect_matlab()
+		# eng.addpath('construct','fwrtoolbox')
 
-		# check the args
-		self.manageOptions()
+	# run appropriate function in matlab
+	#TODO (Nastia): insert appropriate Python code here -> :-)
+	eng.eval('R=ButterLWDF2FWR( %d, %f);'%(filter.n, filter.Wn), nargout=0)
+	R = eng.eval('struct(R)')
 
-		# call matlab
-		eng.eval('R=ButterLWDF2FWR( %d, %f);'%(filter.n, filter.Wn), nargout=0)
-		R = eng.eval('struct(R)')
-
-		# build SIF
-		self._SIF = SIF( (mat(R['J']), mat(R['K']), mat(R['L']), mat(R['M']), mat(R['N']), mat(R['P']), mat(R['Q']), mat(R['R']), mat(R['S'])) )
+	# build SIF
+	return { "JtoS": ( (mat(R['J']), mat(R['K']), mat(R['L']), mat(R['M']), mat(R['N']), mat(R['P']), mat(R['Q']), mat(R['R']), mat(R['S'])) ) }
 
 
-	@staticmethod
-	def canAcceptFilter(filter):
-		"""
-		return True only if the filter is a ODD Butterworth filter
-		"""
-		return filter.isButter() and (filter.n%2)==1
+
+def acceptLWDF(filter):
+	"""
+	a LWDF Realization can be build only if the filter is a ODD Butterworth filter
+	"""
+	return filter.isButter() and (filter.n%2)==1
+
+
+LWDF = Structure( shortName='LWDF', fullName="Lattice Wave Digital Filter", make=makeLWDF, accept=acceptLWDF)

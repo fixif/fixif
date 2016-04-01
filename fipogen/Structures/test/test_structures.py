@@ -12,7 +12,7 @@ __status__ = "Beta"
 
 
 
-from fipogen.Structures import iterStructures, LWDF
+from fipogen.Structures import iterAllRealizations, LWDF
 from fipogen.LTI import Filter, iter_random_Filter
 from fipogen.LTI import iter_random_Butter
 from fipogen.LTI import iter_random_dTF
@@ -22,41 +22,29 @@ import pytest
 
 
 
-@pytest.mark.parametrize( "H", iter_random_dTF(10))
-def test_DFI( H ):
-	"""
-	Test Direct Form I
-	"""
-	R = DFI.makeRealization( Filter(tf=H, stable=False) )
-	print ( R )
-	H.assert_close( R.dSS.to_dTF() )
-
-
-
-
 @pytest.mark.parametrize( "H", iter_random_dTF(20))
-def test_buildAllPossibleRealizationsFromdTF( H ):
+def test_buildAllPossibleSISORealizationsFromdTF( H ):
 	"""
 	Check all the SISO structures (including MIMO structures)
 	check that the correspong transfer function is equal to the initial transfer function
 	"""
 	print('')
 
-	for R in iterStructures(Filter(tf=H, stable=False)):
-		print ( R.fullName +"\t")
+	for R in iterAllRealizations(Filter(tf=H, stable=False)):
+		print ( R.name +"\t")
 		H.assert_close( R.dSS.to_dTF() )
 
 
 
 @pytest.mark.parametrize( "F", iter_random_Filter(20, n=(5, 15), p=(1, 5), q=(1, 5)))
-def test_buildAllPossibleRealizationsFromdSS( F ):
+def test_buildAllPossibleMIMORealizationsFromdSS( F ):
 	"""
 	Check all the possible realizations
 	Check that the corresponding system (state-space) corresponds to the initial one
 	"""
 	print('')
-	for R in iterStructures( F ):
-		print ( R.fullName +"\t")
+	for R in iterAllRealizations(F):
+		print ( R.name +"\t")
 		F.dSS.assert_close( R.dSS )
 
 
@@ -67,5 +55,5 @@ def test_LWDF( H ):
 	Check the LWDF structure
 	check that the correspong transfer function is equal to the initial transfer function
 	"""
-	R = LWDF( H)
+	R = LWDF.makeRealization( H)
 	H.dTF.assert_close( R.dSS.to_dTF(), eps=1e-4 )

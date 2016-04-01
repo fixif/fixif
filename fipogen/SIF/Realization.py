@@ -85,6 +85,9 @@ class Realization(SIF):
 	def filter(self):
 		return self._filter
 
+	@property
+	def name(self):
+		return "Realization `%s` for filter `%s`"%(self._structureName, self._filter.name )
 
 	def __str__(self):
-		return "Realization `%s` for filter `%s`\n%s"%(self._structureName, self._filter.name, SIF.__str__(self) )
+		return self.name + "\n" + SIF.__str__(self)
