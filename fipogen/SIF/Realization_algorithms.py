@@ -17,7 +17,8 @@ from numpy import tril, all, r_, c_
 from datetime import datetime
 from re import compile, sub
 
-# list of methods to be added to the SIF class
+
+# list of methods to be added to the Realization class
 __all__ = [ "algorithmCdouble", "algorithmLaTeX"]
 
 

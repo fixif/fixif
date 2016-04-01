@@ -27,67 +27,86 @@ __status__ = "Beta"
 
 
 from itertools import izip, product
+from fipogen.SIF import Realization
 
 
 class Structure(object):
 	"""
-	- name: name of the structure
+	- _name: name of the structure
+	- _options: dictionary discribing the possible options (name of the option -> tuple of possible values for the option; 1st value is the DEFAULT value for this option)
+	- _make: "factory" function to call to make/build a realization
+	- _accept: function indicating if the structure can accept a filter
 	"""
 
-	_possibleOptions = None         # dictionary of options and their possible values (ex. { 'isScaled': (True,False) })
-									#   key: name of the option
-									#   value: list of possible values
-	_name = ""                      # name of the structures
 
 
+	def __init__(self, name, make, accept, options=None):
+		self._name = name
+		self._options = options
+		self._make = make
+		self._accept = accept
 
-	def __str__(self):
-		"""
-		Return string describing the structured SIF
-		"""
-		return "Structured realization (" + self.fullName + ")\n" + str(self.SIF)
+		# store it in the list of possible structures
+
 
 
 	@property
 	def name(self):
 		return self._name
 
-	@property
-	def fullName(self):
-		return self._name + " (" + ", ".join( '%s:%s'%(key,str(val)) for key,val in self._options.items() ) + ")"
 
 
-	@staticmethod
-	def canAcceptFilter(filter, **options):
+	def makeRealization(self, filter, **options):
 		"""
-		Each structure should redefine this method
-		It returns True if the structure can be applied for that filter and these options
-		(for example, some structures can be applied for SISO filters, or stable filters, or even, depending on the options, it can or it cannot)
+		Factory function
+		Return the structured realization of a given filter
+		the options passed should correspond to the possible options of the structure
+		if no value is passed for a given option, the DEFAULT value for is option (1st value in the tuple of possible values) is chosen
 		"""
-		return True
+		if self._options:
+			Ropt = { k:v[0] for k,v in self._options.items() }
+		else:
+			Ropt = {}
+		# check the options
+		for opt, val in options.items():
+			if self._options is None:
+				raise ValueError( self._name + ": the option " + opt + "=" + str(val) + " is not correct")
+			if opt not in self._options:
+				raise ValueError( self._name + ": the input argument " + opt + " doesn't exist")
+			if val not in self._options[opt]:
+				raise ValueError( self._name + ": the option " + opt + "=" + str(val) + " is not correct")
+			# fill the dictionary of option's value with the options given
+			Ropt[opt] = val
+
+		# call the "factory" function
+		d = self._make( filter, **Ropt)
+		structName = self._name + " (" + ", ".join( '%s:%s'%(key,str(val)) for key,val in Ropt.items() ) + ")"
+
+		# build the realization
+		return Realization( filter, structureName = structName, **d)
 
 
-	def manageOptions(self, **options):
-		"""
-		Check the options and store them
-		"""
-		self._options = options
-		for opt,val in options.items():
-			if self._possibleOptions is None:
-				raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
-			if opt not in self._possibleOptions:
-				raise ValueError( self.__class__.__name__ + ": the input argument " + opt + " doesn't exist")
-			if val not in self._possibleOptions[opt]:
-				raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
-
-
-	@property
-	def SIF(self):
-		return self._SIF
 
 
 
-def iterStructures(lti):
+	# def manageOptions(self, **options):
+	# 	"""
+	# 	Check the options and store them
+	# 	"""
+	# 	self._options = options
+	# 	for opt,val in options.items():
+	# 		if self._possibleOptions is None:
+	# 			raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
+	# 		if opt not in self._possibleOptions:
+	# 			raise ValueError( self.__class__.__name__ + ": the input argument " + opt + " doesn't exist")
+	# 		if val not in self._possibleOptions[opt]:
+	# 			raise ValueError( self.__class__.__name__ + ": the option " + opt + "=" + str(val) + " is not correct")
+
+
+
+
+
+def iterStructures(filter):
 	"""
 	Iterate over all the possible structures, to build (and return through a generator) all the possible realization
 	of a given Filter filter (lti)
@@ -113,8 +132,8 @@ def iterStructures(lti):
 			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
 			vl = ( dict(izip(cls._possibleOptions, x)) for x in product(*cls._possibleOptions.itervalues()) )
 			for options in vl:
-				if cls.canAcceptFilter(lti, **options):
-					yield cls(lti, **options)
+				if cls.canAcceptFilter(filter, **options):
+					yield cls(filter, **options)
 		else:
-			if cls.canAcceptFilter(lti):
-				yield cls(lti)
+			if cls.canAcceptFilter(filter):
+				yield cls(filter)

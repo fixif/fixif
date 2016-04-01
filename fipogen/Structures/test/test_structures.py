@@ -16,9 +16,22 @@ from fipogen.Structures import iterStructures, LWDF
 from fipogen.LTI import Filter, iter_random_Filter
 from fipogen.LTI import iter_random_Butter
 from fipogen.LTI import iter_random_dTF
-
+from fipogen.Structures import DFI
 
 import pytest
+
+
+
+@pytest.mark.parametrize( "H", iter_random_dTF(10))
+def test_DFI( H ):
+	"""
+	Test Direct Form I
+	"""
+	R = DFI.makeRealization( Filter(tf=H, stable=False) )
+	print ( R )
+	H.assert_close( R.dSS.to_dTF() )
+
+
 
 
 @pytest.mark.parametrize( "H", iter_random_dTF(20))
@@ -31,7 +44,7 @@ def test_buildAllPossibleRealizationsFromdTF( H ):
 
 	for R in iterStructures(Filter(tf=H, stable=False)):
 		print ( R.fullName +"\t")
-		H.assert_close( R.SIF.dSS.to_dTF() )
+		H.assert_close( R.dSS.to_dTF() )
 
 
 
@@ -44,7 +57,7 @@ def test_buildAllPossibleRealizationsFromdSS( F ):
 	print('')
 	for R in iterStructures( F ):
 		print ( R.fullName +"\t")
-		F.dSS.assert_close( R.SIF.dSS )
+		F.dSS.assert_close( R.dSS )
 
 
 
@@ -55,4 +68,4 @@ def test_LWDF( H ):
 	check that the correspong transfer function is equal to the initial transfer function
 	"""
 	R = LWDF( H)
-	H.dTF.assert_close( R.SIF.dSS.to_dTF(), eps=1e-4 )
+	H.dTF.assert_close( R.dSS.to_dTF(), eps=1e-4 )

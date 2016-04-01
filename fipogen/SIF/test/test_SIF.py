@@ -79,10 +79,6 @@ def test_construction():
 		assert mySIF.p == p
 		assert mySIF.q == q
 
-		assert len(mySIF._varNameT) == l
-		assert len(mySIF._varNameX) == n
-		assert len(mySIF._varNameY) == p
-		assert len(mySIF._varNameU) == q
 
 
 		# test the construction with not consistent matrices
@@ -92,22 +88,6 @@ def test_construction():
 			with pytest.raises(ValueError):
 				t = SIF(myJtoS)
 
-
-
-
-@pytest.mark.parametrize( "S", iter_random_dSS(4))
-def test_algoMIMO(S):
-
-	for R in iterStructures(Filter(ss=S)):
-		#R.algorithmLaTeX('testlegend')
-		print( R.SIF.algorithmCdouble("myFunction") )
-
-@pytest.mark.parametrize("H", iter_random_dTF(4))
-def test_algoSISO(H):
-
-	for R in iterStructures(Filter(tf=H)):
-		# R.algorithmLaTeX('testlegend')
-		print(R.SIF.algorithmCdouble("myFunction"))
 
 
 
