@@ -18,13 +18,13 @@ __status__ = "Beta"
 
 
 from fipogen.LTI import dSS
-from fipogen.func_aux.dynMethodAdder import dynMethodAdder
+from fipogen.func_aux import dynMethodAdder
 import numpy as np
 
-from numpy import c_, r_, eye, zeros, all, transpose
+from numpy import c_, r_, eye, zeros, matrix as mat
 from numpy.linalg import inv
 from math import log
-
+from copy import copy
 
 
 def isTrivial ( x, epsilon ):
@@ -207,6 +207,17 @@ class SIF(object):
 	@property
 	def Z( self ):
 		return self._Z
+
+	@property
+	def Zcomp(self):
+		"""
+		Zcomp is the matrix Z modified, used for the computation
+		it's Z, except that the term `J` has zeros on its diagonal
+		"""
+		Zcomp = copy(self._Z)
+		Zcomp[0:self._l,0:self._l] = -self.J + eye(self._l) # to set to 0 the diagonal terms of J
+		return Zcomp
+
 
 	@property
 	def dZ( self ):
@@ -461,3 +472,30 @@ class SIF(object):
 
 
 
+	def simulate(self, u):
+		"""
+		Compute the outputs of the SIF with the inputs u
+		2 dimension is time (N samples)
+		Parameters:
+			- u: a q*N matrix
+		Returns:
+			- y: a p*N matrix
+		"""
+		u=mat(u)
+		N = u.shape[1]
+		if u.shape[0] != self._q:
+			raise ValueError( "SIF.simulate: u should be a %d*N matrix"%self._q )
+		y = mat(zeros( (self._p,N) ))
+
+		xk = mat(zeros( (self._n,1) ))	# TODO: add the possibility to start with a non-zero state
+		t = mat(zeros( (self._l, 1) ))
+		Jcomp = self.J-eye(self._l)
+
+		# loop to compute the outputs
+		for i in range(N):
+			t = Jcomp*t + self.M*xk + self.N*u[:,i]
+			xkp1 = self.K*t + self.P*xk + self.Q*u[:,i]
+			y[:,i] = self.L*t + self.R*xk + self.S*u[:,i]
+			xk = xkp1
+
+		return y

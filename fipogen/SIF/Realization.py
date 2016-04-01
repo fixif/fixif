@@ -15,6 +15,8 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
+
+
 from fipogen.SIF import SIF
 from fipogen.func_aux import dynMethodAdder
 
@@ -35,7 +37,7 @@ def genVarName(baseName, nbVar):
 
 
 
-#@dynMethodAdder
+@dynMethodAdder
 class Realization(SIF):
 	"""
 	a Realization is a structured SIF object implementing a particular filter

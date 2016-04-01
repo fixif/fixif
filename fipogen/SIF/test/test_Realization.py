@@ -18,10 +18,11 @@ __status__ = "Beta"
 import pytest
 
 from fipogen.SIF import Realization
-from numpy import matrix as mat, zeros,eye
-from fipogen.Structures import iterAllRealizations
-from fipogen.LTI import Filter, iter_random_dSS, iter_random_dTF
+from numpy import matrix as mat, zeros,eye, empty, float64
 
+from fipogen.Structures import iterAllRealizations
+from fipogen.LTI import Filter, iter_random_Filter, iter_random_dSS
+from scipy.weave import inline
 
 #from func_aux.get_data import get_data
 #from func_aux.MtlbHelper import MtlbHelper
@@ -47,20 +48,39 @@ def test_construction(S):
 
 
 
-@pytest.mark.parametrize( "S", iter_random_dSS(4))
-def test_algoMIMO(S):
+@pytest.mark.parametrize( "F", iter_random_Filter(5))
+def test_implementCdouble(F):
+	N = 10
+	for R in iterAllRealizations( F ):
+		print(str(R.name)+"\t")
+		u = 300*rand( N, F.q)					# random input of N samples
+		yC = zeros( (N, F.p), dtype=float64)	# empty output to be computed by the `implementCdouble` code
+		y = R.simulate(u.transpose()).transpose()
 
-	for R in iterAllRealizations(Filter(ss=S)):
-		#R.algorithmLaTeX('testlegend')
-		print( R.SIF.algorithmCdouble("myFunction") )
+		func = R.implementCdouble("myFunction")
+		pu_str = '*pu' if R.q==1 else 'pu'
+		if R.p==1:
+			iteration  = "*py = myFunction( %s, xk);"%pu_str
+		else:
+			iteration = "myFunction( py, %s, xk);"%pu_str
+		code = """
+		double xk[%d];
+		double *pu = &u[0,0];
+		double *py = &yC[0,0];
+		for( int i=0; i<N; i++)
+		{
+			%s
+			pu += %d;
+			py += %d;
+		}
+		"""%(R.n, iteration, R.q, R.p)
 
-@pytest.mark.parametrize("H", iter_random_dTF(4))
-def test_algoSISO(H):
+		inline(code, ['N', 'u', 'yC'], support_code=func)
 
-	for R in iterAllRealizations(Filter(tf=H)):
-		# R.algorithmLaTeX('testlegend')
-		print(R.SIF.algorithmCdouble("myFunction"))
+		print(y-yC)
 
+
+		assert_allclose(y, yC, atol=1e-5)
 
 
 
