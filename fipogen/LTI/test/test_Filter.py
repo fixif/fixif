@@ -15,8 +15,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fipogen.LTI import Filter
-from fipogen.LTI.Butter import iter_random_Butter
+from fipogen.LTI import Filter, random_Filter, iter_random_Filter
+from fipogen.LTI import iter_random_Butter
 
 import pytest
 
@@ -50,3 +50,9 @@ def test_construction( ):
 @pytest.mark.parametrize( "H", iter_random_Butter(20, onlyEven=True))
 def test_butter( H ):
 	print(H.dTF)
+
+@pytest.mark.parametrize( "H", iter_random_Filter(20, seeded=True, type='all'))
+def test_randomFilter(H):
+
+	F = random_Filter( name=H.name)
+	F.dSS.assert_close(H.dSS)
