@@ -28,7 +28,7 @@ __status__ = "Beta"
 
 from itertools import izip, product
 from fipogen.SIF import Realization
-
+from fipogen.LTI.Filter import iter_random_Filter
 
 class Structure(object):
 	"""
@@ -130,6 +130,20 @@ def iterAllRealizations(filter):
 		else:
 			if st.canAcceptFilter(filter):
 				yield st.makeRealization(filter)
+
+
+
+def iterAllRealizationsRandomFilter(number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True, type='all'):
+	"""
+	Iterate over all the possible structures (exactly like iterAllRealizations), except that it does it for `number` random filters
+	it just call iterAllRealization for all the random filters
+	Parameters are those of iter_random_Filter
+	"""
+	for F in iter_random_Filter( number, n, p, q, seeded, type):
+		for R in iterAllRealizations(F):
+			yield R
+
+
 
 
 

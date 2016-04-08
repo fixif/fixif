@@ -488,14 +488,11 @@ class SIF(object):
 		y = mat(zeros( (self._p,N) ))
 
 		xk = mat(zeros( (self._n,1) ))	# TODO: add the possibility to start with a non-zero state
-		t = mat(zeros( (self._l, 1) ))
-		Jcomp = self.J-eye(self._l)
 
 		# loop to compute the outputs
 		for i in range(N):
-			t = Jcomp*t + self.M*xk + self.N*u[:,i]
-			xkp1 = self.K*t + self.P*xk + self.Q*u[:,i]
-			y[:,i] = self.L*t + self.R*xk + self.S*u[:,i]
+			xkp1 = self.AZ*xk + self.BZ*u[:,i]
+			y[:,i] = self.CZ*xk + self.DZ*u[:,i]
 			xk = xkp1
 
 		return y

@@ -47,11 +47,11 @@ def test_construction( ):
 	L=Filter(A=[[1, 2], [3, 4]], B=[[1], [2]], C=[[1, 2]], D=3, num=[1, 2, 3], den=[0, 6 , 7])
 
 
-@pytest.mark.parametrize( "H", iter_random_Butter(20, onlyEven=True))
+@pytest.mark.parametrize( "H", iter_random_Butter(20, onlyEven=True), ids=lambda x:x.name)
 def test_butter( H ):
 	print(H.dTF)
 
-@pytest.mark.parametrize( "H", iter_random_Filter(20, seeded=True, type='all'))
+@pytest.mark.parametrize( "H", iter_random_Filter(20, seeded=True, type='all'), ids=lambda x:x.name)
 def test_randomFilter(H):
 
 	F = random_Filter( name=H.name)

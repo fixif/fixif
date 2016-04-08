@@ -37,7 +37,7 @@ def genCvarNames(baseName, nbVar):
 
 def implementCdouble(self, funcName):
 	"""
-	Returns (as a string) the C-code (with double coefficients) corresping to the SIF self
+	Returns (as a tuple of two strings) the C-code (with double coefficients) correspoding to the SIF self AND the C-code calling this function
 	The C code is generated from the template `algorithmC_template.c` in the folder directory
 
 	Parameters:
@@ -95,7 +95,9 @@ def implementCdouble(self, funcName):
 	cDict['InVar'] = ', '.join(signature)
 
 	# declare the output variable if necessary, and all the intermediate variables
-	cDict['ExtraVar'] = '\tdouble ' + ", ".join(strXkp) + ";\n"
+	cDict['ExtraVar'] = ''
+	if not isPlt:
+		cDict['ExtraVar'] += '\tdouble ' + ", ".join(strXkp) + ";\n"
 	if p == 1:
 		cDict['ExtraVar'] += '\tdouble y;'
 
@@ -107,9 +109,14 @@ def implementCdouble(self, funcName):
 	comp = []
 	for i in range(0, l+n+p):
 		comp.append( "\t" + strTXY[i] + " = " + scalarProduct( strTXU, self.Zcomp[i,:], self.dZ[i,:] ) + ";\n" )
-	cDict["InterComp"] = "".join( comp[0:l] )
+	cDict["InterComp"] = "".join( "\tdouble "+ t for t in comp[0:l] )
 	cDict["StatesComp"] = "".join( comp[l:l+n] )
 	cDict["OutComp"] = "".join( comp[l+n:] )
+
+	# if l>0:
+	# 	cDict["InterComp"] += 'printf("T=' + "%a, "*l + '\\n",' + ", ".join(strT) + ');\n'
+	# cDict["StatesComp"] += 'printf("X=' + "%a, "*n + '\\n",' + ", ".join(strXk) + ');\n'
+	# cDict["OutComp"] += 'printf("Y=' + "%a, " * p + '\\n",' + ", ".join(strY) + ');\n' + 'printf("U=' + "%a, " * q + '\\n",' + ", ".join(strU) + ');'
 
 
 	# permutation
@@ -120,13 +127,30 @@ def implementCdouble(self, funcName):
 		for i in range(n):
 			cDict['Permutations'] +=  "\t" + strXk[i] + " = " + strXkp[i] + ";\n"
 
-	cDict['Return'] = "return 12;\n" if p==1 else "=".join(strY)+"=0;\n"
-
 	if p==1:
 		cDict['return'] = "\treturn y;"
 
-	cRender = cTemplate.render(**cDict)
-
-	return cRender
+	funcCode = cTemplate.render(**cDict)
 
 
+
+
+	pu_str = '*pu' if self.q == 1 else 'pu'
+	if self.p == 1:
+		iteration = "*py = %s( %s, xk);" % (funcName,pu_str)
+	else:
+		iteration = "%s( py, %s, xk);" % (funcName,pu_str)
+	callingCode = """
+	double xk[%d]={0};
+	double *pu = u;
+	double *py = yC;
+	for( int i=0; i<N; i++)
+	{
+		%s
+		pu += %d;
+		py += %d;
+	}
+	""" % (self.n, iteration, self.q, self.p)
+
+
+	return funcCode, callingCode

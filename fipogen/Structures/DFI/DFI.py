@@ -60,20 +60,30 @@ def makeDFI( filter, nbSum=1, transposed=True):
 	else:
 		J = mat( [[1,0],[-1,1]])
 		K = c_[ zeros((2*n,1)), r_[ zeros((n,1)), atleast_2d(1), zeros((n-1, 1)) ]]
-		L = mat( [[0, 1]])
+		L = mat( [[0,1]])
 		M = r_[  c_[ num[0,1:], zeros((1,n))], c_[ zeros((1,n)), -den[0,1:]]  ]
 		N = mat( [ [num[0,0]], [0] ])
 
 
 	# transposed form
 	if transposed:
+
 		K, M = M.transpose(), K.transpose()
 		P = P.transpose()
 		R, Q = Q.transpose(), R.transpose()
 		L, N = N.transpose(),L.transpose()
-		J = J.transpose()       # no need to really do this, since J in scalar
+		J = J.transpose()
 		S = S.transpose()       # no need to really do this, since S in scalar
 
+		if nbSum==2:
+			# we should do something to keep J lower triangular
+			T = mat(rot90(eye(2)))		#l=2
+			invT=inv(T)
+			J = invT * J * T
+			K = K * T
+			L = L * T
+			M = invT * M
+			N = invT * N
 	else:
 		# transformation to 'optimize' the code, ie to make P upper triangular, so that there is no need to keep x(k+1) and x(k) in the same time in memory
 		T = mat(rot90(eye(2*n)))
@@ -83,6 +93,8 @@ def makeDFI( filter, nbSum=1, transposed=True):
 		M = M*T
 		P = invT*P*T
 		Q = invT*Q
+
+
 
 	# name of the intermediate variables and states
 	var_T = ('t',) if nbSum==1 else ('t_1', 't_2')

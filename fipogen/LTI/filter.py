@@ -19,7 +19,7 @@ from numpy.random import seed as numpy_seed, randint, choice
 from re import compile
 
 
-regRF = compile("RandomFilter-\(([0-9]+),([0-9]+)\)/\(([0-9]+),([0-9]+)\)/\(([0-9]+),([0-9]+)\)-([0-9]+)")	# used to recognize random filter names
+regRF = compile("RandomFilter-([0-9]+)/([0-9]+)/([0-9]+)-([0-9]+)")	# used to recognize random filter names
 
 
 
@@ -156,24 +156,27 @@ def iter_random_Filter( number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True
 	for s in seeds:
 		if type not in pq.keys():
 			type = choice( pq.keys() )
-		yield random_Filter(n=n, p=pq[type][0], q=pq[type][1], seed=s)
+		nn = randint(*n)
+		pp = randint(*pq[type][0])
+		qq = randint(*pq[type][1])
+		yield random_Filter(n=nn, p=pp, q=qq, seed=s)
 
 
 
 
 
-def random_Filter(n=(5,10), p=(1,5), q=(1,5), seed=None, name=None):
+def random_Filter(n=10, p=5, q=5, seed=None, name=None):
 	"""
 	Generate a n-th order stable filter, with q inputs and p outputs
 
 	Parameters
 	----------
-		- n: tuple (mini,maxi) number of states (default:  random between 5 and 10)
-		- p: tuple (mini (incl.) ,maxi (exclus.)) for the number of outputs
-		- q: tuple (mini (incl.) ,maxi (exclus.)) for the number of inputs
+		- n: number of states (default: 10)
+		- p: number of outputs (default: 5)
+		- q: number of inputs (default: 5)
 		- seed: if not None, indicates the seed toi use for the random part (in order to be reproductible, the seed is stored in the name of the filter)
 		- name: used to build a random filter from a string (a name of a filter previously built with random_Filter)
-			-> should be of the form 'RandomFilter-(5,10)/(1,2)/(1,10)-12345678'
+			-> should be of the form 'RandomFilter-7/1/4-12345678'
 
 	Returns a Filter object
 	"""
@@ -181,22 +184,18 @@ def random_Filter(n=(5,10), p=(1,5), q=(1,5), seed=None, name=None):
 		m=regRF.match(name)
 		if m:
 			res = tuple( map( int, m.groups()) )
-			n = res[0:2]
-			p = res[2:4]
-			q = res[4:6]
-			seed = res[6]
+			n = res[0]
+			p = res[1]
+			q = res[2]
+			seed = res[3]
 		else:
-			raise ValueError( "randomFilter: the string should be a valid string, ie be like (RandomFilter-(5,10)/(1,2)/(1,10)-12345678'")
+			raise ValueError( "randomFilter: the string should be a valid string, ie be like 'RandomFilter-7/1/4-12345678'")
 	# change the seed if asked
 	if seed:
 		numpy_seed(seed)
-		t= n+p+q+(seed,)
-		name = 'RandomFilter-(%d,%d)/(%d,%d)/(%d,%d)-%d'%t	# for example 'RandomFilter-(5,10)/(1,2)/(1,10)-12345678' for a MISO filter (#states between 5 and 10, #inputs between 1 and 10), seed=12345678)
+		name = 'RandomFilter-%d/%d/%d-%d'%(n,p,q,seed)	# for example 'RandomFilter-(5,10)/(1,2)/(1,10)-12345678' for a MISO filter (#states between 5 and 10, #inputs between 1 and 10), seed=12345678)
 	else:
 		name = 'RandomFilter'
-	# choose random size
-	nn = randint(*n)
-	pp = randint(*p)
-	qq = randint(*q)
+
 	# return a Filter from a random dSS
-	return Filter( ss=random_dSS(nn, pp, qq), name=name, stable=True)
+	return Filter( ss=random_dSS(n, p, q), name=name, stable=True)

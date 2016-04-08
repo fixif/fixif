@@ -20,8 +20,8 @@ import pytest
 from fipogen.SIF import Realization
 from numpy import matrix as mat, zeros,eye, empty, float64
 
-from fipogen.Structures import iterAllRealizations
-from fipogen.LTI import Filter, iter_random_Filter, iter_random_dSS
+from fipogen.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
+from fipogen.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
 from scipy.weave import inline
 
 #from func_aux.get_data import get_data
@@ -47,41 +47,57 @@ def test_construction(S):
 
 
 
+seed(120)
+N = 10
+u = 300 * rand(N, 3)# random input of N samples
 
-@pytest.mark.parametrize( "F", iter_random_Filter(5))
+#@pytest.mark.parametrize( "F", iter_random_Filter(10, q=(3,4), type='MIMO'), ids=lambda x: x.name)
+@pytest.mark.parametrize( "F", [ random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
 def test_implementCdouble(F):
-	N = 10
+
+
+
+
+
 	for R in iterAllRealizations( F ):
+	#for R in [DFI.makeRealization(F, transposed=False, nbSum=2)]:
 		print(str(R.name)+"\t")
-		u = 300*rand( N, F.q)					# random input of N samples
-		yC = zeros( (N, F.p), dtype=float64)	# empty output to be computed by the `implementCdouble` code
+
 		y = R.simulate(u.transpose()).transpose()
+		yC = zeros((N, F.p), dtype=float64)  # empty output to be computed by the `implementCdouble` code
+		func,run_code = R.implementCdouble("myFunction")
 
-		func = R.implementCdouble("myFunction")
-		pu_str = '*pu' if R.q==1 else 'pu'
-		if R.p==1:
-			iteration  = "*py = myFunction( %s, xk);"%pu_str
-		else:
-			iteration = "myFunction( py, %s, xk);"%pu_str
-		code = """
-		double xk[%d];
-		double *pu = &u[0,0];
-		double *py = &yC[0,0];
-		for( int i=0; i<N; i++)
-		{
-			%s
-			pu += %d;
-			py += %d;
-		}
-		"""%(R.n, iteration, R.q, R.p)
+		print( R )
+		print( func)
 
-		inline(code, ['N', 'u', 'yC'], support_code=func)
+		inline(run_code, ['N', 'u', 'yC'], support_code=func, verbose=0, force=1)
 
-		print(y-yC)
+		print(u)
+		print(y)
+		print(yC)
 
 
 		assert_allclose(y, yC, atol=1e-5)
 
+
+
+
+@pytest.mark.parametrize( "R", iterAllRealizationsRandomFilter(1), ids=lambda x: x.name)
+def test_rea2(R):
+	N = 10
+	u = 300 * rand(N, R.filter.q)  # random input of N samples
+	yC = zeros((N, R.filter.p), dtype=float64)  # empty output to be computed by the `implementCdouble` code
+
+	print(str(R.name) + "\t")
+
+	y = R.simulate(u.transpose()).transpose()
+	func, run_code = R.implementCdouble("myFunction")
+	inline(run_code, ['N', 'u', 'yC'], support_code=func, verbose=0, force=1)
+	assert_allclose(y, yC, atol=1e-5)
+
+	R.filter.dSS.assert_close( R.dSS )
+	if R.filter.isSISO():
+		R.filter.dTF.assert_close( R.dSS.to_dTF() )
 
 
 
