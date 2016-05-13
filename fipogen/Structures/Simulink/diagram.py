@@ -8,7 +8,7 @@ from blocks import *
 
 class System(object):
 
-	def __init__(self, xmlStr):
+	def __init__(self, xmlStr, constants):
 		"""
 		Parameters:
 		- xmlStr: string containing the xml
@@ -16,7 +16,8 @@ class System(object):
 		self.blocks = {} # a dictionary of sid:block
 		self.lines = []
 		self.equations = []
-	
+		self.constants = constants
+
 		self.tree = etree.fromstring(xmlStr) # load xml from file
 		self.syspath = "/ModelInformation/Model/System"
 
@@ -25,6 +26,7 @@ class System(object):
 		self.flattendesign() # eliminate subsys block box 
 		self.fillblocksiolist() # update in/out blocks list of all blocks
 		self.equations = self.buildequations() # build a simplified relationship of all blocks
+
 
 
 	def parsesys(self, etree, syspath):		
@@ -46,7 +48,10 @@ class System(object):
 		for b in blockels:
 			blocktype = b.get("BlockType")
 			try:
-				newblock = blockclass[blocktype](b)
+				if blocktype=='Gain':
+					newblock = blockclass[blocktype](b,self.constants)
+				else:
+					newblock = blockclass[blocktype](b)
 			except KeyError:
 				print blocktype + " is an unsupported block"
 				sys.exit()

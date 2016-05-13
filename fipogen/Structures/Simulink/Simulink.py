@@ -31,10 +31,11 @@ from numpy import mat
 from fipogen.LTI.Filter import random_Filter
 
 
-def importSimulink( fileName):
+def importSimulink( fileName, constants={}):
 	""" create a Realization object from a Simulink diagram (a slx file)
 	Parameters:
 		- fileName: name of the slx file
+		- constants: dictionary of name->value, to give values to constant used in gain blocks
 	"""
 	# check slx file
 	if not is_zipfile(fileName):
@@ -49,7 +50,7 @@ def importSimulink( fileName):
 			raise ValueError("importSimulink: `blockdiagram.xml` not found")
 
 	# processing the `blockdiagram.xml` file
-	mysys = System( blockdiagram )
+	mysys = System( blockdiagram, constants )
 	# blocks and lines
 	mysys.printblocks()
 	mysys.printlines()

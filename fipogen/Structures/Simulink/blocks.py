@@ -31,13 +31,18 @@ class Block(object):
 
 
 class Gain(Block):
-	def __init__(self, bel):
+	def __init__(self, bel, constants={}):
 		super(Gain, self).__init__(bel)
 
 		self.gain = 1.0 # assign 1.0 if not present in P tag ( not given by user in diagram)		
 		for p in bel.findall("P"):
 			if p.get("Name") == "Gain":
-				self.gain = float(p.text)		
+				if p.text in constants:
+					self.gain = constants[ p.text ]
+				else:
+					# TODO: Warning!! FLOAT conversion !!!!
+					#TODO: manage when the conversion is not possible (ie a constant that is not in the constants dictionary
+					self.gain = float(p.text)
 
 	def ischained(self):		
 		"""to know if there is a Gain block in the output of current Gain block
@@ -67,7 +72,7 @@ class Sum(Block):
 		# Determine I/O port number 
 		for p in bel.findall("P"):
 			if p.get("Name") == "Ports":
-		   		iotext = p.text # [2, 1]-> 2 inputs / 1 output
+				iotext = p.text # [2, 1]-> 2 inputs / 1 output
 
 				n = len(iotext)
 				iochar = iotext[1:n-1].partition(',')
@@ -76,8 +81,8 @@ class Sum(Block):
 
 		# parse input sign string
 		for p in bel.findall("P"):
-		 if p.get("Name") == "Inputs":
-		   	signtext = p.text # |++ -> 1st:+ / 2nd:+
+			if p.get("Name") == "Inputs":
+				signtext = p.text # |++ -> 1st:+ / 2nd:+
 		# process inputs sign string and build input sign list
 		for c in signtext:
 			if c == '+' or c == '-':
@@ -101,7 +106,7 @@ class SubSystem(Block):
 
 		# Find Subsystem I/O port number
 		for p in bel.findall("P"):
-			 if p.get("Name") == "Ports":
+			if p.get("Name") == "Ports":
 				iotext = p.text # [2, 1]-> 2 inputs / 1 output
 		
 				n = len(iotext)
@@ -158,7 +163,7 @@ class Inport(Block):
 		super(Inport, self).__init__(bel)
 		self.port = 1
 		for p in bel.findall("P"):
-			 if p.get("Name") == "Port":
+			if p.get("Name") == "Port":
 				self.port = p.text
 
 

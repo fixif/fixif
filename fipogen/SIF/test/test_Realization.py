@@ -51,8 +51,8 @@ seed(120)
 N = 10
 u = 300 * rand(N, 3)# random input of N samples
 
-#@pytest.mark.parametrize( "F", iter_random_Filter(10, q=(3,4), type='MIMO'), ids=lambda x: x.name)
-@pytest.mark.parametrize( "F", [ random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
+@pytest.mark.parametrize( "F", iter_random_Filter(10, q=(3,4), type='MIMO'), ids=lambda x: x.name)
+#@pytest.mark.parametrize( "F", [ random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
 def test_implementCdouble(F):
 
 

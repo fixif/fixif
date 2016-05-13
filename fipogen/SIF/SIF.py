@@ -496,3 +496,9 @@ class SIF(object):
 			xk = xkp1
 
 		return y
+
+
+	def to_dTF(self):
+		"""Convert into a dTF object
+		"""
+		return self.dSS.to_dTF()
