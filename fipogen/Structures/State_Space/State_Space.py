@@ -26,7 +26,7 @@ def makeSS( filter, form=None ):
 	Factory function to make a Direct Form II Realization
 
 	One option:
-	- transposed: (boolean) indicates if the realization is transposed (Direct Form II or Direct Form II transposed)
+	- form: None, 'balanced', 'ctrl' or 'obs'
 
 	Returns
 	- a dictionary of necessary infos to build the Realization

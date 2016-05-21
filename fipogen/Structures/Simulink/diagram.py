@@ -340,15 +340,15 @@ class System(object):
 		return tblocks	
 	
 	def printblocks(self):
-		print "\nBlocks list : ", len(self.blocks)
-		print "[SID, BlockType, Name, inputs]"
+		print "\x1b[32m\nBlocks list : ", len(self.blocks)
+		print "\x1b[0m[SID, BlockType, Name, inputs]"
 		for sid in self.blocks:
 			block = self.getblockbysid(sid)
 			print block.sid, block.type, block.name, [b.sid for b in block.inlist.values()] 
 
 	def printlines(self):
-		print "\nLines list : ", len(self.lines)
-		print "[Src, Dst]"
+		print "\x1b[32m\nLines list : ", len(self.lines)
+		print "\x1b[0m[Src, Dst]"
 		for line in self.lines:
 			print line
 
@@ -363,6 +363,9 @@ class System(object):
 		sum = [self.getblockbysid(teq.out) for teq in self.equations if self.getblockbysid(teq.out).type == 'Sum']
 		t = [bs.name for bs in sum if  bs.isoutblock() == False]
 		y = [bs.name for bs in sum if  bs.isoutblock() == True]
+		# add support for output on Gain block
+		g = [xeq.out for xeq in self.equations if self.getblockbysid(xeq.out).type == 'Gain']
+		y += [s for s in g if  self.getblockbysid(s).isoutblock() == True]
 		return (u,x,t,y)
 
 	

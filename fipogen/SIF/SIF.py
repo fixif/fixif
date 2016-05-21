@@ -135,10 +135,11 @@ class SIF(object):
 
 	def _build_M1M2N1N2( self ):
 		# compute the useful matrices M1, M2, N1 and N2
-		self._q1 = c_[self.K * self._invJ, eye(self._n), zeros((self._n, self._p))]
-		self._q2 = c_[self.L * self._invJ, zeros((self._p, self._n)), eye(self._p)]
-		self._N1 = r_[self._invJ * self.M, eye(self._n), zeros((self._q, self._n))]
-		self._N2 = r_[self._invJ * self.N, zeros((self._n, self._q)), eye(self._q)]
+		self._M1 = c_[self.K * self._invJ, eye(self._n), zeros((self._n, self._p))]
+		self._M2 = c_[self.L * self._invJ, zeros((self._p, self._n)), eye(self._p)]
+		self._N1 = r_[self._invJ * self.M, self.AZ, self.CZ ]
+		self._N2 = r_[self._invJ * self.N, self.BZ, self.DZ]
+
 
 	def _build_dZ( self, dJtodS ):
 		"""
@@ -502,3 +503,13 @@ class SIF(object):
 		"""Convert into a dTF object
 		"""
 		return self.dSS.to_dTF()
+
+
+	@property
+	def Hu(self):
+		"""return the Hu state-space"""
+		return dSS(self.AZ, self.BZ, self._N1, self._N2)
+
+	@property
+	def Hepsilon(self):
+		return dSS(self.AZ, self._M1, self.CZ, self._M2)

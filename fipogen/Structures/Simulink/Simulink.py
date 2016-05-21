@@ -75,6 +75,8 @@ def importSimulink( fileName, constants={}):
 	mysif = sif.Sif(l, m, n, p)
 	# build the corresponding SIF
 	mysif.build(mysys)
+
+
 	mysif.reorganize()
 	print "\n\nSIF corresponding to initial diagram:"
 	print mysif	
@@ -85,7 +87,9 @@ def importSimulink( fileName, constants={}):
 	print "inter t", t
 	print "output y", y
 
-	return Realization(random_Filter(5,1,1), (mat(mysif.J), mat(mysif.K), mat(mysif.L), mat(mysif.M), mat(mysif.N), mat(mysif.P), mat(mysif.Q), mat(mysif.R), mat(mysif.S)))
+	return Realization( None,
+						(mat(mysif.J,dtype='float'), mat(mysif.K,dtype='float'), mat(mysif.L,dtype='float'), mat(mysif.M,dtype='float'), mat(mysif.N,dtype='float'), mat(mysif.P,dtype='float'), mat(mysif.Q,dtype='float'), mat(mysif.R,dtype='float'), mat(mysif.S,dtype='float')),
+						structureName='Simulink (%f)'%fileName)
 
 
 

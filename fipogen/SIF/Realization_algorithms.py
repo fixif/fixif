@@ -23,7 +23,7 @@ __all__ = [ "algorithmLaTeX"]
 
 
 
-def algorithmLaTeX(R, out_file, caption=None):
+def algorithmLaTeX(R, out_file=None, caption=None):
 
 	"""
 

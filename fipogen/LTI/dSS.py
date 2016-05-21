@@ -367,7 +367,7 @@ class dSS(object):
 					set_printoptions(formatter={'float_kind':lambda x:x.hex()})
 					print(self)
 					raise ValueError( "WCPG: cannot compute WCPG")
-				self._WCPG = W
+				self._WCPG = mat(W)
 			except:
 				raise ValueError( "dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
 

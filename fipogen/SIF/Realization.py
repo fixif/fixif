@@ -19,7 +19,7 @@ __status__ = "Beta"
 
 from fipogen.SIF import SIF
 from fipogen.func_aux import dynMethodAdder
-
+from fipogen.LTI import Filter
 
 
 
@@ -76,7 +76,11 @@ class Realization(SIF):
 		self._varNameY = genVarName( 'y', self._p)
 
 		# store the filter
-		self._filter = filter
+		if filter is not None:
+			self._filter = filter
+		else:
+			# build the filter from the SIF...
+			self._filter = Filter( tf=self.to_dTF() )
 
 		# store the structure infos
 		self._structureName = structureName

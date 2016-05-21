@@ -14,7 +14,8 @@ class Block(object):
 		self.sid = bel.get("SID") # find a tag attribute named SID
 		self.name = bel.get("Name")
 		self.type = bel.get("BlockType")
-		self.inlist = {} 
+		self.label = ""
+		self.inlist = {}
 		self.outlist = []
 		#Block.nbr += 1
 
@@ -33,8 +34,9 @@ class Block(object):
 class Gain(Block):
 	def __init__(self, bel, constants={}):
 		super(Gain, self).__init__(bel)
+		self.label = "k"+self.sid
 
-		self.gain = 1.0 # assign 1.0 if not present in P tag ( not given by user in diagram)		
+		self.gain = 1.0 # assign 1.0 if not present in P tag ( not given by user in diagram)
 		for p in bel.findall("P"):
 			if p.get("Name") == "Gain":
 				if p.text in constants:
@@ -44,7 +46,9 @@ class Gain(Block):
 					#TODO: manage when the conversion is not possible (ie a constant that is not in the constants dictionary
 					self.gain = float(p.text)
 
-	def ischained(self):		
+
+
+	def ischained(self):
 		"""to know if there is a Gain block in the output of current Gain block
 			--> to be used to handle Gain chain"""
 		for block in self.outlist:
@@ -56,7 +60,8 @@ class Gain(Block):
 class Delay(Block):
 	def __init__(self, bel):
 		super(Delay,self).__init__(bel)
-		self.delay = 1 # assign 1 if not present in P tag ( not given by user in diagram)		
+		self.delay = 1 # assign 1 if not present in P tag ( not given by user in diagram)
+		self.label = "x"+self.sid
 		for p in bel.findall("P"):
 			if p.get("Name") == "DelayLength":
 				self.delay = int(p.text)
@@ -68,8 +73,9 @@ class Sum(Block):
 		self.outports = 1
 		self.inports = 2
 		self.inportsign = []
+		self.label = "t"+self.sid
 
-		# Determine I/O port number 
+		# Determine I/O port number
 		for p in bel.findall("P"):
 			if p.get("Name") == "Ports":
 				iotext = p.text # [2, 1]-> 2 inputs / 1 output
@@ -99,21 +105,22 @@ class Sum(Block):
 class SubSystem(Block):
 	def __init__(self, bel):
 		super(SubSystem, self).__init__(bel)
-		self.subsysel = bel.find("System") # find a tag (element) 
+		self.subsysel = bel.find("System") # find a tag (element)
 		self.outports = 0
 		self.inports = 0
-		self.ioconnex = [] 
+		self.ioconnex = []
+		self.label = "sub"+self.sid
 
 		# Find Subsystem I/O port number
 		for p in bel.findall("P"):
 			if p.get("Name") == "Ports":
 				iotext = p.text # [2, 1]-> 2 inputs / 1 output
-		
+
 				n = len(iotext)
 				iochar = iotext[1:n-1].partition(',')
 				self.inports = int(iochar[0])
 				self.outports = int(iochar[2])
-	
+
 		# Find i/o port connection in subsys
 		# Generate an imaginary line for each connextion found
 		for b in self.subsysel.findall("Block"): # b:block in the subsys
@@ -127,30 +134,30 @@ class SubSystem(Block):
 				dstp = '1' # scalar Inport
 
 				srctext = srcb + "#out:" + srcp
-				dsttext = dstb + "#in:" + dstp	
+				dsttext = dstb + "#in:" + dstp
 				newline = Line(srctext, dsttext)
 				self.ioconnex.append(newline)
-		
+
 			if b.get("BlockType") == 'Outport':
 				srcb = b.get("SID")
 				dstb = self.sid
 				srcp = '1' # scalar Outport
-				
-				dstp = '1' 
+
+				dstp = '1'
 				for p in b.findall("P"):
 					if p.get("Name") == 'Port':
 						dstp = p.text
 
 				srctext = srcb + "#out:" + srcp
-				dsttext = dstb + "#in:" + dstp	
+				dsttext = dstb + "#in:" + dstp
 				newline = Line(srctext, dsttext)
 				self.ioconnex.append(newline)
-	
-		# lines number must match I/O ports number			
+
+		# lines number must match I/O ports number
 		assert len(self.ioconnex) == self.inports + self.outports
 
-	
-	def __str__(self): # for debug : just print all generated lines 
+
+	def __str__(self): # for debug : just print all generated lines
 		strio = ""
 		for line in self.ioconnex:
 			strio += str(line) + " "
@@ -162,18 +169,22 @@ class Inport(Block):
 	def __init__(self, bel):
 		super(Inport, self).__init__(bel)
 		self.port = 1
+		self.label = "u"+self.sid
 		for p in bel.findall("P"):
 			if p.get("Name") == "Port":
 				self.port = p.text
+
 
 
 class Outport(Block):
 	def __init__(self, bel):
 		super(Outport, self).__init__(bel)
 		self.port = 1
+		self.label = "y"+self.sid
 		for p in bel.findall("P"):
 			if p.get("Name") == "Port":
 				self.port = p.text
+
 
 
 class Line(object):
