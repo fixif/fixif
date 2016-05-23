@@ -49,6 +49,21 @@ def test_buildAllPossibleMIMORealizationsFromdSS( F ):
 
 
 
+@pytest.mark.parametrize( "F", iter_random_Filter(20, n=(5, 10), p=(1, 2), q=(1, 2)))
+def test_buildAllPossibleStableSISORealizationsFromdSS( F ):
+	"""
+	Check all the possible realizations
+	Check that the corresponding system (state-space) corresponds to the initial one
+	"""
+	print('')
+	for R in iterAllRealizations(F):
+		print ( R.name +"\t")
+		F.dSS.assert_close( R.dSS )
+
+
+
+
+
 @pytest.mark.parametrize( "H", iter_random_Butter(20, form='lowpass'))
 def test_LWDF( H ):
 	"""

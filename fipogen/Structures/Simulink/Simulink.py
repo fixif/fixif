@@ -10,7 +10,7 @@ Refactored later by Thibault Hilaire
 
 __author__ = "Maminionja Ravoson, Thibault Hilaire"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
-__credits__ = ["Maminionja Ravoson"]
+__credits__ = ["Maminionja Ravoson", "Thibault Hilaire"]
 
 __license__ = "CECILL-C"
 __version__ = "0.4"

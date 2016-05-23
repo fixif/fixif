@@ -6,6 +6,17 @@ arg : each block take in its constructor an etree element, a <tag> form xml
 """
 
 
+__author__ = "Maminionja Ravoson"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__ = ["Maminionja Ravoson", "Thibault Hilaire"]
+
+__license__ = "CECILL-C"
+__version__ = "0.4"
+__maintainer__ = "Thibault Hilaire"
+__email__ = "thibault.hilaire@lip6.fr"
+__status__ = "Beta"
+
+
 class Block(object):
 	#nbr = 0
 	def __init__(self, bel):

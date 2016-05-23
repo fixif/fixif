@@ -71,7 +71,7 @@ class Structure(object):
 		Factory function
 		Return the structured realization of a given filter
 		the options passed should correspond to the possible options of the structure
-		if no value is passed for a given option, the DEFAULT value for is option (1st value in the tuple of possible values) is chosen
+		if no value is passed for a given option, the DEFAULT value for is option (FIRST value in the tuple of possible values) is chosen
 		"""
 		if self._options:
 			Ropt = { k:v[0] for k,v in self._options.items() }

@@ -23,7 +23,7 @@ from numpy import eye, zeros
 
 def makeSS( filter, form=None ):
 	"""
-	Factory function to make a Direct Form II Realization
+	Factory function to make a state-space Realization
 
 	One option:
 	- form: None, 'balanced', 'ctrl' or 'obs'

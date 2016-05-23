@@ -55,6 +55,7 @@ class Realization(SIF):
 
 		- varNameTX: (varNameT, varNameX), where varNameT and varNameX are two lists containing the name of the variables T and X, respectively
 		- filter: the filter implemented by the Realization
+		- strucureName: name of a structure
 
 		Returns
 		-------
