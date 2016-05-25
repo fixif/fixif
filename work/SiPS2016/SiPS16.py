@@ -32,7 +32,7 @@ R1 = importSimulink("DFIItvertical.slx", constants=const1)
 
 
 # LWDF (using matlab/LWDFtoolbox)
-R2bis = LWDF.makeRealization(F)
+#R2bis = LWDF.makeRealization(F)
 const2 = {'g1' : 0.4905, 'g2' : 0.4543, 'g3' : 0.1910}
 R2 = importSimulink("LWDF_butter3.slx", constants=const2)
 
@@ -48,7 +48,7 @@ def wmin( R, epsilon):
 	return ceil( log( mat(R.Hepsilon.WCPG()) * mat(vceil2( R.Hu.WCPG()*ubar))/epsilon ,2)  ) + 1
 
 
-poids= lambda R,w: [x*(count_nonzero(R.dZ)+R.n+R.p) for x in w]
+poids= lambda R,w: [x*(count_nonzero(R.dZ)) for x in w]
 
 print( 'R1: wmin=%d'%wmin(R1,1e-2))
 print( 'R2: wmin=%d'%wmin(R2,1e-2))
@@ -62,8 +62,10 @@ plt.xlabel(r'Total number of bits used', fontsize=15)
 plt.ylabel(r'$\overline{\Delta y}$', fontsize=15)
 plt.legend(['Direct Form II transposed', 'Lattice Wave Digital Filter'])
 
+plt.draw()
+plt.show()
 
-tikz_save('error-bits.tex')
+#tikz_save('error-bits.tex')
 
 F.dTF.assert_close(R1.to_dTF())
 

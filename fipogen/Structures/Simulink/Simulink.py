@@ -89,7 +89,7 @@ def importSimulink( fileName, constants={}):
 
 	return Realization( None,
 						(mat(mysif.J,dtype='float'), mat(mysif.K,dtype='float'), mat(mysif.L,dtype='float'), mat(mysif.M,dtype='float'), mat(mysif.N,dtype='float'), mat(mysif.P,dtype='float'), mat(mysif.Q,dtype='float'), mat(mysif.R,dtype='float'), mat(mysif.S,dtype='float')),
-						structureName='Simulink (%f)'%fileName)
+						structureName='Simulink (%s)'%fileName)
 
 
 

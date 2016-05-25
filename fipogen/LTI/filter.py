@@ -82,6 +82,13 @@ class Filter(object):
 		return self._name
 
 	@property
+	def order(self):
+		if self._dTF:
+			return self._dTF.order
+		else:
+			return self._dSS.n
+
+	@property
 	def p(self):
 		"""
 		Returns the number of input
