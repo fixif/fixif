@@ -499,6 +499,53 @@ class SIF(object):
 		return y
 
 
+
+	def simulateMP(self, u):
+		"""
+		Compute the outputs of the SIF with the inputs u
+		2 dimension is time (N samples)
+		Parameters:
+			- u: a q*N matrix
+		Returns:
+			- y: a p*N matrix
+		"""
+
+		import mpmath as mp
+
+		N = u.shape[1]
+		if u.shape[0] != self._q:
+			raise ValueError( "SIF.simulate: u should be a %d*N matrix"%self._q )
+
+		mp.mp.dps = 150;
+		mp.mp.pretty = False
+		u=mp.matrix(u)
+
+		AZ = mp.matrix(self.AZ)
+		BZ = mp.matrix(self.BZ)
+		CZ = mp.matrix(self.CZ)
+		DZ = mp.matrix(self.DZ)
+
+		y = mp.matrix(zeros( (self._p,N) ))
+
+		xk = mp.matrix(zeros( (self._n,1) ))	# TODO: add the possibility to start with a non-zero state
+
+		# loop to compute the outputs
+		for i in range(N):
+			xkp1 = AZ*xk + BZ*u[:,i]
+			y[:,i] = CZ*xk + DZ*u[:,i]
+			xk = xkp1
+
+		return y
+
+
+
+
+
+
+
+
+
+
 	def to_dTF(self):
 		"""Convert into a dTF object
 		"""

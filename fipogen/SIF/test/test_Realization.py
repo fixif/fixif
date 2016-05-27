@@ -47,37 +47,33 @@ def test_construction(S):
 
 
 
-seed(120)
-N = 10
-u = 300 * rand(N, 3)# random input of N samples
+#seed(120)
+#N = 10
+#u = 300 * rand(1,N)# random input of N samples
 
-@pytest.mark.parametrize( "F", iter_random_Filter(10, q=(3,4), type='MIMO'), ids=lambda x: x.name)
+@pytest.mark.parametrize( "F", iter_random_Filter(10, type='SISO'), ids=lambda x: x.name)
 #@pytest.mark.parametrize( "F", [ random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
 def test_implementCdouble(F):
 
+	N = 10
+	u = 300 * rand(F.q,N)  # random input of N samples
 
-
-
+	from numpy.linalg import norm
 
 	for R in iterAllRealizations( F ):
-	#for R in [DFI.makeRealization(F, transposed=False, nbSum=2)]:
 		print(str(R.name)+"\t")
 
-		y = R.simulate(u.transpose()).transpose()
-		yC = zeros((N, F.p), dtype=float64)  # empty output to be computed by the `implementCdouble` code
-		func,run_code = R.implementCdouble("myFunction")
+		y = R.simulateMP(u)
+		yb = R.simulate(u)
+		yC = R.runCdouble(u)
 
-		print( R )
-		print( func)
-
-		inline(run_code, ['N', 'u', 'yC'], support_code=func, verbose=0, force=1)
-
-		print(u)
 		print(y)
+		print(yb)
 		print(yC)
 
 
-		assert_allclose(y, yC, atol=1e-5)
+
+		assert( norm( mat(y)-yC)<1e-3)
 
 
 
@@ -85,14 +81,12 @@ def test_implementCdouble(F):
 @pytest.mark.parametrize( "R", iterAllRealizationsRandomFilter(1), ids=lambda x: x.name)
 def test_rea2(R):
 	N = 10
-	u = 300 * rand(N, R.filter.q)  # random input of N samples
-	yC = zeros((N, R.filter.p), dtype=float64)  # empty output to be computed by the `implementCdouble` code
+	u = 300 * rand(R.filter.q,1)  # random input of N samples
 
 	print(str(R.name) + "\t")
 
-	y = R.simulate(u.transpose()).transpose()
-	func, run_code = R.implementCdouble("myFunction")
-	inline(run_code, ['N', 'u', 'yC'], support_code=func, verbose=0, force=1)
+	y = R.simulate(u)
+	yC = R.runCdouble(u)
 	assert_allclose(y, yC, atol=1e-5)
 
 	R.filter.dSS.assert_close( R.dSS )

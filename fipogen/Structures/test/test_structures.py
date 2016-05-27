@@ -32,7 +32,7 @@ def test_buildAllPossibleSISORealizationsFromdTF( H ):
 
 	for R in iterAllRealizations(Filter(tf=H, stable=False)):
 		print ( R.name +"\t")
-		H.assert_close( R.dSS.to_dTF() )
+		H.assert_close( R.dSS.to_dTF(), eps=1e-6 )
 
 
 
@@ -58,7 +58,8 @@ def test_buildAllPossibleStableSISORealizationsFromdSS( F ):
 	print('')
 	for R in iterAllRealizations(F):
 		print ( R.name +"\t")
-		F.dSS.assert_close( R.dSS )
+		#F.dSS.assert_close( R.dSS )
+		F.dTF.assert_close( R.to_dTF(), eps=1e-4)
 
 
 
@@ -71,4 +72,4 @@ def test_LWDF( H ):
 	check that the correspong transfer function is equal to the initial transfer function
 	"""
 	R = LWDF.makeRealization( H)
-	H.dTF.assert_close( R.dSS.to_dTF(), eps=1e-4 )
+	H.dTF.assert_close( R.to_dTF(), eps=1e-6 )

@@ -120,4 +120,4 @@ def acceptDFI(filter, **options):
 
 # build the Direct Form I
 # as an instance of the class structure
-DFI = Structure( shortName='DFI', fullName="Direct Form I", options={ "nbSum" : (1,2), "transposed" : (False,True) }, make=makeDFI, accept=acceptDFI)
+DFI = Structure( shortName='DirectForm', fullName="Direct Form I", options={ "nbSum" : (1,2), "transposed" : (False,True) }, make=makeDFI, accept=acceptDFI)

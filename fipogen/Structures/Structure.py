@@ -149,10 +149,10 @@ def iterAllRealizationsRandomFilter(number, n = (5, 10), p = (1, 5), q = (1, 5),
 
 def makeARealization( filter, realizationName, **options):
 	"""
-	Factory function to make a realization given its name (among 'DFI', 'DFII', etc.)
+	Factory function to make a realization given its name (among 'DirectForms', 'DFII', etc.)
 
 	>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
-	>>> R = Structure.makeARealization(f, 'DFI', transposed=True)
+	>>> R = Structure.makeARealization(f, 'DirectForms', transposed=True)
 	>>> print(R)
 
 	print the Direct Form I transposed realization of the filter

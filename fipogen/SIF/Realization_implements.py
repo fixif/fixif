@@ -16,8 +16,19 @@ from numpy import tril, all
 from datetime import datetime
 from fipogen.func_aux import scalarProduct
 
+from numpy import matrix as mat, zeros,eye, empty, float64
+from scipy.weave import inline
+
+import os
+from subprocess import call
+
+
+GENERATED_PATH = 'generated/code/'
+
+
+
 # list of methods to be added to the Realization class
-__all__ = ["implementCdouble"]
+__all__ = ["implementCdouble", "runCdouble"]
 
 
 
@@ -154,3 +165,24 @@ def implementCdouble(self, funcName):
 
 
 	return funcCode, callingCode
+
+
+def runCdouble(self, u, fileName='runCdouble'):
+	"""
+	Generates C code with double, compile it, and run it with the given input u
+	Parameters
+	----------
+	self: the SIF object
+	u: the input (qxN), where N is the number of samples
+	Returns:
+		the ouput (pxN)
+	"""
+	#u=mat(u, dtype=float64)
+	#u = zeros( u.shape, dtype=float64)
+	N = u.shape[1]
+	yC = zeros( (N,self.p), dtype=float64)  # empty output to be computed by the `implementCdouble` code
+
+	func,run_code = self.implementCdouble(fileName)
+	inline(run_code, ['N', 'u', 'yC'], support_code=func, verbose=1, force=1)
+
+	return yC.transpose()
