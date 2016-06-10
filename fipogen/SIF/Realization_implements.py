@@ -19,16 +19,22 @@ from fipogen.func_aux import scalarProduct
 from numpy import matrix as mat, zeros,eye, empty, float64
 from scipy.weave import inline
 
-import os
-from subprocess import call
+#used to build the Cython module
+from distutils.core import setup
+from distutils.extension import Extension
+from Cython.Distutils import build_ext
 
+from imp import load_dynamic, find_module, load_module
+
+import numpy
+from time import time
 
 GENERATED_PATH = 'generated/code/'
 
 
 
 # list of methods to be added to the Realization class
-__all__ = ["implementCdouble", "runCdouble"]
+__all__ = ["implementCdouble", "makeModule", "runCdouble"]
 
 
 
@@ -48,17 +54,15 @@ def genCvarNames(baseName, nbVar):
 
 def implementCdouble(self, funcName):
 	"""
-	Returns (as a tuple of two strings) the C-code (with double coefficients) correspoding to the SIF self AND the C-code calling this function
-	The C code is generated from the template `algorithmC_template.c` in the folder directory
+	Returns the C-code (with double coefficients) correspoding to the evaluation of SIF self for one time-step
 
 	Parameters:
 		- self: the SIF object
 		- funcName: name of the function
-		- commentName: name of the SIF to be added in the comment (the name of the structure ?)
 	"""
 
 	env = Environment( loader=PackageLoader('fipogen','SIF/templates'), trim_blocks=True, lstrip_blocks=True )
-	cTemplate = env.get_template('algorithmC_template.c')
+	cTemplate = env.get_template('implementC_template.c')
 
 	cDict = {}	# dictionary used to fill the template
 	cDict['funcName'] = funcName
@@ -141,33 +145,66 @@ def implementCdouble(self, funcName):
 	if p==1:
 		cDict['return'] = "\treturn y;"
 
-	funcCode = cTemplate.render(**cDict)
+	return cTemplate.render(**cDict)
 
 
 
+def makeModule(self):
+	"""
+	Generate C and Cython codes, compile them, build the Python module and import it
+	"""
 
-	pu_str = '*pu' if self.q == 1 else 'pu'
-	if self.p == 1:
-		iteration = "*py = %s( %s, xk);" % (funcName,pu_str)
+	env = Environment( loader=PackageLoader('fipogen','SIF/templates'), trim_blocks=True, lstrip_blocks=True )
+	cTemplate = env.get_template('runC_template.c')
+	cythonTemplate = env.get_template('runCython_template.pyx')
+
+	# empty dictionay used for the template
+	cDict = {}
+	if self._filter.isSISO():
+		cDict['SIFname'] = self.name + '\n' + str(self._filter.dTF)
 	else:
-		iteration = "%s( py, %s, xk);" % (funcName,pu_str)
-	callingCode = """
-	double xk[%d]={0};
-	double *pu = u;
-	double *py = yC;
-	for( int i=0; i<N; i++)
-	{
-		%s
-		pu += %d;
-		py += %d;
-	}
-	""" % (self.n, iteration, self.q, self.p)
+		cDict['SIFname'] = self.name + '\n' + str(self._filter.dSS)
+	cDict['date'] = datetime.now().strftime("%Y/%m/%d - %H:%M:%S")
+
+	pu_str = '*u' if self.q == 1 else 'u'
+	if self.p == 1:
+		cDict[ 'callImplementCdouble'] = '*y = implementCdouble(%s, xk);'%pu_str
+	else:
+		cDict['callImplementCdouble'] = 'implementCdouble(y, %s, xk);'%pu_str
+	cDict[ 'SIF' ] = self
+
+	# add the implement functions
+	cDict['implementFunctions'] = self.implementCdouble("implementCdouble")		# implementCdouble
+
+	# write the C file
+	with open(GENERATED_PATH+"runC.c", "w") as cFile:
+		cFile.write( cTemplate.render(**cDict) )	# write the C function containing the `implementC` functions and `runC` functions
+
+	# write the Cython file
+	with open(GENERATED_PATH+"runCython.pyx", "w") as cFile:
+		cFile.write(cythonTemplate.render(**cDict))  # write the Cython wrapper
+
+	# build all (in GENERATED_PATH)
+
+	uniqueName = 'runC'+str(time()).replace('.','')
+	setup(
+		cmdclass = {'build_ext': build_ext},
+		ext_modules = [ Extension(uniqueName,
+								sources=[GENERATED_PATH+"runCython.pyx", GENERATED_PATH+"runC.c"],
+								extra_compile_args=['-Wno-unused-function'],
+								include_dirs=[numpy.get_include()]) ],
+		script_args = ['build_ext', '--build-lib', GENERATED_PATH,  '--force']
+	)
+
+	# and finally import it
+	self._runModule = load_dynamic(uniqueName,GENERATED_PATH+uniqueName+'.so')
+	#f, pathname, desc = find_module( 'runC', ['.'])
+	#self._runModule = load_module('runC', f, pathname, desc)
 
 
-	return funcCode, callingCode
 
 
-def runCdouble(self, u, fileName='runCdouble'):
+def runCdouble(self, u):
 	"""
 	Generates C code with double, compile it, and run it with the given input u
 	Parameters
@@ -177,12 +214,9 @@ def runCdouble(self, u, fileName='runCdouble'):
 	Returns:
 		the ouput (pxN)
 	"""
-	#u=mat(u, dtype=float64)
-	#u = zeros( u.shape, dtype=float64)
-	N = u.shape[1]
-	yC = zeros( (N,self.p), dtype=float64)  # empty output to be computed by the `implementCdouble` code
+	if self._runModule is None:
+		self.makeModule()
 
-	func,run_code = self.implementCdouble(fileName)
-	inline(run_code, ['N', 'u', 'yC'], support_code=func, verbose=1, force=1)
+	ut = numpy.ascontiguousarray( u.transpose())
 
-	return yC.transpose()
+	return self._runModule.simCdouble( ut).transpose()

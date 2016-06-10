@@ -386,3 +386,4 @@ LGS = Structure( shortName='LGS', fullName="Li-Gevers-Sun", options={ "transpose
 LCW = Structure( shortName='LCW', fullName="Li-Chu-Wu", options={ "transposed" : (False,True) }, make=makeLCW, accept=acceptLGSLCW)
 
 #TODO: relire, recommenter en anglais, virer les listes (et mettre du numpy matrix à la place), etc.
+#TODO: et bien sûr, passer en multiprécision (et un jour savoir quelle précision est suffisante...)

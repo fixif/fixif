@@ -95,8 +95,12 @@ class Structure(object):
 		# build the realization
 		return Realization( filter, structureName = structName, **d)
 
-
-
+	def __call__(self, *args, **kwargs):
+		"""
+		Call the factory
+		StateSpace(filter, ...) is equivalent to StateSpace.makeRealization(filter,...)
+		"""
+		return self.makeRealization( *args, **kwargs)
 
 
 def iterAllRealizations(filter):

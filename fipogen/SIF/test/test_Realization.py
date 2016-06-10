@@ -16,12 +16,14 @@ __status__ = "Beta"
 
 
 import pytest
+from colorama import Fore
 
 from fipogen.SIF import Realization
 from numpy import matrix as mat, zeros,eye, empty, float64
 
 from fipogen.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
 from fipogen.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
+from fipogen.Structures import State_Space
 from scipy.weave import inline
 
 #from func_aux.get_data import get_data
@@ -51,31 +53,33 @@ def test_construction(S):
 #N = 10
 #u = 300 * rand(1,N)# random input of N samples
 
-@pytest.mark.parametrize( "F", iter_random_Filter(10, type='SISO'), ids=lambda x: x.name)
+@pytest.mark.parametrize( "F", iter_random_Filter(20, type='MIMO'), ids=lambda x: x.name)
 #@pytest.mark.parametrize( "F", [ random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
 def test_implementCdouble(F):
 
 	N = 10
-	u = 300 * rand(F.q,N)  # random input of N samples
+	u = 3000 * rand(F.q,N)  # random input of N samples
 
 	from numpy.linalg import norm
 
 	for R in iterAllRealizations( F ):
-		print(str(R.name)+"\t")
+		print( '\n'+Fore.RED + str(R.name)+ Fore.RESET+'\n\t')
 
-		y = R.simulateMP(u)
+		#y = R.simulateMP(u)
+
 		yb = R.simulate(u)
+
 		yC = R.runCdouble(u)
 
-		print(y)
-		print(yb)
-		print(yC)
+		assert( norm( yb-yC)<1e-5)
 
 
 
-		assert( norm( mat(y)-yC)<1e-3)
 
-
+def test_makeModule():
+	F = random_Filter()
+	R = State_Space(F)
+	R.makeModule()
 
 
 @pytest.mark.parametrize( "R", iterAllRealizationsRandomFilter(1), ids=lambda x: x.name)

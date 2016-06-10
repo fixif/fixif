@@ -71,5 +71,6 @@ def test_LWDF( H ):
 	Check the LWDF structure
 	check that the correspong transfer function is equal to the initial transfer function
 	"""
-	R = LWDF.makeRealization( H)
+	#R = LWDF.makeRealization( H)
+	R = LWDF(H)
 	H.dTF.assert_close( R.to_dTF(), eps=1e-6 )

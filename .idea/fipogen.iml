@@ -4,7 +4,12 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.cache" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
-      <excludeFolder url="file://$MODULE_DIR$/construct" />
+      <excludeFolder url="file://$MODULE_DIR$/construct/WCPG" />
+      <excludeFolder url="file://$MODULE_DIR$/construct/fipogen-v2" />
+      <excludeFolder url="file://$MODULE_DIR$/construct/fwrtoolbox" />
+      <excludeFolder url="file://$MODULE_DIR$/construct/pyFWR" />
+      <excludeFolder url="file://$MODULE_DIR$/construct/stage-m2-maminionja" />
+      <excludeFolder url="file://$MODULE_DIR$/fipogen/generated" />
     </content>
     <orderEntry type="jdk" jdkName="Virtualenv fipogen" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
