@@ -141,6 +141,7 @@ def FPF_service(FPForm,outputFormat):
 	options.addOptionalOption( "height",  lambda x:int(x), '1300' )		# used for jpg, png, tiff only (default value is very large, to let the user specify width=2000 without being blocked by the height:300)
 	options.addOptionalOption("bits", lambda x:str(x), "")										# value of the bits to be displayed
 	options.addOptionalOption("y_origin", lambda x:float(x), "0")
+	options.addOptionalOption("drawMissing", {"yes":True, "no":False}, "no")
 	# generate LaTeX code for the FPF only
 	latexFPF = F.LaTeX(**options.getValues())
 	# create and return image (or latex code)

@@ -170,7 +170,7 @@ class FPF(object):
 			return ( 0, 2**(self._msb-1) - 2**self.lsb) 
 			
 	
-	def LaTeX(self, y_origin=0, colors=None,  binary_point=False, label='no', notation='mlsb', numeric=False, intfrac=False, power2=False, hatches=None, bits=None, x_shift=0, **other_params):
+	def LaTeX(self, y_origin=0, colors=None,  binary_point=False, label='no', notation='mlsb', numeric=False, intfrac=False, power2=False, hatches=None, bits=None, x_shift=0, drawMissing=False, **other_params):
 		"""Generate the LaTeX version of the FPF -> only a grid, composed of sign, integer and fractional bits
 		
 		Each square is 1x1 square, and the point (0,y_origin) correspond to the binary-point position
@@ -188,7 +188,7 @@ class FPF(object):
 			- hatches: None if no hatches are displayed, otherwise hatches is a pair (msb,lsb) and hatches should be displayed for bits < msb and bits > lsb
 			- bits: None if no value for the bits is displayed, or a string of "0" and "1" giving the bit values to be displayed
 			- maxWL: (int) maximum wordlength to be plot. If the FPF has a longer wordlength, then some dots are plots, and not all the bits are exhibited
-			
+			- drawMissing: (boolean) draw the bits between the FPF and the binary-point position (when the FPF doesn't contain the binary-point), so that these "missing bits" can be shown
 		"""
 		# prepare the colors
 		if colors:
@@ -249,6 +249,12 @@ class FPF(object):
 		for l in range( -min(0,self._msb+1), -self._lsb ):
 			st += "\t\\draw (%f,%f) rectangle ++(1,1) [%s,%s] node[midway] {%s};\n"%(l+x_shift,y_origin, colors[0 if firstSigned else 2], pattern if -l<hatches[1]+1 	else '', bits.next() or ('s' if firstSigned else ''))
 			firstSigned=False
+		#dashed rectangle for "missing bits" around the binary-point position
+		if drawMissing:
+			for m in range(0, -self._msb-1):
+				st += "\t\\draw (%f,%f) [dashed] rectangle ++(1,1);\n" % (m+x_shift, y_origin)
+			for l in range(-self._lsb-1, 0):
+				st += "\t\\draw (%f,%f) [dashed] rectangle ++(1,1);\n" % (l+x_shift, y_origin)
 		# Binary-point position
 		if binary_point:
 			st +='\t\\draw[black,fill] (0,%f) circle [radius=0.1cm];\n'%(y_origin,)
@@ -258,9 +264,9 @@ class FPF(object):
 		elif label=='below':
 			st += '\t\\draw (%f,%f) node[below] {$%s$};\n'%((-self._lsb-self._msb-1)/2, y_origin,fpf_str)
 		elif label=='right':
-			st += '\t\\draw (%f,%f) node[right] {$%s$};\n'%(-self._lsb,y_origin+0.5,fpf_str)
+			st += '\t\\draw (%f,%f) node[right] {$%s$};\n'%(0 if drawMissing and self._lsb>0 else -self._lsb,y_origin+0.5,fpf_str)
 		elif label=='left':
-			st += '\t\\draw (%f,%f) node[left] {$%s$};\n'%(-self._msb-1,y_origin+0.5,fpf_str)
+			st += '\t\\draw (%f,%f) node[left] {$%s$};\n'%(0 if drawMissing and self._msb<0 else -self._msb-1,y_origin+0.5,fpf_str)
 		# Integer/fractional part display (with arrows)
 		if intfrac:
 			if self._msb+1!=0:
