@@ -546,6 +546,30 @@ class SIF(object):
 
 
 
+	def simplify(self):
+
+
+
+
+		return self
+
+	def computeDeltaSIF(self):
+		"""Compute an error filter deltaH which takes an error-vector as inputs
+		it has follwing form:
+			J M (I 0 0)^T
+			K P (0 I 0)^T
+			L R (0 0 I)^T
+				"""
+		E1 = np.bmat([np.eye(self.l, self.l), np.zeros([self.l, self.n]), np.zeros([self.l, self.p])])  # N
+		E2 = np.bmat([np.zeros([self.n, self.l]), np.eye(self.n, self.n), np.zeros([self.n, self.p])])  # Q
+		E3 = np.bmat([np.zeros([self.p, self.l]), np.zeros([self.p, self.n]), np.eye(self.p, self.p)])  # S
+
+		deltaH = SIF((self.J, self.K, self.L, self.M, E1, self.P, E2, self.R, E3))
+		return deltaH
+
+
+
+
 	def to_dTF(self):
 		"""Convert into a dTF object
 		"""

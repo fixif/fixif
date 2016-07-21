@@ -1,2 +1,3 @@
 from genScalarProduct import scalarProduct
 from dynMethodAdder import dynMethodAdder
+from write_matrix_hex import write_matrix_hex

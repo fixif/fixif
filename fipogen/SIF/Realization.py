@@ -20,6 +20,10 @@ __status__ = "Beta"
 from fipogen.SIF import SIF
 from fipogen.func_aux import dynMethodAdder
 from fipogen.LTI import Filter
+from fipogen.LTI import dSS
+
+import numpy as np
+
 
 from os import remove
 
@@ -76,6 +80,7 @@ class Realization(SIF):
 		self._varNameU = genVarName( 'u', self._q)
 		self._varNameY = genVarName( 'y', self._p)
 
+
 		# store the filter
 		if filter is not None:
 			self._filter = filter
@@ -94,7 +99,6 @@ class Realization(SIF):
 		if self._runModule is not None:
 			remove( self._runModule.__file__ )
 
-
 	@property
 	def filter(self):
 		return self._filter
@@ -105,3 +109,7 @@ class Realization(SIF):
 
 	def __str__(self):
 		return self.name + "\n" + SIF.__str__(self)
+
+
+
+

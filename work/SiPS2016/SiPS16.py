@@ -6,8 +6,8 @@ from numpy import vectorize,ones
 from numpy import mat, count_nonzero
 from math import log,ceil
 from fipogen.LTI import random_dSS
-import matplotlib.pyplot as plt
-from matplotlib2tikz import save as tikz_save
+#import matplotlib.pyplot as plt
+#from matplotlib2tikz import save as tikz_save
 
 import os
 
@@ -53,24 +53,5 @@ poids= lambda R,w: [x*(count_nonzero(R.dZ)) for x in w]
 print( 'R1: wmin=%d'%wmin(R1,1e-2))
 print( 'R2: wmin=%d'%wmin(R2,1e-2))
 
-
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
-
-plt.semilogy( poids(R1,wl),dy1,'-ob', poids(R2,wl),dy2,'-sr' )
-plt.xlabel(r'Total number of bits used', fontsize=15)
-plt.ylabel(r'$\overline{\Delta y}$', fontsize=15)
-plt.legend(['Direct Form II transposed', 'Lattice Wave Digital Filter'])
-
-plt.draw()
-plt.show()
-
-#tikz_save('error-bits.tex')
-
-F.dTF.assert_close(R1.to_dTF())
-
-print(F.dTF)
-print(R1.to_dTF())
-print(R2.to_dTF())
 
 
