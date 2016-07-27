@@ -9,18 +9,20 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
+from scipy import signal
 import numpy as np
 from numpy import all
 from fipogen.LTI import Filter
 from fipogen.LTI import dSS
 
+from fipogen.SIF import Realization
 from fipogen.SIF import SIF
 from fipogen.func_aux import dynMethodAdder
 
 import numpy as np
 
 # list of methods to be added to the Realization class
-__all__ = [ "compute_LSB_allvar", "compute_MSB_allvar", "compute_MSB_allvar_extended"]
+__all__ = ['compute_LSB_allvar', 'compute_MSB_allvar', 'compute_MSB_allvar_extended', 'generate_inputs']
 
 def compute_LSB_allvar(self, l_y_out):
 
@@ -35,6 +37,7 @@ def compute_LSB_allvar(self, l_y_out):
 	#we repartition the error budget equally for all variables
 	c = self.l + self.n + self.p
 
+
 	# In order to respect the overall error |deltaY(k)| < 2^(l_y_out-1)
 	# we need to compute the temporary, state and output variables with LSB l_i
 	# l_i = max(l_y_out) - g_i
@@ -43,9 +46,22 @@ def compute_LSB_allvar(self, l_y_out):
 
 	g = np.bmat([1 + max(np.ceil(np.log2(c * wcpgDeltaH[:,i]))) for i in range(0, c)])
 
+	for x in (g==np.inf):
+		if x.any():
+			print 'Divided by zero\n'
+
+
 	lsb = np.bmat([max(l_y_out) - g])
 
 	return lsb
+
+def generate_inputs(self, u_bar, N):
+	u = np.bmat(np.zeros([1,N]))
+	u[0,0] = self.dSS.D
+	for i in range(0,N):
+		u[0,i] = u_bar * np.sign(self.dSS.B * (self.dSS.A ** i) * self.dSS.C)
+
+	return u
 
 
 def compute_MSB_allvar(self, u_bar):

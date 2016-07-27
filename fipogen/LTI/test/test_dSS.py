@@ -105,6 +105,36 @@ def test_Gramians ( S ):
 	dSS._W_method = 'slycot1'
 
 
+@pytest.mark.parametrize( "S", iter_random_dSS(20, True, (5, 10), (1, 1), (1, 1), pBCmask=0.1))
+def test_wcpg_tf ( S ):
+
+	"""
+	Test Worst Case Peak Gain calculation
+	"""
+
+	def calc_wcpg_approx ( S, nit ):
+		"""Very bad WCPG approximation (we hope to get the first digits....)
+		Only used to compare with true, reliable Anastasia's WCPG"""
+
+		res = mat(zeros((S.p, S.q)))
+		powerA = mat(eye(S.n, S.n))
+
+		for i in range(0, nit):
+			res += absolute(S.C * powerA * S.B)
+			powerA = powerA * S.A
+
+		return res + absolute(S.D)
+
+
+	nit = 5000
+	rel_tol_wcpg = 1e-2
+
+	wcpg = calc_wcpg_approx(S, nit)
+	W = S.WCPG()
+
+	assert_allclose( array(W), array(wcpg), rtol=rel_tol_wcpg)
+
+
 @pytest.mark.parametrize( "S", iter_random_dSS(20, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
 def test_wcpg ( S ):
 

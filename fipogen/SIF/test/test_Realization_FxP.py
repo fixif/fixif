@@ -17,7 +17,9 @@ import numpy as np
 from numpy import all
 import time
 
-from fipogen.func_aux import write_matrix_hex
+import mpmath as mp
+
+from fipogen.func_aux import write_matrix_mpf, write_matrix_hex
 
 from fipogen.Structures import LWDF, DFII, State_Space
 
@@ -38,13 +40,23 @@ def test_computeMSBSIF():
 	nu = 1
 	ny = 1
 	nx = 5
-	F = random_Filter(nx, nu, ny)
-	SS = State_Space.makeRealization(F)
+	#F = random_Filter(nx, ny, nu)
+	F = Butter(5, 1.2)
+	SS = LWDF.makeRealization(F)
+
+	#a hardcoded example
+	#A = np.matrix([[-0.1721,  0.004845,    0.2187],[0.004845,  -0.08567,   -0.1096], [0.2187,   -0.1096,   -0.4978]])
+	#B = np.matrix([[1.533], [0], [0]])
+	#C = np.matrix([-0.2256,    1.117,   -1.089])
+	#D = np.matrix([0.03256])
+	#F = Filter(A=A,B=B,C=C,D=D)
+	#SS = State_Space.makeRealization(F)
 
 	u_bar = np.bmat([np.ones([1, nu])])
 	l_y_out = -16
 	msb_u = np.bmat([np.zeros([1, SS.q])])
 	lsb_u = -16 * np.bmat([np.ones([1, SS.q])])
+
 
 	msb = SS.compute_MSB_allvar(u_bar)
 	lsb = SS.compute_LSB_allvar(l_y_out)
@@ -77,6 +89,7 @@ def test_computeMSBSIF():
 		for i in range(0, SS.p):
 			f_handle.write('%d %d\n' % (msb_y[i], lsb_y[i]))
 
+
 		write_matrix_hex(f_handle, SS.Z, ' ')
 
 	f_handle.close()
@@ -89,16 +102,33 @@ def test_computeMSBSIF():
 	print 'MSBs:\n'
 	print msb
 
-	nSimulations = 100;
+	nSimulations = 200
 	u = np.random.rand(1,nSimulations)
-	y_simulated = SS.simulate(u)
+
+	#u = SS.generate_inputs(0.125, nSimulations)
+
+#	y_simulated = SS.simulate(u)
+	y_simulated = SS.simulateMP(u, 10000)
 
 	filename = fileID + 'simulation' + '.txt'
 	with open(filename, 'a') as f_handle:
-		f_handle.write('%d' % nSimulations)
-		write_matrix_hex(f_handle, u, ' ')
-		write_matrix_hex(f_handle, y_simulated, ' ')
+		f_handle.write('%d\n' % nSimulations)
+		for i in range(0,nSimulations):
+			for j in range (0, nu):
+				f_handle.write(u[j,i].hex() + ' ')
+			f_handle.write('\n')
+			for j in range(0,ny):
+				f_handle.write(str(y_simulated[j,i]) + ' ')
+			f_handle.write('\n')
+
 	f_handle.close()
+
+
+
+
+
+
+
 
 
 test_computeMSBSIF()

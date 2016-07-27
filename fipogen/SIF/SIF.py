@@ -18,7 +18,7 @@ __status__ = "Beta"
 
 
 from fipogen.LTI import dSS
-from fipogen.func_aux import dynMethodAdder
+from fipogen.func_aux import dynMethodAdder, python2mpf_matrix
 import numpy as np
 
 from numpy import c_, r_, eye, zeros, matrix as mat
@@ -463,7 +463,7 @@ class SIF(object):
 		def plural ( n ):
 			return 's' if n>1 else ''
 
-		mystr = "l={0}, n={1}, p={2}, q={3} ({0} intermediate variable{4}, {1} state{5}, {3} input{7}, {2} input{6})\n".format(
+		mystr = "l={0}, n={1}, p={2}, q={3} ({0} intermediate variable{4}, {1} state{5}, {3} input{7}, {2} output{6})\n".format(
 			self._l, self._n, self._p, self._q, plural(self._l), plural(self._n), plural(self._p), plural(self._q))
 		mystr += "Z = \n" + str(self._Z) + "\n"
 
@@ -500,7 +500,7 @@ class SIF(object):
 
 
 
-	def simulateMP(self, u):
+	def simulateMP(self, u, prec):
 		"""
 		Compute the outputs of the SIF with the inputs u
 		2 dimension is time (N samples)
@@ -516,18 +516,22 @@ class SIF(object):
 		if u.shape[0] != self._q:
 			raise ValueError( "SIF.simulate: u should be a %d*N matrix"%self._q )
 
-		mp.mp.dps = 150;
+		mp.mp.dps = prec
 		mp.mp.pretty = False
-		u=mp.matrix(u)
+		u = python2mpf_matrix(u)
+		#u=mp.matrix(u)
 
-		AZ = mp.matrix(self.AZ)
-		BZ = mp.matrix(self.BZ)
-		CZ = mp.matrix(self.CZ)
-		DZ = mp.matrix(self.DZ)
 
-		y = mp.matrix(zeros( (self._p,N) ))
 
-		xk = mp.matrix(zeros( (self._n,1) ))	# TODO: add the possibility to start with a non-zero state
+		AZ = python2mpf_matrix(self.AZ)
+		BZ = python2mpf_matrix(self.BZ)
+		CZ = python2mpf_matrix(self.CZ)
+		DZ = python2mpf_matrix(self.DZ)
+
+		y = mp.zeros(self._p,N)
+		#y = python2mpf_matrix(zeros( (self._p,N) ))
+		xk = mp.zeros(self._n,1)
+		#xk = python2mpf_matrix(zeros( (self._n,1) ))	# TODO: add the possibility to start with a non-zero state
 
 		# loop to compute the outputs
 		for i in range(N):

@@ -130,6 +130,46 @@ class dTF(object):
 		assert( norm(snum-onum)<eps )
 		assert( norm(sden-oden)<eps )
 
+	def WCPG_tf(self):
+
+		r"""
+		Compute the Worst Case Peak Gain of the state space
+
+		.. math::
+			\langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
+
+		Using algorithm developed in paper :
+		[CIT001]_
+
+		.. [CIT001]
+			Lozanova & al., calculation of WCPG
+
+		"""
+		# compute the WCPG value if it's not already done
+		if self._WCPG is None:
+
+			try:
+				num = array(self.num)
+				denum = array(self.den)
+				num_size = num.shape
+				den_size = denum.shape
+				W = empty((1, 1), dtype=float64)
+
+				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q);"
+				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'
+				err = inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support_code,
+							 libraries=["WCPG"])
+				if err == 0:
+					# change numpy display formatter, so that we can display the full coefficient in hex (equivalent to printf("%a",...) in C)
+					set_printoptions(formatter={'float_kind': lambda x: x.hex()})
+					print(self)
+					raise ValueError("WCPG_tf: cannot compute WCPG")
+				self._WCPG = mat(W)
+			except:
+				raise ValueError("dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
+
+		return self._WCPG
+
 
 
 
@@ -146,9 +186,9 @@ def iter_random_dTF(number , order = (5, 10)):
 		- returns a generator of dTF objects (to use in a for loop for example)
 
 	..Example::
-		>>> sys = list( iter_random_dTF( 12, (10,20)) )
-		>>> for S in iter_random_dTF( 12, (10,20)):
-		>>>		print( S.num )
+		#>>> sys = list( iter_random_dTF( 12, (10,20)) )
+		#>>> for S in iter_random_dTF( 12, (10,20)):
+		#>>>		print( S.num )
 
 	"""
 	for i in range(number):
@@ -166,3 +206,4 @@ def random_dTF( order = (5, 10) ):
 	num = mat(rand(1,n))
 	den = mat(rand(1,n))
 	return dTF( num, den)
+
