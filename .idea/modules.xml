@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$USER_HOME$/Progs/Labyrinth/.idea/Labyrinth.iml" filepath="$USER_HOME$/Progs/Labyrinth/.idea/Labyrinth.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/fipogen.iml" filepath="$PROJECT_DIR$/.idea/fipogen.iml" />
     </modules>
   </component>

@@ -12,7 +12,7 @@ from path import CACHE_PATH, GENERATED_PATH
 
 
 # Define the colors for the different color themes (named "BW" and "YG" for the moment)
-colorThemes = { "YG" : ("orange!60","yellow!30","green!15","Yellow&amp;Green") , "BW": ("black!60","black!30","white",'Black&amp;White'), "RB":("red!60","blue!30","purple!15","Red&amp;Blue") }
+colorThemes = { "YG" : ("orange!60","yellow!30","green!15","Yellow&amp;Green") , "BW": ("black!60","black!30","white",'Black&amp;White'), "RB":("red!40","blue!15","purple!15","Red&amp;Blue") }
 
 #Define the available image formats
 imageFormats = ('pdf','jpg','png','tiff','eps')
