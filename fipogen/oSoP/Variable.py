@@ -4,8 +4,8 @@
 The Variable class allows to represent variables in fixed-point arithmetic
 """
 
-from FPF import FPF
-from Constant import Constant
+from fipogen.oSoP import FPF
+from fipogen.oSoP import Constant
 from math import floor, log
 
 ########################################################################
@@ -43,10 +43,10 @@ class Variable(object):
 		# check for good combination of given arguments
 		#TODO: assert or raise error ?
 		if not ((value_inf is not None and value_sup is not None and wl and not (signed or fpf or integer_inf or integer_sup)) \
-				    or (value_inf is not None and value_sup is not None and wl and signed is not None and not (fpf or integer_inf or integer_sup)) \
-				    or (value_inf is not None and value_sup is not None and fpf and integer_inf is not None and integer_sup is not None and not (wl or (signed is not None))) \
-				    or (value_inf is not None and value_sup is not None and fpf and not (wl or (signed is not None) or integer_inf or integer_sup)) \
-				    or (fpf and not (value_inf or value_sup or wl or (signed is not None) or integer_inf or integer_sup))):
+					or (value_inf is not None and value_sup is not None and wl and signed is not None and not (fpf or integer_inf or integer_sup)) \
+					or (value_inf is not None and value_sup is not None and fpf and integer_inf is not None and integer_sup is not None and not (wl or (signed is not None))) \
+					or (value_inf is not None and value_sup is not None and fpf and not (wl or (signed is not None) or integer_inf or integer_sup)) \
+					or (fpf and not (value_inf or value_sup or wl or (signed is not None) or integer_inf or integer_sup))):
 			raise ValueError("Bad combination of arguments")
 		
 		# check for non-sense values
@@ -180,7 +180,7 @@ class Variable(object):
 	
 	def __repr__(self):
 		return "[%g ; %g]"%(self.approx_values[0],self.approx_values[1])
-    
+
 	def copy(self):
 		v_inf,v_sup = self.values
 		N_inf,N_sup = self.integers
@@ -227,7 +227,7 @@ class Variable(object):
 			SELF._integer_sup <<= SELF.FPF.lsb - fpf.lsb	
 		SELF.FPF = fpf
 		return SELF, rshift
-    
+
 	def add(self,other,wl_op,msb_final=None, fpf_add= None):
 		# if other is not a Variable object, then return an AssertionError
 		assert (isinstance(other,Variable)), "Variable type expected for 'other', not %s"%type(other).__name__

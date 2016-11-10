@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from Tkinter import *
 import tkFileDialog
-from PIL import Image, ImageTk  
-from os import walk, rename, getcwd,listdir
-import os, sys
-
-from Functions.optimization import *
-from Functions.matlab_files_reader import MatlabDict2FilterExample_SIF
-
-from oSoP.Adder import Adder
-from oSoP.oSoP_Generator import best_oSoP_gen_from_dict
+from Tkinter import *
 from pickle import dump
+
+from PIL import Image, ImageTk
+from os import listdir
+
+from Functions.matlab_files_reader import MatlabDict2FilterExample_SIF
+from Functions.optimization import *
+from fipogen.oSoP import best_oSoP_gen_from_dict
 
 
 # /!\ ATTENTION /!\

@@ -17,11 +17,10 @@ from bottle import route, run, error, static_file, request, post, get, response
 # jinja is the template engine used
 from jinja2 import Environment, FileSystemLoader
 
-
 # oSoP packages
-from oSoP.FPF import FPF
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from fipogen.oSoP import FPF
+from fipogen.oSoP import Variable
+from fipogen.oSoP import Constant
 
 # utilities and path definition
 from utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin
@@ -179,7 +178,7 @@ def Constant_service(constInter):
 		WL: word-length
 			-> only one of these two options should be given !
 		signed: (bool) indicates if the constant is represented with a signed constant
-		 	
+
 	It returns a json object with the following fields
 		error: (string) indicates if there is an error
 		FPF: (string) the FPF used for the conversion (usefull if the WL was given)
