@@ -13,12 +13,14 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-
+import mpmath
 from numpy import ndenumerate, array, zeros, matrix, matrix
 from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
 from scipy.linalg import norm
+from mpmath import *
+from fipogen.func_aux import mpc_get_real
 
 from numpy.testing import assert_allclose
 
@@ -169,6 +171,33 @@ class dTF(object):
 				raise ValueError("dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
 
 		return self._WCPG
+
+
+def TFmp_to_dSSmp(b, a):
+	b = mpc_get_real(b)
+	a = mpc_get_real(a)
+	p = 1
+	q = 1
+	N = max(b.rows, a.rows)
+	nb = b.rows
+	na = a.rows
+
+	D = b[nb-1, 0]		# D = b_0
+
+	if a[na - 1] != mpf('1.0'):
+		a = [element / a[na-1] for element in a]
+		for i in range(0, na):
+			a[i, 0] = a[i] / a[na-1]
+
+	if na > nb:
+		N = na
+		beta = mp.zeros(N, 1)
+		for i in range(0, nb):
+			beta[i,0] = b[i]
+
+
+
+
 
 
 

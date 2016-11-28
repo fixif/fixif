@@ -24,26 +24,51 @@ from fipogen.func_aux import write_matrix_mpf, write_matrix_hex
 from fipogen.Structures import LWDF, DFII, State_Space
 
 from fipogen.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
-from fipogen.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter, random_dSS
+from fipogen.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter, random_dSS, dSS
 from scipy.weave import inline
 
 # from func_aux.get_data import get_data
 # from func_aux.MtlbHelper import MtlbHelper
 
-
-
+from mpmath import *
+from fipogen.func_aux import mpf_poly_mult
 from numpy.random import seed, rand, randint, shuffle
 from numpy.testing import assert_allclose
 
+# This function computes the product product_i=0^n (1 - p_i)
+		# If the second argument j is specified, it computes the product for all i != j
+def polyproduct(p, j = -1):
+	degP = len(p)
+	if degP < 2:
+		raise ValueError( 'error in polynomial product: empty polynomial')
+	if j == -1:
+		c = mp.matrix([1, p[0]])
+		for i in range(1, degP):
+			c = mpf_poly_mult(c, mp.matrix([1, p[i]]))
+	else:
+		if j == 0:
+			c = mp.matrix([1, p[1]])
+		else:
+			c = mp.matrix([1, p[0]])
+
+		for i in range(1, j):
+			c = mpf_poly_mult(c, mp.matrix([1, p[i]]))
+
+		for i in range(j + 1, degP):
+			c = mpf_poly_mult(c, mp.matrix([1, p[i]]))
+
+	return c
 
 def test_computeMSBSIF():
 	nu = 1
 	ny = 1
 	nx = 5
-	#F = random_Filter(nx, ny, nu)
-	F = Butter(5, 1.2)
-	SS = LWDF.makeRealization(F)
+	F = random_Filter(nx, ny, nu)
+	#F = Butter(5, 1.2)
+	#SS = LWDF.makeRealization(F)
+	SS = State_Space.makeRealization(F)
 
+	PP, QQ = SS.dSS.to_dTFmp()
 	#a hardcoded example
 	#A = np.matrix([[-0.1721,  0.004845,    0.2187],[0.004845,  -0.08567,   -0.1096], [0.2187,   -0.1096,   -0.4978]])
 	#B = np.matrix([[1.533], [0], [0]])
@@ -51,6 +76,8 @@ def test_computeMSBSIF():
 	#D = np.matrix([0.03256])
 	#F = Filter(A=A,B=B,C=C,D=D)
 	#SS = State_Space.makeRealization(F)
+
+
 
 	u_bar = np.bmat([np.ones([1, nu])])
 	l_y_out = -16
@@ -87,7 +114,7 @@ def test_computeMSBSIF():
 		for i in range(0, SS.n):
 			f_handle.write('%d %d\n' % (msb_x[i], lsb_x[i]))
 		for i in range(0, SS.p):
-			f_handle.write('%d %d\n' % (msb_y[i], lsb_y[i]))
+			f_handle.write('%d %d\n' % (msb_y[i], l_y_out))
 
 
 		write_matrix_hex(f_handle, SS.Z, ' ')
@@ -102,7 +129,7 @@ def test_computeMSBSIF():
 	print 'MSBs:\n'
 	print msb
 
-	nSimulations = 200
+	nSimulations = 50
 	u = np.random.rand(1,nSimulations)
 
 	#u = SS.generate_inputs(0.125, nSimulations)

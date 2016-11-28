@@ -125,7 +125,7 @@ class Realization(SIF):
 
 		# In order to respect the overall error |deltaY(k)| < 2^(l_y_out-1)
 		# we need to compute the temporary, state and output variables with LSB l_i
-		# l_i = max(l_y_out) - g_i
+		# l_i = max(l_y_out) - g_i-1
 		# where the correction term g_i is computed via
 		# g_i = 1 + max_j { ceil( log2 ( c * wcpgDeltaH[j, i] ) )}
 
@@ -135,7 +135,7 @@ class Realization(SIF):
 			if x.any():
 				print 'Divided by zero\n'
 
-		lsb = np.bmat([max(l_y_out) - g])
+		lsb = np.bmat([max(l_y_out) - g - np.ones(l_y_out.shape)])
 
 		return lsb
 

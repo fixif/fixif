@@ -30,6 +30,10 @@ from scipy.weave			import inline
 from scipy.signal import ss2tf
 
 from numpy.testing import assert_allclose
+import mpmath
+from mpmath import mp
+
+from fipogen.func_aux		import python2mpf_matrix, mp_poly_product, mpc_get_real
 
 
 class dSS(object):
@@ -513,6 +517,8 @@ class dSS(object):
 		return dSS(self._A, self._B[:,args[0][1]], self._C[args[0][0],:], self._D[args[0][0],args[0][1]])
 
 
+
+
 	def to_dTF(self):
 		"""
 		Transform a SISO state-space into a transfer function
@@ -523,6 +529,61 @@ class dSS(object):
 		from fipogen.LTI import dTF
 		num,den = ss2tf( self._A, self._B, self._C, self._D)
 		return dTF( num[0], den )
+
+	def to_dTFmp(self):
+		"""
+		Computes the Trasnfer function of a dSS in multiple precision using following method:
+
+		H(Z) = P(Z)/Q(z) with
+
+		P(z) = sum_i^n {  }
+
+		TODO: complete the description
+
+		Returns
+		-------
+		P, Q - coefficients of numerator and denumerator of the transfer function H(z) of self
+		"""
+
+		# converting the dSS matrices to mp type
+
+		prec = 100
+		if(self.p != 1 or self.q != 1):
+			raise ValueError( 'dSS: cannot convert a dSS to TF in multiple precision for not a SISO system')
+
+		Amp = python2mpf_matrix(self.A)
+		Bmp = python2mpf_matrix(self.B)
+		Cmp = python2mpf_matrix(self.C)
+		Dmp = python2mpf_matrix(self.D)
+
+		mp.prec = prec * 2
+		E, V = mp.eig(Amp)		#eig returns a list E and a matrix V
+		Cmp = Cmp * V
+		Vinv = mp.inverse(V)
+		Bmp = Vinv * Bmp
+
+
+		Q = mp_poly_product([-e for e in E])
+		PP = mp.zeros(Q.rows - 1, 1)
+		#tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
+		for i in range(0, self.n):
+			# P = sum_i=0^n c_i * b_i * product_j!=i p_j
+			tmp_polyproduct = mp_poly_product([-e for e in E], i)
+			PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
+
+		if Dmp[0,0] == mpmath.mpf('0.0'):
+			return PP, Q
+
+		P = Dmp[0,0] * Q
+		for i in range(1, P.rows):
+			P[i, 0] = P[i, 0] + PP[i-1, 0]
+
+
+		return P,Q
+
+
+
+
 
 
 	def assert_close(self, other):
@@ -719,3 +780,4 @@ def random_dSS(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.
 	D = D * Dmask
 
 	return dSS(A, B, C, D)
+
