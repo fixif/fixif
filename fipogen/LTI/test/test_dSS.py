@@ -3,6 +3,9 @@
 """
 This file contains tests for the dSS class and its methods
 """
+import numpy
+
+from fipogen.SIF import SIF
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -21,9 +24,10 @@ from numpy import matrix as mat
 from numpy.linalg import eigvals
 from numpy.testing import assert_allclose
 from numpy.random import seed, randint
-from mpmath import *
 
-from fipogen.LTI import dSS, random_dSS, iter_random_dSS
+from fipogen.LTI import dSS, random_dSS, iter_random_dSS, to_dTFmp, sub_dSSmp, TFmp_to_dSSmp, iter_random_dTF, \
+	random_dTF
+from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy
 
 
 def my_assert_allclose_TFmp(H, b, a, tol):
@@ -32,13 +36,13 @@ def my_assert_allclose_TFmp(H, b, a, tol):
 		raise ValueError('MP Transfer function is not the same size as the scipy transfer function!')
 
 	for i in range(0, b.rows):
-		if mpmath.fabs(b[i,0].real - H.num[0,i]) < tol:
+		if mpmath.fabs(b[i,0] - H.num[0,i]) < tol:
 			assert(True)
 		else:
 			raise ValueError("MP transfer function is not close to the dTF")
 
 	for i in range(0, a.rows):
-		if mpmath.fabs(a[i, 0].real - H.den[0,i]) < tol:
+		if mpmath.fabs(a[i, 0] - H.den[0,i]) < tol:
 			assert(True)
 		else:
 			raise ValueError("MP transfer function is not close to the dTF")
@@ -194,17 +198,31 @@ def test_to_dTF( S ):
 		S.assert_close( SS )
 
 
-@pytest.mark.parametrize( "S", iter_random_dSS(20, False, n=(3, 6), p=(1, 2), q=(1, 2)))
+@pytest.mark.parametrize( "S", iter_random_dSS(20, False, n=(3, 6), p=1, q=1))
 def test_to_dTFmp( S ):
 	if S.p > 1 or S.q > 1:
 		print ('Case of %d and %d' % S.p, S.q)
-		assert (True)
+		assert (False)
 	else:
 		H = S.to_dTF()
-		b,a = S.to_dTFmp()
-		my_assert_allclose_TFmp(H, b, a, 1e-5)
+		b,a = to_dTFmp(python2mpf_matrix(S.A), python2mpf_matrix(S.B), python2mpf_matrix(S.C), python2mpf_matrix(S.D), 100)
+		my_assert_allclose_TFmp(H, b, a, 1e-10)
 
+@pytest.mark.parametrize("H", iter_random_dTF(20, order=(3,10)))
+def test_sub_dSS( H ):
+	prec = 100
+	b = python2mpf_matrix(H.num).transpose()
+	a = python2mpf_matrix(H.den).transpose()
+	A, B, C, D = TFmp_to_dSSmp(b, a, mpmatrices=True, prec=prec)
+	A2, B2, C2, D2 = sub_dSSmp(A, B, C, D, A, B, C, D, add=True)
+	A3, B3, C3, D3 = sub_dSSmp(A2, B2, C2, D2, A, B, C, D)
 
+	t = (numpy.empty([0, 0]), numpy.empty([A.rows, 0]), numpy.empty([D.rows, 0]), numpy.empty([0, A.rows]), numpy.empty([0, D.rows]), mpf_to_numpy(A), mpf_to_numpy(B),	mpf_to_numpy(C), mpf_to_numpy(D))
+	SIF1 = SIF(t)
+	t2 = (numpy.empty([0, 0]), numpy.empty([A3.rows, 0]), numpy.empty([D3.rows, 0]), numpy.empty([0, A3.rows]), numpy.empty([0, D3.rows]), mpf_to_numpy(A3), mpf_to_numpy(B3), mpf_to_numpy(C3), mpf_to_numpy(D3))
+	SIF2 = SIF(t2)
+	u = numpy.random.rand(1,100)
+	assert_allclose(SIF1.simulate(u), SIF2.simulate(u))
 
 
 
@@ -212,7 +230,7 @@ def test_to_dTFmp( S ):
 def test_balanced( S ):
 	Sb = S.balanced()
 	# check if S and Sb represent the same systems
-	S.assert_close( Sb)
+	S.assert_close(Sb)
 	# check if Sb is really balanced
 	my_assert_allclose( Sb.Wo,'Wo', Sb.Wc, 'Wc', atol=1e-6 )
 

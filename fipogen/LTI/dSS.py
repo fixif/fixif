@@ -17,8 +17,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from numpy					import inf, empty, float64, shape, identity, absolute, dot, eye, array, asfarray, ones, \
-	matrix, matrix, matrix, matrix, zeros  # , astype
+from numpy					import inf, empty, float64, shape, identity, absolute, dot, eye, array, asfarray, ones, matrix, matrix, matrix, matrix, zeros  # , astype
 from numpy					import matrix as mat, Inf, set_printoptions
 from numpy					import eye, zeros, r_, c_, sqrt
 from numpy.linalg			import inv, det, solve, eigvals, LinAlgError
@@ -29,9 +28,9 @@ from copy					import copy
 from scipy.weave			import inline
 from scipy.signal import ss2tf
 
+import mpmath, numpy
+
 from numpy.testing import assert_allclose
-import mpmath
-from mpmath import mp
 
 from fipogen.func_aux		import python2mpf_matrix, mp_poly_product, mpc_get_real
 
@@ -530,61 +529,6 @@ class dSS(object):
 		num,den = ss2tf( self._A, self._B, self._C, self._D)
 		return dTF( num[0], den )
 
-	def to_dTFmp(self):
-		"""
-		Computes the Trasnfer function of a dSS in multiple precision using following method:
-
-		H(Z) = P(Z)/Q(z) with
-
-		P(z) = sum_i^n {  }
-
-		TODO: complete the description
-
-		Returns
-		-------
-		P, Q - coefficients of numerator and denumerator of the transfer function H(z) of self
-		"""
-
-		# converting the dSS matrices to mp type
-
-		prec = 100
-		if(self.p != 1 or self.q != 1):
-			raise ValueError( 'dSS: cannot convert a dSS to TF in multiple precision for not a SISO system')
-
-		Amp = python2mpf_matrix(self.A)
-		Bmp = python2mpf_matrix(self.B)
-		Cmp = python2mpf_matrix(self.C)
-		Dmp = python2mpf_matrix(self.D)
-
-		mp.prec = prec * 2
-		E, V = mp.eig(Amp)		#eig returns a list E and a matrix V
-		Cmp = Cmp * V
-		Vinv = mp.inverse(V)
-		Bmp = Vinv * Bmp
-
-
-		Q = mp_poly_product([-e for e in E])
-		PP = mp.zeros(Q.rows - 1, 1)
-		#tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
-		for i in range(0, self.n):
-			# P = sum_i=0^n c_i * b_i * product_j!=i p_j
-			tmp_polyproduct = mp_poly_product([-e for e in E], i)
-			PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
-
-		if Dmp[0,0] == mpmath.mpf('0.0'):
-			return PP, Q
-
-		P = Dmp[0,0] * Q
-		for i in range(1, P.rows):
-			P[i, 0] = P[i, 0] + PP[i-1, 0]
-
-
-		return P,Q
-
-
-
-
-
 
 	def assert_close(self, other):
 		# at this point, it should exist an invertible matrix T such that
@@ -615,6 +559,103 @@ class dSS(object):
 		if Nr==0:
 			raise ValueError("dSS: balanced: The selected order nr is greater than the order of a minimal realization of the given system. It was set automatically to a value corresponding to the order of a minimal realization of the system")
 		return dSS( Ar, Br, Cr, self.D)
+
+	def sub_dSS(self, S, add=False):
+		"""
+		This method computes the difference between self and a filter S given in the argument such that
+		the result filter H := self - S has
+			H.A = [[self.A, zeros(self.n, S.n)], [zeros(S.n, self.n), S.A]]
+			H.B = [[self.B], [S.B]]
+			H.C = [self.C, -S.C]
+			H.D = [self.D - S.D]
+		Parameters
+		----------
+		S - a dSS to substract from self
+
+		Returns
+		-------
+		H - a dSS which is equal to (self - S)
+		"""
+		newA = numpy.matrix([[self.A, numpy.zeros(self.n, S.n)], [numpy.zeros(S.n, self.n), S.A]])
+		newB = numpy.matrix([[self.B], [S.B]])
+		if add:
+			newC = numpy.matrix([self.C, S.C])
+			newD = self.D + S.D
+		else:
+			newC = numpy.matrix([self.C, -S.C])
+			newD = self.D - S.D
+
+		return dSS(newA, newB, newC, newD)
+
+
+
+
+def sub_dSSmp(A1, B1, C1, D1, A2, B2, C2, D2, add=False):
+	"""
+	Given two state-space systems S1 and S2 with coefficients in multiple precision metrices,
+	this function computes the difference H:=S1-S2, where system H has output h := y1(k) - y2(k).
+
+	Parameters
+	----------
+	A1,...,D1 - state matrices of system S1
+	A2,...,D2 - state matrices of system S2
+
+	Returns
+	-------
+	A, B, C, D - state matrices of the filter H
+	"""
+	n1 = A1.rows
+	n2 = A2.rows
+	p1 = D1.rows
+	p2 = D2.rows
+	q1 = D1.cols
+	q2 = D2.cols
+
+	if q1 != q2:
+		raise ValueError('Cannot substract two State-Space systems with different size of inputs')
+	if p1 != p2:
+		raise ValueError('Cannot substract two State-Space systems with different size of outputs')
+	q = q1
+	p = p1
+
+	A = mpmath.mp.zeros(n1 + n2, n1 + n2)
+	B = mpmath.mp.zeros(n1 + n2, q)
+	C = mpmath.mp.zeros(p, n1 + n2)
+
+
+
+	for i in range(0, n1):
+		for j in range(0, n1):
+			A[i,j] = A1[i,j]
+
+	for i in range(0, n2):
+		for j in range(0, n2):
+			A[i + n1, j+n1] = A2[i,j]
+
+	for i in range(0, n1):
+		for j in range(0, q):
+			B[i,j] = B1[i,j]
+	for i in range(0, n2):
+		for j in range(0, q):
+			B[i+n1, j] = B2[i,j]
+
+	for i in range(0, p):
+		for j in range(0, n1):
+			C[i,j] = C1[i,j]
+
+	if add:
+		D = D1 + D2
+		for j in range(0, p):
+			for j in range(0, n2):
+				C[i, j + n1] = C2[i, j]
+	else:
+		D = D1 - D2
+		for j in range(0, p):
+			for j in range(0, n2):
+				C[i, j + n1] = -C2[i, j]
+
+
+	return A,B,C,D
 
 
 
@@ -653,13 +694,19 @@ def iter_random_dSS(number, stable = True, n = (5, 10), p = (1, 5), q = (1, 5), 
 		if stable:
 			yield random_dSS(randint(*n), randint(*p), randint(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
 		else:
-			nn=randint(*n)
-			pp=randint(*p)
-			qq=randint(*q)
+			nn = randint(*n)
+			if p == 1 and q == 1:
+				pp = 1
+				qq = 1
+			else:
+				pp=randint(*p)
+				qq=randint(*q)
 			A = mat(rand(nn,nn))
 			B = mat(rand(nn,qq))
 			C = mat(rand(pp,nn))
 			D = mat(rand(pp,qq))
+
+
 			yield dSS(A,B,C,D)
 
 
@@ -780,4 +827,81 @@ def random_dSS(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.
 	D = D * Dmask
 
 	return dSS(A, B, C, D)
+
+
+def to_dTFmp(A,B,C,D, prec):
+		"""
+		Computes the Trasnfer function of a dSS in multiple precision using following method:
+
+		H(Z) = P(Z)/Q(z) with
+
+		P(z) = sum_i^n {  }
+
+		TODO: complete the description
+
+		Returns
+		-------
+		P, Q - coefficients of numerator and denumerator of the transfer function H(z) of self
+		"""
+
+		# converting the dSS matrices to mp type
+		from mpmath import mp
+		#prec = 100
+		oldprec = mp.prec
+		mp.prec = prec
+
+		if isinstance(A, numpy.matrix):
+			Amp = python2mpf_matrix(A)
+		else:
+			Amp = A
+		if isinstance(B, numpy.matrix):
+			Bmp = python2mpf_matrix(B)
+		else:
+			Bmp = B
+		if isinstance(C, numpy.matrix):
+			Cmp = python2mpf_matrix(C)
+		else:
+			Cmp = C
+		if isinstance(D, numpy.matrix):
+			Dmp = python2mpf_matrix(D)
+		else:
+			Dmp = D
+
+		n = Amp.rows
+		p = Dmp.rows
+		q = Dmp.cols
+		if(p != 1 or q != 1):
+			raise ValueError( 'dSS: cannot convert a dSS to TF in multiple precision for not a SISO system')
+
+		mp.prec = prec * 2
+		E, V = mp.eig(Amp)		#eig returns a list E and a matrix V
+		Cmp = Cmp * V
+		Vinv = mp.inverse(V)
+		Bmp = Vinv * Bmp
+
+
+		Q = mp_poly_product([-e for e in E])
+		PP = mp.zeros(Q.rows - 1, 1)
+		#tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
+		for i in range(0, n):
+			# P = sum_i=0^n c_i * b_i * product_j!=i p_j
+			tmp_polyproduct = mp_poly_product([-e for e in E], i)
+			PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
+
+		if Dmp[0,0] == mpmath.mpf('0.0'):
+			return PP, Q
+
+		P = Dmp[0,0] * Q
+		for i in range(1, P.rows):
+			P[i, 0] = P[i, 0] + PP[i-1, 0]
+
+		b = mp.zeros(P.rows, 1)
+		a = mp.zeros(Q.rows, 1)
+		for i in range(0, P.rows):
+			b[i,0] = P[i,0].real
+		for i in range(0, Q.rows):
+			a[i, 0] = Q[i, 0].real
+
+		mp.prec = oldprec
+		return b,a
 

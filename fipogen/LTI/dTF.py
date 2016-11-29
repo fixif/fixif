@@ -19,8 +19,8 @@ from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
 from scipy.linalg import norm
-from mpmath import *
-from fipogen.func_aux import mpc_get_real
+from mpmath import mp, matrix
+from fipogen.func_aux import mpc_get_real, mpf_to_numpy
 
 from numpy.testing import assert_allclose
 
@@ -173,32 +173,6 @@ class dTF(object):
 		return self._WCPG
 
 
-def TFmp_to_dSSmp(b, a):
-	b = mpc_get_real(b)
-	a = mpc_get_real(a)
-	p = 1
-	q = 1
-	N = max(b.rows, a.rows)
-	nb = b.rows
-	na = a.rows
-
-	D = b[nb-1, 0]		# D = b_0
-
-	if a[na - 1] != mpf('1.0'):
-		a = [element / a[na-1] for element in a]
-		for i in range(0, na):
-			a[i, 0] = a[i] / a[na-1]
-
-	if na > nb:
-		N = na
-		beta = mp.zeros(N, 1)
-		for i in range(0, nb):
-			beta[i,0] = b[i]
-
-
-
-
-
 
 
 
@@ -231,8 +205,72 @@ def random_dTF( order = (5, 10) ):
 	Parameters:
 		- order: tuple (mini,maxi) order of the filter (default:  random between 5 and 10)
 	"""
-	n = randint(*order)
+	if order[0] == order[1]:
+		n = order[0]
+	else:
+		n = randint(*order)
 	num = mat(rand(1,n))
 	den = mat(rand(1,n))
 	return dTF( num, den)
 
+
+def TFmp_to_dSSmp(b, a, prec = 64, mpmatrices=True):
+
+	oldprec = mp.prec
+	if mp.prec < prec:
+		mp.prec = prec
+
+	#we need to store a and b as column vectors (because legacy)
+	#if they are row vectors, just transpose them
+	if a.rows == 1:
+		a = a.transpose()
+	if b.rows == 1:
+		b = b.transpose()
+
+	p = 1
+	q = 1
+	nb = b.rows
+	na = a.rows
+
+	if a[0,0] != mpmath.mpf('1.0'):
+		for i in range(0, na):
+			a[i, 0] = a[i] / a[0]
+
+	alpha = a
+	beta = b
+	if na > nb:
+		#if b is shorter than a, then we fill it with na-nb zeroes
+		N = na
+		beta = mp.zeros(N, 1)
+		for i in range(0, nb):
+			beta[i,0] = b[i]
+	elif nb < na:
+		N = nb
+		alpha = mp.zeroes(N, 1)
+		for i in range(0, na):
+			alpha[i, 0] = a[i]
+	else:
+		#if a and b are of the same size
+		N = nb
+
+	A = mp.zeros(N-1, N-1)
+	A[0,:] = -alpha.transpose()[0,1:N]
+	for i in range(1, N-1):
+		A[i,i-1] = mpmath.mpf('1.0')
+	B = mp.zeros(N-1, 1)
+	B[0,0] = mpmath.mpf('1.0')
+
+	C = beta.transpose()[0,1:N] - beta[0,0] * alpha.transpose()[0, 1:N]
+
+	D = mpmath.matrix([beta[0,0]])
+
+	mp.prec = oldprec
+
+	if not mpmatrices:
+		A = mpf_to_numpy(A)
+		B = mpf_to_numpy(B)
+		C = mpf_to_numpy(C)
+		D = mpf_to_numpy(D)
+
+
+	return A,B,C,D

@@ -123,6 +123,7 @@ class SIF(object):
 		self._Z = np.bmat( [[-J, M, N], [K, P, Q], [L, R, S]] )
 
 
+
 	def _build_AZtoDZ( self ):
 		# compute AZ, BZ, CZ and DZ matrices
 		AZ = self.K * self._invJ * self.M + self.P
