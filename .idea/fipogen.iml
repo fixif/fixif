@@ -11,8 +11,9 @@
       <excludeFolder url="file://$MODULE_DIR$/construct/stage-m2-maminionja" />
       <excludeFolder url="file://$MODULE_DIR$/fipogen/generated" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 2.7.10 (/usr/bin/python)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Virtualenv fipogen" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="Labyrinth" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="myDocStringFormat" value="NumPy" />
