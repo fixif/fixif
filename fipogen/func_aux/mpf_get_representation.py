@@ -29,8 +29,8 @@ def mpf_get_representation(a):
 	if not isinstance(a, mpmath.mpf):
 		raise ValueError('Expected mpmath.mpf but got %s' % type(a))
 
-	if not mpmath.isnormal(a):
-		raise ValueError('Cannot get a representation of a not normal number')
+	if mpmath.isinf(a) or mpmath.isnan(a):
+		raise ValueError('Cannot get a representation of number: an Inf or NaN occured')
 
 	t = a._mpf_
 	if len(t) != 4:

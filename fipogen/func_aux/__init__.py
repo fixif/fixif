@@ -12,3 +12,5 @@ from mpf_matrix_fmul import mpf_matrix_fmul
 from mpf_matrix_fadd import mpf_matrix_fadd
 from mpf_matrix_fsub import mpf_matrix_fsub
 from mpf_matrix_lt_inverse import  mpf_matrix_lt_inverse
+from mpf_matrix_to_sollya import mpf_matrix_to_sollya
+from sollya_matrix_print import sollya_matrix_print
