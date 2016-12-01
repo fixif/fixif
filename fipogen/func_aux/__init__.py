@@ -8,3 +8,7 @@ from mpc_get_real import mpc_get_real
 from mpf_to_numpy import mpf_to_numpy
 from mpf_get_representation import mpf_get_representation
 from mpf_matrix_get_representation import mpf_matrix_get_representation
+from mpf_matrix_fmul import mpf_matrix_fmul
+from mpf_matrix_fadd import mpf_matrix_fadd
+from mpf_matrix_fsub import mpf_matrix_fsub
+from mpf_matrix_lt_inverse import  mpf_matrix_lt_inverse
