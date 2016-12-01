@@ -6,3 +6,5 @@ from mpf_poly_mult import mpf_poly_mult
 from mp_poly_product import mp_poly_product
 from mpc_get_real import mpc_get_real
 from mpf_to_numpy import mpf_to_numpy
+from mpf_get_representation import mpf_get_representation
+from mpf_matrix_get_representation import mpf_matrix_get_representation
