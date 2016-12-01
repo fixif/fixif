@@ -90,7 +90,7 @@ def test_random_dSS( S ):
 
 
 
-#@pytest.mark.parametrize( "S", iter_random_dSS(130, stable=True, n=(2, 40), p=(2, 15), q=(2, 15)))
+@pytest.mark.parametrize( "S", iter_random_dSS(130, stable=True, n=(2, 40), p=(2, 15), q=(2, 15)))
 def test_Gramians ( S ):
 	"""
 	Test calculation of :math:`W_o` and :math:`W_c` with the two different methods (``linalg`` from scipy and ``slycot``from Slycot)
@@ -162,7 +162,7 @@ def test_wcpg (S):
 	assert_allclose( array(W), array(wcpg), rtol=rel_tol_wcpg)
 
 
-#@pytest.mark.parametrize( "S", iter_random_dSS(50, True, (5, 10), (1, 5), (1, 5)))
+@pytest.mark.parametrize( "S", iter_random_dSS(50, True, (5, 10), (1, 5), (1, 5)))
 def test_subsystems( S ):
 
 	# random slices
@@ -183,7 +183,7 @@ def test_subsystems( S ):
 	assert all(Sub.D == S.D[i,j])
 
 
-#@pytest.mark.parametrize( "S", iter_random_dSS(20))
+@pytest.mark.parametrize( "S", iter_random_dSS(20))
 def test_str( S ):
 	str(S)
 
@@ -226,7 +226,7 @@ def test_sub_dSSmp( H ):
 
 
 
-#@pytest.mark.parametrize( "S", iter_random_dSS(20, stable=True, n=(1, 15), p=(1, 5), q=(1, 5)))
+@pytest.mark.parametrize( "S", iter_random_dSS(20, stable=True, n=(1, 15), p=(1, 5), q=(1, 5)))
 def test_balanced( S ):
 	Sb = S.balanced()
 	# check if S and Sb represent the same systems
