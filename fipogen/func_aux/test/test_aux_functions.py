@@ -2,9 +2,11 @@ import unittest
 import numpy
 import mpmath
 from mpmath import *
+import sollya
+from sollya import *
 
-from fipogen.func_aux import python2mpf_matrix, mpf_poly_mult, mp_poly_product, mpf_get_representation, mpf_matrix_get_representation
-
+from fipogen.func_aux import *
+from fipogen.LTI import dSS, random_dSS
 
 def my_assert_allclose_mp(A, AA, abs_tol):
 
@@ -121,7 +123,53 @@ class MyTestCase(unittest.TestCase):
 			assert False
 
 
+	def test_mpf_matrix_mul_exact(self):
+		S = random_dSS(5, 2, 3)
+		C = mpf_matrix_fmul(S.A, S.B)
+		C2 = mpf_matrix_fmul(python2mpf_matrix(S.A), python2mpf_matrix(S.B))
 
+		#TODO: add unit tests to verify exception catching
+
+		self.assertEqual(C, C2)
+
+	def test_mpf_matrix_fsub(self):
+		A = numpy.matrix(numpy.random.rand(5, 5))
+
+		AA = mpf_matrix_fsub(A, A)
+		Z = mpmath.zeros(5,5)
+		self.assertEqual(AA, Z)
+
+		AA = mpf_matrix_fadd(AA, A)
+		self.assertEqual(AA, python2mpf_matrix(A))
+
+	def test_inverse(self):
+		J = mpmath.matrix([[1, 0, 0], [2, 1, 0], [3, 4, 1]])
+		Jinv = mpmath.inverse(J)
+		myInverse = mpf_matrix_lt_inverse(J)
+
+		self.assertEqual(Jinv, myInverse)
+
+	def test_mpf_to_sollya(self):
+		J = mpmath.matrix([[1, 0, 0], [3, 4, 1]])
+		S = [SollyaObject(1),SollyaObject(0),SollyaObject(0),SollyaObject(3),SollyaObject(4),SollyaObject(1)]
+		myS, m, n = mpf_matrix_to_sollya(J)
+		sollya_matrix_print(myS, m, n)
+
+		self.assertEqual(S, myS)
+
+	def test_sollya_conversion(self):
+		n = 10
+		R = numpy.matrix(numpy.random.rand(n, n))
+		Rmp = python2mpf_matrix(R)
+
+		S = list()
+		for i in range(0, n):
+			for j in range(0,n):
+				S.append(SollyaObject(R[i,j]))
+
+		Smy, p, q = mpf_matrix_to_sollya(Rmp)
+
+		self.assertEqual(S, Smy)
 
 
 if __name__ == '__main__':

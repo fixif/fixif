@@ -25,7 +25,7 @@ from numpy import c_, r_, eye, zeros, matrix as mat
 from numpy.linalg import inv
 from math import log
 from copy import copy
-
+from fipogen.func_aux import mpf_matrix_lt_inverse, mpf_matrix_fsub, mpf_matrix_fadd, mpf_matrix_fmul, python2mpf_matrix
 
 def isTrivial ( x, epsilon ):
 	"""
@@ -134,6 +134,43 @@ class SIF(object):
 		self._dSS = dSS(AZ, BZ, CZ, DZ)
 
 
+	def dSSexact( self ):
+		"""
+		Compute the dSS corresponding to current SIF exactly.
+		This function returns state-space matrices in multiple
+		precision in MPMATH format.
+
+		Returns
+		-------
+		AZ, BZ, CZ, DZ
+		"""
+		if self.l == 0:
+			return python2mpf_matrix(self.P), python2mpf_matrix(self.Q),python2mpf_matrix(self.R),python2mpf_matrix(self.S)
+
+
+		invJ = mpf_matrix_lt_inverse(self.J)
+
+		AZ = mpf_matrix_fmul(invJ, self.M)
+		AZ = mpf_matrix_fmul(self.K, AZ)
+		AZ = mpf_matrix_fadd(AZ, self.P)
+
+		BZ = mpf_matrix_fmul(invJ, self.N)
+		BZ = mpf_matrix_fmul(self.K, BZ)
+		BZ = mpf_matrix_fadd(BZ, self.Q)
+
+		CZ = mpf_matrix_fmul(invJ, self.M)
+		CZ = mpf_matrix_fmul(self.L, CZ)
+		CZ = mpf_matrix_fadd(CZ, self.R)
+
+		DZ = mpf_matrix_fmul(invJ, self.N)
+		DZ = mpf_matrix_fmul(self.L, DZ)
+		DZ = mpf_matrix_fadd(DZ, self.S)
+
+		return AZ, BZ, CZ, DZ
+
+
+
+
 	def _build_M1M2N1N2( self ):
 		# compute the useful matrices M1, M2, N1 and N2
 		self._M1 = c_[self.K * self._invJ, eye(self._n), zeros((self._n, self._p))]
@@ -160,6 +197,7 @@ class SIF(object):
 		else:
 			dJ, dK, dL, dM, dN, dP, dQ, dR, dS = [np.matrix(X) for X in dJtodS]
 			self._dZ = np.bmat( [[dJ, dM, dN], [dK, dP, dQ], [dL, dR, dS]] )
+
 
 
 
@@ -194,6 +232,7 @@ class SIF(object):
 	@property
 	def dSS(self):
 		return self._dSS
+
 
 	# Wo and Wc are from AZ to DZ state space
 	@property
@@ -581,6 +620,7 @@ class SIF(object):
 		return self.dSS.to_dTF()
 
 
+
 	@property
 	def Hu(self):
 		"""return the Hu state-space"""
@@ -589,3 +629,4 @@ class SIF(object):
 	@property
 	def Hepsilon(self):
 		return dSS(self.AZ, self._M1, self.CZ, self._M2)
+

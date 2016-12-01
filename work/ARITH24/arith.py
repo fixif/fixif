@@ -5,6 +5,9 @@ from fipogen.func_aux import *
 import numpy as np
 import mpmath as mpm
 
+import sollya
+
+
 
 def get_TFmp(S, prec):
 	"""
@@ -49,8 +52,10 @@ def get_TFmp(S, prec):
 
 
 
+s = sollya.SollyaObject('123')
+print s
 S = random_dSS(5, 1, 1)
-for prec in range(50, 1000, 50):
-	b, a, theta = get_TFmp(S, prec)
-	print 'Transfer function: \n \t num: %s \n \t den: %s \nTheta: %s\n'% (repr(b.transpose()), repr(a.transpose()), repr(theta))
+#for prec in range(50, 1000, 50):
+#	b, a, theta = get_TFmp(S, prec)
+#	print 'Transfer function: \n \t num: %s \n \t den: %s \nTheta: %s\n'% (repr(b.transpose()), repr(a.transpose()), repr(theta))
 
