@@ -30,8 +30,15 @@ int main()
 	*/
 
 
+		/* 
+		Benoit's examples
+		*/
+
+		FILE *input = fopen("./examples/eigen_example.txt", "r");
+		//FILE *input = fopen("./examples/ex_benoit2.txt", "r");
+		// FILE *input = fopen("./examples/ex_benoit.txt", "r");
 	// // /* Old examples */
-	 FILE *input = fopen("./examples/input3_f53bits.txt", "r");
+	 // FILE *input = fopen("./examples/input3_f53bits.txt", "r");
 	// FILE *input = fopen("./examples/ex_antoine.txt", "r");
 	 // FILE *input = fopen("./examples/ex_antoine2.txt", "r");
 	// FILE *input = fopen("./examples/input2.txt", "r");

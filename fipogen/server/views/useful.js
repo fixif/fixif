@@ -12,7 +12,7 @@ function queryString(form, except_name)
 		{
 			if (e[i].name!="")
 				if (e[i].type=="checkbox")
-					s.push( e[i].name +"="+(e[i].checked?"yes":"no") )
+					s.push( e[i].name +"="+(e[i].checked?"yes":"no") );
 				else
 					s.push( e[i].name+"="+e[i].value );
 		}

@@ -2,31 +2,31 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 if blas.h found */
-/* #undef BLAS_HEADER */
+#define BLAS_HEADER 1
 
 /* Define to 1 if cblas.h found */
-#define CBLAS_HEADER 1
+/* #undef CBLAS_HEADER */
 
 /* Define to 1 if clapack.h found */
-/* #undef CLAPACK_HEADER */
+#define CLAPACK_HEADER 1
 
 /* Define to 1 if f2c.h found */
 #define F2C_HEADER 1
 
 /* Define to 1 if you have the <blaswrap.h> header file. */
-/* #undef HAVE_BLASWRAP_H */
+#define HAVE_BLASWRAP_H 1
 
 /* Define to 1 if you have the <blas.h> header file. */
-/* #undef HAVE_BLAS_H */
+#define HAVE_BLAS_H 1
 
 /* Define to 1 if you have the <cblas.h> header file. */
-#define HAVE_CBLAS_H 1
+/* #undef HAVE_CBLAS_H */
 
 /* Define to 1 if you have the `ceil' function. */
-/* #undef HAVE_CEIL */
+#define HAVE_CEIL 1
 
 /* Define to 1 if you have the <clapack.h> header file. */
-/* #undef HAVE_CLAPACK_H */
+#define HAVE_CLAPACK_H 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
@@ -44,10 +44,10 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <lapacke.h> header file. */
-#define HAVE_LAPACKE_H 1
+/* #undef HAVE_LAPACKE_H */
 
 /* Define to 1 if you have the <lapack.h> header file. */
-/* #undef HAVE_LAPACK_H */
+#define HAVE_LAPACK_H 1
 
 /* Define to 1 if you have the `gmp' library (-lgmp). */
 #define HAVE_LIBGMP 1
@@ -79,7 +79,7 @@
 #define HAVE_REALLOC 1
 
 /* Define to 1 if you have the `sqrt' function. */
-/* #undef HAVE_SQRT */
+#define HAVE_SQRT 1
 
 /* Define to 1 if you have the <stding.h> header file. */
 /* #undef HAVE_STDING_H */
@@ -112,13 +112,12 @@
 #define HAVE__BOOL 1
 
 /* Define to 1 if lapacke.h found */
-#define LAPACKE_HEADER 1
+/* #undef LAPACKE_HEADER */
 
 /* Define to 1 if lapack.h found */
-/* #undef LAPACK_HEADER */
+#define LAPACK_HEADER 1
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
 
 /* Define to the address where bug reports for this package should be sent. */

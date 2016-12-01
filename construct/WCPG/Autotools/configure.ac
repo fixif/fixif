@@ -95,6 +95,59 @@ AC_ARG_WITH(mpfi,
                SO_LIB_PATH="${SO_LIB_PATH:+$SO_LIB_PATH:}$withval/lib"
 	     fi
             ])
+            
+AC_ARG_WITH(lapack,
+            [  --with-lapack=DIR        LAPACK install directory ],
+            [if test "x$withval" != "xyes" -a "x$withval" != "x"
+             then
+               AM_CPPFLAGS="$AM_CPPFLAGS -I$withval/include"
+               AM_LDFLAGS="$AM_LDFLAGS -L$withval/lib"
+               SO_LIB_PATH="${SO_LIB_PATH:+$SO_LIB_PATH:}$withval/lib"
+               
+             fi
+            ])
+            
+AC_ARG_WITH(lapack-include,
+            [  --with-lapack-include=DIR  LAPACK include directory ],
+            [if test "x$withval" != "xyes" -a "x$withval" != "x"
+             then
+               AM_CPPFLAGS="$AM_CPPFLAGS -I$withval"
+             fi])
+             
+AC_ARG_WITH(lapack-lib,
+            [  --with-lapack-lib=DIR      LAPACK lib directory ],
+            [if test "x$withval" != "xyes" -a "x$withval" != "x"
+             then
+               AM_LDFLAGS="$AM_LDFLAGS -L$withval"
+               SO_LIB_PATH="${SO_LIB_PATH:+$SO_LIB_PATH:}$withval"
+             fi
+            ])
+            
+AC_ARG_WITH(blas,
+            [  --with-blas=DIR        BLAS install directory ],
+            [if test "x$withval" != "xyes" -a "x$withval" != "x"
+             then
+               AM_CPPFLAGS="$AM_CPPFLAGS -I$withval/include"
+               AM_LDFLAGS="$AM_LDFLAGS -L$withval/lib"
+               SO_LIB_PATH="${SO_LIB_PATH:+$SO_LIB_PATH:}$withval/lib"
+               
+             fi
+            ])
+AC_ARG_WITH(blas-include,
+            [  --with-blas-include=DIR  BLAS include directory ],
+            [if test "x$withval" != "xyes" -a "x$withval" != "x"
+             then
+               AM_CPPFLAGS="$AM_CPPFLAGS -I$withval"
+             fi])
+             
+AC_ARG_WITH(blas-lib,
+            [  --with-blas-lib=DIR      BLAS lib directory ],
+            [if test "x$withval" != "xyes" -a "x$withval" != "x"
+             then
+               AM_LDFLAGS="$AM_LDFLAGS -L$withval"
+               SO_LIB_PATH="${SO_LIB_PATH:+$SO_LIB_PATH:}$withval"
+             fi
+            ])
 
 #------------------------------------------------------------------------------
 # Save user flags and set flags given by configure for the rest of the tests
