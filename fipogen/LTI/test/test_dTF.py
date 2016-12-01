@@ -16,13 +16,13 @@ __status__ = "Beta"
 
 
 
-from fipogen.LTI import dTF, iter_random_dTF, TFmp_to_dSSmp, to_dTFmp
+from fipogen.LTI import dTF, iter_random_dTF, to_dSSmp, to_dTFmp
 from fipogen.func_aux import python2mpf_matrix
 import mpmath
 import pytest
 
 
-def my_assert_allclose_mp(A, AA, tol):
+def my_assert_allclose_mp(A, AA, abs_tol):
 
 	if AA.cols != A.cols or A.rows != AA.rows:
 		raise ValueError('Trying to assert_close two matrices of different size! ')
@@ -30,20 +30,23 @@ def my_assert_allclose_mp(A, AA, tol):
 	#if matrices are complex, then we need to check real and imaginary parts separately
 	#we hope that if A[0,0] is complex, then all the elements are complex
 	#this is to avoid the chek inside for for loops
-	if isinstance(A[0,0], mpmath.mpc):
-		for i in range(0, A.rows):
-			for j in range(0, A.cols):
-				if mpmath.fabs(A[i, j].real - AA[i, j].real) > tol or mpmath.fabs(A[i, j].imag - AA[i, j].imag) > tol:
-					#raise ValueError("Two complex MP matrices are not close.")
-					assert(False)
-	else:
-		for i in range(0, A.rows):
-			for j in range(0, A.cols):
-				if mpmath.fabs(A[i, j] - AA[i, j]) > tol:
-					#raise ValueError("Two MP matrices are not close.")
-					assert (False)
 
-	assert(True)
+	if abs_tol:
+		if isinstance(A[0, 0], mpmath.mpc):
+			for i in range(0, A.rows):
+				for j in range(0, A.cols):
+					if not mpmath.almosteq(A[i,j].real, AA[i,j].real, abs_eps=abs_tol) or not mpmath.almosteq(A[i,j].imag, AA[i,j.imag], abs_eps=abs_tol):
+						assert False
+		else:
+			for i in range(0, A.rows):
+				for j in range(0, A.cols):
+					if not mpmath.almosteq(A[i, j], AA[i, j], abs_eps=abs_tol) :
+						assert False
+
+	else:
+		assert False
+
+	assert True
 
 
 def test_construction( ):
@@ -79,8 +82,8 @@ def test_TFmp_to_dSSmp( H ):
 	b = b.transpose()
 	a = a.transpose()
 
-	A,B,C,D = TFmp_to_dSSmp(b, a, mpmatrices=True,prec=prec)
-	#Ad, Bd, Cd, Dd = TFmp_to_dSSmp(b, a, mpmatrices=False,prec=prec)
+	A,B,C,D = to_dSSmp(b, a)
+	#Ad, Bd, Cd, Dd = to_dSSmp(b, a, mpmatrices=False)
 	bb, aa = to_dTFmp(A, B, C, D, prec)
 	my_assert_allclose_mp(bb, b, 1e-16)
 	my_assert_allclose_mp(aa, a, 1e-16)

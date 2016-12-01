@@ -25,7 +25,7 @@ def mpf_to_numpy(A):
 
 	m = A.rows
 	n = A.cols
-	M = numpy.zeros([m,n])
+	M = numpy.matrix(numpy.zeros([m,n]))
 	for i in range(0,m):
 		for j in range(0, n):
 			M[i,j] = float(A[i,j])

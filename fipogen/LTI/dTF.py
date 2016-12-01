@@ -214,11 +214,53 @@ def random_dTF( order = (5, 10) ):
 	return dTF( num, den)
 
 
-def TFmp_to_dSSmp(b, a, prec = 64, mpmatrices=True):
+def to_dSSmp(b, a, mpmatrices=True):
 
-	oldprec = mp.prec
-	if mp.prec < prec:
-		mp.prec = prec
+	"""
+	Given a SISO transfer function numerator and denumerator in multiple precision,
+	this function constructs a discrete state-space matrices in canonical controllable form[1].
+	If mpmatrices is not True, return the state matrices in numpy format instead of MPmath.
+
+	Requirements:
+	1. numerator and denumenator are in the form of MPmath amtrices of size degree x 1
+	2. denumerator must have its first coeff equal to 1.0 (by construction it must be true)
+
+	Algorithm:
+
+	1. Extract a delay-free path D = h(0) = b_0
+	This is done by one stage of long division:
+
+	H(z) = b_0 + { (beta_1 * z^-1 + ... + beta_N * z^-N} / {1 + a_1 * z^-1 + ... + a_N * z^-N},
+
+	where
+		N = max(Na, Nb)
+		a_i = 0                     for i > Na
+		b_i = 0                     for i > Nb
+		beta_i = b_i - b_0 * a_i    for i=1...N
+
+	2. Controller canonical form is as follows:
+		-a_1    -a_2    ... -a_N-1    -a_N          1
+		1       0                        0          0
+	A = 0       1                        0      B=  0
+						....                        ...
+		0       0              1         0		    0
+
+
+	C = [beta_1     beta_2  ... beta_N]         D = b_0
+
+
+	[1] https://ccrma.stanford.edu/~jos/fp/Converting_State_Space_Form_Hand.html
+	Parameters
+	----------
+	b           - numerator of a TF, in MPmath
+	a           - denumerator of a TF, in MPmath
+	mpmatrices  - set to False if want numpy matrices to be returned
+
+	Returns
+	-------
+	A, B, C, D  - state-matrices of a discrete state-space in canonical form.
+	"""
+
 
 	#we need to store a and b as column vectors (because legacy)
 	#if they are row vectors, just transpose them
@@ -233,8 +275,7 @@ def TFmp_to_dSSmp(b, a, prec = 64, mpmatrices=True):
 	na = a.rows
 
 	if a[0,0] != mpmath.mpf('1.0'):
-		for i in range(0, na):
-			a[i, 0] = a[i] / a[0]
+		raise ValueError('Cannot convert a MP transfer function to dSS: a[0] must be 1 but it is not.')
 
 	alpha = a
 	beta = b
@@ -245,6 +286,8 @@ def TFmp_to_dSSmp(b, a, prec = 64, mpmatrices=True):
 		for i in range(0, nb):
 			beta[i,0] = b[i]
 	elif nb < na:
+		# if a is shorter than b, then we fill it with na-nb zeroes
+		# WARNING: a priori this should never be the case !!!
 		N = nb
 		alpha = mp.zeroes(N, 1)
 		for i in range(0, na):
@@ -260,11 +303,15 @@ def TFmp_to_dSSmp(b, a, prec = 64, mpmatrices=True):
 	B = mp.zeros(N-1, 1)
 	B[0,0] = mpmath.mpf('1.0')
 
-	C = beta.transpose()[0,1:N] - beta[0,0] * alpha.transpose()[0, 1:N]
+
+	#We compute matrix C exactly
+	C = mp.zeros(1, N-1)
+	for i in range(0, N-1):
+		tmp = mpmath.fmul(beta[0,0], alpha[i+1, 0], exact=True)
+		C[0,i] = mpmath.fsub(beta[i+1,0], tmp, exact=True)
 
 	D = mpmath.matrix([beta[0,0]])
 
-	mp.prec = oldprec
 
 	if not mpmatrices:
 		A = mpf_to_numpy(A)

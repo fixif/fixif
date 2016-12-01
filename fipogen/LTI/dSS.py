@@ -576,13 +576,21 @@ class dSS(object):
 		-------
 		H - a dSS which is equal to (self - S)
 		"""
-		newA = numpy.matrix([[self.A, numpy.zeros(self.n, S.n)], [numpy.zeros(S.n, self.n), S.A]])
-		newB = numpy.matrix([[self.B], [S.B]])
+
+		newA = numpy.concatenate((self.A, numpy.zeros([self.n, S.n])), axis=1)
+		tmp = numpy.concatenate((numpy.zeros([S.n, self.n]), S.A), axis=1)
+		newA = numpy.concatenate((newA, tmp), axis=0)
+
+		#newA = numpy.matrix([[self.A, numpy.zeros(self.n, S.n)], [numpy.zeros(S.n, self.n), S.A]])
+		newB =numpy.concatenate((self.B, S.B), axis=0)
+		#newB = numpy.matrix([[self.B], [S.B]])
 		if add:
-			newC = numpy.matrix([self.C, S.C])
+			#newC = numpy.matrix([self.C, S.C])
+			newC = numpy.concatenate((self.C, S.C), axis = 1)
 			newD = self.D + S.D
 		else:
-			newC = numpy.matrix([self.C, -S.C])
+			#newC = numpy.matrix([self.C, -S.C])
+			newC = numpy.concatenate((self.C, -S.C), axis=1)
 			newD = self.D - S.D
 
 		return dSS(newA, newB, newC, newD)
@@ -621,7 +629,7 @@ def sub_dSSmp(A1, B1, C1, D1, A2, B2, C2, D2, add=False):
 	A = mpmath.mp.zeros(n1 + n2, n1 + n2)
 	B = mpmath.mp.zeros(n1 + n2, q)
 	C = mpmath.mp.zeros(p, n1 + n2)
-
+	D = mpmath.mp.zeros(p, q)
 
 
 	for i in range(0, n1):
@@ -644,13 +652,18 @@ def sub_dSSmp(A1, B1, C1, D1, A2, B2, C2, D2, add=False):
 			C[i,j] = C1[i,j]
 
 	if add:
-		D = D1 + D2
-		for j in range(0, p):
+		for i in range(0, p):
+			for j in range(0,q):
+				D[i,j] = mpmath.fadd(D1[i,j], D2[i,j], exact=True)
+
+		for i in range(0, p):
 			for j in range(0, n2):
 				C[i, j + n1] = C2[i, j]
 	else:
-		D = D1 - D2
-		for j in range(0, p):
+		for i in range(0, p):
+			for j in range(0, q):
+				D[i, j] = mpmath.fsub(D1[i, j], D2[i, j], exact=True)
+		for i in range(0, p):
 			for j in range(0, n2):
 				C[i, j + n1] = -C2[i, j]
 
@@ -873,25 +886,28 @@ def to_dTFmp(A,B,C,D, prec):
 		if(p != 1 or q != 1):
 			raise ValueError( 'dSS: cannot convert a dSS to TF in multiple precision for not a SISO system')
 
+
 		mp.prec = prec * 2
-		E, V = mp.eig(Amp)		#eig returns a list E and a matrix V
-		Cmp = Cmp * V
-		Vinv = mp.inverse(V)
-		Bmp = Vinv * Bmp
+		with mpmath.extraprec(prec * 6):
+			E, V = mp.eig(Amp)		#eig returns a list E and a matrix V
+			Cmp = Cmp * V
+			Vinv = mp.inverse(V)
+			Bmp = Vinv * Bmp
 
 
-		Q = mp_poly_product([-e for e in E])
-		PP = mp.zeros(Q.rows - 1, 1)
-		#tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
-		for i in range(0, n):
-			# P = sum_i=0^n c_i * b_i * product_j!=i p_j
-			tmp_polyproduct = mp_poly_product([-e for e in E], i)
-			PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
+			Q = mp_poly_product([-e for e in E])
+			PP = mp.zeros(Q.rows - 1, 1)
+			#tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
+			for i in range(0, n):
+				# P = sum_i=0^n c_i * b_i * product_j!=i p_j
+				tmp_polyproduct = mp_poly_product([-e for e in E], i)
+				PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
 
-		if Dmp[0,0] == mpmath.mpf('0.0'):
-			return PP, Q
+		if Dmp[0,0] != mpmath.mpf('0.0'):
+			P = Dmp[0, 0] * Q
+		else:
+			P = mp.zeros(Q.rows, 1)
 
-		P = Dmp[0,0] * Q
 		for i in range(1, P.rows):
 			P[i, 0] = P[i, 0] + PP[i-1, 0]
 

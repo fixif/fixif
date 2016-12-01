@@ -25,7 +25,7 @@ from numpy.linalg import eigvals
 from numpy.testing import assert_allclose
 from numpy.random import seed, randint
 
-from fipogen.LTI import dSS, random_dSS, iter_random_dSS, to_dTFmp, sub_dSSmp, TFmp_to_dSSmp, iter_random_dTF, \
+from fipogen.LTI import dSS, random_dSS, iter_random_dSS, to_dTFmp, sub_dSSmp, to_dSSmp, iter_random_dTF, \
 	random_dTF
 from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy
 
@@ -209,11 +209,11 @@ def test_to_dTFmp( S ):
 		my_assert_allclose_TFmp(H, b, a, 1e-10)
 
 @pytest.mark.parametrize("H", iter_random_dTF(20, order=(3,10)))
-def test_sub_dSS( H ):
+def test_sub_dSSmp( H ):
 	prec = 100
 	b = python2mpf_matrix(H.num).transpose()
 	a = python2mpf_matrix(H.den).transpose()
-	A, B, C, D = TFmp_to_dSSmp(b, a, mpmatrices=True, prec=prec)
+	A, B, C, D = to_dSSmp(b, a, mpmatrices=True)
 	A2, B2, C2, D2 = sub_dSSmp(A, B, C, D, A, B, C, D, add=True)
 	A3, B3, C3, D3 = sub_dSSmp(A2, B2, C2, D2, A, B, C, D)
 
