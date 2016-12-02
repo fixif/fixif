@@ -598,77 +598,77 @@ class dSS(object):
 
 
 
-def sub_dSSmp(A1, B1, C1, D1, A2, B2, C2, D2, add=False):
-	"""
-	Given two state-space systems S1 and S2 with coefficients in multiple precision metrices,
-	this function computes the difference H:=S1-S2, where system H has output h := y1(k) - y2(k).
-
-	Parameters
-	----------
-	A1,...,D1 - state matrices of system S1
-	A2,...,D2 - state matrices of system S2
-
-	Returns
-	-------
-	A, B, C, D - state matrices of the filter H
-	"""
-	n1 = A1.rows
-	n2 = A2.rows
-	p1 = D1.rows
-	p2 = D2.rows
-	q1 = D1.cols
-	q2 = D2.cols
-
-	if q1 != q2:
-		raise ValueError('Cannot substract two State-Space systems with different size of inputs')
-	if p1 != p2:
-		raise ValueError('Cannot substract two State-Space systems with different size of outputs')
-	q = q1
-	p = p1
-
-	A = mpmath.mp.zeros(n1 + n2, n1 + n2)
-	B = mpmath.mp.zeros(n1 + n2, q)
-	C = mpmath.mp.zeros(p, n1 + n2)
-	D = mpmath.mp.zeros(p, q)
-
-
-	for i in range(0, n1):
-		for j in range(0, n1):
-			A[i,j] = A1[i,j]
-
-	for i in range(0, n2):
-		for j in range(0, n2):
-			A[i + n1, j+n1] = A2[i,j]
-
-	for i in range(0, n1):
-		for j in range(0, q):
-			B[i,j] = B1[i,j]
-	for i in range(0, n2):
-		for j in range(0, q):
-			B[i+n1, j] = B2[i,j]
-
-	for i in range(0, p):
-		for j in range(0, n1):
-			C[i,j] = C1[i,j]
-
-	if add:
-		for i in range(0, p):
-			for j in range(0,q):
-				D[i,j] = mpmath.fadd(D1[i,j], D2[i,j], exact=True)
-
-		for i in range(0, p):
-			for j in range(0, n2):
-				C[i, j + n1] = C2[i, j]
-	else:
-		for i in range(0, p):
-			for j in range(0, q):
-				D[i, j] = mpmath.fsub(D1[i, j], D2[i, j], exact=True)
-		for i in range(0, p):
-			for j in range(0, n2):
-				C[i, j + n1] = -C2[i, j]
-
-
-	return A,B,C,D
+# def sub_dSSmp(A1, B1, C1, D1, A2, B2, C2, D2, add=False):
+# 	"""
+# 	Given two state-space systems S1 and S2 with coefficients in multiple precision metrices,
+# 	this function computes the difference H:=S1-S2, where system H has output h := y1(k) - y2(k).
+#
+# 	Parameters
+# 	----------
+# 	A1,...,D1 - state matrices of system S1
+# 	A2,...,D2 - state matrices of system S2
+#
+# 	Returns
+# 	-------
+# 	A, B, C, D - state matrices of the filter H
+# 	"""
+# 	n1 = A1.rows
+# 	n2 = A2.rows
+# 	p1 = D1.rows
+# 	p2 = D2.rows
+# 	q1 = D1.cols
+# 	q2 = D2.cols
+#
+# 	if q1 != q2:
+# 		raise ValueError('Cannot substract two State-Space systems with different size of inputs')
+# 	if p1 != p2:
+# 		raise ValueError('Cannot substract two State-Space systems with different size of outputs')
+# 	q = q1
+# 	p = p1
+#
+# 	A = mpmath.mp.zeros(n1 + n2, n1 + n2)
+# 	B = mpmath.mp.zeros(n1 + n2, q)
+# 	C = mpmath.mp.zeros(p, n1 + n2)
+# 	D = mpmath.mp.zeros(p, q)
+#
+#
+# 	for i in range(0, n1):
+# 		for j in range(0, n1):
+# 			A[i,j] = A1[i,j]
+#
+# 	for i in range(0, n2):
+# 		for j in range(0, n2):
+# 			A[i + n1, j+n1] = A2[i,j]
+#
+# 	for i in range(0, n1):
+# 		for j in range(0, q):
+# 			B[i,j] = B1[i,j]
+# 	for i in range(0, n2):
+# 		for j in range(0, q):
+# 			B[i+n1, j] = B2[i,j]
+#
+# 	for i in range(0, p):
+# 		for j in range(0, n1):
+# 			C[i,j] = C1[i,j]
+#
+# 	if add:
+# 		for i in range(0, p):
+# 			for j in range(0,q):
+# 				D[i,j] = mpmath.fadd(D1[i,j], D2[i,j], exact=True)
+#
+# 		for i in range(0, p):
+# 			for j in range(0, n2):
+# 				C[i, j + n1] = C2[i, j]
+# 	else:
+# 		for i in range(0, p):
+# 			for j in range(0, q):
+# 				D[i, j] = mpmath.fsub(D1[i, j], D2[i, j], exact=True)
+# 		for i in range(0, p):
+# 			for j in range(0, n2):
+# 				C[i, j + n1] = -C2[i, j]
+#
+#
+# 	return A,B,C,D
 
 
 
@@ -842,82 +842,82 @@ def random_dSS(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.
 	return dSS(A, B, C, D)
 
 
-def to_dTFmp(A,B,C,D, prec):
-		"""
-		Computes the Trasnfer function of a dSS in multiple precision using following method:
-
-		H(Z) = P(Z)/Q(z) with
-
-		P(z) = sum_i^n {  }
-
-		TODO: complete the description
-
-		Returns
-		-------
-		P, Q - coefficients of numerator and denumerator of the transfer function H(z) of self
-		"""
-
-		# converting the dSS matrices to mp type
-		from mpmath import mp
-		#prec = 100
-		oldprec = mp.prec
-		mp.prec = prec
-
-		if isinstance(A, numpy.matrix):
-			Amp = python2mpf_matrix(A)
-		else:
-			Amp = A
-		if isinstance(B, numpy.matrix):
-			Bmp = python2mpf_matrix(B)
-		else:
-			Bmp = B
-		if isinstance(C, numpy.matrix):
-			Cmp = python2mpf_matrix(C)
-		else:
-			Cmp = C
-		if isinstance(D, numpy.matrix):
-			Dmp = python2mpf_matrix(D)
-		else:
-			Dmp = D
-
-		n = Amp.rows
-		p = Dmp.rows
-		q = Dmp.cols
-		if(p != 1 or q != 1):
-			raise ValueError( 'dSS: cannot convert a dSS to TF in multiple precision for not a SISO system')
-
-
-		mp.prec = prec * 2
-		with mpmath.extraprec(prec * 6):
-			E, V = mp.eig(Amp)		#eig returns a list E and a matrix V
-			Cmp = Cmp * V
-			Vinv = mp.inverse(V)
-			Bmp = Vinv * Bmp
-
-
-			Q = mp_poly_product([-e for e in E])
-			PP = mp.zeros(Q.rows - 1, 1)
-			#tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
-			for i in range(0, n):
-				# P = sum_i=0^n c_i * b_i * product_j!=i p_j
-				tmp_polyproduct = mp_poly_product([-e for e in E], i)
-				PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
-
-		if Dmp[0,0] != mpmath.mpf('0.0'):
-			P = Dmp[0, 0] * Q
-		else:
-			P = mp.zeros(Q.rows, 1)
-
-		for i in range(1, P.rows):
-			P[i, 0] = P[i, 0] + PP[i-1, 0]
-
-		b = mp.zeros(P.rows, 1)
-		a = mp.zeros(Q.rows, 1)
-		for i in range(0, P.rows):
-			b[i,0] = P[i,0].real
-		for i in range(0, Q.rows):
-			a[i, 0] = Q[i, 0].real
-
-		mp.prec = oldprec
-		return b,a
+# def to_dTFmp(A,B,C,D, prec):
+# 		"""
+# 		Computes the Trasnfer function of a dSS in multiple precision using following method:
+#
+# 		H(Z) = P(Z)/Q(z) with
+#
+# 		P(z) = sum_i^n {  }
+#
+# 		TODO: complete the description
+#
+# 		Returns
+# 		-------
+# 		P, Q - coefficients of numerator and denumerator of the transfer function H(z) of self
+# 		"""
+#
+# 		# converting the dSS matrices to mp type
+# 		from mpmath import mp
+# 		#prec = 100
+# 		oldprec = mp.prec
+# 		mp.prec = prec
+#
+# 		if isinstance(A, numpy.matrix):
+# 			Amp = python2mpf_matrix(A)
+# 		else:
+# 			Amp = A
+# 		if isinstance(B, numpy.matrix):
+# 			Bmp = python2mpf_matrix(B)
+# 		else:
+# 			Bmp = B
+# 		if isinstance(C, numpy.matrix):
+# 			Cmp = python2mpf_matrix(C)
+# 		else:
+# 			Cmp = C
+# 		if isinstance(D, numpy.matrix):
+# 			Dmp = python2mpf_matrix(D)
+# 		else:
+# 			Dmp = D
+#
+# 		n = Amp.rows
+# 		p = Dmp.rows
+# 		q = Dmp.cols
+# 		if(p != 1 or q != 1):
+# 			raise ValueError( 'dSS: cannot convert a dSS to TF in multiple precision for not a SISO system')
+#
+#
+# 		mp.prec = prec * 2
+# 		with mpmath.extraprec(prec * 6):
+# 			E, V = mp.eig(Amp)		#eig returns a list E and a matrix V
+# 			Cmp = Cmp * V
+# 			Vinv = mp.inverse(V)
+# 			Bmp = Vinv * Bmp
+#
+#
+# 			Q = mp_poly_product([-e for e in E])
+# 			PP = mp.zeros(Q.rows - 1, 1)
+# 			#tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
+# 			for i in range(0, n):
+# 				# P = sum_i=0^n c_i * b_i * product_j!=i p_j
+# 				tmp_polyproduct = mp_poly_product([-e for e in E], i)
+# 				PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
+#
+# 		if Dmp[0,0] != mpmath.mpf('0.0'):
+# 			P = Dmp[0, 0] * Q
+# 		else:
+# 			P = mp.zeros(Q.rows, 1)
+#
+# 		for i in range(1, P.rows):
+# 			P[i, 0] = P[i, 0] + PP[i-1, 0]
+#
+# 		b = mp.zeros(P.rows, 1)
+# 		a = mp.zeros(Q.rows, 1)
+# 		for i in range(0, P.rows):
+# 			b[i,0] = P[i,0].real
+# 		for i in range(0, Q.rows):
+# 			a[i, 0] = Q[i, 0].real
+#
+# 		mp.prec = oldprec
+# 		return b,a
 
