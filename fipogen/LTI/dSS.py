@@ -523,6 +523,7 @@ class dSS(object):
 		Transform a SISO state-space into a transfer function
 
 		"""
+
 		if self._p!=1 or self._q!= 1:
 			raise ValueError( 'dSS: the state-space must be SISO to be converted in transfer function')
 		from fipogen.LTI import dTF
