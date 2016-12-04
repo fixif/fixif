@@ -1,3 +1,4 @@
+from numpy.random.mtrand import randint, rand
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
@@ -9,8 +10,7 @@ __maintainer__ = "Anastasia Volkova"
 __email__ = "Anastasia.Volkova@lip6.fr"
 __status__ = "Beta"
 
-from fipogen.LTI import dSSmp
-from fipogen.func_aux import python2mpf_matrix
+from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy
 import mpmath
 import numpy
 
@@ -70,11 +70,17 @@ class dTFmp(object):
 	def order(self):
 		return self._order
 
+	def to_dTF(self):
+		from fipogen.LTI import dTF
+		return dTF(mpf_to_numpy(self._num), mpf_to_numpy(self._den))
+
 	def to_dSSmp(self):
 
 		"""
 		This function constructs a discrete state-space matrices in canonical controllable form[1].
 		Returns a dSSmp object.
+
+		All operations are performed *exactly*
 
 
 		Algorithm:
@@ -108,6 +114,7 @@ class dTFmp(object):
 		S  - dSSmp object
 		"""
 
+		from fipogen.LTI import dSSmp
 
 		N = self.order + 1
 
@@ -127,6 +134,40 @@ class dTFmp(object):
 		D = mpmath.matrix([self.num[0, 0]])
 
 		return dSSmp(A,B,C,D)
+
+def iter_random_dTFmp(number, order=(5, 10)):
+	"""
+		Generate some n-th order random (stable or not) SISO transfer functions
+
+		Parameters:
+			- number: number of state-space to generate
+			- order: tuple (mini,maxi) order of the filter (default:  random between 5 and 10)
+
+		Returns:
+			- returns a generator of dTF objects (to use in a for loop for example)
+
+		..Example::
+			#>>> sys = list( iter_random_dTF( 12, (10,20)) )
+			#>>> for S in iter_random_dTF( 12, (10,20)):
+			#>>>		print( S.num )
+
+	"""
+	for i in range(number):
+		yield random_dTFmp(order)
+
+def random_dTFmp(order=(5, 10)):
+	"""
+		Generate a n-th order random transfer function (not necessary stable)
+		Parameters:
+			- order: tuple (mini,maxi) order of the filter (default:  random between 5 and 10)
+	"""
+	if order[0] == order[1]:
+		n = order[0]
+	else:
+		n = randint(*order)
+	num = numpy.matrix(rand(1, n))
+	den = numpy.matrix(rand(1, n))
+	return dTFmp(num, den)
 
 
 

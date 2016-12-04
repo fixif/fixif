@@ -16,7 +16,7 @@ __status__ = "Beta"
 
 
 
-from fipogen.LTI import dTF, iter_random_dTF, to_dSSmp, to_dTFmp
+from fipogen.LTI import dTF, iter_random_dTF
 from fipogen.func_aux import python2mpf_matrix
 import mpmath
 import pytest
@@ -73,18 +73,5 @@ def test_to_dSS( H ):
 	H.assert_close( HH )
 
 
-@pytest.mark.parametrize("H", iter_random_dTF(20, order=(3,10)))
-def test_TFmp_to_dSSmp( H ):
 
-	prec = 100
-	b = python2mpf_matrix(H.num)
-	a = python2mpf_matrix(H.den)
-	b = b.transpose()
-	a = a.transpose()
-
-	A,B,C,D = to_dSSmp(b, a)
-	#Ad, Bd, Cd, Dd = to_dSSmp(b, a, mpmatrices=False)
-	bb, aa = to_dTFmp(A, B, C, D, prec)
-	my_assert_allclose_mp(bb, b, 1e-16)
-	my_assert_allclose_mp(aa, a, 1e-16)
 

@@ -3,9 +3,7 @@
 """
 This file contains tests for the dSS class and its methods
 """
-import numpy
 
-from fipogen.SIF import SIF
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -17,6 +15,10 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
+import numpy
+
+from fipogen.SIF import SIF
+
 import pytest
 import mpmath
 from numpy import array, zeros, absolute, eye, all
@@ -25,8 +27,7 @@ from numpy.linalg import eigvals
 from numpy.testing import assert_allclose
 from numpy.random import seed, randint
 
-from fipogen.LTI import dSS, random_dSS, iter_random_dSS, to_dTFmp, sub_dSSmp, to_dSSmp, iter_random_dTF, \
-	random_dTF
+from fipogen.LTI import dSS, random_dSS, iter_random_dSS, iter_random_dTF, random_dTF
 from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy
 
 
@@ -90,7 +91,7 @@ def test_random_dSS( S ):
 
 
 
-@pytest.mark.parametrize( "S", iter_random_dSS(130, stable=True, n=(2, 40), p=(2, 15), q=(2, 15)))
+@pytest.mark.parametrize( "S", iter_random_dSS(1, stable=True, n=(2, 40), p=(2, 15), q=(2, 15)))
 def test_Gramians ( S ):
 	"""
 	Test calculation of :math:`W_o` and :math:`W_c` with the two different methods (``linalg`` from scipy and ``slycot``from Slycot)
@@ -126,7 +127,14 @@ def test_Gramians ( S ):
 	dSS._W_method = 'slycot1'
 
 
+@pytest.mark.parametrize( "S", iter_random_dSS(1, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
+def test_wcpgMP( S ):
 
+	W = S.WCPGmp()
+
+	print W
+
+	assert True
 
 
 
@@ -196,34 +204,6 @@ def test_to_dTF( S ):
 		H = S.to_dTF()
 		SS = H.to_dSS()
 		S.assert_close( SS )
-
-
-@pytest.mark.parametrize( "S", iter_random_dSS(20, False, n=(3, 6), p=1, q=1))
-def test_to_dTFmp( S ):
-	if S.p > 1 or S.q > 1:
-		print ('Case of %d and %d' % S.p, S.q)
-		assert (False)
-	else:
-		H = S.to_dTF()
-		b,a = to_dTFmp(python2mpf_matrix(S.A), python2mpf_matrix(S.B), python2mpf_matrix(S.C), python2mpf_matrix(S.D), 100)
-		my_assert_allclose_TFmp(H, b, a, 1e-10)
-
-@pytest.mark.parametrize("H", iter_random_dTF(20, order=(3,10)))
-def test_sub_dSSmp( H ):
-	prec = 100
-	b = python2mpf_matrix(H.num).transpose()
-	a = python2mpf_matrix(H.den).transpose()
-	A, B, C, D = to_dSSmp(b, a, mpmatrices=True)
-	A2, B2, C2, D2 = sub_dSSmp(A, B, C, D, A, B, C, D, add=True)
-	A3, B3, C3, D3 = sub_dSSmp(A2, B2, C2, D2, A, B, C, D)
-
-	t = (numpy.empty([0, 0]), numpy.empty([A.rows, 0]), numpy.empty([D.rows, 0]), numpy.empty([0, A.rows]), numpy.empty([0, D.rows]), mpf_to_numpy(A), mpf_to_numpy(B),	mpf_to_numpy(C), mpf_to_numpy(D))
-	SIF1 = SIF(t)
-	t2 = (numpy.empty([0, 0]), numpy.empty([A3.rows, 0]), numpy.empty([D3.rows, 0]), numpy.empty([0, A3.rows]), numpy.empty([0, D3.rows]), mpf_to_numpy(A3), mpf_to_numpy(B3), mpf_to_numpy(C3), mpf_to_numpy(D3))
-	SIF2 = SIF(t2)
-	u = numpy.random.rand(1,100)
-	assert_allclose(SIF1.simulate(u), SIF2.simulate(u))
-
 
 
 @pytest.mark.parametrize( "S", iter_random_dSS(20, stable=True, n=(1, 15), p=(1, 5), q=(1, 5)))

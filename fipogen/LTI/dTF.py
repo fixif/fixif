@@ -2,6 +2,7 @@
 
 # This class describes a SISO transfer function
 from numpy.random.mtrand import randint, rand
+from scipy.weave import inline
 
 _author__ = "Thibault Hilaire"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -13,14 +14,15 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
+#from fipogen.LTI import dTFmp
 import mpmath
-from numpy import ndenumerate, array, zeros, matrix, matrix
+import numpy
+from numpy import ndenumerate, array, zeros, matrix, matrix, set_printoptions, empty
 from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
 from scipy.linalg import norm
-from mpmath import mp, matrix
-from fipogen.func_aux import mpc_get_real, mpf_to_numpy
+
 
 from numpy.testing import assert_allclose
 
@@ -53,8 +55,6 @@ class dTF(object):
 		self._order = num.shape[1]-1
 
 
-
-
 	@property
 	def num(self):
 		return self._num
@@ -83,6 +83,10 @@ class dTF(object):
 		str_tf += " "*7 + sp_den + str_den + "\n"
 
 		return str_tf
+
+
+	def to_dTFmp(self):
+		return dTFmp(self._num, self._den)
 
 
 	def to_dSS(self, form="ctrl"):
@@ -155,7 +159,7 @@ class dTF(object):
 				denum = array(self.den)
 				num_size = num.shape
 				den_size = denum.shape
-				W = empty((1, 1), dtype=float64)
+				W = empty((1, 1), dtype=numpy.float64)
 
 				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q);"
 				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'

@@ -1,3 +1,4 @@
+from numpy.random.mtrand import randint, rand
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
@@ -12,8 +13,8 @@ __status__ = "Beta"
 import mpmath
 import numpy
 
-from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mpf_poly_mult, mp_poly_product
-from fipogen.LTI import dSS, dTF
+from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mp_poly_product, mpf_matrix_fadd, mpf_matrix_fmul
+from fipogen.LTI import random_dSS
 
 class dSSmp(object):
 
@@ -58,28 +59,25 @@ class dSSmp(object):
 		"""
 
 		if not isinstance(A, mpmath.matrix):
-			if isinstance(A.numpy.matrix):
+			if isinstance(A, numpy.matrix):
 				A = python2mpf_matrix(A)
 			else:
-				raise ValueError('Cannot create dSSmp object: expected mpmath.matrix of numpy.matrix but instead got %s') % type(A)
+				raise ValueError('Cannot create dSSmp object: expected mpmath.matrix of numpy.matrix')
 		if not isinstance(B, mpmath.matrix):
-			if isinstance(B.numpy.matrix):
+			if isinstance(B, numpy.matrix):
 				B = python2mpf_matrix(B)
 			else:
-				raise ValueError(
-					'Cannot create dSSmp object: expected mpmath.matrix of numpy.matrix but instead got %s') % type(B)
+				raise ValueError('Cannot create dSSmp object: expected mpmath.matrix of numpy.matri')
 		if not isinstance(C, mpmath.matrix):
-			if isinstance(C.numpy.matrix):
+			if isinstance(C, numpy.matrix):
 				C = python2mpf_matrix(C)
 			else:
-				raise ValueError(
-					'Cannot create dSSmp object: expected mpmath.matrix of numpy.matrix but instead got %s') % type(C)
-		if not isinstance(C, mpmath.matrix):
-			if isinstance(C.numpy.matrix):
-				C = python2mpf_matrix(C)
+				raise ValueError('Cannot create dSSmp object: expected mpmath.matrix of numpy.matrix')
+		if not isinstance(D, mpmath.matrix):
+			if isinstance(D, numpy.matrix):
+				D = python2mpf_matrix(D)
 			else:
-				raise ValueError(
-					'Cannot create dSSmp object: expected mpmath.matrix of numpy.matrix but instead got %s') % type(D)
+				raise ValueError('Cannot create dSSmp object: expected mpmath.matrix of numpy.matrix')
 
 
 		#checking sizes
@@ -137,8 +135,72 @@ class dSSmp(object):
 	def q(self):
 		return self._q
 
+	def __add__(self, S):
+		"""
+		Given a dSSmp system S the function returns a dSSmp system H,
+		whcih corresponds to the difference H:=self - S in the meaning that
+		y_H(k) = y_self(k) - y_S(k)
 
-	def sub(self, S, add=False):
+		Set add to True if you want to perfor addition of systems.
+
+		Parameters
+		----------
+		S - a dSSmp system to substract
+		add=False - set to True if you want addition
+		Returns
+		-------
+		H - a filter which corresponds to the difference of systems self and S
+		"""
+
+		from fipogen.LTI import dSS
+		if not isinstance(S, dSSmp):
+			if isinstance(S, dSS):
+				S = dSSmp(S.A, S.B, S.C, S.D)
+			else:
+				raise ValueError('Cannot substract two dSSmp filters: expected a dSSmp but instead got %s') % type(S)
+
+		if self.q != S.q:
+			raise ValueError('Cannot substract two State-Space systems with different size of inputs')
+		if self.p != S.p:
+			raise ValueError('Cannot substract two State-Space systems with different size of outputs')
+
+		A = mpmath.mp.zeros(self.n + S.n, self.n + S.n)
+		B = mpmath.mp.zeros(self.n + S.n, self.q)
+		C = mpmath.mp.zeros(self.p, self.n + S.n)
+		D = mpmath.mp.zeros(self.p, self.q)
+
+		for i in range(0, self.n):
+			for j in range(0, self.n):
+				A[i, j] = self.A[i, j]
+
+		for i in range(0, S.n):
+			for j in range(0, S.n):
+				A[i + self.n, j + self.n] = S.A[i, j]
+
+		for i in range(0, self.n):
+			for j in range(0, self.q):
+				B[i, j] = self.B[i, j]
+		for i in range(0, S.n):
+			for j in range(0, self.q):
+				B[i + self.n, j] = S.B[i, j]
+
+		for i in range(0, self.p):
+			for j in range(0, self.n):
+				C[i, j] = self.C[i, j]
+
+		for i in range(0, self.p):
+			for j in range(0, S.n):
+				C[i, j + self.n] = S.C[i, j]
+
+		for i in range(0, self.p):
+			for j in range(0, self.q):
+				D[i, j] = mpmath.fadd(self.D[i, j], S.D[i, j], exact=True)
+
+
+		return dSSmp(A, B, C, D)
+
+
+	def __sub__(self, S):
 		"""
 		Given a dSSmp system S the function returns a dSSmp system H,
 		whcih corresponds to the difference H:=self - S in the meaning that
@@ -156,7 +218,7 @@ class dSSmp(object):
 		"""
 
 
-
+		from fipogen.LTI import dSS
 		if not isinstance(S, dSSmp):
 			if isinstance(S, dSS):
 				S = dSSmp(S.A, S.B, S.C, S.D)
@@ -194,30 +256,22 @@ class dSSmp(object):
 			for j in range(0, self.n):
 				C[i, j] = self.C[i, j]
 
-		if add:
-			for i in range(0,self.p):
-				for j in range(0,self.q):
-					D[i, j] = mpmath.fadd(self.D[i, j], S.D[i, j], exact=True)
-
-			for i in range(0,self.p):
-				for j in range(0, S.n):
-					C[i, j + self.n] = S.C[i, j]
-		else:
-			for i in range(0, self.p):
-				for j in range(0,self.q):
-					D[i, j] = mpmath.fsub(self.D[i, j], S.D[i, j], exact=True)
-			for i in range(0,self.p):
-				for j in range(0, S.n):
-					C[i, j + self.n] = -S.C[i, j]
+		for i in range(0, self.p):
+			for j in range(0, self.q):
+				D[i, j] = mpmath.fsub(self.D[i, j], S.D[i, j], exact=True)
+		for i in range(0, self.p):
+			for j in range(0, S.n):
+				C[i, j + self.n] = -S.C[i, j]
 
 		return dSSmp(A, B, C, D)
 
 
-	def get_dSS(self):
-		return dSS(mpf_to_numpy(self._A), mpf_to_numpy(self._B), mpf_to_numpy(self._C), mpf_to_numpy(self._C))
+	def to_dSS(self):
+		from fipogen.LTI import dSS
+		return dSS(mpf_to_numpy(self._A), mpf_to_numpy(self._B), mpf_to_numpy(self._C), mpf_to_numpy(self._D))
 
 
-	def get_dTFmp(self, prec):
+	def to_dTFmp(self, prec=64):
 		"""
 		This function computes corresponding transfer function in multiple precision.
 		All operations are performed with at leaste prec bits of precision for mantissas.
@@ -235,7 +289,7 @@ class dSSmp(object):
 		oldprec = mpmath.mp.prec
 		mpmath.mp.prec = prec
 
-
+		from fipogen.LTI import dTFmp
 
 		if self.p != 1 or self.q != 1:
 			raise ValueError('dSS: cannot convert a dSSmp to dTFmp for not a SISO system')
@@ -274,4 +328,121 @@ class dSSmp(object):
 		mpmath.mp.prec = oldprec
 		return dTFmp(b, a)
 
+
+	def simulate(self, u, exact=True, x0=None):
+		"""
+		Given a vector of inputs u this function simulates
+		the output of the dSS system on these inputs.
+
+		If the flag exact is set to True (default) then the simulation is performed
+		exactly. Otherwise, on each iteration the SoPs are computed exactly and then the state variables
+		are rounded to double precision.
+
+		Parameters
+		----------
+		u - vector of inputs in the format numpy.matrix or mpmath.matrix of size q x T
+		x0 - vector of inital states, if specified must be of size n x 1
+		exact - a flag wether to perform simulations in exact (by default) or to perform
+
+		Returns
+		-------
+		y -  p x T matrix of outputs
+
+		"""
+
+		if not isinstance(u, mpmath.matrix):
+			if isinstance(u, numpy.matrix):
+				u = python2mpf_matrix(u)
+			else:
+				raise ValueError('Cannot perform simulation: u must be either mpmath.matrix or numpy.matrix')
+
+		if u.rows != self._q:
+			raise ValueError('Cannot perform somulation: u is of incorrect size')
+
+		xk = mpmath.mp.zeros(self._n, 1)
+		if x0:
+			if not isinstance(x0, mpmath.matrix):
+				if isinstance(x0, numpy.matrix):
+					xk = python2mpf_matrix(x0)
+				else:
+					raise ValueError('Cannot perform simulation: initial state specified in incorrect format')
+
+		if xk.rows != self._n:
+			raise ValueError('Cannot perform simulation: initial state is of incorrect size')
+
+		T = u.cols
+		yk = mpmath.mp.zeros(self._p, T)
+
+		if exact:
+			for i in range(0, T):
+				xkp1 = mpf_matrix_fmul(self._A, xk)
+				xkp1 = mpf_matrix_fadd(xkp1, mpf_matrix_fmul(self._B, u[:, i]))
+
+				yk[:, i] = mpf_matrix_fmul(self._C, xk)
+				yk[:, i] = mpf_matrix_fadd(yk[:, i], mpf_matrix_fmul(self._D, u[:, i]))
+
+				xk = xkp1
+
+		else:
+			for i in range(0, T):
+				xkp1 = mpf_matrix_fmul(self._A, xk)
+				xkp1 = mpf_matrix_fadd(xkp1, mpf_matrix_fmul(self._B, u[:, i]))
+
+				yk[:, i] = mpf_matrix_fmul(self._C, xk)
+				yk[:, i] = mpf_matrix_fadd(yk[:, i], mpf_matrix_fmul(self._D, u[:, i]))
+
+				for i in range(0, xk.rows):
+					xk[i, 0] = mpmath.fadd(xkp1[i, 0], mpmath.mp.zero, prec=64, rounding='n')
+
+
+
+		return yk
+
+
+
+
+
+
+
+def random_dSSmp(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
+	return random_dSS(n, p, q, pRepeat, pReal, pBCmask, pDmask, pDmask, pDzero).to_dSSmp()
+
+
+
+def iter_random_dSSmp(number, stable = True, n = (5, 10), p = (1, 5), q = (1, 5), pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
+	"""
+	Generate some n-th order random (stable or not) state-spaces, with q inputs and p outputs
+	copy/Adapted from control-python library (thanks guys): https://sourceforge.net/projects/python-control/
+	possibly already adpated from Mathworks or Octave
+
+	Parameters:
+		- number: number of state-space to generate
+		- stable: indicate if the state-spaces are stable or not
+		- n: tuple (mini,maxi) number of states (default:  random between 5 and 10)
+		- p: number of outputs (default: 1)
+		- q: number of inputs (default: 1)
+
+		- pRepeat: Probability of repeating a previous root (default: 0.01)
+		- pReal: Probability of choosing a real root (default: 0.5). Note that when choosing a complex root, the conjugate gets chosen as well. So the expected proportion of real roots is pReal / (pReal + 2 * (1 - pReal))
+		- pBCmask: Probability that an element in B or C will not be masked out (default: 0.9)
+		- pDmask: Probability that an element in D will not be masked out (default: 0.8)
+		- pDzero: Probability that D = 0 (default: 0.5)
+
+	Returns:
+		- returns a generator of dSS objects (to use in a for loop for example)
+
+	"""
+	for i in range(number):
+		if stable:
+			yield random_dSSmp(randint(*n), randint(*p), randint(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
+		else:
+			nn = randint(*n)
+			pp = randint(*p)
+			qq = randint(*q)
+			A = numpy.matrix(rand(nn,nn))
+			B = numpy.matrix(rand(nn,qq))
+			C = numpy.matrix(rand(pp,nn))
+			D = numpy.matrix(rand(pp,qq))
+
+			yield dSSmp(A,B,C,D)
 

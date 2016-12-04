@@ -6,6 +6,9 @@ This file contains Object and methods for a Discrete State Space
 from numpy.core.umath import pi, cos, sin
 from numpy.random.mtrand import randint, seed, rand, randn
 
+
+
+
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
 __credits__ = ["Thibault Hilaire", "Joachim Kruithof", "Anastasia Lozanova"]
@@ -17,10 +20,10 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from numpy					import inf, empty, float64, shape, identity, absolute, dot, eye, array, asfarray, ones, matrix, matrix, matrix, matrix, zeros  # , astype
+from numpy					import empty, float64, identity, dot, array
 from numpy					import matrix as mat, Inf, set_printoptions
 from numpy					import eye, zeros, r_, c_, sqrt
-from numpy.linalg			import inv, det, solve, eigvals, LinAlgError
+from numpy.linalg			import inv, solve
 from numpy.linalg.linalg	import LinAlgError
 from scipy.linalg			import solve_discrete_lyapunov
 from slycot					import sb03md, ab09ad
@@ -32,7 +35,7 @@ import mpmath, numpy
 
 from numpy.testing import assert_allclose
 
-from fipogen.func_aux		import python2mpf_matrix, mp_poly_product, mpc_get_real
+
 
 
 class dSS(object):
@@ -376,6 +379,28 @@ class dSS(object):
 
 		return self._WCPG
 
+	def WCPGmp(self):
+		"""
+		This functions computes the WCPG of the state-space system
+		with absolute error bounded by 2^k, k > 1.
+
+		The result is given as a list W of sollya objects, which represents a
+		p x q WCPG matrix.
+
+
+		Parameters
+		----------
+		k -
+
+		Returns
+		-------
+		W - a list of sollya objects representing elemnts of the WCPG matrix
+		"""
+
+
+
+
+
 
 
 
@@ -515,7 +540,9 @@ class dSS(object):
 
 		return dSS(self._A, self._B[:,args[0][1]], self._C[args[0][0],:], self._D[args[0][0],args[0][1]])
 
-
+	def to_dSSmp(self):
+		from fipogen.LTI import dSSmp
+		return dSSmp(self._A, self._B, self._C, self._D)
 
 
 	def to_dTF(self):
@@ -561,7 +588,36 @@ class dSS(object):
 			raise ValueError("dSS: balanced: The selected order nr is greater than the order of a minimal realization of the given system. It was set automatically to a value corresponding to the order of a minimal realization of the system")
 		return dSS( Ar, Br, Cr, self.D)
 
-	def sub_dSS(self, S, add=False):
+	def __add__(self, S):
+		"""
+		This method computes the difference between self and a filter S given in the argument such that
+		the result filter H := self + S has
+					H.A = [[self.A, zeros(self.n, S.n)], [zeros(S.n, self.n), S.A]]
+					H.B = [[self.B], [S.B]]
+					H.C = [self.C, S.C]
+					H.D = [self.D + S.D]
+		Parameters
+		----------
+		S - a dSS to substract from self
+
+		Returns
+		-------
+		H - a dSS which is equal to (self - S)
+		"""
+
+		newA = numpy.concatenate((self.A, numpy.zeros([self.n, S.n])), axis=1)
+		tmp = numpy.concatenate((numpy.zeros([S.n, self.n]), S.A), axis=1)
+		newA = numpy.concatenate((newA, tmp), axis=0)
+
+		newB = numpy.concatenate((self.B, S.B), axis=0)
+		newC = numpy.concatenate((self.C, S.C), axis=1)
+		newD = self.D + S.D
+
+		return dSS(newA, newB, newC, newD)
+
+
+
+	def __sub__(self, S):
 		"""
 		This method computes the difference between self and a filter S given in the argument such that
 		the result filter H := self - S has
@@ -582,17 +638,9 @@ class dSS(object):
 		tmp = numpy.concatenate((numpy.zeros([S.n, self.n]), S.A), axis=1)
 		newA = numpy.concatenate((newA, tmp), axis=0)
 
-		#newA = numpy.matrix([[self.A, numpy.zeros(self.n, S.n)], [numpy.zeros(S.n, self.n), S.A]])
 		newB =numpy.concatenate((self.B, S.B), axis=0)
-		#newB = numpy.matrix([[self.B], [S.B]])
-		if add:
-			#newC = numpy.matrix([self.C, S.C])
-			newC = numpy.concatenate((self.C, S.C), axis = 1)
-			newD = self.D + S.D
-		else:
-			#newC = numpy.matrix([self.C, -S.C])
-			newC = numpy.concatenate((self.C, -S.C), axis=1)
-			newD = self.D - S.D
+		newC = numpy.concatenate((self.C, -S.C), axis=1)
+		newD = self.D - S.D
 
 		return dSS(newA, newB, newC, newD)
 
