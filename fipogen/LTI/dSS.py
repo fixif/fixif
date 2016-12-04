@@ -379,23 +379,6 @@ class dSS(object):
 
 		return self._WCPG
 
-	def WCPGmp(self):
-		"""
-		This functions computes the WCPG of the state-space system
-		with absolute error bounded by 2^k, k > 1.
-
-		The result is given as a list W of sollya objects, which represents a
-		p x q WCPG matrix.
-
-
-		Parameters
-		----------
-		k -
-
-		Returns
-		-------
-		W - a list of sollya objects representing elemnts of the WCPG matrix
-		"""
 
 
 

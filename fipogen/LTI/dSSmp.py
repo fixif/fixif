@@ -1,4 +1,3 @@
-from numpy.random.mtrand import randint, rand
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
@@ -13,7 +12,8 @@ __status__ = "Beta"
 import mpmath
 import numpy
 
-from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mp_poly_product, mpf_matrix_fadd, mpf_matrix_fmul
+from numpy.random.mtrand import randint, rand
+from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mp_poly_product, mpf_matrix_fadd, mpf_matrix_fmul, mpf_matrix_to_sollya
 from fipogen.LTI import random_dSS
 
 class dSSmp(object):
@@ -328,6 +328,52 @@ class dSSmp(object):
 		mpmath.mp.prec = oldprec
 		return dTFmp(b, a)
 
+	def WCPGmp(self, k):
+		"""
+		This functions computes the WCPG of the state-space system
+		with absolute error bounded by 2^k, k > 1.
+
+		The result is given as a list W of sollya objects, which represents a
+		p x q WCPG matrix.
+
+
+		Parameters
+		----------
+		k -
+
+		Returns
+		-------
+		W - a list of sollya objects representing elemnts of the WCPG matrix
+		"""
+
+		import sollya
+		import sys
+
+		# load gabarit.sol
+		sollya.suppressmessage(57, 174, 130, 457)
+		sollya.execute("fipogen/LTI/wcpg.sol")
+
+
+		#construct the inputs for the wcpg function in sollyaObject format
+		A,_,_ = mpf_matrix_to_sollya(self._A)
+		B,_,_ = mpf_matrix_to_sollya(self._B)
+		C,_,_ = mpf_matrix_to_sollya(self._C)
+		D,_,_ = mpf_matrix_to_sollya(self._D)
+
+		if abs(k) == 0 or abs(k) == 1:
+			raise ValueError('Cannot compute WCPG in multiple precision, k must be strictly larger than 1')
+		if k < -1:
+			k = abs(k)
+
+		eps = 2 ** sollya.SollyaObject(-k)
+
+		W = sollya.parse("wcpg")(A, B, C, D, self._n, self._p, self._q, eps)
+
+		return W
+
+
+
+
 
 	def simulate(self, u, exact=True, x0=None):
 		"""
@@ -445,4 +491,7 @@ def iter_random_dSSmp(number, stable = True, n = (5, 10), p = (1, 5), q = (1, 5)
 			D = numpy.matrix(rand(pp,qq))
 
 			yield dSSmp(A,B,C,D)
+
+
+
 
