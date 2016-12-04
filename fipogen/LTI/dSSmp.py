@@ -13,7 +13,7 @@ import mpmath
 import numpy
 
 from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mpf_poly_mult, mp_poly_product
-from fipogen.LTI import dSS, dTF, dTFmp
+from fipogen.LTI import dSS, dTF
 
 class dSSmp(object):
 
