@@ -20,8 +20,8 @@ from fipogen.LTI import dTF
 from scipy.signal import iirdesign, freqz
 from numpy import atleast_1d, array, pi,log
 
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+#import matplotlib.pyplot as plt
+#from matplotlib.patches import Rectangle
 
 import sollya
 

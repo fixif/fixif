@@ -1,15 +1,19 @@
-from fipogen.LTI import dSS, dTF, iter_random_dSS, iter_random_dTF, iter_random_Butter, to_dTFmp, sub_dSSmp, to_dSSmp, random_dSS
-from fipogen.SIF import *
-from fipogen.func_aux import *
 
-import numpy as np
-import mpmath as mpm
 
+import numpy
+import mpmath
 import sollya
 
+from sollya import *
+
+#from fipogen.LTI import dTFmp, dSSmp, dSS, dTF, Gabarit
+
+from fipogen.LTI import dTFmp, dSSmp
+from fipogen.SIF import SIF, Realization
 
 
-def get_TFmp(S, prec):
+
+def blablabla(S, prec):
 	"""
 	Given a dSS system S (we consider that dSS objest has exact state-space matrices),
 	this function computes a bound on the absolute value of its transfer function:
@@ -32,30 +36,66 @@ def get_TFmp(S, prec):
 	"""
 
 
-	T_b, T_a = to_dTFmp(S.A, S.B, S.C, S.D, prec)
 
-	T_A, T_B, T_C, T_D = to_dSSmp(T_b, T_a)
-	T_Adbl, T_Bdbl, T_Cdbl, T_Ddbl = to_dSSmp(T_b, T_a, mpmatrices=False)
+# --------- set a Gabarit
+#g = Gabarit(.....)
 
-	dSS_Tdbl = dSS(T_Adbl, T_Bdbl, T_Cdbl, T_Ddbl)
-
-	#compute the difference between S and dSS_T
-
-	dSS_delta_dbl = S.sub_dSS(dSS_Tdbl)
-
-	delta_A, delta_B, delta_C, delta_D = sub_dSSmp(python2mpf_matrix(S.A),python2mpf_matrix(S.B), python2mpf_matrix(S.C), python2mpf_matrix(S.D), T_A, T_B, T_C, T_D)
-
-	Theta = dSS_delta_dbl.WCPG()
+# --------- transform the gabarit to the TF
+# TF = g.to_TF(....)
 
 
-	return T_b, T_a, Theta
+# --------- get Realizations for this TF
+
+#for R in iterAllRealizations():
+
+	# --------- quantize the realization coefficients
+	# Rq = R.quantizeMatrices(q = 16)
+
+	# --------- get the exact dSSmp corresponding to this realization
+	#S = Rq.SIF.to_dSSmp()
+
+	# --------- set the bound for which we compute the gabarit
+	#x = 10
+	#bound = 10**sollyaObject(-x)
+
+	# --------- set the initial precision for the TF computation
+	#prec = max(100, log2(bound))
+
+	#while True:
+
+		#while True:
+
+			# --------- compute the transfer function corresponding to the dSS
+			#H = S.to_dTFmp(prec)
+
+			# --------- compute the exact dSS corresponding to H
+			#S_H = H.to_dSSmp()
+
+			# --------- compute S_delta = S - S_H
+			#S_delta = S - S_H
+
+			# set the initial precision for the WCPG computation to eps=log2(bound) + 2
+			# eps = max(64, log2(bound) + 2)
+
+			#while True:
+				# --------- compute the WCPG of the S_delta with error bound 2**-eps
+				#W = S_delta.WCPGmp(eps)
+
+				# --------- if WCPG + eps > bound then we need to either increase the precision fo the WCPG computation or
+				#                                                increase the precision of the TF computation
+
+				#if W[0] + 2**(-eps) > bound:
 
 
 
-s = sollya.SollyaObject('123')
-print s
-S = random_dSS(5, 1, 1)
-#for prec in range(50, 1000, 50):
-#	b, a, theta = get_TFmp(S, prec)
-#	print 'Transfer function: \n \t num: %s \n \t den: %s \nTheta: %s\n'% (repr(b.transpose()), repr(a.transpose()), repr(theta))
+
+
+
+
+
+
+
+
+
+
 
