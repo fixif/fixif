@@ -351,7 +351,7 @@ class dSSmp(object):
 
 		# load gabarit.sol
 		sollya.suppressmessage(57, 174, 130, 457)
-		sollya.execute("/Users/anastasiialozanova/Work/fipogen_git/fipogen/fipogen/LTI/wcpg.sol")
+		sollya.execute("fipogen/LTI/wcpg.sol")
 
 		wcpg = sollya.parse("wcpg")
 
