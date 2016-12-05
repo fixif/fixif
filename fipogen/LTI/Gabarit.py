@@ -16,9 +16,12 @@ __status__ = "Beta"
 
 
 from copy import copy
-from fipogen.LTI import dTF
+from fipogen.LTI import dTF, dTFmp
 from scipy.signal import iirdesign, freqz
 from numpy import atleast_1d, array, pi,log
+from fipogen.func_aux import mpf_matrix_to_sollya
+
+import mpmath
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
@@ -88,21 +91,21 @@ class Band(object):
 	def __repr__(self):
 		return "Band(%s,%s,%s,%s)" % (self._Fs, self._F1, self._F2, self._Gain)
 
-	def sollyaConstraint(self,eps):
+	def sollyaConstraint(self,bound):
 		"""
 		Returns a dictonary for sollya checkModulusFilterInSpecification
 		"""
 		w1 = 2*sollya.SollyaObject(self._F1)/self._Fs
 		w2 = 2*sollya.SollyaObject(self._F2)/self._Fs if self._F2 else 1    # F2==None -> F2=Fs/2, so w2=1
-		eps = sollya.SollyaObject(eps)
+		bound = sollya.SollyaObject(bound)
 
 		if self.isPassBand:
 			# pass band
-			betaInf = 10 ** (sollya.SollyaObject(self.Gain[1]) / 20)*(1-eps)
-			betaSup = 10 ** (sollya.SollyaObject(self.Gain[0]) / 20)*(1+eps)
+			betaInf = 10 ** (sollya.SollyaObject(self.Gain[1]) / 20) - bound
+			betaSup = 10 ** (sollya.SollyaObject(self.Gain[0]) / 20) + bound
 		else:
 			betaInf = 0
-			betaSup = 10 ** (sollya.SollyaObject(self.Gain) / 20)*(1+eps)
+			betaSup = 10 ** (sollya.SollyaObject(self.Gain) / 20) + bound
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
 
@@ -208,7 +211,7 @@ class Gabarit(object):
 
 		plt.show()
 
-	def check_dTF(self, tf, eps=0):
+	def check_dTF(self, tf, bound=0):
 		"""
 		Check if a transfer function satisfy the Gabarit
 		This is done using Sollya and gabarit.sol
@@ -223,12 +226,18 @@ class Gabarit(object):
 		sollya.suppressmessage(57, 174, 130, 457)
 		sollya.execute("fipogen/LTI/gabarit.sol")
 
+		if isinstance(tf.num[0,0], mpmath.mpf):
+			tf_num_sollya, len_num, _ = mpf_matrix_to_sollya(tf.num)
+			tf_den_sollya, len_den, _ = mpf_matrix_to_sollya(tf.den)
+			num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(tf_num_sollya)))
+			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(tf_den_sollya)))
+		else:
 		# build sollya objects
-		num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(tf.num)[0,:])))
-		den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(tf.den)[0,:])))
+			num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(tf.num)[0,:])))
+			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(tf.den)[0,:])))
 
 		# build the constraints to verify
-		constraints = [b.sollyaConstraint(eps) for b in self._bands]
+		constraints = [b.sollyaConstraint(bound) for b in self._bands]
 
 		# run sollya check
 		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints)
