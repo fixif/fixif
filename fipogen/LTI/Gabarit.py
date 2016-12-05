@@ -163,23 +163,30 @@ class Gabarit(object):
 			- Bessel/Thomson: 'bessel'
 		- method: (string) the method used ('scipy' for scipy.signal.iirdesign, or 'matlab' for )
 		"""
+		# Start Matlab if needed
+		matlabEng = None
 		if method=='matlab':
-			import matlab
-			# http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
-			eng = matlab.engine.start_matlab()
+			from matlab.engine import start_matlab   # http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
+			matlabEng = start_matlab()
 			# TODO: avoir une class MatlbabHelper, qui permet de n'avoir qu'une seule instance d'engine matlab pour ne pas avoir à la redémarrer à chaque fois
+
+
 		if self.type=='lowpass':
 			# lowpass
 			passb, stopb = self._bands
 			gain = passb.Gain[0]
 			passb = passb - gain
 			stopb = stopb - gain
-			if method=='matlab':
-				pass
+
+			if matlabEng:
+				de = matlabEng.fdesign.lowpass(passb.F2,stopb.F1,-passb.Gain[1], -stopb.Gain, self._Fs)
 			else:
 				num, den = iirdesign(passb.w2, stopb.w1, -passb.Gain[1], -stopb.Gain, analog=False, ftype=ftype)
-		else:
-			raise ValueError("Not yet implemented")
+
+
+		if matlabEng:
+			h = matlabEng.design(de, ftype,'SystemObject',1)
+			num,den = matlabEng.tf(h, nargout=2)
 
 		return dTF(num, den)
 
