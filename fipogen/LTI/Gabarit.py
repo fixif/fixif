@@ -20,26 +20,49 @@ from fipogen.LTI import dTF
 from scipy.signal import iirdesign, freqz
 from numpy import atleast_1d, array, pi,log
 
-#import matplotlib.pyplot as plt
-#from matplotlib.patches import Rectangle
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 
 import sollya
 
 class Band(object):
 	"""Normalized band
 	pass band or stop band"""
-	def __init__(self, w1, w2, Gain):
-		self._w1 = w1
-		self._w2 = w2
+	def __init__(self, Fs, F1, F2, Gain):
+		"""
+
+		Parameters
+		----------
+		- Fs: sampling Frequency (Hz), None if unspecified
+		- F1,F2: frequencies of the band (F2 can be None, to indicate F2 = Fs/2)
+		- Gain: Gain (in dB) of the band -> negative for attenuation !!
+		"""
+		self._Fs = Fs if Fs else 2
+		self._F1 = F1
+		self._F2 = F2
 		self._Gain = Gain
 
 	@property
+	def Fs(self):
+		return self._Fs
+
+	@property
+	def F1(self):
+		return self._F1
+
+	@property
+	def F2(self):
+		return self._F2 if self._F2 else float(self._Fs/2)
+
+	@property
 	def w1(self):
-		return self._w1
+		"""Normalized frequency (approx. due to the division)"""
+		return 2*float(self._F1)/self._Fs
 
 	@property
 	def w2(self):
-		return self._w2
+		"""Normalized frequency (approx. due to the division)"""
+		return 2*float(self._F2)/self._Fs
 
 	@property
 	def Gain(self):
@@ -52,18 +75,25 @@ class Band(object):
 
 	def __le__(self, other):
 		"""compare two bands"""
-		return self.w1 < other.w1
+		return self.F1 < other.F1
 
 	def __sub__(self,other):
 		"""Substract a Band and a Gain"""
-		return Band(self._w1, self._w2, self._Gain-other if not self.isPassBand else (self._Gain[0]-other, self._Gain[1]-other))
+		try:
+			return Band(self._Fs, self._F1, self._F2, self._Gain-other if not self.isPassBand else (self._Gain[0]-other, self._Gain[1]-other))
+		except Exception as e:
+			raise e
+			raise ValueError("The gain should be a constant")
+
+	def __repr__(self):
+		return "Band(%s,%s,%s,%s)" % (self._Fs, self._F1, self._F2, self._Gain)
 
 	def sollyaConstraint(self,eps):
 		"""
 		Returns a dictonary for sollya checkModulusFilterInSpecification
 		"""
-		w1 = sollya.SollyaObject(self.w1)
-		w2 = sollya.SollyaObject(self.w2)
+		w1 = 2*sollya.SollyaObject(self._F1)/self._Fs
+		w2 = 2*sollya.SollyaObject(self._F2)/self._Fs if self._F2 else 1    # F2==None -> F2=Fs/2, so w2=1
 		eps = sollya.SollyaObject(eps)
 
 		if self.isPassBand:
@@ -72,7 +102,7 @@ class Band(object):
 			betaSup = 10 ** (sollya.SollyaObject(self.Gain[0]) / 20)*(1+eps)
 		else:
 			betaInf = 0
-			betaSup = 10 ** (sollya.SollyaObject(self.Gain) / 20)
+			betaSup = 10 ** (sollya.SollyaObject(self.Gain) / 20)*(1+eps)
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
 
@@ -95,10 +125,10 @@ class Gabarit(object):
 				for stop band, the amplitude is a float x --> the amplitude must be lower than x dB
 		"""
 		# sampling frequency
-		self._Fs = Fs if Fs else .5
+		self._Fs = Fs
 
 		# store the bands (sorted)
-		self._bands = [ Band(2.0*F1/self._Fs, 2.0*F2/self._Fs if F2 else 1, G) for (F1,F2),G in zip(Fbands, Abands) ]       # division par Fs, est-ce à faire dans sollya ?
+		self._bands = [ Band(Fs, F1, F2, G) for (F1,F2),G in zip(Fbands, Abands) ]
 		self._bands.sort()
 
 		self._type = None
@@ -118,27 +148,36 @@ class Gabarit(object):
 				self._type = 'multiband'
 		return self._type
 
-	def to_dTF(self, ftype='butter'):
+
+	def to_dTF(self, ftype='butter', method='scipy'):
 		"""
 		Returns a transfer function (dTF object) that *should* satisfy the gabarit
 		using scipy.signal.iirdesin
 
 		Parameters:
-		ftype : (str) the type of IIR filter to design:
-		- Butterworth   : 'butter'
-		- Chebyshev I   : 'cheby1'
-		- Chebyshev II  : 'cheby2'
-		- Cauer/elliptic: 'ellip'
-		- Bessel/Thomson: 'bessel'
+		-ftype : (str) the type of IIR filter to design:
+			- Butterworth   : 'butter'
+			- Chebyshev I   : 'cheby1'
+			- Chebyshev II  : 'cheby2'
+			- Cauer/elliptic: 'ellip'
+			- Bessel/Thomson: 'bessel'
+		- method: (string) the method used ('scipy' for scipy.signal.iirdesign, or 'matlab' for )
 		"""
-
+		if method=='matlab':
+			import matlab
+			# http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
+			eng = matlab.engine.start_matlab()
+			# TODO: avoir une class MatlbabHelper, qui permet de n'avoir qu'une seule instance d'engine matlab pour ne pas avoir à la redémarrer à chaque fois
 		if self.type=='lowpass':
 			# lowpass
 			passb, stopb = self._bands
-			#gain = passb.Gain[0]
-			#passb = passb - gain
-			#stopb = stopb - gain
-			num, den = iirdesign(passb.w2, stopb.w1, -passb.Gain[1], -stopb.Gain, analog=False, ftype=ftype)
+			gain = passb.Gain[0]
+			passb = passb - gain
+			stopb = stopb - gain
+			if method=='matlab':
+				pass
+			else:
+				num, den = iirdesign(passb.w2, stopb.w1, -passb.Gain[1], -stopb.Gain, analog=False, ftype=ftype)
 		else:
 			raise ValueError("Not yet implemented")
 
@@ -147,16 +186,18 @@ class Gabarit(object):
 
 	def plot(self, tf=None):
 		"""Plot a gabarit"""
+		minG = -200
 		if tf:
 			w, h = freqz(tf.num.transpose(), tf.den.transpose())
 			plt.plot( (self._Fs * 0.5 / pi) * w, 20*log(abs(h)) )
+			minG = min(20*log(abs(h)))
 
 		currentAxis = plt.gca()
 		for b in self._bands:
 			if b.isPassBand:
-				currentAxis.add_patch(Rectangle((b.w1*.5*self._Fs, b.Gain[0]), (b.w2-b.w1)*.5*self._Fs, b.Gain[1]-b.Gain[0], facecolor="red", alpha=0.3))
+				currentAxis.add_patch(Rectangle((b.F1, b.Gain[0]), (b.F2-b.F1), b.Gain[1]-b.Gain[0], facecolor="red", alpha=0.3))
 			else:
-				currentAxis.add_patch(Rectangle((b.w1 * .5 * self._Fs, b.Gain), (b.w2 - b.w1) * .5 * self._Fs, -1e3, facecolor="red", alpha=0.3))
+				currentAxis.add_patch(Rectangle((b.F1, b.Gain), b.F2 - b.F1, minG, facecolor="red", alpha=0.3))
 
 		plt.show()
 
