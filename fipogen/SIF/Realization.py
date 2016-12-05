@@ -81,6 +81,9 @@ class Realization(SIF):
 		self._varNameY = genVarName( 'y', self._p)
 
 
+		self._MSB = None
+		self._LSB = None
+
 		# store the filter
 		if filter is not None:
 			self._filter = filter
@@ -98,6 +101,14 @@ class Realization(SIF):
 		# remove the module file (.so) when it exists
 		if self._runModule is not None:
 			remove( self._runModule.__file__ )
+
+	@property
+	def MSB(self):
+		return self._MSB
+
+	@property
+	def LSB(self):
+		return self._LSB
 
 	@property
 	def filter(self):

@@ -59,9 +59,11 @@ def test_construction( ):
 	with pytest.raises(ValueError):
 		dSSmp([[1, 2], [3, 4]], [[1], [2]], [[1, 2], [1, 2]], 3)
 
-@pytest.mark.parametrize( "S", iter_random_dSSmp(20, False, n=(3, 10), p=(1,5), q=(1,5)))
+#@pytest.mark.parametrize( "S", iter_random_dSSmp(20, False, n=(3, 10), p=(1,5), q=(1,5)))
+@pytest.mark.parametrize( "S", iter_random_dSSmp(20, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
 def test_to_dSS( S ):
-
+	W = S.WCPGmp(53)
+	print W
 	Sd = S.to_dSS()
 	Sdd = Sd.to_dSSmp()
 
@@ -78,8 +80,11 @@ def test_to_dSS( S ):
 #
 # 	Sd = S.to_dSS()
 
+@pytest.mark.parametrize( "S", iter_random_dSSmp(1, False, n=(3, 10), p=(1,5), q=(1,5)))
+def test_WCPGmp( S ):
 
-
+	W = S.WCPGmp(53)
+	print W
 
 
 

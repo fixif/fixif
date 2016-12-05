@@ -351,7 +351,9 @@ class dSSmp(object):
 
 		# load gabarit.sol
 		sollya.suppressmessage(57, 174, 130, 457)
-		sollya.execute("fipogen/LTI/wcpg.sol")
+		sollya.execute("/Users/anastasiialozanova/Work/fipogen_git/fipogen/fipogen/LTI/wcpg.sol")
+
+		wcpg = sollya.parse("wcpg")
 
 
 		#construct the inputs for the wcpg function in sollyaObject format
@@ -367,8 +369,8 @@ class dSSmp(object):
 
 		eps = 2 ** sollya.SollyaObject(-k)
 
-		W = sollya.parse("wcpg")(A, B, C, D, self._n, self._p, self._q, eps)
-
+		#W = sollya.parse("wcpg")(A, B, C, D, self._n, self._p, self._q, eps)
+		W = wcpg(A, B, C, D, self._n, self._p, self._q, eps)
 		return W
 
 
@@ -451,7 +453,7 @@ class dSSmp(object):
 
 
 def random_dSSmp(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
-	return random_dSS(n, p, q, pRepeat, pReal, pBCmask, pDmask, pDmask, pDzero).to_dSSmp()
+	return random_dSS(n, p, q, pRepeat, pReal, pBCmask, pDmask, pDzero).to_dSSmp()
 
 
 

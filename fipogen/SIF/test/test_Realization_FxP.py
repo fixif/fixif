@@ -35,29 +35,7 @@ from fipogen.func_aux import mpf_poly_mult
 from numpy.random import seed, rand, randint, shuffle
 from numpy.testing import assert_allclose
 
-# This function computes the product product_i=0^n (1 - p_i)
-		# If the second argument j is specified, it computes the product for all i != j
-def polyproduct(p, j = -1):
-	degP = len(p)
-	if degP < 2:
-		raise ValueError( 'error in polynomial product: empty polynomial')
-	if j == -1:
-		c = mp.matrix([1, p[0]])
-		for i in range(1, degP):
-			c = mpf_poly_mult(c, mp.matrix([1, p[i]]))
-	else:
-		if j == 0:
-			c = mp.matrix([1, p[1]])
-		else:
-			c = mp.matrix([1, p[0]])
 
-		for i in range(1, j):
-			c = mpf_poly_mult(c, mp.matrix([1, p[i]]))
-
-		for i in range(j + 1, degP):
-			c = mpf_poly_mult(c, mp.matrix([1, p[i]]))
-
-	return c
 
 def test_computeMSBSIF():
 	nu = 1
@@ -68,7 +46,7 @@ def test_computeMSBSIF():
 	#SS = LWDF.makeRealization(F)
 	SS = State_Space.makeRealization(F)
 
-	PP, QQ = SS.dSS.to_dTFmp()
+
 	#a hardcoded example
 	#A = np.matrix([[-0.1721,  0.004845,    0.2187],[0.004845,  -0.08567,   -0.1096], [0.2187,   -0.1096,   -0.4978]])
 	#B = np.matrix([[1.533], [0], [0]])
@@ -158,6 +136,6 @@ def test_computeMSBSIF():
 
 
 
-#test_computeMSBSIF()
+test_computeMSBSIF()
 
 

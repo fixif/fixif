@@ -188,13 +188,13 @@ def makerhoDFII( filter, gamma=None, Delta=None, transposed=True, scaling=None, 
 			S = mat(0)
 
 	if not transposed:
-		# matrices J, K, L, M, N, P, Q, R and S where for transposed form
+		# matrices J, K, L, M, N, P, Q, R and S were for transposed form
 			K, M = M.transpose(), K.transpose()
 			P = P.transpose()
 			R, Q = Q.transpose(), R.transpose()
 			L, N = N.transpose(), L.transpose()
 			J = J.transpose()
-			S = S.transpose()  # no need to really do this, since S in scalar
+			S = S.transpose()  # no need to really do this, since S is a scalar
 
 	#TODO: store gamma !!
 	return {"JtoS": (J,K,L,M,N,P,Q,R,S) }

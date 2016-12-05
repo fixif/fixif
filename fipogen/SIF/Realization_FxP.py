@@ -22,9 +22,38 @@ from fipogen.func_aux import dynMethodAdder
 import numpy as np
 
 # list of methods to be added to the Realization class
-__all__ = ['compute_LSB_allvar', 'compute_MSB_allvar', 'compute_MSB_allvar_extended', 'generate_inputs']
+__all__ = ['compute_LSB', '_compute_MSB', 'compute_MSB_allvar_extended', 'flopoco']
 
-def compute_LSB_allvar(self, l_y_out):
+
+
+def flopoco(self, LSB_y_out, u_bar):
+	"""
+	This function generates MSB and LSB formats for a Fixed-Point implementation
+	using the FloPoCo tool.
+
+	User must indicate the desired LSB format for the output and the bound on
+	the inputs.
+
+	As result, function sets fields MSB and LSB to the formats which will guarantee
+	that the output filter has output faithfully rounded to the LSB_y_out bits.
+
+
+	Parameters
+	----------
+	self
+	LSB_y_out - a p - element list of integers representing the LSB constraints on the y
+	u_bar
+
+	Returns
+	-------
+
+	"""
+
+
+
+
+
+def _compute_LSB(self, l_y_out):
 
 	l_y_out = np.matrix([l_y_out])
 
@@ -55,16 +84,10 @@ def compute_LSB_allvar(self, l_y_out):
 
 	return lsb
 
-def generate_inputs(self, u_bar, N):
-	u = np.bmat(np.zeros([1,N]))
-	u[0,0] = self.dSS.D
-	for i in range(0,N):
-		u[0,i] = u_bar * np.sign(self.dSS.B * (self.dSS.A ** i) * self.dSS.C)
-
-	return u
 
 
-def compute_MSB_allvar(self, u_bar):
+
+def _compute_MSB(self, u_bar):
 
 	# self._Z = np.bmat([[-J, M, N], [K, P, Q], [L, R, S]])
 

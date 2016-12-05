@@ -512,6 +512,44 @@ class SIF(object):
 		return mystr
 
 
+	def generate_inputs(self, u_bar, N):
+		"""
+		Given a 1 x q vector of bound on the input interval and a positive
+		integer N, this function generates N inputs for a filter simulation
+		such that the output is the largest possible for u \in [-u_bar; u_bar] .
+		For this,
+
+		u[i] = u_bar * sign( h(N - i) ),
+
+		where h(k) is the filter's impulse response.
+
+		We compute it by passing to the state-space representation.
+
+
+		Parameters
+		----------
+		u_bar - 1 x q vector or a list of q elements of bounds ont he input interval
+		N - a positive integer
+
+		Returns
+		-------
+		u - a numpy vector of size q x N
+
+		"""
+
+		u_bar = np.matrix(u_bar)
+		if u_bar.shape != (self._dSS.q, 1):
+			if u_bar.shape == (1, self._dSS.q):
+				u_bar.transpose()
+			else:
+				raise ValueError('Cannot generate inputs: u_bar is of incorrect size')
+
+		u = np.matrix(np.zeros([self._dSS.q, N]))
+		u[:, 0] = self.dSS.D
+		for i in range(1, N):
+			u[:, i] = u_bar * np.sign(self.dSS.B * (self.dSS.A ** (N - i )) * self.dSS.C)
+		return u
+
 
 	def simulate(self, u):
 		"""
@@ -540,54 +578,6 @@ class SIF(object):
 
 
 
-	def simulateMP(self, u, prec):
-		"""
-		Compute the outputs of the SIF with the inputs u
-		2 dimension is time (N samples)
-		Parameters:
-			- u: a q*N matrix
-		Returns:
-			- y: a p*N matrix
-		"""
-
-		import mpmath as mp
-
-		N = u.shape[1]
-		if u.shape[0] != self._q:
-			raise ValueError( "SIF.simulate: u should be a %d*N matrix"%self._q )
-
-		mp.mp.dps = prec
-		mp.mp.pretty = False
-		u = python2mpf_matrix(u)
-		#u=mp.matrix(u)
-
-
-
-		AZ = python2mpf_matrix(self.AZ)
-		BZ = python2mpf_matrix(self.BZ)
-		CZ = python2mpf_matrix(self.CZ)
-		DZ = python2mpf_matrix(self.DZ)
-
-		y = mp.zeros(self._p,N)
-		#y = python2mpf_matrix(zeros( (self._p,N) ))
-		xk = mp.zeros(self._n,1)
-		#xk = python2mpf_matrix(zeros( (self._n,1) ))	# TODO: add the possibility to start with a non-zero state
-
-		# loop to compute the outputs
-		for i in range(N):
-			xkp1 = AZ*xk + BZ*u[:,i]
-			y[:,i] = CZ*xk + DZ*u[:,i]
-			xk = xkp1
-
-		return y
-
-
-
-
-
-
-
-
 
 
 	def simplify(self):
@@ -608,8 +598,8 @@ class SIF(object):
 		E2 = np.bmat([np.zeros([self.n, self.l]), np.eye(self.n, self.n), np.zeros([self.n, self.p])])  # Q
 		E3 = np.bmat([np.zeros([self.p, self.l]), np.zeros([self.p, self.n]), np.eye(self.p, self.p)])  # S
 
-		deltaH = SIF((self.J, self.K, self.L, self.M, E1, self.P, E2, self.R, E3))
-		return deltaH
+
+		return SIF((self.J, self.K, self.L, self.M, E1, self.P, E2, self.R, E3))
 
 
 
