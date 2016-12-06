@@ -320,7 +320,7 @@ class dSSmp(object):
 		a = mpmath.mp.zeros(Q.rows, 1)
 		for i in range(0, P.rows):
 			b[i, 0] = P[i, 0].real
-			#b[i, 0] = mpmath.fadd(b[i,0], mpmath.mp.zero, prec=prec)
+			b[i, 0] = mpmath.fadd(b[i,0], mpmath.mp.zero, prec=prec)
 		for i in range(0, Q.rows):
 			a[i, 0] = Q[i, 0].real
 			#a[i, 0] = mpmath.fadd(a[i, 0], mpmath.mp.zero, prec=prec)
