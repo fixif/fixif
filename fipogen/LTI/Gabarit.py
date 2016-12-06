@@ -324,6 +324,16 @@ class Gabarit(object):
 
 
 
+def parse_results(d):
+	if sollya.length(d['results']) != 2:
+		raise ValueError('Result dictionnary must have length = 2')
+
+	#parsing the result for the polynomial p
+
+
+
+
+
 
 def iter_random_Gabarit( number, form=None):
 	"""
