@@ -31,52 +31,50 @@ F = Filter(tf=TF, name='sollya_test_filter')
 R = State_Space(F)
 #for R in iterAllRealizations():
 
-	# --------- quantize the realization coefficients
+# --------- quantize the realization coefficients
 q = 16
 Rq = R.quantize(q, rnd='n')
 
 # --------- get the exact dSSmp corresponding to this realization
-#S = Rq.dSS.to_dSSmp() #method of SIF!!
 S = Rq.dSSexact()
-# --------- set the bound for which we compute the gabarit
+
+
 pp = 10
-bound = 10 ** (-pp)
+prec = 100
+check_for_H = False
+check_gabarit = False
 
-# --------- set the initial precision for the TF computation
-prec = max(100, numpy.log2(bound))
+while pp > 0 and not check_gabarit:
+	bound = 10 ** (-pp)
+	while prec < 500:
+		H = S.to_dTFmp(prec)
+		check_for_H = g.check_dTF(H)
+		if check_for_H:
+			break
+		prec = prec + 100
 
-# while True:
+	if check_for_H:
 
-# while True:
+		# --------- compute the exact dSS corresponding to H
+		S_H = H.to_dSSmp()
+		# --------- compute S_delta = S - S_H
+		S_delta = S - S_H
+		# set the initial precision for the WCPG computation to eps=log2(bound) + 2
+		eps = max(64, log2(bound) + 2)
+		# --------- compute the WCPG of the S_delta with error bound 2**-eps
+		W = S_delta.WCPGmp(eps)
 
-# --------- compute the transfer function corresponding to the dSS
-H = S.to_dTFmp(prec)
+		if W[0] + 2 ** (-eps) > bound:
+			print 'WCPG is too large...'
+		else:
+			check_gabarit = g.check_dTF(H, W[0] + 2 ** (-eps))
 
-# --------- compute the exact dSS corresponding to H
-S_H = H.to_dSSmp()
+	pp = pp - 2
 
-# --------- compute S_delta = S - S_H
-S_delta = S - S_H
 
-# set the initial precision for the WCPG computation to eps=log2(bound) + 2
-eps = max(64, log2(bound) + 2)
 
-# while True:
-# --------- compute the WCPG of the S_delta with error bound 2**-eps
-W = S_delta.WCPGmp(eps)
 
-# --------- if WCPG + eps > bound then we need to either increase the precision fo the WCPG computation or
-#                                                increase the precision of the TF computation
 
-if W[0] + 2 ** (-eps) > bound:
-	print 'ooops'
-else:
-	#g.check_dTF(TF)
-	#g.check_dTF(H.to_dTF(),  W[0] + 2 ** (-eps))
-	g.check_dTF(H,  W[0] + 2 ** (-eps))
-	#g.check_dTF(TF,  W[0] + 2 ** (-eps))
-
-print 'lolololo'
 
 
 
