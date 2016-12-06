@@ -2,7 +2,10 @@
 from fipogen.LTI import Gabarit, iter_random_Gabarit, random_Gabarit
 from fipogen.LTI import dTF
 
-g = Gabarit(48000,[ (0,9600), (12000,None) ], [(0,-1), -20])
+#g = Gabarit(48000,[ (0,9600), (12000,None) ], [(0,-1)], -20)    # lowpass
+#g = Gabarit(48000,[ (0,9600), (12000,None) ], [-20, (0,-1)])    # highpass
+g = Gabarit(48000,[ (0,9600), (12000,14000), (16400,None) ], [-20, (0,-1), -20])    # passband
+
 
 #for g in iter_random_Gabarit(5, form='lowpass'):
 #g = random_Gabarit(form='lowpass')
@@ -12,7 +15,7 @@ print(g)
 # print(tfS)
 # g.plot(tfS)
 
-tfM = g.to_dTF(ftype='butter', method='matlab')
+tfM = g.to_dTF(ftype='butter', method='scipy')
 print(tfM)
 g.plot(tfM)
 

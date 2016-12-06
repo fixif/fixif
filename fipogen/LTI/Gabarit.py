@@ -71,7 +71,7 @@ class Band(object):
 	@property
 	def w2(self):
 		"""Normalized frequency (approx. due to the division)"""
-		return 2*float(self._F2)/self._Fs
+		return 2*float(self._F2)/self._Fs if self._F2 else 1
 
 	@property
 	def passGains(self):
@@ -121,7 +121,8 @@ class Band(object):
 			betaSup = 10 ** (sollya.SollyaObject(self._passGains[0]) / 20) - bound
 			betaInf = 10 ** (sollya.SollyaObject(self._passGains[1]) / 20) + bound
 		else:
-			betaInf = 0
+			# stop band
+			betaInf = bound
 			betaSup = 10 ** (sollya.SollyaObject(self._stopGain) / 20) - bound
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
@@ -185,6 +186,12 @@ class Gabarit(object):
 			passBands = [b.isPassBand for b in self._bands]
 			if len(self._bands) == 2 and passBands == [True, False]:
 				self._type = 'lowpass'
+			elif len(self._bands) == 2 and passBands == [False, True]:
+				self._type = 'highpass'
+			elif len(self._bands) == 3 and passBands == [True, False, True]:
+				self._type = 'bandstop'
+			elif len(self._bands) == 3 and passBands == [False, True, False]:
+				self._type = 'bandpass'
 			else:
 				self._type = 'multiband'
 		return self._type
@@ -213,18 +220,45 @@ class Gabarit(object):
 
 		gain = 0
 		if self.type=='lowpass':
-			# lowpass
+			# normalize (with pass gain = 0dB)
 			passb, stopb = self._bands
 			gain = passb.passGains[0]
 			passb = passb - gain
 			stopb = stopb - gain
-
+			# run iirdesign or fdesign
 			if matlabEng:
-				de = matlabEng.fdesign.lowpass(passb.F2, stopb.F1, -passb.passGains[1], -stopb.stopGain, self._Fs)
+				de = matlabEng.fdesign.lowpass(passb.w2, stopb.w1, -passb.passGains[1], -stopb.stopGain)
 			else:
 				num, den = iirdesign(passb.w2, stopb.w1, -passb.passGains[1], -stopb.stopGain, analog=False, ftype=ftype)
+		elif self.type == 'highpass':
+			# normalize (with pass gain = 0dB)
+			stopb, passb = self._bands
+			gain = passb.passGains[0]
+			passb = passb - gain
+			stopb = stopb - gain
+			# run iirdesign or fdesign
+			if matlabEng:
+				de = matlabEng.fdesign.highpass(stopb.w2, passb.w1, -stopb.stopGain, -passb.passGains[1])
+			else:
+				num, den = iirdesign(passb.w1, stopb.w2, -passb.passGains[1], -stopb.stopGain, analog=False, ftype=ftype)
+		elif self.type == 'bandpass':
+			# normalize (with pass gain = 0dB)
+			stop1b, passb, stop2b = self._bands
+			gain = passb.passGains[0]
+			passb = passb - gain
+			stop1b = stop1b - gain
+			stop2b = stop2b - gain
+			# run iirdesign or fdesign
+			if matlabEng:
+				de = matlabEng.fdesign.bandpass(stop1b.w2, passb.w1, passb.w2, stop2b.w1, -stop1b.stopGain, -passb.passGains[1], -stop2b.stopGain)
+			else:
+				if stop1b.stopGain != stop2b.stopGain:
+					raise ValueError("Scipy cannot handle bandpass when the two stop band have different gain")
+				num, den = iirdesign([passb.w1, passb.w2], [stop1b.w2, stop2b.w1], -passb.passGains[1], -stop1b.stopGain, analog=False, ftype=ftype)
+		else:
+			raise ValueError("Cannot (yet) handle multibands gabarit.")
 
-
+		# for matlab method, call design and then convert back results
 		if matlabEng:
 			h = matlabEng.design(de, ftype,'SystemObject',1)
 			numM,denM = matlabEng.tf(h, nargout=2)
@@ -232,7 +266,7 @@ class Gabarit(object):
 			num = array(numM._data.tolist())
 			den = array(denM._data.tolist())
 
-
+		# add the gain
 		num = num*10**(gain/20.0)
 
 		return dTF(num, den)
@@ -251,6 +285,8 @@ class Gabarit(object):
 			currentAxis.add_patch( b.Rectangle(minG))
 
 		plt.show()
+
+
 
 	def check_dTF(self, tf, bound=0):
 		"""
