@@ -294,20 +294,18 @@ class dSSmp(object):
 		if self.p != 1 or self.q != 1:
 			raise ValueError('dSS: cannot convert a dSSmp to dTFmp for not a SISO system')
 
+		E, V = mpmath.mp.eig(self.A)  # eig returns a list E and a matrix V
+		Cmp = self.C * V
+		Vinv = mpmath.mp.inverse(V)
+		Bmp = Vinv * self.B
 
-		with mpmath.extraprec(prec * 6):
-			E, V = mpmath.mp.eig(self.A)  # eig returns a list E and a matrix V
-			Cmp = self.C * V
-			Vinv = mpmath.mp.inverse(V)
-			Bmp = Vinv * self.B
-
-			Q = mp_poly_product([-e for e in E])
-			PP = mpmath.mp.zeros(Q.rows - 1, 1)
-			# tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
-			for i in range(0, self.n):
-				# P = sum_i=0^n c_i * b_i * product_j!=i p_j
-				tmp_polyproduct = mp_poly_product([-e for e in E], i)
-				PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
+		Q = mp_poly_product([-e for e in E])
+		PP = mpmath.mp.zeros(Q.rows - 1, 1)
+		# tmp_polyproduct = mp.zeros([self.n, 1]) #temporary polynomial products
+		for i in range(0, self.n):
+			# P = sum_i=0^n c_i * b_i * product_j!=i p_j
+			tmp_polyproduct = mp_poly_product([-e for e in E], i)
+			PP = PP + Cmp[0, i] * Bmp[i, 0] * tmp_polyproduct
 
 
 		if self.D[0, 0] != mpmath.mp.zero:
@@ -322,8 +320,10 @@ class dSSmp(object):
 		a = mpmath.mp.zeros(Q.rows, 1)
 		for i in range(0, P.rows):
 			b[i, 0] = P[i, 0].real
+			#b[i, 0] = mpmath.fadd(b[i,0], mpmath.mp.zero, prec=prec)
 		for i in range(0, Q.rows):
 			a[i, 0] = Q[i, 0].real
+			#a[i, 0] = mpmath.fadd(a[i, 0], mpmath.mp.zero, prec=prec)
 
 		mpmath.mp.prec = oldprec
 		return dTFmp(b, a)
