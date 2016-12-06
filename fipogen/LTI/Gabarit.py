@@ -18,7 +18,8 @@ __status__ = "Beta"
 from copy import copy
 from fipogen.LTI import dTF, dTFmp
 from scipy.signal import iirdesign, freqz
-from numpy import atleast_1d, array, pi,log
+from numpy import atleast_1d, array, pi,log10
+from numpy.random import seed as set_seed, choice, randint, uniform
 from fipogen.func_aux import mpf_matrix_to_sollya
 
 import mpmath
@@ -39,11 +40,13 @@ class Band(object):
 		- Fs: sampling Frequency (Hz), None if unspecified
 		- F1,F2: frequencies of the band (F2 can be None, to indicate F2 = Fs/2)
 		- Gain: Gain (in dB) of the band -> negative for attenuation !!
+			a 2-tuple for passBand, or a float for stopBand
 		"""
 		self._Fs = Fs if Fs else 2
 		self._F1 = F1
 		self._F2 = F2
-		self._Gain = Gain
+		self._stopGain = Gain if not isinstance(Gain, (tuple, list)) else None
+		self._passGains = Gain if isinstance(Gain, (tuple, list)) else None
 
 	@property
 	def Fs(self):
@@ -68,13 +71,17 @@ class Band(object):
 		return 2*float(self._F2)/self._Fs
 
 	@property
-	def Gain(self):
-		return self._Gain
+	def passGains(self):
+		return self._passGains
+
+	@property
+	def stopGain(self):
+		return self._stopGain
 
 	@property
 	def isPassBand(self):
 		"""is the band a pass band ?"""
-		return isinstance(self._Gain,(tuple,list))
+		return bool(self._passGains)
 
 	def __le__(self, other):
 		"""compare two bands"""
@@ -83,13 +90,20 @@ class Band(object):
 	def __sub__(self,other):
 		"""Substract a Band and a Gain"""
 		try:
-			return Band(self._Fs, self._F1, self._F2, self._Gain-other if not self.isPassBand else (self._Gain[0]-other, self._Gain[1]-other))
+			stopGain = self._stopGain-other if self._stopGain else None
+			passGains = (self._passGains[0]-other, self._passGains[1]-other) if self._passGains else None
 		except Exception as e:
-			raise e
 			raise ValueError("The gain should be a constant")
+		return Band(self._Fs, self._F1, self._F2, passGains or stopGain)
 
 	def __repr__(self):
-		return "Band(%s,%s,%s,%s)" % (self._Fs, self._F1, self._F2, self._Gain)
+		return "Band(%s,%s,%s,stopGain=%s,passGains=%s)" % (self.Fs, self.F1, self.F2, self._stopGain, self._passGains)
+
+	def __str__(self):
+		if self.isPassBand:
+			return "Freq. [%sHz,%sHz]: Passband in [%sdB, %sdB]"%(self.F1, self.F2, self._passGains[0], self._passGains[1])
+		else:
+			return "Freq. [%sHz,%sHz]: Stopband at %sdB"%(self.F1, self.F2, self._stopGain)
 
 	def sollyaConstraint(self,bound):
 		"""
@@ -101,13 +115,24 @@ class Band(object):
 
 		if self.isPassBand:
 			# pass band
-			betaInf = 10 ** (sollya.SollyaObject(self.Gain[1]) / 20) - bound
-			betaSup = 10 ** (sollya.SollyaObject(self.Gain[0]) / 20) + bound
+			betaInf = 10 ** (sollya.SollyaObject(self._passGains[0]) / 20)-bound
+			betaSup = 10 ** (sollya.SollyaObject(self._passGains[1]) / 20)+bound
 		else:
 			betaInf = 0
-			betaSup = 10 ** (sollya.SollyaObject(self.Gain) / 20) + bound
+			betaSup = 10 ** (sollya.SollyaObject(self._stopGain) / 20)+bound
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
+
+	def Rectangle(self, minG):
+		"""
+		Returns a rectangle to be used with matplotlib, corresponding to the band
+		minG: minimum y-value for the plot
+		"""
+
+		if self.isPassBand:
+			return Rectangle((self.F1, self.passGains[0]), (self.F2 - self.F1), self.passGains[1] - self.passGains[0], facecolor="red", alpha=0.3)
+		else:
+			return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
 
 
 class Gabarit(object):
@@ -116,7 +141,7 @@ class Gabarit(object):
 	It is decomposed in bands, that can be pass-band (amplitude in [x;y]) or stop-band (amplitude less than z)
 	"""
 
-	def __init__(self, Fs, Fbands, Abands):
+	def __init__(self, Fs, Fbands, Abands, name=""):
 		"""
 
 		Parameters:
@@ -135,7 +160,10 @@ class Gabarit(object):
 		self._bands.sort()
 
 		self._type = None
+		self._name = name
 
+	def __str__(self):
+		return "%sType: %s (Fs=%sHz)\n%s"%(self._name+"\n" if self._name else "", self.type, self._Fs, "\n".join(str(b) for b in self._bands))
 
 	@property
 	def type(self):
@@ -173,23 +201,29 @@ class Gabarit(object):
 			matlabEng = start_matlab()
 			# TODO: avoir une class MatlbabHelper, qui permet de n'avoir qu'une seule instance d'engine matlab pour ne pas avoir à la redémarrer à chaque fois
 
-
+		gain = 0
 		if self.type=='lowpass':
 			# lowpass
 			passb, stopb = self._bands
-			gain = passb.Gain[0]
+			gain = passb.passGains[0]
 			passb = passb - gain
 			stopb = stopb - gain
 
 			if matlabEng:
-				de = matlabEng.fdesign.lowpass(passb.F2,stopb.F1,-passb.Gain[1], -stopb.Gain, self._Fs)
+				de = matlabEng.fdesign.lowpass(passb.F2, stopb.F1, -passb.passGains[1], -stopb.stopGain, self._Fs)
 			else:
-				num, den = iirdesign(passb.w2, stopb.w1, -passb.Gain[1], -stopb.Gain, analog=False, ftype=ftype)
+				num, den = iirdesign(passb.w2, stopb.w1, -passb.passGains[1], -stopb.stopGain, analog=False, ftype=ftype)
 
 
 		if matlabEng:
 			h = matlabEng.design(de, ftype,'SystemObject',1)
-			num,den = matlabEng.tf(h, nargout=2)
+			numM,denM = matlabEng.tf(h, nargout=2)
+			# transform to numpy array
+			num = array(numM._data.tolist())
+			den = array(denM._data.tolist())
+
+
+		num = num*10**(gain/20.0)
 
 		return dTF(num, den)
 
@@ -199,15 +233,12 @@ class Gabarit(object):
 		minG = -200
 		if tf:
 			w, h = freqz(tf.num.transpose(), tf.den.transpose())
-			plt.plot( (self._Fs * 0.5 / pi) * w, 20*log(abs(h)) )
-			minG = min(20*log(abs(h)))
+			plt.plot( (self._Fs * 0.5 / pi) * w, 20*log10(abs(h)) )
+			minG = min(20*log10(abs(h)))
 
 		currentAxis = plt.gca()
 		for b in self._bands:
-			if b.isPassBand:
-				currentAxis.add_patch(Rectangle((b.F1, b.Gain[0]), (b.F2-b.F1), b.Gain[1]-b.Gain[0], facecolor="red", alpha=0.3))
-			else:
-				currentAxis.add_patch(Rectangle((b.F1, b.Gain), b.F2 - b.F1, minG, facecolor="red", alpha=0.3))
+			currentAxis.add_patch( b.Rectangle(minG))
 
 		plt.show()
 
@@ -244,3 +275,55 @@ class Gabarit(object):
 		sollya.parse("presentResults")(res)
 
 		return dict(res)["okay"]
+
+
+
+
+def iter_random_Gabarit( number, form=None):
+	"""
+	Generate some random gabarits
+	Parameters
+	- number: number of gabarit generated
+	- form: (string) {None, ‘lowpass’, ‘highpass’, ‘bandpass’, ‘bandstop’}. Gives the type of filter. If None, the type is randomized
+	"""
+	for x in range(number):
+		yield random_Gabarit(form=form)
+
+
+
+def random_Gabarit(form=None, seed=None):
+	"""
+	Generate a random Gabarit
+	Parameters:
+	- form: (string) {None, ‘lowpass’, ‘highpass’, ‘bandpass’, ‘bandstop’}. Gives the type of filter. If None, the type is randomized
+	- seed: if not None, indicates the seed to use for the random part (in order to be reproductible, the seed is stored in the name of the gabarit)
+	"""
+	# change the seed if asked (otherwise, set the seed)
+	if not seed:
+		set_seed(None)  # (from doc):  If seed is omitted or None, current system time is used
+		seed = randint(0, 16777215)  # between 0 and 2^24-1
+	set_seed(seed)
+
+	# choose a form if asked
+	if form is None:
+		#form = choice(("lowpass", "highpass", "bandpass", "bandstop"))
+		form = choice(("lowpass"))
+	name = "%s-%s" % (form, hex(seed))
+
+	Fs = randint(500,100000)
+	bands = []
+	Gains = []
+
+	# lowpass
+	if form=='lowpass':
+		Fpass = uniform(0.01,0.9)*Fs/2
+		Fstop = uniform(Fpass,Fs/2)
+		gp = uniform(-5,5)
+		gps = uniform(0.1,5)
+		gs = uniform( 2*(gp-gps), 80)
+		bands = [ (0,Fpass), (Fstop,None) ]
+		Gains = [ (gp, gp-gps), -gs ]
+	else:
+		raise ValueError('The form is not valid')
+
+	return Gabarit(Fs, bands, Gains, name=name)
