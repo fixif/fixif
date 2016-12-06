@@ -24,8 +24,8 @@ from fipogen.func_aux import mpf_matrix_to_sollya
 
 import mpmath
 
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+#import matplotlib.pyplot as plt
+#from matplotlib.patches import Rectangle
 
 import sollya
 
@@ -127,16 +127,16 @@ class Band(object):
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
 
-	def Rectangle(self, minG):
-		"""
-		Returns a rectangle to be used with matplotlib, corresponding to the band
-		minG: minimum y-value for the plot
-		"""
-
-		if self.isPassBand:
-			return Rectangle((self.F1, self.passGains[0]), (self.F2 - self.F1), self.passGains[1] - self.passGains[0], facecolor="red", alpha=0.3)
-		else:
-			return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
+	# def Rectangle(self, minG):
+	# 	"""
+	# 	Returns a rectangle to be used with matplotlib, corresponding to the band
+	# 	minG: minimum y-value for the plot
+	# 	"""
+	#
+	# 	if self.isPassBand:
+	# 		return Rectangle((self.F1, self.passGains[0]), (self.F2 - self.F1), self.passGains[1] - self.passGains[0], facecolor="red", alpha=0.3)
+	# 	else:
+	# 		return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
 
 
 
@@ -272,19 +272,19 @@ class Gabarit(object):
 		return dTF(num, den)
 
 
-	def plot(self, tf=None):
-		"""Plot a gabarit"""
-		minG = -200
-		if tf:
-			w, h = freqz(tf.num.transpose(), tf.den.transpose())
-			plt.plot( (self._Fs * 0.5 / pi) * w, 20*log10(abs(h)) )
-			minG = min(20*log10(abs(h)))
-
-		currentAxis = plt.gca()
-		for b in self._bands:
-			currentAxis.add_patch( b.Rectangle(minG))
-
-		plt.show()
+	# def plot(self, tf=None):
+	# 	"""Plot a gabarit"""
+	# 	minG = -200
+	# 	if tf:
+	# 		w, h = freqz(tf.num.transpose(), tf.den.transpose())
+	# 		plt.plot( (self._Fs * 0.5 / pi) * w, 20*log10(abs(h)) )
+	# 		minG = min(20*log10(abs(h)))
+	#
+	# 	currentAxis = plt.gca()
+	# 	for b in self._bands:
+	# 		currentAxis.add_patch( b.Rectangle(minG))
+	#
+	# 	plt.show()
 
 
 
