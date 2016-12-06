@@ -59,8 +59,8 @@ q = 16
 Rq = R.quantize(q, rnd='n')
 
 # --------- get the exact dSSmp corresponding to this realization
-S = Rq.dSS.to_dSSmp()
-
+#S = Rq.dSS.to_dSSmp() #method of SIF!!
+S = Rq.dSSexact()
 # --------- set the bound for which we compute the gabarit
 pp = 10
 bound = 10 ** (-pp)
@@ -94,10 +94,10 @@ W = S_delta.WCPGmp(eps)
 if W[0] + 2 ** (-eps) > bound:
 	print 'ooops'
 else:
-	g.check_dTF(TF)
-	g.check_dTF(H.to_dTF(), bound + W[0] + 2 ** (-eps))
-	g.check_dTF(H, bound + W[0] + 2 ** (-eps))
-	g.check_dTF(TF, bound + W[0] + 2 ** (-eps))
+	#g.check_dTF(TF)
+	#g.check_dTF(H.to_dTF(),  W[0] + 2 ** (-eps))
+	g.check_dTF(H,  W[0] + 2 ** (-eps))
+	#g.check_dTF(TF,  W[0] + 2 ** (-eps))
 
 print 'lolololo'
 

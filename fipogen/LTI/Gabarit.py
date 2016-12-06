@@ -119,10 +119,10 @@ class Band(object):
 		if self.isPassBand:
 			# pass band
 			betaSup = 10 ** (sollya.SollyaObject(self._passGains[0]) / 20) - bound
-			betaInf = 10 ** (sollya.SollyaObject(self._passGains[1]) / 20)+bound
+			betaInf = 10 ** (sollya.SollyaObject(self._passGains[1]) / 20) + bound
 		else:
 			betaInf = 0
-			betaSup = 10 ** (sollya.SollyaObject(self._stopGain) / 20)+bound
+			betaSup = 10 ** (sollya.SollyaObject(self._stopGain) / 20) - bound
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
 

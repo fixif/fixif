@@ -166,7 +166,8 @@ class SIF(object):
 		DZ = mpf_matrix_fmul(self.L, DZ)
 		DZ = mpf_matrix_fadd(DZ, self.S)
 
-		return AZ, BZ, CZ, DZ
+		from fipogen.LTI import dSSmp
+		return dSSmp(AZ, BZ, CZ, DZ)
 
 
 
