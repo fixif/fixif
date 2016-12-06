@@ -72,7 +72,7 @@ class dTFmp(object):
 
 	def to_dTF(self):
 		from fipogen.LTI import dTF
-		return dTF(mpf_to_numpy(self._num), mpf_to_numpy(self._den))
+		return dTF(mpf_to_numpy(self._num.transpose()), mpf_to_numpy(self._den.transpose()))
 
 	def to_dSSmp(self):
 

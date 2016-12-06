@@ -9,7 +9,7 @@ from sollya import *
 #from fipogen.LTI import dTFmp, dSSmp, dSS, dTF, Gabarit
 
 from fipogen.LTI import dTFmp, dSSmp, Filter
-from fipogen.SIF import SIF, Realization
+from fipogen.SIF import SIF
 from fipogen.LTI import Gabarit
 from fipogen.Structures import LWDF, State_Space, DFI, DFII, rhoDFII
 
@@ -49,9 +49,9 @@ g = Gabarit(48000,[ (0,9600), (12000,None) ], [(0,-1), -20])
 TF = g.to_dTF(ftype='butter', method='matlab')
 
 # --------- get Realizations for this TF
-F = Filter(tf=TF, name='sollta_test_filter')
+F = Filter(tf=TF, name='sollya_test_filter')
 
-R = rhoDFII(F)
+R = State_Space(F)
 #for R in iterAllRealizations():
 
 	# --------- quantize the realization coefficients
@@ -94,7 +94,10 @@ W = S_delta.WCPGmp(eps)
 if W[0] + 2 ** (-eps) > bound:
 	print 'ooops'
 else:
+	g.check_dTF(TF)
+	g.check_dTF(H.to_dTF(), bound + W[0] + 2 ** (-eps))
 	g.check_dTF(H, bound + W[0] + 2 ** (-eps))
+	g.check_dTF(TF, bound + W[0] + 2 ** (-eps))
 
 print 'lolololo'
 
