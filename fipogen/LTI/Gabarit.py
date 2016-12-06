@@ -29,18 +29,21 @@ from matplotlib.patches import Rectangle
 
 import sollya
 
+
 class Band(object):
-	"""Normalized band
-	pass band or stop band"""
+	"""A band is a zone in frequency (between two frequencies in Hz), with a gain in an interval or lower than a value
+	It could be a pass band (gain in [G1;G2]) or astop band (gain<G)
+	Gains are in dB, frequencies in Hz (except if Fs is None, otherwise frequencies are Nyquist normalised frequencies)
+	"""
 	def __init__(self, Fs, F1, F2, Gain):
 		"""
-
-		Parameters
-		----------
+		Constructor
+		Parameters:
 		- Fs: sampling Frequency (Hz), None if unspecified
+			(then the frequencies are Nyquist normalised frquencies, between 0 and 1)
 		- F1,F2: frequencies of the band (F2 can be None, to indicate F2 = Fs/2)
 		- Gain: Gain (in dB) of the band -> negative for attenuation !!
-			a 2-tuple for passBand, or a float for stopBand
+			a 2-tuple for pass Band, or a float for stop Band
 		"""
 		self._Fs = Fs if Fs else 2
 		self._F1 = F1
@@ -115,8 +118,8 @@ class Band(object):
 
 		if self.isPassBand:
 			# pass band
-			betaInf = 10 ** (sollya.SollyaObject(self._passGains[0]) / 20)-bound
-			betaSup = 10 ** (sollya.SollyaObject(self._passGains[1]) / 20)+bound
+			betaSup = 10 ** (sollya.SollyaObject(self._passGains[0]) / 20) - bound
+			betaInf = 10 ** (sollya.SollyaObject(self._passGains[1]) / 20)+bound
 		else:
 			betaInf = 0
 			betaSup = 10 ** (sollya.SollyaObject(self._stopGain) / 20)+bound
@@ -135,13 +138,14 @@ class Band(object):
 			return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
 
 
+
 class Gabarit(object):
 	"""
 	A Gabarit object represents a freq. specification
 	It is decomposed in bands, that can be pass-band (amplitude in [x;y]) or stop-band (amplitude less than z)
 	"""
 
-	def __init__(self, Fs, Fbands, Abands, name=""):
+	def __init__(self, Fs, Fbands, Abands, seed=None):
 		"""
 
 		Parameters:
@@ -151,6 +155,7 @@ class Gabarit(object):
 		- Abands: list of amplitudes (in dB)
 				for pass band, the amplitude is a tuple (x,y) --> the amplitude must be between x dB and y dB
 				for stop band, the amplitude is a float x --> the amplitude must be lower than x dB
+		- seed: seed used to generate it (not used, just stored)
 		"""
 		# sampling frequency
 		self._Fs = Fs
@@ -160,10 +165,15 @@ class Gabarit(object):
 		self._bands.sort()
 
 		self._type = None
-		self._name = name
+		self._seed = seed
 
 	def __str__(self):
-		return "%sType: %s (Fs=%sHz)\n%s"%(self._name+"\n" if self._name else "", self.type, self._Fs, "\n".join(str(b) for b in self._bands))
+		seed = "Seed=%s\n"%(self._seed) if self._seed else ""
+		return "%sType: %s (Fs=%sHz)\n%s"%(seed, self.type, self._Fs, "\n".join(str(b) for b in self._bands))
+
+	@property
+	def seed(self):
+		return self._seed
 
 	@property
 	def type(self):
@@ -308,7 +318,6 @@ def random_Gabarit(form=None, seed=None):
 	if form is None:
 		#form = choice(("lowpass", "highpass", "bandpass", "bandstop"))
 		form = choice(("lowpass"))
-	name = "%s-%s" % (form, hex(seed))
 
 	Fs = randint(500,100000)
 	bands = []
@@ -316,14 +325,14 @@ def random_Gabarit(form=None, seed=None):
 
 	# lowpass
 	if form=='lowpass':
-		Fpass = uniform(0.01,0.9)*Fs/2
-		Fstop = uniform(Fpass,Fs/2)
-		gp = uniform(-5,5)
-		gps = uniform(0.1,5)
-		gs = uniform( 2*(gp-gps), 80)
+		Fpass = uniform(0.01,0.9)*Fs/2  # Wpass between 0.01 and 0.9
+		Fstop = uniform(Fpass,Fs/2)     # Wstop between Wpass and 1
+		gp = uniform(-5,5)              # upperband for pass in [-5;5]
+		gps = uniform(0.1,5)            # pass width in [0.1;5]
+		gs = uniform( -80, 2*(gp-gps))   # stop band in [-80 and 2*lowerband]
 		bands = [ (0,Fpass), (Fstop,None) ]
-		Gains = [ (gp, gp-gps), -gs ]
+		Gains = [ (gp, gp-gps), gs ]
 	else:
 		raise ValueError('The form is not valid')
 
-	return Gabarit(Fs, bands, Gains, name=name)
+	return Gabarit(Fs, bands, Gains, seed=seed)
