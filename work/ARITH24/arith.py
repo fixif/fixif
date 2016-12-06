@@ -32,7 +32,7 @@ R = State_Space(F)
 #for R in iterAllRealizations():
 
 # --------- quantize the realization coefficients
-q = 16
+q = 38
 Rq = R.quantize(q, rnd='n')
 
 # --------- get the exact dSSmp corresponding to this realization
@@ -46,7 +46,7 @@ check_gabarit = False
 
 while pp > 0 and not check_gabarit:
 	bound = 10 ** (-pp)
-	while prec < 500:
+	while prec < 200:
 		H = S.to_dTFmp(prec)
 		check_for_H = g.check_dTF(H)
 		if check_for_H:
