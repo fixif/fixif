@@ -14,29 +14,6 @@ from fipogen.LTI import Gabarit
 from fipogen.Structures import LWDF, State_Space, DFI, DFII, rhoDFII
 
 
-def blablabla(S, prec):
-	"""
-	Given a dSS system S (we consider that dSS objest has exact state-space matrices),
-	this function computes a bound on the absolute value of its transfer function:
-	 |H(z)| <= |T(z)| + Theta,
-
-	 where
-	    - T(z) is an approximation on the transfer function of dSS (computed in multiple precision
-	 but still not exact)
-	    - Theta is the WCPG <<delta_dSS>> of the system delta_dSS, which is the difference between
-	    the exact initial system dSS and the exact system dSS_T, whcih corresponds to the computed transfer function T(z)
-
-	Parameters
-	----------
-	S
-
-	Returns
-	-------
-	b, a - MP matrices holding the numerator and denominator of the transfer function T(z)
-	Theta - scalar
-	"""
-
-
 
 # --------- set a Gabarit
 #g = Gabarit(.....)

@@ -145,7 +145,8 @@ class SIF(object):
 		AZ, BZ, CZ, DZ
 		"""
 		if self.l == 0:
-			return python2mpf_matrix(self.P), python2mpf_matrix(self.Q),python2mpf_matrix(self.R),python2mpf_matrix(self.S)
+			from fipogen.LTI import dSSmp
+			return dSSmp(self.P, self.Q, self.R, self.S)# python2mpf_matrix(self.P), python2mpf_matrix(self.Q),python2mpf_matrix(self.R),python2mpf_matrix(self.S)
 
 
 		invJ = mpf_matrix_lt_inverse(self.J)
@@ -167,6 +168,7 @@ class SIF(object):
 		DZ = mpf_matrix_fadd(DZ, self.S)
 
 		from fipogen.LTI import dSSmp
+
 		return dSSmp(AZ, BZ, CZ, DZ)
 
 
