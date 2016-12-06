@@ -108,7 +108,7 @@ class Band(object):
 		else:
 			return "Freq. [%sHz,%sHz]: Stopband at %sdB"%(self.F1, self.F2, self._stopGain)
 
-	def sollyaConstraint(self,bound):
+	def sollyaConstraint(self,bound, dBmargin):
 		"""
 		Returns a dictonary for sollya checkModulusFilterInSpecification
 		"""
@@ -118,12 +118,12 @@ class Band(object):
 
 		if self.isPassBand:
 			# pass band
-			betaSup = 10 ** (sollya.SollyaObject(self._passGains[0]) / 20) - bound
-			betaInf = 10 ** (sollya.SollyaObject(self._passGains[1]) / 20) + bound
+			betaSup = 10 ** (sollya.SollyaObject(self._passGains[0]+dBmargin) / 20) - bound
+			betaInf = 10 ** (sollya.SollyaObject(self._passGains[1]-dBmargin) / 20) + bound
 		else:
 			# stop band
 			betaInf = bound
-			betaSup = 10 ** (sollya.SollyaObject(self._stopGain) / 20) - bound
+			betaSup = 10 ** (sollya.SollyaObject(self._stopGain+dBmargin) / 20) - bound
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
 
@@ -288,7 +288,7 @@ class Gabarit(object):
 
 
 
-	def check_dTF(self, tf, bound=0):
+	def check_dTF(self, tf, bound=0, dBmargin=0):
 		"""
 		Check if a transfer function satisfy the Gabarit
 		This is done using Sollya and gabarit.sol
@@ -314,7 +314,7 @@ class Gabarit(object):
 			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(tf.den)[0,:])))
 
 		# build the constraints to verify
-		constraints = [b.sollyaConstraint(bound) for b in self._bands]
+		constraints = [b.sollyaConstraint(bound, dBmargin) for b in self._bands]
 
 		# run sollya check
 		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints)
