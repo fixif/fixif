@@ -134,7 +134,7 @@ class SIF(object):
 		self._dSS = dSS(AZ, BZ, CZ, DZ)
 
 
-	def dSSexact( self ):
+	def to_dSSexact(self):
 		"""
 		Compute the dSS corresponding to current SIF exactly.
 		This function returns state-space matrices in multiple
@@ -322,6 +322,10 @@ class SIF(object):
 
 
 	# dJtodS getters
+	@property
+	def dJtodS(self):
+		return self.dJ, self.dK, self.dL, self.dM, self.dN, self.dP, self.dQ, self.dR, self.dS
+
 	@property
 	def dJ( self ):
 		return -self._dZ[0: self._l, 0: self._l]

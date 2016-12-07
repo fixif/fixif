@@ -4,7 +4,6 @@ import numpy
 import mpmath
 import sollya
 
-from sollya import *
 
 #from fipogen.LTI import dTFmp, dSSmp, dSS, dTF, Gabarit
 
@@ -52,7 +51,7 @@ def CheckGabaritForQuantizedRealizations(g, q):
 	Rq = R.quantize(q, rnd='n')
 
 	# --------- get the exact dSSmp corresponding to this realization
-	S = Rq.dSSexact()
+	S = Rq.to_dSSexact()
 
 
 
@@ -137,7 +136,7 @@ def CheckGabaritForQuantizedRealizations(g, q):
 		# --------- compute S_delta = S - S_H
 		S_delta = S - S_H
 		# set the initial precision for the WCPG computation to eps=log2(bound) + 2
-		wcpg_eps = max(64, log2(10 ** dBmargin_power) + 4)
+		wcpg_eps = max(64, sollya.log2(10 ** dBmargin_power) + 4)
 		check_for_wcpg = False
 		i = 0
 		while i < wcpg_prec_increase_times and not check_for_wcpg:
@@ -162,7 +161,7 @@ def CheckGabaritForQuantizedRealizations(g, q):
 # --------- set a Gabarit
 g = Gabarit(48000, [(0, 9600), (12000, None)], [(0, -1), -20])
 # --------- set the quantization factor for realizations
-q = 42
+q = 25
 
 try:
 	(ans, margin) = CheckGabaritForQuantizedRealizations(g, q)

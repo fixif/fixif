@@ -21,9 +21,9 @@ from fipogen.SIF import SIF
 from fipogen.func_aux import dynMethodAdder
 from fipogen.LTI import Filter
 from fipogen.LTI import dSS
-
+from fipogen.oSoP import Constant
 import numpy as np
-
+from copy import copy
 
 from os import remove
 
@@ -125,14 +125,13 @@ class Realization(SIF):
 
 	def quantize(self, q, rnd = 'n'):
 		"""
-		Given a positive integer q this function quantizes matrix Z of the current realiaztion to
+		Given a positive integer q this function
+		returns a new realization where the  matrix Z is quantized to
 		q bits with rounding to nearest ('n') (by default), up ('u') or down ('d')
 
 		Z[i,j] = round(Z[i,j] * 2** -q) * 2**q for round-to-nearest
 		Z[i,j] = ceil(Z[i,j] * 2** -q) * 2**q for round-up
 		Z[i,j] = floor(Z[i,j] * 2** -q) * 2**q for round-down
-
-
 
 
 		Parameters
@@ -144,31 +143,20 @@ class Realization(SIF):
 		-------
 
 		"""
-		Rq = self
+		def quantize(x,q,rnd='n'):
+			# m,n = X.shape
+			# return np.matrix([[Constant(X[i, j], wl=q).approx if X[i, j] else 0 for i in range(0, m)] for j in range(0, n)])
+			return Constant(x, wl=q).approx if x else 0
 
 
-		if not isinstance(q, int) or q == 0:
-			raise ValueError('Vannot quantize the realiaztion: q must be a strictly positive int')
 
-		if q < 0:
-			q = abs(q)
+		if not isinstance(q, int) or q <= 0:
+			raise ValueError('Cannot quantize the realiaztion: q must be a strictly positive int')
 
-		m, n = Rq.Z.shape
-
-		Rq.Z = np.matrix([[Rq.Z[i,j] * 2 ** (q) for i in range(0,m)] for j in range(0,n)])
-
-		if rnd == 'n':
-			Rq.Z = np.around(Rq.Z)
-		elif rnd == 'u':
-			Rq.Z = np.matrix([[np.ceil(Rq.Z[i,j]) for i in range(0,m)] for j in range(0,n)])
-		elif rnd == 'd':
-			Rq.Z = np.matrix([[np.floor(Rq.Z[i,j]) for i in range(0,m)] for j in range(0,n)])
-		else:
-			raise ValueError('Cannot quantize the realiaztion: rounding mode specifier is invalid, can have n, u or d ')
-
-		Rq.Z = np.matrix([[Rq.Z[i,j] * 2 ** (-q) for i in range(0,m)] for j in range(0,n)])
-
-		return Rq
+		R = copy(self)
+		quantizeMat = np.vectorize(lambda x:quantize(x,q),otypes=[np.float])
+		R.Z = quantizeMat(R.Z)
+		return R
 
 
 
