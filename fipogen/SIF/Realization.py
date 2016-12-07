@@ -122,50 +122,37 @@ class Realization(SIF):
 		return self.name + "\n" + SIF.__str__(self)
 
 
-
-	def quantize(self, q, rnd = 'n'):
+	def quantize(self, w):
 		"""
-		Given a positive integer q this function
-		returns a new realization where the  matrix Z is quantized to
-		q bits with rounding to nearest ('n') (by default), up ('u') or down ('d')
+		This funciton returns a new realization where the coefficients are quantized on wl bits
+		(quantization is round-to-nearest only)
 
-		Z[i,j] = round(Z[i,j] * 2** -q) * 2**q for round-to-nearest
-		Z[i,j] = ceil(Z[i,j] * 2** -q) * 2**q for round-up
-		Z[i,j] = floor(Z[i,j] * 2** -q) * 2**q for round-down
+		basically, a coefficient x is modified in round(x*2^l)*2^-l,
+		where l is its LSB, defined by l=w-m-1
+		and m is its MSB : m=ceil(log2(abs(x))
 
+		This "rule" has some exceptions (because 2's complement representation is not symetric),
+		and and they are managed in Constant class
 
-		Parameters
-		----------
-		q
-		rnd
+		Parameters:
+		- w: word-length used for the quantization of the coefficients
 
-		Returns
-		-------
-
+		Returns: a new realization
 		"""
-		def quantize(x,q,rnd='n'):
-			# m,n = X.shape
-			# return np.matrix([[Constant(X[i, j], wl=q).approx if X[i, j] else 0 for i in range(0, m)] for j in range(0, n)])
-			return Constant(x, wl=q).approx if x else 0
 
+		def quantize(x,w):
+			"""Simple function to quantized x with w bits (fixed-point style)"""
+			return Constant(x, wl=w).approx if x else 0
 
-
-		if not isinstance(q, int) or q <= 0:
+		# check arguments
+		if not isinstance(w, int) or w <= 0:
 			raise ValueError('Cannot quantize the realiaztion: q must be a strictly positive int')
 
+		# copy the realization and quantized the matrix Z
 		R = copy(self)
-		quantizeMat = np.vectorize(lambda x:quantize(x,q),otypes=[np.float])
+		quantizeMat = np.vectorize(lambda x:quantize(x, w), otypes=[np.float])
 		R.Z = quantizeMat(R.Z)
 		return R
-
-
-
-
-
-
-
-
-
 
 
 
