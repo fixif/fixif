@@ -15,7 +15,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-import pytest
+from pytest import mark
+from pytest import raises
 from fipogen.LTI import Gabarit
 from itertools import product
 
@@ -40,7 +41,7 @@ def test_GabaritConstruction():
 	Test the constructor and some basic properties
 	"""
 	# wrong construction
-	with pytest.raises(ValueError):
+	with raises(ValueError):
 		Gabarit(None, [(0,0.2),(0.3,0.4),(0.5,1)], [-10,-20])
 	# lowpass
 	g = Gabarit(48000,[ (0,9600), (12000,None) ], [(0,-1), -20])
@@ -78,16 +79,20 @@ def test_GabaritConstruction():
 
 
 
-@pytest.mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
-@pytest.mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
-def test_Gabarit_to_dTF(g,type):
+@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
+@mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
+#@mark.parametrize("type", ['ellip'])
+@mark.parametrize("method", ('matlab','scipy'))
+def test_Gabarit_to_dTF(g,type,method):
 	"""
 	Test if the conversion to_dTF works for matlab/scipy and various types
 	"""
-	for method in ('matlab',):
-		if not (method=='matlab' and type=='bessel'):
+	if g.type=='multiband' or g.type=='bandstop':
+		with raises(ValueError):
 			H = g.to_dTF(method=method, ftype=type)
-			print(H)
-			# check it's in the gabarit +/- 1dB
-			assert( g.check_dTF(H,dBmargin=1) )
+	else:
+		H = g.to_dTF(method=method, ftype=type)
+		print(H)
+		# check it's in the gabarit +/- 1dB
+		assert(g.check_dTF(H,dBmargin=1))
 

@@ -283,7 +283,7 @@ class Gabarit(object):
 			num = array(numM._data.tolist())
 			den = array(denM._data.tolist())
 		else:
-			num, den = iirdesign(*scipyParams, analog=False, ftype=self.type)
+			num, den = iirdesign(*scipyParams, analog=False, ftype=ftype)
 
 		# go back to pass gain not centered in 0dB
 		num = num*10**(centerPassGain/20.0)
