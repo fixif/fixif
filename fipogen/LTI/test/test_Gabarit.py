@@ -80,14 +80,14 @@ def test_GabaritConstruction():
 
 
 @mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
-@mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
-#@mark.parametrize("type", ['ellip'])
+#@mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
+@mark.parametrize("type", ['ellip'])
 @mark.parametrize("method", ('matlab','scipy'))
 def test_Gabarit_to_dTF(g,type,method):
 	"""
 	Test if the conversion to_dTF works for matlab/scipy and various types
 	"""
-	if g.type=='multiband' or g.type=='bandstop':
+	if g.type=='multiband':
 		with raises(ValueError):
 			H = g.to_dTF(method=method, ftype=type)
 	else:
@@ -95,4 +95,5 @@ def test_Gabarit_to_dTF(g,type,method):
 		print(H)
 		# check it's in the gabarit +/- 1dB
 		assert(g.check_dTF(H,dBmargin=1))
+		#g.plot(H)
 

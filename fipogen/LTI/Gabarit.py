@@ -262,10 +262,13 @@ class Gabarit(object):
 			if not matlabEng and stop1b.stopGain != stop2b.stopGain:
 					raise ValueError("Scipy cannot handle bandpass when the two stop band have different gains")
 
-		# elif self.type == 'bandstop':
-		# 	pass1b, stopb, pass2b = bands
-		# 	matlabParams = [stop1b.w2, passb.w1, passb.w2, stop2b.w1, -stop1b.stopGain, -passb.passGains[1], -stop2b.stopGain]
-		# 	scipyParams = [[passb.w1, passb.w2], [stop1b.w2, stop2b.w1], -passb.passGains[1], -stop1b.stopGain]
+		elif self.type == 'bandstop':
+			pass1b, stopb, pass2b = bands
+			matlabParams = [pass1b.w2, stopb.w1, stopb.w2, pass2b.w1, -pass1b.passGains[0], -stopb.stopGain[1], -pass2b.passGains[0]]
+			scipyParams = [[pass1b.w2, pass2b.w1], [stopb.w1, stopb.w2], -pass1b.passGains[0], -stopb.stopGain]
+			if not matlabEng and pass1b.passGains[0] != pass1b.passGains[0]:
+					raise ValueError("Scipy cannot handle bandstop when the two pass bands have different gains")
+
 
 		else:
 			raise ValueError("Cannot (yet) handle multibands gabarit.")
