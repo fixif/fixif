@@ -16,7 +16,7 @@ __status__ = "Beta"
 
 
 
-from matlab.engine import start_matlab
+
 
 
 class MatlabHelper(object):
@@ -25,8 +25,12 @@ class MatlabHelper(object):
 	"""
 	_engine = []
 	def __init__(self):
-		if not self._engine:
-			self._engine.append( start_matlab() )
+		try:
+			from matlab.engine import start_matlab
+			if not self._engine:
+				self._engine.append(start_matlab())
+		except:
+			self._engine = None
 
 	@property
 	def engine(self):

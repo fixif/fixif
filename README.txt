@@ -15,7 +15,7 @@ $ pip install numpy scipy matplotlib cython mpmath bottle jinja2 pytest
 
 Others:
 - pythonsollya (needs Sollya)
-- slycot (needs Slicot + pip install slycot)
+- slycot (pip install slycot, see https://github.com/avventi/Slycot)
 - matlabengineforpython (needs Matlab http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html)
 - WCPG
 
