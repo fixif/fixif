@@ -15,7 +15,7 @@ print(g)
 # print(tfS)
 # g.plot(tfS)
 
-tfM = g.to_dTF(ftype='butter', method='scipy')
+tfM = g.to_dTF(ftype='butter', method='matlab')
 print(tfM)
 g.plot(tfM)
 

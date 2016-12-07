@@ -40,8 +40,8 @@ def genVarName(baseName, nbVar):
 		return [ baseName+"_{%d}(k)"%(i+1) for i in range(nbVar) ]
 
 
-
-@dynMethodAdder
+# TODO: tester pour voir pourquoi le @dynMethodAdder ne marche pas... (avec pytest, notamment)
+#@dynMethodAdder
 class Realization(SIF):
 	"""
 	a Realization is a structured SIF object implementing a particular filter
