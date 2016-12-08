@@ -17,8 +17,8 @@ __status__ = "Beta"
 
 from pytest import mark
 from pytest import raises
-from fipogen.LTI import Gabarit
-from itertools import product
+from fipogen.LTI import Gabarit, dTF
+
 
 # a simple gabarit iterator
 def iterSimpleGabarit():
@@ -80,8 +80,8 @@ def test_GabaritConstruction():
 
 
 @mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
-#@mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
-@mark.parametrize("type", ['ellip'])
+@mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
+#@mark.parametrize("type", ['ellip'])
 @mark.parametrize("method", ('matlab','scipy'))
 def test_Gabarit_to_dTF(g,type,method):
 	"""
@@ -94,6 +94,13 @@ def test_Gabarit_to_dTF(g,type,method):
 		H = g.to_dTF(method=method, ftype=type)
 		print(H)
 		# check it's in the gabarit +/- 1dB
-		assert(g.check_dTF(H,dBmargin=1))
+		assert(g.check_dTF(H,margin=10**(1.0/20))[0])
 		#g.plot(H)
+
+@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
+def test_minimumMargin(g):
+
+	H = g.to_dTF(method='scipy', ftype='butter')
+	H2 = dTF(1.1*H.num,H.den)
+	m = g.findMinimumMargin(H2)
 

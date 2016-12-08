@@ -116,22 +116,27 @@ class Band(object):
 		else:
 			return "Freq. [%sHz,%sHz]: Stopband at %sdB"%(self.F1, self.F2, self._stopGain)
 
-	def sollyaConstraint(self,bound, dBmargin):
+	def sollyaConstraint(self,margin):
 		"""
+		Parameter:
+		- margin: margin we add to the band (not in dB)
+			margin is negative when the band is reduced
 		Returns a dictonary for sollya checkModulusFilterInSpecification
 		"""
 		w1 = 2*sollya.SollyaObject(self._F1)/self._Fs
 		w2 = 2*sollya.SollyaObject(self._F2)/self._Fs if self._F2 else 1    # F2==None -> F2=Fs/2, so w2=1
-		bound = sollya.SollyaObject(bound)
+		margin = sollya.SollyaObject(margin)
 
 		if self.isPassBand:
 			# pass band
-			betaInf = 10 ** ((sollya.SollyaObject(self._passGains[0]) - dBmargin) / 20) + bound
-			betaSup = 10 ** ((sollya.SollyaObject(self._passGains[1]) + dBmargin) / 20) - bound
+			betaInf = 10 ** (sollya.SollyaObject(self._passGains[0]) / 20) - margin
+			betaSup = 10 ** (sollya.SollyaObject(self._passGains[1]) / 20) + margin
 		else:
 			# stop band
-			betaInf = bound
-			betaSup = 10 ** ((sollya.SollyaObject(self._stopGain)+dBmargin) / 20) - bound
+			betaInf = 0
+			betaSup = 10 ** (sollya.SollyaObject(self._stopGain) / 20) + margin
+
+		assert( betaInf < betaSup)
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
 
@@ -312,51 +317,74 @@ class Gabarit(object):
 
 
 
-	def check_dTF(self, tf, bound=0, dBmargin=0, prec=53):
+	def check_dTF(self, tf, margin=0, prec=165):
 		"""
 		Check if a transfer function satisfy the Gabarit
 		This is done using Sollya and gabarit.sol
 
 		Parameters:
 		- tf: (dTF) transfer function we want to check
+		- margin: margin we can tolerate in the check (not in dB)
+		- prec: (int) precision in bits given to Sollya.checkModulusFilterInSpecification
 
-		Returns a boolean (display feedback?)
+		Returns a tuple (isOk, res)
+		- isOk: True if the transfer function is in the gabarit
+		- res: sollya object embedded the result
 		"""
 
 		# load gabarit.sol
 		sollya.suppressmessage(57, 174, 130, 457)
 		sollya.execute("fipogen/LTI/gabarit.sol")
 
-		if isinstance(tf.num[0,0], mpmath.mpf):
-			tf_num_sollya, len_num, _ = mpf_matrix_to_sollya(tf.num)
-			tf_den_sollya, len_den, _ = mpf_matrix_to_sollya(tf.den)
-			num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(tf_num_sollya)))
-			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(tf_den_sollya)))
-		else:
-		# build sollya objects
-			num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(tf.num)[0,:])))
-			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(tf.den)[0,:])))
+		# get num,den as sollya objects
+		num,den = tf.to_Sollya()
 
 		# build the constraints to verify
-		constraints = [b.sollyaConstraint(bound, dBmargin) for b in self._bands]
+		constraints = [b.sollyaConstraint(margin) for b in self._bands]
 
 		# run sollya check
 		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints, prec)
-		sollya.parse("presentResults")(res)
+		#sollya.parse("presentResults")(res)
 
-		return dict(res)["okay"]
-
-
-
-def parse_results(d):
-	if sollya.length(d['results']) != 2:
-		raise ValueError('Result dictionnary must have length = 2')
-
-	#parsing the result for the polynomial p
+		return dict(res)["okay"], res
 
 
 
+	def findMinimumMargin(self, tf):
+		margin = 0
+		deltaMargin = 0
+		gPass = False
+		while not gPass:
+			# check if margin
+			gPass, res = self.check_dTF(tf,margin=margin)
+			if not gPass:
+				# find the maximum margin we should apply, according to the results
+				result = dict(res)["results"]
+				oldDeltaMargin = deltaMargin
+				deltaMargin = 0
+				for b in dict(res)["results"]:        # for every band
+					okay = dict(b)["okay"]
+					if not okay:
+						issues = [ dict(b)["issue"][i] for i in range(sollya.length(dict(b)["issue"]))]     # bug pythonsollya, un for i in dict(b)["issue"] devrait marcher
+						for i in issues:                        # for every issues
+							H = dict(i)["H"]
+							betaInf = dict(dict(i)["specification"])["betaInf"]
+							betaSup = dict(dict(i)["specification"])["betaSup"]
+							if sollya.inf(H) > betaSup:
+								 deltaMargin = sollya.max( deltaMargin, sollya.sup(H) - betaSup )
+							else:
+								deltaMargin = sollya.max(deltaMargin, betaSup - sollya.inf(H))
 
+				# check if we have something to improve
+				if deltaMargin == 0:
+					raise ValueError("Don't know what to do")
+				# check if the margin decrease
+				if oldDeltaMargin < deltaMargin and margin!=0:
+					raise ValueError("deltaMargin does not decrease")
+				# increase the margin
+				margin += sollya.round(deltaMargin, 12, sollya.RU)
+
+		return margin
 
 
 def iter_random_Gabarit( number, form=None):
