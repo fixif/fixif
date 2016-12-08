@@ -83,7 +83,7 @@ def test_to_dSS( S ):
 def test_WCPGmp( S ):
 
 	W = S.WCPGmp(53)
-	print W
+
 
 
 
