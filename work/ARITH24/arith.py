@@ -48,7 +48,7 @@ def CheckGabaritForQuantizedRealizations(g, q):
 	# for R in iterAllRealizations():
 
 	# --------- quantize the realization coefficients
-	Rq = R.quantize(q, rnd='n')
+	Rq = R.quantize(q)
 
 	# --------- get the exact dSSmp corresponding to this realization
 	S = Rq.to_dSSexact()

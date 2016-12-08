@@ -312,7 +312,7 @@ class Gabarit(object):
 
 
 
-	def check_dTF(self, tf, bound=0, dBmargin=0):
+	def check_dTF(self, tf, bound=0, dBmargin=0, prec=165):
 		"""
 		Check if a transfer function satisfy the Gabarit
 		This is done using Sollya and gabarit.sol
@@ -341,7 +341,7 @@ class Gabarit(object):
 		constraints = [b.sollyaConstraint(bound, dBmargin) for b in self._bands]
 
 		# run sollya check
-		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints)
+		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints, prec)
 		sollya.parse("presentResults")(res)
 
 		return dict(res)["okay"]
