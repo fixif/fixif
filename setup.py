@@ -17,8 +17,11 @@ setup(
 		"slycot >= 0.2.0",
 		"pytest >= 2.8.7",
 		"jinja2 >= 2.8",
-		"sphinx >= 1.3",
-		"lxml >= 3.6",
+#		"sphinx >= 1.3",
+#		"lxml >= 3.6",
 		"matlabengineforpython",
+		"sollya",
+		"cython",
+		"mpmath"
 	],
 ) 

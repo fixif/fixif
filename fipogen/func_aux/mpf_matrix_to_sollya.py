@@ -1,6 +1,6 @@
 import mpmath
 import sollya
-from sollya import *
+#from sollya import *
 from fipogen.func_aux import mpf_matrix_get_representation
 
 def mpf_matrix_to_sollya(A):
@@ -39,7 +39,7 @@ def mpf_matrix_to_sollya(A):
 	S = list()
 	for i in range(0, m):
 		for j in range(0,n):
-			s = SollyaObject(Y[i,j]) * 2**SollyaObject(N[i,j])
+			s = sollya.SollyaObject(Y[i,j]) * 2**sollya.SollyaObject(N[i,j])
 			S.append(s)
 
 

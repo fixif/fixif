@@ -44,7 +44,7 @@ def test_dSSexact( S ):
 
 	SS = mySIF.dSS
 
-	A, B, C, D = mySIF.dSSexact()
+	A, B, C, D = mySIF.to_dSSexact()
 
 	assert_allclose(SS.A, mpf_to_numpy(A))
 	assert_allclose(SS.B, mpf_to_numpy(B))

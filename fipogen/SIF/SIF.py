@@ -134,41 +134,41 @@ class SIF(object):
 		self._dSS = dSS(AZ, BZ, CZ, DZ)
 
 
-	def dSSexact( self ):
+	def to_dSSexact(self):
 		"""
-		Compute the dSS corresponding to current SIF exactly.
-		This function returns state-space matrices in multiple
-		precision in MPMATH format.
-
-		Returns
-		-------
-		AZ, BZ, CZ, DZ
+		Compute the dSS corresponding to current SIF exactly (using mpmath).
+		This function returns a dSSmp object (state-space matrices in multiple precision in MPMATH format).
 		"""
+		# particular case when the SIF is already a state-space
 		if self.l == 0:
 			from fipogen.LTI import dSSmp
-			return dSSmp(self.P, self.Q, self.R, self.S)# python2mpf_matrix(self.P), python2mpf_matrix(self.Q),python2mpf_matrix(self.R),python2mpf_matrix(self.S)
+			return dSSmp(self.P, self.Q, self.R, self.S)
 
-
+		# otherwise
+		# compute inv(J)
 		invJ = mpf_matrix_lt_inverse(self.J)
 
+		# AZ = K*inv(J)*M+P
 		AZ = mpf_matrix_fmul(invJ, self.M)
 		AZ = mpf_matrix_fmul(self.K, AZ)
 		AZ = mpf_matrix_fadd(AZ, self.P)
 
+		# BZ = K*inv(J)*N+Q
 		BZ = mpf_matrix_fmul(invJ, self.N)
 		BZ = mpf_matrix_fmul(self.K, BZ)
 		BZ = mpf_matrix_fadd(BZ, self.Q)
 
+		# CZ = L*inv(J)*M+R
 		CZ = mpf_matrix_fmul(invJ, self.M)
 		CZ = mpf_matrix_fmul(self.L, CZ)
 		CZ = mpf_matrix_fadd(CZ, self.R)
 
+		# DZ = M*inv(J)*N+S
 		DZ = mpf_matrix_fmul(invJ, self.N)
 		DZ = mpf_matrix_fmul(self.L, DZ)
 		DZ = mpf_matrix_fadd(DZ, self.S)
 
 		from fipogen.LTI import dSSmp
-
 		return dSSmp(AZ, BZ, CZ, DZ)
 
 
@@ -322,6 +322,10 @@ class SIF(object):
 
 
 	# dJtodS getters
+	@property
+	def dJtodS(self):
+		return self.dJ, self.dK, self.dL, self.dM, self.dN, self.dP, self.dQ, self.dR, self.dS
+
 	@property
 	def dJ( self ):
 		return -self._dZ[0: self._l, 0: self._l]

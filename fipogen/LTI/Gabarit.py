@@ -15,19 +15,21 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from copy import copy
 from fipogen.LTI import dTF, dTFmp
+from fipogen.func_aux import mpf_matrix_to_sollya, MatlabHelper
+
 from scipy.signal import iirdesign, freqz
-from numpy import atleast_1d, array, pi,log10
+from numpy import array, pi, log10
 from numpy.random import seed as set_seed, choice, randint, uniform
-from fipogen.func_aux import mpf_matrix_to_sollya
+
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 
 import mpmath
-
-#import matplotlib.pyplot as plt
-#from matplotlib.patches import Rectangle
-
 import sollya
+
+
+
 
 
 class Band(object):
@@ -37,19 +39,25 @@ class Band(object):
 	"""
 	def __init__(self, Fs, F1, F2, Gain):
 		"""
-		Constructor
+		Constructor of a band (a pass band or a stop band)
 		Parameters:
 		- Fs: sampling Frequency (Hz), None if unspecified
 			(then the frequencies are Nyquist normalised frquencies, between 0 and 1)
 		- F1,F2: frequencies of the band (F2 can be None, to indicate F2 = Fs/2)
 		- Gain: Gain (in dB) of the band -> negative for attenuation !!
-			a 2-tuple for pass Band, or a float for stop Band
+			CONVENTION: a 2-tuple for pass Band, or a float for stop Band
 		"""
 		self._Fs = Fs if Fs else 2
 		self._F1 = F1
 		self._F2 = F2
-		self._stopGain = Gain if not isinstance(Gain, (tuple, list)) else None
-		self._passGains = Gain if isinstance(Gain, (tuple, list)) else None
+		if isinstance(Gain, (tuple, list)):
+			# pass band (the gains are sorted)
+			self._stopGain = None
+			self._passGains = (Gain[0],Gain[1]) if Gain[0]<Gain[1] else (Gain[1],Gain[0])
+		else:
+			# stop band
+			self._stopGain = Gain
+			self._passGains = None
 
 	@property
 	def Fs(self):
@@ -84,9 +92,9 @@ class Band(object):
 	@property
 	def isPassBand(self):
 		"""is the band a pass band ?"""
-		return bool(self._passGains)
+		return bool(self._passGains)        # True if not None or 0
 
-	def __le__(self, other):
+	def __lt__(self, other):
 		"""compare two bands"""
 		return self.F1 < other.F1
 
@@ -118,25 +126,28 @@ class Band(object):
 
 		if self.isPassBand:
 			# pass band
-			betaSup = 10 ** (sollya.SollyaObject(self._passGains[0]+dBmargin) / 20) - bound
-			betaInf = 10 ** (sollya.SollyaObject(self._passGains[1]-dBmargin) / 20) + bound
+			betaInf = 10 ** ((sollya.SollyaObject(self._passGains[0]) - dBmargin) / 20) + bound
+			betaSup = 10 ** ((sollya.SollyaObject(self._passGains[1]) + dBmargin) / 20) - bound
 		else:
 			# stop band
 			betaInf = bound
-			betaSup = 10 ** (sollya.SollyaObject(self._stopGain+dBmargin) / 20) - bound
+			betaSup = 10 ** ((sollya.SollyaObject(self._stopGain)+dBmargin) / 20) - bound
 
 		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
 
-	# def Rectangle(self, minG):
-	# 	"""
-	# 	Returns a rectangle to be used with matplotlib, corresponding to the band
-	# 	minG: minimum y-value for the plot
-	# 	"""
-	#
-	# 	if self.isPassBand:
-	# 		return Rectangle((self.F1, self.passGains[0]), (self.F2 - self.F1), self.passGains[1] - self.passGains[0], facecolor="red", alpha=0.3)
-	# 	else:
-	# 		return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
+	def Rectangle(self, minG):
+		"""
+		Returns a rectangle object, to be used with matplotlib
+		The rectangle corresponds to the (stop/pass) band to draw on a Bode diagram
+		Parameters:
+		- minG: minimum y-value for the plot
+		"""
+
+		if self.isPassBand:
+			return Rectangle((self.F1, self.passGains[0]), (self.F2 - self.F1), self.passGains[1] - self.passGains[0], facecolor="red", alpha=0.3)
+		else:
+			return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
+
 
 
 
@@ -148,7 +159,7 @@ class Gabarit(object):
 
 	def __init__(self, Fs, Fbands, Abands, seed=None):
 		"""
-
+		Build a Gabarit, from list of bands, and list of amplitudes (in dB)
 		Parameters:
 		----------
 		- Fs: (float) sampling frequency (set to None or .5 if the Frequency are Nyquist frequencies, between 0 and 1)
@@ -156,10 +167,13 @@ class Gabarit(object):
 		- Abands: list of amplitudes (in dB)
 				for pass band, the amplitude is a tuple (x,y) --> the amplitude must be between x dB and y dB
 				for stop band, the amplitude is a float x --> the amplitude must be lower than x dB
-		- seed: seed used to generate it (not used, just stored)
+		- seed: seed used to generate it (not used, just stored for the record)
 		"""
 		# sampling frequency
 		self._Fs = Fs
+
+		if len(Fbands) != len(Abands):
+			raise ValueError("Fbands and Abands should be lists/tuples with same size")
 
 		# store the bands (sorted)
 		self._bands = [ Band(Fs, F1, F2, G) for (F1,F2),G in zip(Fbands, Abands) ]
@@ -182,6 +196,7 @@ class Gabarit(object):
 		Returns the type of gabarit (lowpass, highpass, stopband, passband or multiband)
 		Determine the type if it is not yet determined
 		"""
+		# determine the type from the list of pass/stop bands
 		if self._type is None:
 			passBands = [b.isPassBand for b in self._bands]
 			if len(self._bands) == 2 and passBands == [True, False]:
@@ -194,13 +209,19 @@ class Gabarit(object):
 				self._type = 'bandpass'
 			else:
 				self._type = 'multiband'
+
 		return self._type
 
+	@property
+	def bands(self):
+		return self._bands
 
 	def to_dTF(self, ftype='butter', method='scipy'):
 		"""
-		Returns a transfer function (dTF object) that *should* satisfy the gabarit
-		using scipy.signal.iirdesin
+		This methods HELPS to find a transfer function that *should* satisfy the gabarit
+		It is just here to quickly determine a transfer function that satisfy the gabarit in a simple way
+		But it cannot handle all the options these tools (matlab/scipy) offer (the best is to use these tools the way
+		you want, with all the possible options, and then to check if the transfer function fulfills the gabarit
 
 		Parameters:
 		-ftype : (str) the type of IIR filter to design:
@@ -209,86 +230,89 @@ class Gabarit(object):
 			- Chebyshev II  : 'cheby2'
 			- Cauer/elliptic: 'ellip'
 			- Bessel/Thomson: 'bessel'
-		- method: (string) the method used ('scipy' for scipy.signal.iirdesign, or 'matlab' for )
+		- method: (string) the method used ('scipy' for scipy.signal.iirdesign, or 'matlab' for matlab fdesign functions)
+
+		Returns a transfer function (dTF object)
 		"""
 		# Start Matlab if needed
 		matlabEng = None
 		if method=='matlab':
-			from matlab.engine import start_matlab   # http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
-			matlabEng = start_matlab()
-			# TODO: avoir une class MatlbabHelper, qui permet de n'avoir qu'une seule instance d'engine matlab pour ne pas avoir à la redémarrer à chaque fois
+			MH = MatlabHelper()
+			matlabEng = MH.engine
 
-		gain = 0
+		# normalize bands (with pass gain centered in 0dB)
+		centerPassGain = max( (b.passGains[0]+b.passGains[1])/2.0 for b in self._bands if b.isPassBand )
+		bands = [ b-centerPassGain for b in self._bands ]
+
+		# arguments for matlab/scipy functions, for each type of band
 		if self.type=='lowpass':
-			# normalize (with pass gain = 0dB)
-			passb, stopb = self._bands
-			gain = passb.passGains[0]
-			passb = passb - gain
-			stopb = stopb - gain
-			# run iirdesign or fdesign
-			if matlabEng:
-				de = matlabEng.fdesign.lowpass(passb.w2, stopb.w1, -passb.passGains[1], -stopb.stopGain)
-			else:
-				num, den = iirdesign(passb.w2, stopb.w1, -passb.passGains[1], -stopb.stopGain, analog=False, ftype=ftype)
+			passb, stopb = bands
+			matlabParams = [passb.w2, stopb.w1, -passb.passGains[0], -stopb.stopGain]
+			scipyParams = [passb.w2, stopb.w1, -passb.passGains[0], -stopb.stopGain]
+
 		elif self.type == 'highpass':
-			# normalize (with pass gain = 0dB)
-			stopb, passb = self._bands
-			gain = passb.passGains[0]
-			passb = passb - gain
-			stopb = stopb - gain
-			# run iirdesign or fdesign
-			if matlabEng:
-				de = matlabEng.fdesign.highpass(stopb.w2, passb.w1, -stopb.stopGain, -passb.passGains[1])
-			else:
-				num, den = iirdesign(passb.w1, stopb.w2, -passb.passGains[1], -stopb.stopGain, analog=False, ftype=ftype)
+			stopb, passb = bands
+			matlabParams = [stopb.w2, passb.w1, -stopb.stopGain, -passb.passGains[0]]
+			scipyParams = [passb.w1, stopb.w2, -passb.passGains[0], -stopb.stopGain]
+
 		elif self.type == 'bandpass':
-			# normalize (with pass gain = 0dB)
-			stop1b, passb, stop2b = self._bands
-			gain = passb.passGains[0]
-			passb = passb - gain
-			stop1b = stop1b - gain
-			stop2b = stop2b - gain
-			# run iirdesign or fdesign
-			if matlabEng:
-				de = matlabEng.fdesign.bandpass(stop1b.w2, passb.w1, passb.w2, stop2b.w1, -stop1b.stopGain, -passb.passGains[1], -stop2b.stopGain)
-			else:
-				if stop1b.stopGain != stop2b.stopGain:
-					raise ValueError("Scipy cannot handle bandpass when the two stop band have different gain")
-				num, den = iirdesign([passb.w1, passb.w2], [stop1b.w2, stop2b.w1], -passb.passGains[1], -stop1b.stopGain, analog=False, ftype=ftype)
+			stop1b, passb, stop2b = bands
+			matlabParams = [stop1b.w2, passb.w1, passb.w2, stop2b.w1, -stop1b.stopGain, -passb.passGains[0], -stop2b.stopGain]
+			scipyParams = [[passb.w1, passb.w2], [stop1b.w2, stop2b.w1], -passb.passGains[0], -stop1b.stopGain]
+			if not matlabEng and stop1b.stopGain != stop2b.stopGain:
+					raise ValueError("Scipy cannot handle bandpass when the two stop band have different gains")
+
+		elif self.type == 'bandstop':
+			pass1b, stopb, pass2b = bands
+			matlabParams = [pass1b.w2, stopb.w1, stopb.w2, pass2b.w1, -pass1b.passGains[0], -stopb.stopGain[1], -pass2b.passGains[0]]
+			scipyParams = [[pass1b.w2, pass2b.w1], [stopb.w1, stopb.w2], -pass1b.passGains[0], -stopb.stopGain]
+			if not matlabEng and pass1b.passGains[0] != pass1b.passGains[0]:
+					raise ValueError("Scipy cannot handle bandstop when the two pass bands have different gains")
+
+
 		else:
 			raise ValueError("Cannot (yet) handle multibands gabarit.")
 
-		# for matlab method, call design and then convert back results
+		# call matlab or scipy methods
 		if matlabEng:
-			h = matlabEng.design(de, ftype,'SystemObject',1)
+			# call fdesign.lowpass/highpass/bandpass/bandstop functions, according to self.type
+			try:
+				de = matlabEng.fdesign.__getattr__(self.type)(*matlabParams)
+				h = matlabEng.design(de, ftype,'SystemObject',1)
+			except Exception as e:
+				raise ValueError("Matlab cannot deal with the following gabarit:\n%s\n%s"%(self,e), exc_info=True)
 			numM,denM = matlabEng.tf(h, nargout=2)
 			# transform to numpy array
 			num = array(numM._data.tolist())
 			den = array(denM._data.tolist())
+		else:
+			num, den = iirdesign(*scipyParams, analog=False, ftype=ftype)
 
-		# add the gain
-		num = num*10**(gain/20.0)
+		# go back to pass gain not centered in 0dB
+		num = num*10**(centerPassGain/20.0)
 
 		return dTF(num, den)
 
 
-	# def plot(self, tf=None):
-	# 	"""Plot a gabarit"""
-	# 	minG = -200
-	# 	if tf:
-	# 		w, h = freqz(tf.num.transpose(), tf.den.transpose())
-	# 		plt.plot( (self._Fs * 0.5 / pi) * w, 20*log10(abs(h)) )
-	# 		minG = min(20*log10(abs(h)))
-	#
-	# 	currentAxis = plt.gca()
-	# 	for b in self._bands:
-	# 		currentAxis.add_patch( b.Rectangle(minG))
-	#
-	# 	plt.show()
+	def plot(self, tf=None):
+		"""
+		Plot a gabarit, and a transfer function (if given)
+		"""
+		minG = -200
+		if tf:
+			w, h = freqz(tf.num.transpose(), tf.den.transpose())
+			plt.plot( (self._Fs * 0.5 / pi) * w, 20*log10(abs(h)) )
+			minG = min(20*log10(abs(h)))
+
+		currentAxis = plt.gca()
+		for b in self._bands:
+			currentAxis.add_patch( b.Rectangle(minG))
+
+		plt.show()
 
 
 
-	def check_dTF(self, tf, bound=0, dBmargin=0):
+	def check_dTF(self, tf, bound=0, dBmargin=0, prec=165):
 		"""
 		Check if a transfer function satisfy the Gabarit
 		This is done using Sollya and gabarit.sol
@@ -317,7 +341,7 @@ class Gabarit(object):
 		constraints = [b.sollyaConstraint(bound, dBmargin) for b in self._bands]
 
 		# run sollya check
-		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints)
+		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints, prec)
 		sollya.parse("presentResults")(res)
 
 		return dict(res)["okay"]
@@ -359,6 +383,7 @@ def random_Gabarit(form=None, seed=None):
 		set_seed(None)  # (from doc):  If seed is omitted or None, current system time is used
 		seed = randint(0, 16777215)  # between 0 and 2^24-1
 	set_seed(seed)
+
 
 	# choose a form if asked
 	if form is None:

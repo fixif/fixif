@@ -517,7 +517,7 @@ procedure __provePolynomialPositiveInner(p, dom) {
 
 	  q = 0;
 	  for i from 0 to degree(p) do {
-	      q = q + round(coeff(p,i),prec,RN) * _x_^i;
+	      q = q + round(coeff(p,i),2 * prec,RN) * _x_^i;
 	  };
 	  q = horner(q);
 	  
@@ -543,33 +543,61 @@ procedure __provePolynomialPositiveInner(p, dom) {
 	  return res;
 };
 
-procedure polynomialZeros(poly, dom) {
-          var res, nbz, oldPoints, okay, p;
+procedure polynomialZerosInner(poly, dom) {
+          var res, nbz, oldPoints, okay, p, oldPrec;
 
           p = 0;
           for i from 0 to degree(poly) do {
-              p = p + round(coeff(poly,i),16 * prec,RN) * _x_^i;
+              p = p + round(coeff(poly,i),32 * prec,RN) * _x_^i;
           };
           p = horner(p);
 
           nbz = wrappednumberroots(p, dom);
           okay = false;
           oldPoints = points;
+	  oldPrec = prec;
           while ((!okay) && (points <= 256 * oldPoints)) do {
                 res = dirtyfindzeros(poly, dom);
                 if (length(res) == nbz) then {
                    okay = true;
                 } else {
-                   points = 2 * points!;
+                   points = 2 * points + 1!;
                 };
           };
           points = oldPoints!;
+	  prec = oldPrec!;
 
           return res;
 };
 
+procedure polynomialZeros(poly, dom) {
+	  var res;
+	  var oldPoints;
+
+	  oldPoints = points;
+	  points = min(oldPoints, ceil(ceil(degree(poly) * 2 * 1.05)/2)*2 + 1)!;
+
+	  res = (polynomialZerosInner(poly, dom)) @ (dirtyfindzeros(poly, dom));
+
+	  if (0 in dom) then {
+	     if (0 in evaluate(poly,[0])) then {
+	     	res = 0 .: res;
+	     };
+	  };
+
+	  res = sort(res);
+
+	  points = oldPoints!;
+
+	  return res;
+};
+
 procedure basicZeros(p, dom) {
           var res;
+	  var oldPrec;
+
+	  oldPrec = prec;
+	  prec = ceil(1.05 * prec)!;
 
           if (degree(p) < 0) then {
              res = dirtyfindzeros(p, dom);
@@ -577,6 +605,8 @@ procedure basicZeros(p, dom) {
              res = polynomialZeros(p, dom);
           };
 
+	  oldPrec = prec!;
+	  
           return res;
 };
 
@@ -602,13 +632,17 @@ procedure blowPointToInterval(z, p, a, b) {
 
 procedure functionZeros(p, dom) {
           var rawZeros, oldPrec, res, z, pz, y;
+	  var oldPoints;
 
           res = [||];
 
           oldPrec = prec;
+	  oldPoints = points;
           prec = 4 * prec!;
+	  points = ceil(ceil(points * 1.05)/2)*2 + 1!;
           rawZeros = basicZeros(p, dom);
           prec = oldPrec!;
+	  points = oldPoints!;
           
           for z in rawZeros do {
               pz = blowPointToInterval(z, 2 * prec, inf(dom), sup(dom));
@@ -616,30 +650,61 @@ procedure functionZeros(p, dom) {
               if (inf(y) * sup(y) <= 0) then {
                  res = pz .: res;
               };
+	      res = [z] .: res;
           };
 
           return res;
 };
 
-procedure functionNegativeAbscissa(q, dom) {
+procedure functionNegativeAbscissaInner(q, dom) {
           var pderiv, Z, z, y, res;
 	  var p;
+	  var za, zb, ya, yb;
 
 	  p = horner(q);
 
           res = [||];
           
           pderiv = diff(p);
-          Z = functionZeros(pderiv, dom) @ [| blowPointToInterval(inf(dom), 2 * prec, inf(dom), sup(dom)), blowPointToInterval(sup(dom), 2 * prec, inf(dom), sup(dom)) |];
+          Z = functionZeros(pderiv, dom) @ [| [inf(dom)], [sup(dom)], blowPointToInterval(inf(dom), 2 * prec, inf(dom), sup(dom)), blowPointToInterval(sup(dom), 2 * prec, inf(dom), sup(dom)) |];
           for z in Z do {
               y = evaluate(horner(p(inf(z) + (sup(z) - inf(z)) * (_x_ + 0.5))),[-0.5;0.5]);
-
-              if (sup(y) <= 0) then {
-                 res = { .failurePoint = z, .failureDomain = dom } .: res;
-              };
+	      if ((sup(y) <= 0) && (inf(y) < 0)) then {
+	      	 res = { .failurePoint = z, .failureDomain = dom } .: res;
+	      } else {
+	         za = inf(z);
+		 zb = sup(z);
+		 if (za != zb) then {
+		    ya = mid(evaluate(p, za));
+		    yb = mid(evaluate(p, zb));
+		    if (ya * yb < 0) then {
+		       res = { .failurePoint = z, .failureDomain = dom } .: res;
+		    };
+		 };
+	      };
           };
           
           return res;
+};
+
+procedure functionNegativeAbscissa(q, dom) {
+	  var res, a, b, c, h, sdom, r;
+
+	  if (0 in dom) then {
+	     res = [||];
+	     a = inf(dom);
+	     b = sup(dom);
+	     h = round((b - a) / 5,prec,RU);
+	     for c from a to b by h do {
+	     	 sdom = [ max(a, c); min(b, round(c + h, prec, RU)) ];
+		 r = functionNegativeAbscissaInner(q, sdom);
+		 res = res @ r;
+	     };
+	  } else {
+	     res = functionNegativeAbscissaInner(q, dom);
+	  };
+
+	  return res;
 };
 
 /* Test whether the polynomial p with real coefficients,
@@ -695,6 +760,7 @@ procedure provePolynomialPositive(poly, dom) {
 
 procedure provePolynomialPositiveWithFailureReport(poly, dom) {
           var t, res, failures;
+	  var oldDisplay;
 
           t = provePolynomialPositive(poly, dom);
 
@@ -1176,14 +1242,18 @@ procedure __checkModulusFilterInSpecificationInner(b, a, specifications) {
 	  return R;
 };
 
-procedure checkModulusFilterInSpecification(b, a, specifications) {
+procedure checkModulusFilterInSpecification(b, a, specifications, p) {
 	  var t, r;
-
+	  var oldPrec;
+	  
+	  oldPrec = prec;
+	  prec = p!;
 	  t = time({
 	               r = __checkModulusFilterInSpecificationInner(b, a, specifications);
 	           });
 
           r.computeTime = t;
+	  prec = oldPrec!;
 
 	  return r;
 };

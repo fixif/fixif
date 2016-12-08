@@ -21,9 +21,9 @@ from fipogen.SIF import SIF
 from fipogen.func_aux import dynMethodAdder
 from fipogen.LTI import Filter
 from fipogen.LTI import dSS
-
+from fipogen.oSoP import Constant
 import numpy as np
-
+from copy import copy
 
 from os import remove
 
@@ -40,8 +40,8 @@ def genVarName(baseName, nbVar):
 		return [ baseName+"_{%d}(k)"%(i+1) for i in range(nbVar) ]
 
 
-
-@dynMethodAdder
+# TODO: tester pour voir pourquoi le @dynMethodAdder ne marche pas... (avec pytest, notamment)
+#@dynMethodAdder
 class Realization(SIF):
 	"""
 	a Realization is a structured SIF object implementing a particular filter
@@ -122,62 +122,37 @@ class Realization(SIF):
 		return self.name + "\n" + SIF.__str__(self)
 
 
-
-	def quantize(self, q, rnd = 'n'):
+	def quantize(self, w):
 		"""
-		Given a positive integer q this function quantizes matrix Z of the current realiaztion to
-		q bits with rounding to nearest ('n') (by default), up ('u') or down ('d')
+		This funciton returns a new realization where the coefficients are quantized on wl bits
+		(quantization is round-to-nearest only)
 
-		Z[i,j] = round(Z[i,j] * 2** -q) * 2**q for round-to-nearest
-		Z[i,j] = ceil(Z[i,j] * 2** -q) * 2**q for round-up
-		Z[i,j] = floor(Z[i,j] * 2** -q) * 2**q for round-down
+		basically, a coefficient x is modified in round(x*2^l)*2^-l,
+		where l is its LSB, defined by l=w-m-1
+		and m is its MSB : m=ceil(log2(abs(x))
 
+		This "rule" has some exceptions (because 2's complement representation is not symetric),
+		and and they are managed in Constant class
 
+		Parameters:
+		- w: word-length used for the quantization of the coefficients
 
-
-		Parameters
-		----------
-		q
-		rnd
-
-		Returns
-		-------
-
+		Returns: a new realization
 		"""
-		Rq = self
 
+		def quantize(x,w):
+			"""Simple function to quantized x with w bits (fixed-point style)"""
+			return Constant(x, wl=w).approx if x else 0
 
-		if not isinstance(q, int) or q == 0:
-			raise ValueError('Vannot quantize the realiaztion: q must be a strictly positive int')
+		# check arguments
+		if not isinstance(w, int) or w <= 0:
+			raise ValueError('Cannot quantize the realiaztion: q must be a strictly positive int')
 
-		if q < 0:
-			q = abs(q)
-
-		m, n = Rq.Z.shape
-
-		Rq.Z = np.matrix([[Rq.Z[i,j] * 2 ** (q) for i in range(0,m)] for j in range(0,n)])
-
-		if rnd == 'n':
-			Rq.Z = np.around(Rq.Z)
-		elif rnd == 'u':
-			Rq.Z = np.matrix([[np.ceil(Rq.Z[i,j]) for i in range(0,m)] for j in range(0,n)])
-		elif rnd == 'd':
-			Rq.Z = np.matrix([[np.floor(Rq.Z[i,j]) for i in range(0,m)] for j in range(0,n)])
-		else:
-			raise ValueError('Cannot quantize the realiaztion: rounding mode specifier is invalid, can have n, u or d ')
-
-		Rq.Z = np.matrix([[Rq.Z[i,j] * 2 ** (-q) for i in range(0,m)] for j in range(0,n)])
-
-		return Rq
-
-
-
-
-
-
-
-
-
+		# copy the realization and quantized the matrix Z
+		R = copy(self)
+		quantizeMat = np.vectorize(lambda x:quantize(x, w), otypes=[np.float])
+		R.Z = quantizeMat(R.Z)
+		return R
 
 
 
