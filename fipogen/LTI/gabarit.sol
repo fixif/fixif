@@ -1176,14 +1176,18 @@ procedure __checkModulusFilterInSpecificationInner(b, a, specifications) {
 	  return R;
 };
 
-procedure checkModulusFilterInSpecification(b, a, specifications) {
+procedure checkModulusFilterInSpecification(b, a, specifications, p) {
 	  var t, r;
-
+	  var oldPrec;
+	  
+	  oldPrec = prec;
+	  prec = p!;
 	  t = time({
 	               r = __checkModulusFilterInSpecificationInner(b, a, specifications);
 	           });
 
           r.computeTime = t;
+	  prec = oldPrec!;
 
 	  return r;
 };
