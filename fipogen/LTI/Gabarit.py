@@ -312,7 +312,7 @@ class Gabarit(object):
 
 
 
-	def check_dTF(self, tf, bound=0, dBmargin=0, prec=165):
+	def check_dTF(self, tf, bound=0, dBmargin=0, prec=53):
 		"""
 		Check if a transfer function satisfy the Gabarit
 		This is done using Sollya and gabarit.sol

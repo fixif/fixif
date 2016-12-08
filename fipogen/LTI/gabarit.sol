@@ -543,6 +543,22 @@ procedure __provePolynomialPositiveInner(p, dom) {
 	  return res;
 };
 
+procedure mydirtyfindzeros(f, dom) {
+	  var res, a;
+
+	  res = dirtyfindzeros(f, dom);
+
+	  for a in [| 0, inf(dom), sup(dom), mid(dom) |] do {
+	     if (a in dom) then {
+	        if (0 in evaluate(f, [a])) then {
+	     	   res = a .: res;
+	        };
+	     };
+	  };
+
+	  return res;
+};
+
 procedure polynomialZerosInner(poly, dom) {
           var res, nbz, oldPoints, okay, p, oldPrec;
 
@@ -556,9 +572,13 @@ procedure polynomialZerosInner(poly, dom) {
           okay = false;
           oldPoints = points;
 	  oldPrec = prec;
-          while ((!okay) && (points <= 256 * oldPoints)) do {
-                res = dirtyfindzeros(poly, dom);
-                if (length(res) == nbz) then {
+          while ((!okay) && (points <= 32 * oldPoints)) do {
+                if (nbz == 0) then {
+		   res = [||];
+		} else {
+		   res = mydirtyfindzeros(poly, dom);
+		};
+                if (length(res) >= nbz) then {
                    okay = true;
                 } else {
                    points = 2 * points + 1!;
@@ -577,7 +597,7 @@ procedure polynomialZeros(poly, dom) {
 	  oldPoints = points;
 	  points = min(oldPoints, ceil(ceil(degree(poly) * 2 * 1.05)/2)*2 + 1)!;
 
-	  res = (polynomialZerosInner(poly, dom)) @ (dirtyfindzeros(poly, dom));
+	  res = (polynomialZerosInner(poly, dom)) @ (mydirtyfindzeros(poly, dom));
 
 	  if (0 in dom) then {
 	     if (0 in evaluate(poly,[0])) then {
@@ -600,7 +620,7 @@ procedure basicZeros(p, dom) {
 	  prec = ceil(1.05 * prec)!;
 
           if (degree(p) < 0) then {
-             res = dirtyfindzeros(p, dom);
+             res = mydirtyfindzeros(p, dom);
           } else {
              res = polynomialZeros(p, dom);
           };
@@ -666,7 +686,7 @@ procedure functionNegativeAbscissaInner(q, dom) {
           res = [||];
           
           pderiv = diff(p);
-          Z = functionZeros(pderiv, dom) @ [| [inf(dom)], [sup(dom)], blowPointToInterval(inf(dom), 2 * prec, inf(dom), sup(dom)), blowPointToInterval(sup(dom), 2 * prec, inf(dom), sup(dom)) |];
+          Z = functionZeros(pderiv, dom) @ [| [inf(dom)], [sup(dom)], blowPointToInterval(inf(dom), 2 * prec, inf(dom), sup(dom)), blowPointToInterval(sup(dom), 2 * prec, inf(dom), sup(dom)) |] @ functionZeros(p, dom);
           for z in Z do {
               y = evaluate(horner(p(inf(z) + (sup(z) - inf(z)) * (_x_ + 0.5))),[-0.5;0.5]);
 	      if ((sup(y) <= 0) && (inf(y) < 0)) then {
@@ -1013,7 +1033,7 @@ procedure splitDomain(dom, splitPoints) {
 	  return res;
 };
 
-procedure checkRatioPolynomialsBetweenBounds(p, q, dom, betaInf, betaSup) {
+procedure checkRatioPolynomialsBetweenBoundsSafe(p, q, dom, betaInf, betaSup) {
 	  var zerosQ, okay, failures, splitDomains;
 
 	  zerosQ = functionZeros(q, dom);
@@ -1024,11 +1044,23 @@ procedure checkRatioPolynomialsBetweenBounds(p, q, dom, betaInf, betaSup) {
 	  failures = [||];
 	  for d in splitDomains do {
 	      R = __checkRatioPolynomialsBetweenBoundsInner(p, q, d, betaInf, betaSup);
-	      okay = okay && R.okay;
-	      failures = failures @ R.failures;
+	      okay = okay && (R.okay);
+	      failures = failures @ (R.failures);
 	  };
 	  
 	  return { .okay = okay, .failures = failures };
+};
+
+procedure checkRatioPolynomialsBetweenBounds(p, q, dom, betaInf, betaSup) {
+	  var res;
+
+	  if (betaInf > betaSup) then {
+	     res = { .okay = true };
+	  } else {
+	     res = checkRatioPolynomialsBetweenBoundsSafe(p, q, dom, betaInf, betaSup);
+	  };
+
+	  return res;
 };
 
 procedure omegaDomainToXiDomain(Omega, t) {
@@ -1244,16 +1276,19 @@ procedure __checkModulusFilterInSpecificationInner(b, a, specifications) {
 
 procedure checkModulusFilterInSpecification(b, a, specifications, p) {
 	  var t, r;
-	  var oldPrec;
+	  var oldPrec, oldPoints;
 	  
 	  oldPrec = prec;
 	  prec = p!;
+	  oldPoints = points;
+	  points = ceil(ceil(4 * max(degree(b),degree(a),40)) / 2) * 2 + 1!;
 	  t = time({
 	               r = __checkModulusFilterInSpecificationInner(b, a, specifications);
 	           });
 
           r.computeTime = t;
 	  prec = oldPrec!;
+	  points = oldPoints!;
 
 	  return r;
 };
