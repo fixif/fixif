@@ -1,4 +1,23 @@
 
+suppressmessage(183);
+
+procedure productOfDenominators(p) {
+	  var res, i, c, d;
+
+	  res = 1;
+	  for i from 0 to degree(p) do {
+	      c = coeff(p, i);
+	      d = denominator(c);
+	      res = res * d;
+	  };
+
+	  if (res < 0) then {
+	     res = -res;
+	  };
+
+	  return res;
+};
+
 /* Given a polynomial p, computes a polynomial q and an integer n such
    that
 
@@ -346,6 +365,7 @@ procedure composePolynomialInXi(p) {
 procedure modulusSquareFilterInXi(b, a) {
           var hsq, P, Q, PR, QR, prp, prq, qrp, qrq, gp, gq;
           var up, uq, vp, vq, bp, bq, nbp, nbq;
+	  var dp, dq;
 
           hsq = modulusSquareFilter(b, a);
 
@@ -402,6 +422,12 @@ procedure modulusSquareFilterInXi(b, a) {
 	      bq = nbq;
 	  };
 
+	  dp = productOfDenominators(bp);
+	  dq = productOfDenominators(bq);
+
+	  bp = horner((dp * dq) * bp);
+	  bq = horner((dp * dq) * bq);
+	  
           return { .p = bp, .q = bq };
 };
 
@@ -431,7 +457,7 @@ procedure provePolynomialPositiveAtPoint(p, a) {
 };
 
 procedure wrappednumberrootsinner(p, dom) {
-	  var nz, oldPrec, pp, i;
+	  var nz, oldPrec, pp, i, oldDisplay;
 	  
 	  pp = prec;
 	  for i from 0 to degree(p) do {
@@ -461,8 +487,9 @@ procedure wrappednumberroots(p, dom) {
 	  return res;
 };
 
-procedure provePolynomialPositiveBasic(p, dom) {
-	  var res, a, b, v, h, t, tt;
+procedure provePolynomialPositiveBasicInner(p, dom) {
+	  var res, a, b, v, h, t, tt, g, h;
+	  var nz, dg, dh, rg, rh;
 	  
 	  a = inf(dom);
 	  b = sup(dom);
@@ -501,7 +528,39 @@ procedure provePolynomialPositiveBasic(p, dom) {
 		      res = false;
 		   };
 		} else {
-		   res = false;
+		   g = horner(gcd(p, diff(p)));
+		   h = horner(simplify(horner(p / g)));
+		   if ((degree(g) > 0) && (degree(h) > 0)) then {
+		       dg = productOfDenominators(g);
+		       dh = productOfDenominators(h);
+		       g = horner(dg * g);
+		       h = horner(dh * h);
+		       rg = provePolynomialPositiveBasicInner(g, dom);
+		       if (rg) then {
+		       	  rh = provePolynomialPositiveBasicInner(h, dom);
+			  if (rh) then {
+			    res = true;
+			  } else {
+			    res = false;
+			  };
+		       } else {
+		       	 g = horner(-g);
+			 h = horner(-h);
+			 rg = provePolynomialPositiveBasicInner(g, dom);
+			 if (rg) then {
+			    rh = provePolynomialPositiveBasicInner(h, dom);
+			    if (rh) then {
+			      res = true;
+			    } else {
+			      res = false;
+			    };
+			 } else {
+			    res = false;
+			 };
+		       };
+		   } else {
+		      res = false;
+                   };
 		};
 	     } else {
 	        res = true;
@@ -509,7 +568,31 @@ procedure provePolynomialPositiveBasic(p, dom) {
 	  } else {
 	    res = false;
 	  };
+
 	  return res;
+};
+
+procedure provePolynomialPositiveBasicRecurse(p, dom, n) {
+	  var res;
+	  var sda, sdb, m;
+
+	  res = provePolynomialPositiveBasicInner(p, dom);
+
+	  if ((!res) && (n > 0)) then {
+	     m = round(mid(dom), prec, RN);
+	     sda = [inf(dom);m];
+	     sdb = [m;sup(dom)];
+	     res = provePolynomialPositiveBasicRecurse(p, sda, n - 1);
+	     if (res) then {
+	     	res = provePolynomialPositiveBasicRecurse(p, sdb, n - 1);
+	     };
+	  };
+
+	  return res;
+};
+
+procedure provePolynomialPositiveBasic(p, dom) {
+	  return provePolynomialPositiveBasicRecurse(p, dom, 8);
 };
 
 procedure __provePolynomialPositiveInner(p, dom) {
@@ -543,7 +626,7 @@ procedure __provePolynomialPositiveInner(p, dom) {
 	  return res;
 };
 
-procedure mydirtyfindzeros(f, dom) {
+procedure mydirtyfindzerosinner(f, dom) {
 	  var res, a;
 
 	  res = dirtyfindzeros(f, dom);
@@ -559,35 +642,60 @@ procedure mydirtyfindzeros(f, dom) {
 	  return res;
 };
 
+procedure mydirtyfindzeros(f, dom) {
+	  var r, res, a, b, c, h, sdom;
+
+	  a = inf(dom);
+	  b = sup(dom);
+	  h = round((b - a) / 16,prec,RU);
+	  res = [||];
+	  for c from a to b - h by h do {
+	      sdom = [ max(a, c); min(b, c + h) ];
+	      r = mydirtyfindzerosinner(f, sdom);
+	      res = res @ r;
+	  };
+
+	  return res;
+};
+
+procedure __polynomialsZerosSafe(p, dom) {
+	  var nbz, res, sdomA, sdomB, m;
+	  var oldPoints, found;
+
+	  nbz = wrappednumberroots(p, dom);
+
+	  if (nbz == 0) then {
+	     res = [||];
+	  } else {
+	    if (nbz == 1) then {
+	       oldPoints = points;
+	       found = false;
+	       while ((!found) && (points <= 32 * oldPoints)) do {
+	       	     res = mydirtyfindzeros(p, dom);
+		     if (length(res) > 0) then {
+		     	found = true;
+		     } else {
+		        points = ceil(ceil(points * 1.5)/2)*2 + 1;
+		     };
+	       };
+	       points = oldPoints!;
+	    } else {
+	      m = round(mid(dom), prec, RN);
+	      sdomA = [inf(dom);m];
+	      sdomB = [m;sup(dom)];
+	      res = __polynomialsZerosSafe(p, sdomA) @ __polynomialsZerosSafe(p, sdomB);
+	    };
+	  };
+	  return res;
+};
+
 procedure polynomialZerosInner(poly, dom) {
-          var res, nbz, oldPoints, okay, p, oldPrec;
+	  var d, p;
 
-          p = 0;
-          for i from 0 to degree(poly) do {
-              p = p + round(coeff(poly,i),32 * prec,RN) * _x_^i;
-          };
-          p = horner(p);
+	  d = productOfDenominators(poly);
+	  p = horner(d * poly);
 
-          nbz = wrappednumberroots(p, dom);
-          okay = false;
-          oldPoints = points;
-	  oldPrec = prec;
-          while ((!okay) && (points <= 32 * oldPoints)) do {
-                if (nbz == 0) then {
-		   res = [||];
-		} else {
-		   res = mydirtyfindzeros(poly, dom);
-		};
-                if (length(res) >= nbz) then {
-                   okay = true;
-                } else {
-                   points = 2 * points + 1!;
-                };
-          };
-          points = oldPoints!;
-	  prec = oldPrec!;
-
-          return res;
+	  return __polynomialsZerosSafe(p, dom);
 };
 
 procedure polynomialZeros(poly, dom) {
@@ -670,7 +778,6 @@ procedure functionZeros(p, dom) {
               if (inf(y) * sup(y) <= 0) then {
                  res = pz .: res;
               };
-	      res = [z] .: res;
           };
 
           return res;
@@ -679,28 +786,17 @@ procedure functionZeros(p, dom) {
 procedure functionNegativeAbscissaInner(q, dom) {
           var pderiv, Z, z, y, res;
 	  var p;
-	  var za, zb, ya, yb;
 
 	  p = horner(q);
 
           res = [||];
           
           pderiv = diff(p);
-          Z = functionZeros(pderiv, dom) @ [| [inf(dom)], [sup(dom)], blowPointToInterval(inf(dom), 2 * prec, inf(dom), sup(dom)), blowPointToInterval(sup(dom), 2 * prec, inf(dom), sup(dom)) |] @ functionZeros(p, dom);
+          Z = functionZeros(pderiv, dom) @ [| blowPointToInterval(inf(dom), 2 * prec, inf(dom), sup(dom)), blowPointToInterval(sup(dom), 2 * prec, inf(dom), sup(dom)) |];
           for z in Z do {
               y = evaluate(horner(p(inf(z) + (sup(z) - inf(z)) * (_x_ + 0.5))),[-0.5;0.5]);
 	      if ((sup(y) <= 0) && (inf(y) < 0)) then {
 	      	 res = { .failurePoint = z, .failureDomain = dom } .: res;
-	      } else {
-	         za = inf(z);
-		 zb = sup(z);
-		 if (za != zb) then {
-		    ya = mid(evaluate(p, za));
-		    yb = mid(evaluate(p, zb));
-		    if (ya * yb < 0) then {
-		       res = { .failurePoint = z, .failureDomain = dom } .: res;
-		    };
-		 };
 	      };
           };
           
@@ -750,8 +846,10 @@ procedure functionNegativeAbscissa(q, dom) {
 */
 procedure provePolynomialPositive(poly, dom) {
           var q, r, delta, pr, oldPrec, c, cc, t, p;
+	  var d;
 
-          p = horner(poly);
+	  d = productOfDenominators(poly);
+          p = horner(d * poly);
 
           q = 0;
           for i from 0 to degree(p) do {
