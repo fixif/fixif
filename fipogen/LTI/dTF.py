@@ -14,7 +14,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-#from fipogen.LTI import dTFmp
+
 import mpmath
 import numpy
 from numpy import ndenumerate, array, zeros, matrix, matrix, set_printoptions, empty
@@ -22,7 +22,7 @@ from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
 from scipy.linalg import norm
-
+import sollya
 
 from numpy.testing import assert_allclose
 
@@ -54,6 +54,8 @@ class dTF(object):
 
 		self._order = num.shape[1]-1
 
+		# cached sollya numerator and denominator
+		self._sollya = None
 
 	@property
 	def num(self):
@@ -86,8 +88,8 @@ class dTF(object):
 
 
 	def to_dTFmp(self):
+		from fipogen.LTI import dTFmp
 		return dTFmp(self._num, self._den)
-
 
 	def to_dSS(self, form="ctrl"):
 		"""
@@ -112,6 +114,22 @@ class dTF(object):
 			raise ValueError( 'dTF.to_dSS: the form "%s" is invalid (must be "ctrl" or "obs")'%form )
 
 		return dSS(A,B,C,D)
+
+
+	def to_Sollya(self):
+		"""
+		Convert transfer function into two Sollya polynomials (numerator and denomitator)
+		The result is cached in self._sollya
+		Returns
+		- num, den: (sollya object) numerator and denominator of the transfer function
+		"""
+		if not self._sollya:
+			num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(self.num)[0, :])))
+			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(self.den)[0, :])))
+			self._sollya = (num,den)
+		return self._sollya
+
+
 
 
 	def assert_close(self, other, eps=1e-7):
