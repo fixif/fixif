@@ -1,4 +1,6 @@
 
+gabaritdebugmode = false!;
+
 suppressmessage(183);
 
 procedure productOfDenominators(p) {
@@ -613,7 +615,16 @@ procedure provePolynomialPositiveBasicRecurse(p, dom, n) {
 };
 
 procedure provePolynomialPositiveBasic(p, dom) {
-	  return provePolynomialPositiveBasicRecurse(p, dom, 8);
+	  var res;
+	  res = provePolynomialPositiveBasicRecurse(p, dom, 8);
+
+	  if (gabaritdebugmode) then {
+	     if (!res) then {
+	     	plot(p, dom);
+	     };
+	  };
+
+	  return res;
 };
 
 procedure __provePolynomialPositiveInner(p, dom) {
@@ -1514,5 +1525,9 @@ procedure presentResults(res) {
 	     };
 	  };
 	  write("Computing this result took ", ceil(res.computeTime * 1000), "ms\n");
+};
+
+procedure setdebugmode(dodebug) {
+	  gabaritdebugmode = dodebug;
 };
 
