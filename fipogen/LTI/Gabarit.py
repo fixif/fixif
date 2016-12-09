@@ -157,6 +157,16 @@ class Band(object):
 			return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
 
 
+	def applyDesignMargin(self, margin):
+		"""
+		change the band according to the margin (in dB)
+		(positive when we reduce the band)
+		"""
+		if self.isPassBand:
+			self._passGains =  self._passGains[0] + margin, self._passGains[1] - margin
+		else:
+			self._stopGain -= margin
+
 
 
 class Gabarit(object):
@@ -198,6 +208,11 @@ class Gabarit(object):
 	def seed(self):
 		return self._seed
 
+	def maxGain(self):
+		"""Compute the maximum gain of the gabarit in dB
+		"""
+		return max(b.passGains[1] if b.isPassBand else b.stopGain for b in self._bands)
+
 	@property
 	def type(self):
 		"""
@@ -224,7 +239,7 @@ class Gabarit(object):
 	def bands(self):
 		return self._bands
 
-	def to_dTF(self, ftype='butter', method='scipy'):
+	def to_dTF(self, ftype='butter', method='scipy', designMargin = 0):
 		"""
 		This methods HELPS to find a transfer function that *should* satisfy the gabarit
 		It is just here to quickly determine a transfer function that satisfy the gabarit in a simple way
@@ -239,6 +254,7 @@ class Gabarit(object):
 			- Cauer/elliptic: 'ellip'
 			- Bessel/Thomson: 'bessel'
 		- method: (string) the method used ('scipy' for scipy.signal.iirdesign, or 'matlab' for matlab fdesign functions)
+		- designMargin: margin (in dB) the designer wants to add to its design (positive reduce the band)
 
 		Returns a transfer function (dTF object)
 		"""
@@ -251,6 +267,8 @@ class Gabarit(object):
 		# normalize bands (with pass gain centered in 0dB)
 		centerPassGain = max( (b.passGains[0]+b.passGains[1])/2.0 for b in self._bands if b.isPassBand )
 		bands = [ b-centerPassGain for b in self._bands ]
+		for b in bands:
+			b.applyDesignMargin(designMargin)
 
 		# arguments for matlab/scipy functions, for each type of band
 		if self.type=='lowpass':
@@ -359,16 +377,20 @@ class Gabarit(object):
 				oldDeltaMargin = deltaMargin
 				# find the maximum margin we should apply, according to the results
 				deltaMargin = findMaxIssue(res)
+
+				if deltaMargin == 0:
+					deltaMargin += 10**(1e-3 + self.maxGain()/20) - 10**(self.maxGain()/20)
+
 				print('deltaMargin='+str(deltaMargin))
 				# check if we have something to improve
-				if deltaMargin == 0:
-					raise ValueError("Don't know what to do")
 				# check if the margin decrease
 				if oldDeltaMargin < deltaMargin and margin!=0:
 					raise ValueError("deltaMargin does not decrease")
 				# increase the margin
 				margin += deltaMargin
 				#margin += sollya.round(deltaMargin, 12, sollya.RU)
+
+
 
 		return margin
 

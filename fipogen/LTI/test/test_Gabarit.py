@@ -79,31 +79,28 @@ def test_GabaritConstruction():
 
 
 
-@mark.parametrize("g", iterSimpleGabarit(), ids='')
-@mark.parametrize("type", ('cheby1', 'cheby2', 'ellip','butter'))
+@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
+@mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
 #@mark.parametrize("type", ['ellip'])
 @mark.parametrize("method", ('matlab','scipy'))
 def test_Gabarit_to_dTF(g,type,method):
 	"""
 	Test if the conversion to_dTF works for matlab/scipy and various types
 	"""
-	if g.type=='multiband':
-		with raises(ValueError):
-			H = g.to_dTF(method=method, ftype=type)
-	else:
-		H = g.to_dTF(method=method, ftype=type)
-		print(H)
-		# check it's in the gabarit +/- 1dB
-		#assert(g.check_dTF(H,margin=0)[0])
-		print(g.findMinimumMargin(H))
-		#g.plot(H)
+	H = g.to_dTF(method=method, ftype=type, designMargin=1e-3)
+	print(H)
+	# check it's in the gabarit +/- 1dB
+	#assert(g.check_dTF(H,margin=0)[0])
+	print(g.findMinimumMargin(H))
+	#g.plot(H)
 
-@mark.parametrize("g", iterSimpleGabarit(), ids='')
+
+@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
 def test_minimumMargin(g):
-
-	H = g.to_dTF(method='scipy', ftype='butter')
-	H2 = dTF(1.1*H.num,H.den)
-	print(g.findMinimumMargin(H2))
+	#g = Gabarit(48000,[ (0,9600), (12000,None) ], [-20, (0,-1)])
+	H = g.to_dTF(method='matlab', ftype='ellip')
+	#H2 = dTF(1.1*H.num,H.den)
+	print(g.findMinimumMargin(H))
 
 def test_cql():
         g = Gabarit(48000,[ (0,9600), (12000,None) ], [(0,-1), -20])
