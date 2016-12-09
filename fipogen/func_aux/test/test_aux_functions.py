@@ -2,6 +2,7 @@ import unittest
 import numpy
 import mpmath
 from mpmath import *
+from mpmath import matrix
 import sollya
 from sollya import *
 

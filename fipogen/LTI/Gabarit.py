@@ -22,8 +22,8 @@ from scipy.signal import iirdesign, freqz
 from numpy import array, pi, log10
 from numpy.random import seed as set_seed, choice, randint, uniform
 
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+#import matplotlib.pyplot as plt
+#from matplotlib.patches import Rectangle
 
 import mpmath
 import sollya
