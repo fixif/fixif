@@ -1,5 +1,13 @@
 
-gabaritdebugmode = false!;
+dodebug = false;
+
+procedure debug(l = ...) {
+	  var i;
+	  if (dodebug) then {
+	     for i in l do write(i);
+	     write("\n");
+	  };
+};
 
 suppressmessage(183);
 
@@ -495,7 +503,11 @@ procedure wrappednumberrootstimed(p, dom) {
 procedure wrappednumberroots(p, dom) {
 	  var res, t;
 
+	  debug("starting wrappednumberroots");
+
 	  t = time({ res = wrappednumberrootstimed(p, dom); }); 
+
+	  debug("wrappednumberroots gave res = ", res, " and took ", ceil(1000 * t), "ms");
 
 	  return res;
 };
@@ -510,10 +522,10 @@ procedure wrappednumberrootsnomultiplicities(p, dom) {
 	  return wrappednumberroots(q, dom);
 };
 
-procedure provePolynomialPositiveBasicInner(p, dom) {
+procedure provePolynomialPositiveBasicInnerWrap(p, dom) {
 	  var res, a, b, v, h, t, tt, g, h;
 	  var nz, dg, dh, rg, rh;
-	  
+
 	  a = inf(dom);
 	  b = sup(dom);
 
@@ -553,7 +565,7 @@ procedure provePolynomialPositiveBasicInner(p, dom) {
 		} else {
 		   g = horner(gcd(p, diff(p)));
 		   h = horner(simplify(horner(p / g)));
-		   if ((degree(g) > 0) && (degree(h) > 0)) then {
+		   if ((degree(g) > 1) && (degree(h) > 1)) then {
 		       dg = productOfDenominators(g);
 		       dh = productOfDenominators(h);
 		       g = horner(dg * g);
@@ -595,6 +607,19 @@ procedure provePolynomialPositiveBasicInner(p, dom) {
 	  return res;
 };
 
+procedure provePolynomialPositiveBasicInner(p, dom) {
+	  var res;
+
+	  debug("Starting provePolynomialPositiveBasicInner");
+
+	  res = provePolynomialPositiveBasicInnerWrap(p, dom);
+
+	  debug("provePolynomialPositiveBasicInner finished, res = ", res);
+
+
+	  return res;
+};
+
 procedure provePolynomialPositiveBasicRecurse(p, dom, n) {
 	  var res;
 	  var sda, sdb, m;
@@ -602,7 +627,7 @@ procedure provePolynomialPositiveBasicRecurse(p, dom, n) {
 	  res = provePolynomialPositiveBasicInner(p, dom);
 
 	  if ((!res) && (n > 0)) then {
-	     m = round(mid(dom), prec, RN);
+	     m = min(max(round(mid(dom), prec, RN), inf(dom)), sup(dom));
 	     sda = [inf(dom);m];
 	     sdb = [m;sup(dom)];
 	     res = provePolynomialPositiveBasicRecurse(p, sda, n - 1);
@@ -617,13 +642,6 @@ procedure provePolynomialPositiveBasicRecurse(p, dom, n) {
 procedure provePolynomialPositiveBasic(p, dom) {
 	  var res;
 	  res = provePolynomialPositiveBasicRecurse(p, dom, 8);
-
-	  if (gabaritdebugmode) then {
-	     if (!res) then {
-	     	plot(p, dom);
-	     };
-	  };
-
 	  return res;
 };
 
@@ -720,7 +738,7 @@ procedure __polynomialsZerosSafe(p, dom) {
 	       };
 	       points = oldPoints!;
 	    } else {
-	      m = round(mid(dom), prec, RN);
+	      m = min(max(round(mid(dom), prec, RN), inf(dom)), sup(dom));
 	      sdomA = [inf(dom);m];
 	      sdomB = [m;sup(dom)];
 	      res = __polynomialsZerosSafe(p, sdomA) @ __polynomialsZerosSafe(p, sdomB);
@@ -939,7 +957,11 @@ procedure functionNegativeAbscissaTimed(q, dom) {
 procedure functionNegativeAbscissa(p, dom) {
 	  var res, t;
 
+	  debug("Starting functionNegativeAbscissa");
+
 	  t = time({ res = functionNegativeAbscissaTimed(p, dom); });
+
+	  debug("functionNegativeAbscissa yielded ", res, " and took ", ceil(1000 * t), "ms");
 
 	  return res;
 };
@@ -1525,9 +1547,5 @@ procedure presentResults(res) {
 	     };
 	  };
 	  write("Computing this result took ", ceil(res.computeTime * 1000), "ms\n");
-};
-
-procedure setdebugmode(dodebug) {
-	  gabaritdebugmode = dodebug;
 };
 
