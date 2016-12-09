@@ -29,6 +29,9 @@ import mpmath
 import sollya
 
 
+# load 'gabarit.sol'
+sollya.suppressmessage(57, 174, 130, 457)
+sollya.execute("fipogen/LTI/gabarit.sol")
 
 
 
@@ -269,7 +272,7 @@ class Gabarit(object):
 
 		elif self.type == 'bandstop':
 			pass1b, stopb, pass2b = bands
-			matlabParams = [pass1b.w2, stopb.w1, stopb.w2, pass2b.w1, -pass1b.passGains[0], -stopb.stopGain[1], -pass2b.passGains[0]]
+			matlabParams = [pass1b.w2, stopb.w1, stopb.w2, pass2b.w1, -pass1b.passGains[0], -stopb.stopGain, -pass2b.passGains[0]]
 			scipyParams = [[pass1b.w2, pass2b.w1], [stopb.w1, stopb.w2], -pass1b.passGains[0], -stopb.stopGain]
 			if not matlabEng and pass1b.passGains[0] != pass1b.passGains[0]:
 					raise ValueError("Scipy cannot handle bandstop when the two pass bands have different gains")
@@ -331,11 +334,6 @@ class Gabarit(object):
 		- isOk: True if the transfer function is in the gabarit
 		- res: sollya object embedded the result
 		"""
-
-		# load gabarit.sol
-		sollya.suppressmessage(57, 174, 130, 457)
-		sollya.execute("fipogen/LTI/gabarit.sol")
-
 		# get num,den as sollya objects
 		num,den = tf.to_Sollya()
 
@@ -344,7 +342,7 @@ class Gabarit(object):
 
 		# run sollya check
 		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints, prec)
-		#sollya.parse("presentResults")(res)
+		sollya.parse("presentResults")(res)
 
 		return dict(res)["okay"], res
 
@@ -358,23 +356,10 @@ class Gabarit(object):
 			# check if margin
 			gPass, res = self.check_dTF(tf,margin=margin)
 			if not gPass:
-				# find the maximum margin we should apply, according to the results
-				result = dict(res)["results"]
 				oldDeltaMargin = deltaMargin
-				deltaMargin = 0
-				for b in dict(res)["results"]:        # for every band
-					okay = dict(b)["okay"]
-					if not okay:
-						issues = [ dict(b)["issue"][i] for i in range(sollya.length(dict(b)["issue"]))]     # bug pythonsollya, un for i in dict(b)["issue"] devrait marcher
-						for i in issues:                        # for every issues
-							H = dict(i)["H"]
-							betaInf = dict(dict(i)["specification"])["betaInf"]
-							betaSup = dict(dict(i)["specification"])["betaSup"]
-							if sollya.inf(H) > betaSup:
-								 deltaMargin = sollya.max( deltaMargin, sollya.sup(H) - betaSup )
-							else:
-								deltaMargin = sollya.max(deltaMargin, betaSup - sollya.inf(H))
-
+				# find the maximum margin we should apply, according to the results
+				deltaMargin = findMaxIssue(res)
+				print('deltaMargin='+str(deltaMargin))
 				# check if we have something to improve
 				if deltaMargin == 0:
 					raise ValueError("Don't know what to do")
@@ -382,7 +367,8 @@ class Gabarit(object):
 				if oldDeltaMargin < deltaMargin and margin!=0:
 					raise ValueError("deltaMargin does not decrease")
 				# increase the margin
-				margin += sollya.round(deltaMargin, 12, sollya.RU)
+				margin += deltaMargin
+				#margin += sollya.round(deltaMargin, 12, sollya.RU)
 
 		return margin
 
@@ -435,3 +421,27 @@ def random_Gabarit(form=None, seed=None):
 		raise ValueError('The form is not valid')
 
 	return Gabarit(Fs, bands, Gains, seed=seed)
+
+
+def findMaxIssue(res):
+	"""
+	Find the issue with the maximum error
+	Parameters:
+	- res: (sollya object) result from the checkModulusFilterInSpecification function
+
+	Returns the maximum value (0 if not available)
+	"""
+	maxError = 0
+	for b in dict(res)["results"]:  # for every band
+		okay = dict(b)["okay"]
+		if not okay:
+			for i in dict(b)["issue"]:  # for every issues
+				H = dict(i)["H"]
+				betaInf = dict(dict(i)["specification"])["betaInf"]
+				betaSup = dict(dict(i)["specification"])["betaSup"]
+				if sollya.inf(H) > betaSup:
+					maxError = sollya.max(maxError, sollya.sup(H) - betaSup)
+				else:
+					maxError = sollya.max(maxError, betaSup - sollya.inf(H))
+
+	return maxError
