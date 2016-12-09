@@ -458,6 +458,7 @@ procedure provePolynomialPositiveAtPoint(p, a) {
 
 procedure wrappednumberrootsinner(p, dom) {
 	  var nz, oldPrec, pp, i, oldDisplay;
+	  var t;
 	  
 	  pp = prec;
 	  for i from 0 to degree(p) do {
@@ -465,14 +466,16 @@ procedure wrappednumberrootsinner(p, dom) {
 	  };
 
 	  oldPrec = prec;
-	  prec = 3 * pp!;
-	  nz = numberroots(p, dom);
+	  prec = min(3 * pp, 4 * oldPrec)!;
+
+	  t = time({ nz = numberroots(p, dom); });
+
 	  prec = oldPrec!;
 	  
 	  return nz;
 };
 
-procedure wrappednumberroots(p, dom) {
+procedure wrappednumberrootstimed(p, dom) {
 	  var res, i, Emin, q;
 
 	  Emin = exponent(coeff(p, 0));
@@ -483,6 +486,14 @@ procedure wrappednumberroots(p, dom) {
 	  q = 2^(-Emin) * p;
 
 	  res = wrappednumberrootsinner(q, dom);
+
+	  return res;
+};
+
+procedure wrappednumberroots(p, dom) {
+	  var res, t;
+
+	  t = time({ res = wrappednumberrootstimed(p, dom); }); 
 
 	  return res;
 };
@@ -652,7 +663,7 @@ procedure mydirtyfindzerosinner(f, dom) {
 	  return res;
 };
 
-procedure mydirtyfindzeros(f, dom) {
+procedure mydirtyfindzerostimed(f, dom) {
 	  var r, res, a, b, c, h, sdom;
 
 	  a = inf(dom);
@@ -665,6 +676,14 @@ procedure mydirtyfindzeros(f, dom) {
 	      res = res @ r;
 	  };
 
+	  return res;
+};
+
+procedure mydirtyfindzeros(f, dom) {
+	  var res, t;
+
+	  t = time({ res = mydirtyfindzerostimed(f, dom); });
+	  
 	  return res;
 };
 
@@ -701,11 +720,26 @@ procedure __polynomialsZerosSafe(p, dom) {
 
 procedure polynomialZerosInner(poly, dom) {
 	  var d, p;
+	  var nbz, res;
+	  var oldPoints;
+	  var t;
 
 	  d = productOfDenominators(poly);
 	  p = horner(d * poly);
 
-	  return __polynomialsZerosSafe(p, dom);
+	  t = time({ nbz = wrappednumberrootsnomultiplicities(p, dom); });
+
+	  oldPoints = points;
+	  points = min(1001, oldPoints)!;
+	  res = mydirtyfindzeros(p, dom);
+	  points = oldPoints!;
+	  if (length(res) < nbz) then {
+
+	     t = time({ res = __polynomialsZerosSafe(p, dom); });
+
+	  };
+
+	  return res;
 };
 
 procedure polynomialZeros(poly, dom) {
@@ -715,7 +749,7 @@ procedure polynomialZeros(poly, dom) {
 	  oldPoints = points;
 	  points = min(oldPoints, ceil(ceil(degree(poly) * 2 * 1.05)/2)*2 + 1)!;
 
-	  res = (polynomialZerosInner(poly, dom)) @ (mydirtyfindzeros(poly, dom));
+	  res = polynomialZerosInner(poly, dom);
 
 	  if (0 in dom) then {
 	     if (0 in evaluate(poly,[0])) then {
@@ -768,10 +802,10 @@ procedure blowPointToInterval(z, p, a, b) {
           return pz;
 };
 
-procedure functionZeros(p, dom) {
+procedure functionZerosSafe(p, dom) {
           var rawZeros, oldPrec, res, z, pz, y;
 	  var oldPoints;
-
+	  
           res = [||];
 
           oldPrec = prec;
@@ -793,18 +827,65 @@ procedure functionZeros(p, dom) {
           return res;
 };
 
-procedure functionNegativeAbscissaInner(q, dom) {
+procedure functionZerosLazy(p, dom) {
+          var rawZeros, oldPrec, res, z, pz, y;
+	  var oldPoints;
+	  
+          res = [||];
+
+          oldPrec = prec;
+	  oldPoints = points;
+          prec = 4 * prec!;
+	  points = max(301, ceil(ceil(points * 1.05)/2)*2 + 1)!;
+          rawZeros = mydirtyfindzeros(p, dom);
+          prec = oldPrec!;
+	  points = oldPoints!;
+          
+          for z in rawZeros do {
+              pz = blowPointToInterval(z, 2 * prec, inf(dom), sup(dom));
+              y = p(pz);
+              if (inf(y) * sup(y) <= 0) then {
+                 res = pz .: res;
+              };
+          };
+
+          return res;
+};
+
+procedure functionZerosTimed(p, dom, lazy) {
+	  var res;
+
+	  if (lazy) then {
+	     res = functionZerosLazy(p, dom);
+	  } else {
+	     res = functionZerosSafe(p, dom);
+	  };
+
+	  return res;
+};
+
+procedure functionZeros(p, dom, lazy) {
+	  var res, t;
+
+	  t = time({ res = functionZerosTimed(p, dom, lazy); });
+
+	  return res;
+};
+
+procedure functionNegativeAbscissaInnerWithLaziness(q, dom, lazy) {
           var pderiv, Z, z, y, res;
 	  var p;
+	  var t;
 
 	  p = horner(q);
 
           res = [||];
           
           pderiv = diff(p);
-          Z = functionZeros(pderiv, dom) @ [| blowPointToInterval(inf(dom), 2 * prec, inf(dom), sup(dom)), blowPointToInterval(sup(dom), 2 * prec, inf(dom), sup(dom)) |];
+          Z = functionZeros(pderiv, dom, lazy) @ [| blowPointToInterval(inf(dom), 2 * prec, inf(dom), sup(dom)), blowPointToInterval(sup(dom), 2 * prec, inf(dom), sup(dom)) |];
           for z in Z do {
-              y = evaluate(horner(p(inf(z) + (sup(z) - inf(z)) * (_x_ + 0.5))),[-0.5;0.5]);
+	      t = time({ y = evaluate(horner(p(inf(z) + (sup(z) - inf(z)) * (_x_ + 0.5))),[-0.5;0.5]); });
+
 	      if ((sup(y) <= 0) && (inf(y) < 0)) then {
 	      	 res = { .failurePoint = z, .failureDomain = dom } .: res;
 	      };
@@ -813,7 +894,18 @@ procedure functionNegativeAbscissaInner(q, dom) {
           return res;
 };
 
-procedure functionNegativeAbscissa(q, dom) {
+procedure functionNegativeAbscissaInner(q, dom) {
+	  var res;
+
+	  res = functionNegativeAbscissaInnerWithLaziness(q, dom, true);
+	  if (res == [||]) then {
+	     res = functionNegativeAbscissaInnerWithLaziness(q, dom, false);
+	  };
+
+	  return res;
+};
+
+procedure functionNegativeAbscissaTimed(q, dom) {
 	  var res, a, b, c, h, sdom, r;
 
 	  if (0 in dom) then {
@@ -829,6 +921,14 @@ procedure functionNegativeAbscissa(q, dom) {
 	  } else {
 	     res = functionNegativeAbscissaInner(q, dom);
 	  };
+
+	  return res;
+};
+
+procedure functionNegativeAbscissa(p, dom) {
+	  var res, t;
+
+	  t = time({ res = functionNegativeAbscissaTimed(p, dom); });
 
 	  return res;
 };
@@ -1144,7 +1244,7 @@ procedure splitDomain(dom, splitPoints) {
 procedure checkRatioPolynomialsBetweenBoundsSafe(p, q, dom, betaInf, betaSup) {
 	  var zerosQ, okay, failures, splitDomains;
 
-	  zerosQ = functionZeros(q, dom);
+	  zerosQ = functionZeros(q, dom, false);
 
 	  splitDomains = splitDomain(dom, zerosQ);
 
