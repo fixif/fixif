@@ -10,10 +10,10 @@ __maintainer__ = "Anastasia Volkova"
 __email__ = "Anastasia.Volkova@lip6.fr"
 __status__ = "Beta"
 
-from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy
+from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mpf_matrix_to_sollya
 import mpmath
 import numpy
-
+import sollya
 
 class dTFmp(object):
 
@@ -57,6 +57,10 @@ class dTFmp(object):
 		self._order = n - 1
 		self._num = b
 		self._den = a
+
+		# cached sollya numerator and denominator
+		self._sollya = None
+
 
 	@property
 	def num(self):
@@ -134,6 +138,26 @@ class dTFmp(object):
 		D = mpmath.matrix([self.num[0, 0]])
 
 		return dSSmp(A,B,C,D)
+
+
+	def to_Sollya(self):
+		"""
+		Convert transfer function into two Sollya polynomials (numerator and denomitator)
+		The result is cached in self._sollya
+		Returns
+		- num, den: (sollya object) numerator and denominator of the transfer function
+		"""
+		if not self._sollya:
+			tf_num_sollya, len_num, _ = mpf_matrix_to_sollya(self._num)
+			tf_den_sollya, len_den, _ = mpf_matrix_to_sollya(self._den)
+			num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(tf_num_sollya)))
+			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(tf_den_sollya)))
+			self._sollya = (num, den)
+
+		return self._sollya
+
+
+
 
 def iter_random_dTFmp(number, order=(5, 10)):
 	"""
