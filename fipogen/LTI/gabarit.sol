@@ -487,6 +487,16 @@ procedure wrappednumberroots(p, dom) {
 	  return res;
 };
 
+procedure wrappednumberrootsnomultiplicities(p, dom) {
+	  var q, d;
+
+	  q = horner(simplify(horner(p / gcd(p, diff(p)))));
+	  d = productOfDenominators(q);
+	  q = horner(simplify(horner(d * q)));
+
+	  return wrappednumberroots(q, dom);
+};
+
 procedure provePolynomialPositiveBasicInner(p, dom) {
 	  var res, a, b, v, h, t, tt, g, h;
 	  var nz, dg, dh, rg, rh;
@@ -662,7 +672,7 @@ procedure __polynomialsZerosSafe(p, dom) {
 	  var nbz, res, sdomA, sdomB, m;
 	  var oldPoints, found;
 
-	  nbz = wrappednumberroots(p, dom);
+	  nbz = wrappednumberrootsnomultiplicities(p, dom);
 
 	  if (nbz == 0) then {
 	     res = [||];
