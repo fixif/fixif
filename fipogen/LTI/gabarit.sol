@@ -736,6 +736,9 @@ procedure __polynomialsZerosSafe(p, dom) {
 		        points = ceil(ceil(points * 1.5)/2)*2 + 1;
 		     };
 	       };
+	       if (!found) then {
+	       	  res = mydirtyfindzeros(horner(simplify(horner(p/gcd(p,diff(p))))), dom);
+	       };
 	       points = oldPoints!;
 	    } else {
 	      m = min(max(round(mid(dom), prec, RN), inf(dom)), sup(dom));
