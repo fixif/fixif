@@ -366,8 +366,8 @@ class Gabarit(object):
 
 
 
-	def findMinimumMargin(self, tf):
-		margin = 0
+	def findMinimumMargin(self, tf, initMargin=0):
+		margin = initMargin
 		deltaMargin = 0
 		gPass = False
 		while not gPass:
@@ -384,8 +384,10 @@ class Gabarit(object):
 				print('deltaMargin='+str(deltaMargin))
 				# check if we have something to improve
 				# check if the margin decrease
-				if oldDeltaMargin < deltaMargin and margin!=0:
-					raise ValueError("deltaMargin does not decrease")
+
+				#if oldDeltaMargin < deltaMargin and margin!=0:
+				#	raise ValueError("deltaMargin does not decrease")
+
 				# increase the margin
 				margin += deltaMargin
 				#margin += sollya.round(deltaMargin, 12, sollya.RU)

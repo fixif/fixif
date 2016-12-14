@@ -116,7 +116,7 @@ def CheckIfRealizationInGabarit(g, R):
 	H_hat = S.to_dTFmp(prec)
 	margin = g.findMinimumMargin(H_hat)
 
-	while prec < 1000:
+	while prec < 1500:
 
 		ThetaCheck, Theta = ComputeTheta(S, H_hat, g, abs(margin))
 
@@ -125,13 +125,13 @@ def CheckIfRealizationInGabarit(g, R):
 		verification_margin = margin-Theta
 
 		if ThetaCheck:
-                        check, res = g.check_dTF(H_hat, margin=verification_margin)
-                        if check:
-                                return (True, sollya.max(0, margin - Theta ), res)
-                        else:
-                                margin = g.findMinimumMargin(H_hat, zeroMargin=verification_margin)
+			check, res = g.check_dTF(H_hat, margin=verification_margin)
+			if check:
+				return (True, sollya.max(0, margin - Theta ), res)
+			else:
+				margin = g.findMinimumMargin(H_hat, initMargin=verification_margin)
 		else:
-			margin = g.findMinimumMargin(H_hat, zeroMargin=verification_margin)
+			margin = g.findMinimumMargin(H_hat, initMargin=verification_margin)
 
 		prec += prec
 		H_hat = S.to_dTFmp(prec)

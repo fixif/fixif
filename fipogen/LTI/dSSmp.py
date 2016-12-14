@@ -107,6 +107,8 @@ class dSSmp(object):
 		self._C = C
 		self._D = D
 
+
+
 	@property
 	def A(self):
 		return self._A
@@ -366,6 +368,9 @@ class dSSmp(object):
 			raise ValueError('Cannot compute WCPG in multiple precision, k must be strictly larger than 1')
 		if k < -1:
 			k = abs(k)
+ 		if k > 0 and k < 1:
+			#it means someone forgot that k is not epsilon but a power of two
+			k = sollya.ceil(sollya.log2(k))
 
 		eps = 2 ** sollya.SollyaObject(-k)
 
