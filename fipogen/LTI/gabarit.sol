@@ -1539,6 +1539,9 @@ procedure checkModulusFilterInSpecification(b, a, specifications, p) {
 	           });
 
           r.computeTime = t;
+	  r.a = a;
+	  r.b = b;
+	  r.specifications = specifications;
 	  prec = oldPrec!;
 	  points = oldPoints!;
 
