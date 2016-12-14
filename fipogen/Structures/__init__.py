@@ -1,4 +1,4 @@
-from Structure import Structure, iterAllRealizations, makeARealization, iterAllRealizationsRandomFilter
+from Structure import Structure, iterAllRealizations, makeARealization, iterAllRealizationsRandomFilter, iterStructuresAndOptions
 
 from DirectForms.DFI import DFI
 from DirectForms.DFII import DFII

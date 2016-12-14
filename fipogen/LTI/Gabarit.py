@@ -19,7 +19,7 @@ from fipogen.LTI import dTF, dTFmp
 from fipogen.func_aux import mpf_matrix_to_sollya, MatlabHelper
 
 from scipy.signal import iirdesign, freqz
-from numpy import array, pi, log10
+from numpy import array, pi, log10, infty
 from numpy.random import seed as set_seed, choice, randint, uniform
 
 #import matplotlib.pyplot as plt
@@ -367,10 +367,12 @@ class Gabarit(object):
 
 
 	def findMinimumMargin(self, tf, initMargin=0):
-		margin = initMargin
-		deltaMargin = 0
+		margin = sollya.round( initMargin, 53, sollya.RU)
+		deltaMargin = -infty
 		gPass = False
-		while not gPass:
+		nbIter = 0
+		while (not gPass) and (nbIter<25):
+			nbIter += 1
 			# check if margin
 			gPass, res = self.check_dTF(tf,margin=margin)
 			if not gPass:
@@ -382,15 +384,17 @@ class Gabarit(object):
 					deltaMargin += 10**(1e-3 + self.maxGain()/20) - 10**(self.maxGain()/20)
 
 				print('deltaMargin='+str(deltaMargin))
+				print('margin='+str(margin))
 				# check if we have something to improve
 				# check if the margin decrease
 
-				#if oldDeltaMargin < deltaMargin and margin!=0:
-				#	raise ValueError("deltaMargin does not decrease")
+				# if the old margin is lower than the new margin, and it is not the first iteration
+				if oldDeltaMargin <= deltaMargin and oldDeltaMargin != -infty and margin != 0:
+					raise ValueError("deltaMargin does not decrease")
 
 				# increase the margin
-				margin += deltaMargin
-				#margin += sollya.round(deltaMargin, 12, sollya.RU)
+				#margin += deltaMargin
+				margin = sollya.round(deltaMargin+margin, 53, sollya.RU)
 
 
 

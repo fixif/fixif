@@ -115,6 +115,10 @@ class Realization(SIF):
 		return self._filter
 
 	@property
+	def structureName(self):
+		return self._structureName
+
+	@property
 	def name(self):
 		return "Realization `%s` for filter `%s`"%(self._structureName, self._filter.name )
 

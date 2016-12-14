@@ -313,7 +313,7 @@ def JSS_trans(D):
 	return alpha
 
 
-def makeLGS(filter, transposed=False):
+def makeLGS(filt, transposed=False):
 	"""
 	Factory function to make a LGS Realization
 
@@ -325,7 +325,7 @@ def makeLGS(filter, transposed=False):
 	"""
 
 	# We compute (Phi,K,L,D) from the initial state-space
-	(Phi, K, L, D) = PhiKLD(filter.dSS)
+	(Phi, K, L, D) = PhiKLD(filt.dSS)
 	num, den = signal.ss2tf(Phi, K, L, D)
 
 	# We compute alphas with JSS-transformation
@@ -349,11 +349,11 @@ def makeLGS(filter, transposed=False):
 
 
 
-def makeLCW(filter, transposed=False):
+def makeLCW(filt, transposed=False):
 	"""Retourne la forme SIF de la structure LCW correspondant au filtre donné"""
 	# Par la fonction de scipy.signal on obtient le state-space associé
 	# On calcule ensuite (Phi,K,L,D) qu'on reconverti en fonction de transfert
-	(Phi, K, L, D) = PhiKLD(filter.dSS)
+	(Phi, K, L, D) = PhiKLD(filt.dSS)
 	num, den = signal.ss2tf(Phi, K, L, D)
 	# On calcule les alpha par la JSS-transformation
 	alpha = JSS_trans(den)
@@ -373,11 +373,11 @@ def makeLCW(filter, transposed=False):
 
 
 
-def acceptLGSLCW(filter, **options):
+def acceptLGSLCW(filt, **options):
 	"""
 	return True only if the filter is SISO
 	"""
-	return filter.isSISO() and filter.isStable()
+	return filt.isSISO() and filt.isStable()
 
 
 # build the Direct Form I

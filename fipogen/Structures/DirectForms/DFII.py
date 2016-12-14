@@ -23,7 +23,7 @@ from numpy import diagflat, zeros, eye, rot90, ones, r_, c_, atleast_2d, fliplr
 from numpy.linalg import inv
 
 
-def makeDFII( filter, transposed=True):
+def makeDFII(filt, transposed=True):
 	"""
 	Factory function to make a Direct Form II Realization
 
@@ -35,9 +35,9 @@ def makeDFII( filter, transposed=True):
 	"""
 
 	# convert everything to mat
-	n = filter.dTF.order
-	num = mat(filter.dTF.num)
-	den = mat(filter.dTF.den)
+	n = filt.dTF.order
+	num = mat(filt.dTF.num)
+	den = mat(filt.dTF.den)
 
 	# Compute J to S matrices
 	J = mat( atleast_2d(1) )

@@ -34,7 +34,7 @@ def floor2( x):
 
 
 
-def makerhoDFII( filter, gamma=None, Delta=None, transposed=True, scaling=None, equiv_dSS=False ):
+def makerhoDFII(filt, gamma=None, Delta=None, transposed=True, scaling=None, equiv_dSS=False):
 	"""
 	Factory function to make a rho Direct Form II Realisation
 
@@ -52,7 +52,7 @@ def makerhoDFII( filter, gamma=None, Delta=None, transposed=True, scaling=None, 
 
 	# see LI04b and Hila11b for reference
 
-	n = filter.order
+	n = filt.order
 	if gamma is None:
 		gamma = ones( (1,n) )
 	gamma = mat(gamma)
@@ -64,8 +64,8 @@ def makerhoDFII( filter, gamma=None, Delta=None, transposed=True, scaling=None, 
 	# =====================================
 
 	# Va and Vb
-	Va = transpose(filter.dTF.den)
-	Vb = transpose(filter.dTF.num)
+	Va = transpose(filt.dTF.den)
+	Vb = transpose(filt.dTF.num)
 
 	# Build Tbar
 	Tbar = mat(zeros( (n+1,n+1) ))

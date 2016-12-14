@@ -65,24 +65,33 @@ def ComputeTheta(S, H_hat, g, margin):
 
 	Returns
 	-------
-	boolean
+	boolean: do we have enough space for WCPG or not?
 	sollyaObject - a scalar value Theta>0
 
 	"""
 
 	# compute a margin for the WCPG
 	wcpg_margin = ComputeWCPGMargin(g,margin)
+	wcpg_margin_ini = wcpg_margin
 
 	# compute the exact dSS corresponding to H
 	S_H = H_hat.to_dSSmp()
 
 	S_delta = S - S_H
 
-	W = S_delta.WCPGmp(sollya.ceil(sollya.log2(wcpg_margin / 8)))
-	if W[0] + wcpg_margin / 8 >= max(margin, wcpg_margin):
+	# compute WCPG while it doesn't make sense (wcpgm_margin is not too big compare to WCPG value)
+	WCPG = S_delta.WCPGmp( wcpg_margin / 8 )[0]
+	while WCPG < wcpg_margin / 16 and wcpg_margin> wcpg_margin_ini*1e-15:
+		wcpg_margin /= 10
+		#print( 'WCPG_margin='+str(wcpg_margin) )
+		#print( 'WCPG='+str(WCPG) )
+		WCPG = S_delta.WCPGmp(wcpg_margin / 8)[0]
+
+	W = WCPG + wcpg_margin / 8
+	if W >= max(margin, wcpg_margin):
 		return (False, None)
 	else:
-		return (True, W[0] + wcpg_margin / 8)
+		return (True, W)
 
 
 
@@ -127,9 +136,9 @@ def CheckIfRealizationInGabarit(g, R):
 		if ThetaCheck:
 			check, res = g.check_dTF(H_hat, margin=verification_margin)
 			if check:
-				return (True, sollya.max(0, margin - Theta ), res)
+				return (True, sollya.round( sollya.max(0, margin - Theta ), 53, sollya.RU), res)
 			else:
-				margin = g.findMinimumMargin(H_hat, initMargin=verification_margin)
+				margin = max( margin+Theta, g.findMinimumMargin(H_hat, initMargin=verification_margin) )
 		else:
 			margin = g.findMinimumMargin(H_hat, initMargin=verification_margin)
 

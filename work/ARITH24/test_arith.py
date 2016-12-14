@@ -1,12 +1,13 @@
 
 from arith import CheckIfRealizationInGabarit
 
-from fipogen.LTI import Gabarit, Filter
+from fipogen.LTI import Gabarit, Filter, dTF
 from fipogen.SIF import Realization
-from fipogen.Structures import iterAllRealizations, State_Space, rhoDFII, DFI, DFII
+from fipogen.LTI import random_Filter
+from fipogen.Structures import iterStructuresAndOptions, State_Space, rhoDFII, DFI, DFII
 
 import pytest
-from pytest import mark
+from pytest import mark, fixture
 from pytest import raises
 
 # a simple gabarit iterator
@@ -22,21 +23,33 @@ def iterSimpleGabarit():
 	# multibands
 	#yield Gabarit(48000, [(0, 9600), (12000, 14000), (16400, 19000), (19000,None)], [(0,-1), -20, (0,-1),-40])
 
-@mark.parametrize("g", iterSimpleGabarit(), ids='')
-@mark.parametrize("type", ('butter', 'cheby2', 'ellip'))
-@mark.parametrize("method", ('matlab','scipy'))
-@mark.parametrize("q", ('64','16','32'))
-@mark.parametrize("R", (State_Space, rhoDFII, DFI, DFII))
-def test_CheckIfRealizationInGabarit(g,type,method, q, R):
-	H = g.to_dTF(method=method, ftype=type, designMargin=1e-3)
-	wl=int(q)
-	Rapprox = R(Filter(tf=H)).quantize(wl)
-	#for R in iterAllRealizations(Filter(tf=H)):
-	#Rapprox = State_Space(Filter(tf=H)).quantize(wl)
-	print ('------> Checking Realization: %s') % (Rapprox._structureName)
+
+fakeFilter = random_Filter(2,1,1)
+
+
+#@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
+#@mark.parametrize("type", ('butter', 'cheby2', 'ellip'))
+#@mark.parametrize("method", ('scipy',))
+@mark.parametrize("wl", (8,16,32))
+@mark.parametrize("SandO", iterStructuresAndOptions(fakeFilter), ids=lambda x:x[0].name)
+def test_CheckIfRealizationInGabarit(SandO, wl, g=iterSimpleGabarit().next(), type='ellip', method='scipy'):
+
+	# create the initial transfer function (designMargin = 0)
+	H = g.to_dTF(method=method, ftype=type, designMargin=0)
+	filt = Filter(tf=H)
+	# build the realizatoin from the structure and options
+	st,options = SandO
+	if options:
+		R = st.makeRealization(filt, **options)
+	else:
+		R = st.makeRealization(filt)
+	Rapprox = R.quantize(wl)
+
+	# check if realization in Gabarit
+	print ('------> Checking Realization: %s') % (R.structureName)
 	check, margin, res = CheckIfRealizationInGabarit(g, Rapprox)
 	if check:
-		print ('------> Realization %s is in Gabarit with margin = %e') % (Rapprox._structureName, margin)
+		print ('------> Realization %s is in Gabarit with margin = %s') % (R.structureName, margin)
 		print ('------> The Sollya result is %s') % (res)
 	else:
 		print ('------> Something went wrong! ...')

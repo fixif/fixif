@@ -54,7 +54,7 @@ class Structure(object):
 
 	@property
 	def name(self):
-		return self._fullname
+		return self._fullName
 
 
 	def canAcceptFilter(self, filter, **options):
@@ -110,7 +110,7 @@ def iterAllRealizations(filter):
 	Parameters
 	----------
 	- filter: the filter (Filter object) we want to implement
-
+	- exceptStructures: (list) list of structure name we don't want to use
 	Returns
 	-------
 	a generator of
@@ -134,6 +134,26 @@ def iterAllRealizations(filter):
 		else:
 			if st.canAcceptFilter(filter):
 				yield st.makeRealization(filter)
+
+
+
+def iterStructuresAndOptions(fakeFilter):
+	"""
+	Iterate over all the possibles structures
+	fakeFilter is used to determine the options
+	Returns a 2-tuple (structure,options)
+	"""
+	for st in Structure._allStructures.values():
+		if st._options:
+			# list of all the possible values for dictionnary
+			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
+			vl = ( dict(izip(st._options, x)) for x in product(*st._options.itervalues()) )
+			for options in vl:
+				if st.canAcceptFilter(fakeFilter, **options):
+					yield st, options
+		else:
+			if st.canAcceptFilter(fakeFilter):
+				yield st, options
 
 
 

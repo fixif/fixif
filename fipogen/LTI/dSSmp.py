@@ -330,10 +330,10 @@ class dSSmp(object):
 		mpmath.mp.prec = oldprec
 		return dTFmp(b, a)
 
-	def WCPGmp(self, k):
+	def WCPGmp(self, delta):
 		"""
 		This functions computes the WCPG of the state-space system
-		with absolute error bounded by 2^k, k > 1.
+		with absolute error bounded by delta.
 
 		The result is given as a list W of sollya objects, which represents a
 		p x q WCPG matrix.
@@ -341,7 +341,7 @@ class dSSmp(object):
 
 		Parameters
 		----------
-		k -
+		delta - bound of the absolute
 
 		Returns
 		-------
@@ -352,7 +352,7 @@ class dSSmp(object):
 		import sys
 
 		# load gabarit.sol
-		sollya.suppressmessage(57, 174, 130, 457)
+		#sollya.suppressmessage(57, 174, 130, 457)
 		sollya.execute("fipogen/LTI/wcpg.sol")
 
 		wcpg = sollya.parse("wcpg")
@@ -364,18 +364,8 @@ class dSSmp(object):
 		C,_,_ = mpf_matrix_to_sollya(self._C)
 		D,_,_ = mpf_matrix_to_sollya(self._D)
 
-		if abs(k) == 0 or abs(k) == 1:
-			raise ValueError('Cannot compute WCPG in multiple precision, k must be strictly larger than 1')
-		if k < -1:
-			k = abs(k)
- 		if k > 0 and k < 1:
-			#it means someone forgot that k is not epsilon but a power of two
-			k = sollya.ceil(sollya.log2(k))
-
-		eps = 2 ** sollya.SollyaObject(-k)
-
 		#W = sollya.parse("wcpg")(A, B, C, D, self._n, self._p, self._q, eps)
-		W = wcpg(A, B, C, D, self._n, self._p, self._q, eps)
+		W = wcpg(A, B, C, D, self._n, self._p, self._q, delta)
 		return W
 
 
