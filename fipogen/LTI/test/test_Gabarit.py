@@ -79,7 +79,7 @@ def test_GabaritConstruction():
 
 
 
-@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
+@mark.parametrize("g", iterSimpleGabarit(), ids='')
 @mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
 #@mark.parametrize("type", ['ellip'])
 @mark.parametrize("method", ('matlab','scipy'))
@@ -95,7 +95,7 @@ def test_Gabarit_to_dTF(g,type,method):
 	#g.plot(H)
 
 
-@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
+@mark.parametrize("g", iterSimpleGabarit(), ids='')
 def test_minimumMargin(g):
 	#g = Gabarit(48000,[ (0,9600), (12000,None) ], [-20, (0,-1)])
 	H = g.to_dTF(method='matlab', ftype='ellip')

@@ -22,7 +22,7 @@ def iterSimpleGabarit():
 	# multibands
 	#yield Gabarit(48000, [(0, 9600), (12000, 14000), (16400, 19000), (19000,None)], [(0,-1), -20, (0,-1),-40])
 
-@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
+@mark.parametrize("g", iterSimpleGabarit(), ids='')
 @mark.parametrize("type", ('butter', 'cheby2', 'ellip'))
 @mark.parametrize("method", ('matlab','scipy'))
 @mark.parametrize("q", ('64','48','32', '16'))
@@ -32,11 +32,14 @@ def test_CheckIfRealizationInGabarit(g,type,method, q):
 	#for R in iterAllRealizations(Filter(tf=H)):
 	Rapprox = State_Space(Filter(tf=H)).quantize(wl)
 	print ('------> Checking Realization: %s') % (Rapprox._structureName)
-	check, margin = CheckIfRealizationInGabarit(g, Rapprox)
+	check, margin, res = CheckIfRealizationInGabarit(g, Rapprox)
 	if check:
 		print ('------> Realization %s is in Gabarit with margin = %e') % (Rapprox._structureName, margin)
+                print ('------> The Sollya result is %s') % (res)
 	else:
 		print ('------> Something went wrong! ...')
+                print ('------> The Sollya result is %s') % (res)
+        print ('Asserting now')
 	assert (check)
 
 

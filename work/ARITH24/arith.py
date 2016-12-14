@@ -124,8 +124,12 @@ def CheckIfRealizationInGabarit(g, R):
 		# otherwise, we check with a wider margin
 		verification_margin = margin-Theta
 
-		if ThetaCheck and (g.check_dTF(H_hat, margin=verification_margin))[0]==True:
-			return (True, sollya.max(0, margin - Theta ))
+		if ThetaCheck:
+                        check, res = g.check_dTF(H_hat, margin=verification_margin)
+                        if check:
+                                return (True, sollya.max(0, margin - Theta ), res)
+                        else:
+                                margin = g.findMinimumMargin(H_hat, zeroMargin=verification_margin)
 		else:
 			margin = g.findMinimumMargin(H_hat, zeroMargin=verification_margin)
 
@@ -133,7 +137,7 @@ def CheckIfRealizationInGabarit(g, R):
 		H_hat = S.to_dTFmp(prec)
 
 
-	return (False, None)
+	return (False, None, None)
 
 
 def buildApproxRealization(g, wl, struct):

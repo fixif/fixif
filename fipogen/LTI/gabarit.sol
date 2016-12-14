@@ -1299,7 +1299,7 @@ procedure checkRatioPolynomialsBetweenBounds(p, q, dom, betaInf, betaSup) {
 	  var res;
 
 	  if (betaInf > betaSup) then {
-	     res = { .okay = true };
+	     res = { .okay = false, .failures = [||] };
 	  } else {
 	     res = checkRatioPolynomialsBetweenBoundsSafe(p, q, dom, betaInf, betaSup);
 	  };
@@ -1545,7 +1545,7 @@ procedure presentResults(res) {
 	     write("The following issues have been found:\n");
 	     for i in res.results do {
 	     	 for k in i.issue do {
-		     write("Issue in subdomain Omega = ", k.subdomainOmegaFactor, " * ", k.subdomainOmega, " at omega = ", k.omegaFactor, " * ", k.omega, ": |H(exp(j*omega))| should be between ", k.specification.betaInf, " and ", k.specification.betaSup, " but evaluates to ", k.H, " = 10^(", 20 * log10(k.H)," / 20)\n");
+		     write("Issue in subdomain Omega = ", k.subdomainOmegaFactor, " * ", k.subdomainOmega, " at omega = ", k.omegaFactor, " * ", k.omega, ": |H(exp(j*omega))| should be between ", round(k.specification.betaInf, 4 * prec, RU), " and ", round(k.specification.betaSup, 4 * prec, RD), " but evaluates to ", k.H, " = 10^(", 20 * log10(k.H)," / 20)\n");
 		 };
 	     };
 	  };
