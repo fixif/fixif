@@ -476,7 +476,7 @@ procedure wrappednumberrootsinner(p, dom) {
 	  };
 
 	  oldPrec = prec;
-	  prec = min(3 * pp, 4 * oldPrec)!;
+	  prec = min(3 * pp, 24 * oldPrec)!;
 
 	  t = time({ nz = numberroots(p, dom); });
 
@@ -502,6 +502,7 @@ procedure wrappednumberrootstimed(p, dom) {
 
 procedure wrappednumberroots(p, dom) {
 	  var res, t;
+	  var oldDisplay;
 
 	  debug("starting wrappednumberroots");
 
@@ -514,12 +515,18 @@ procedure wrappednumberroots(p, dom) {
 
 procedure wrappednumberrootsnomultiplicities(p, dom) {
 	  var q, d;
+	  var res;
 
-	  q = horner(simplify(horner(p / gcd(p, diff(p)))));
-	  d = productOfDenominators(q);
-	  q = horner(simplify(horner(d * q)));
+	  res = wrappednumberroots(p, dom);
 
-	  return wrappednumberroots(q, dom);
+	  if (res > 0) then {
+	      q = horner(simplify(horner(p / gcd(p, diff(p)))));
+	      d = productOfDenominators(q);
+	      q = horner(simplify(horner(d * q)));
+	      res = wrappednumberroots(q, dom);
+	  };
+
+	  return res;
 };
 
 procedure provePolynomialPositiveBasicInnerWrap(p, dom) {
@@ -759,12 +766,13 @@ procedure polynomialZerosInner(poly, dom) {
 	  d = productOfDenominators(poly);
 	  p = horner(d * poly);
 
-	  t = time({ nbz = wrappednumberrootsnomultiplicities(p, dom); });
-
 	  oldPoints = points;
 	  points = min(1001, oldPoints)!;
 	  res = mydirtyfindzeros(p, dom);
 	  points = oldPoints!;
+
+	  t = time({ nbz = wrappednumberrootsnomultiplicities(p, dom); });
+
 	  if (length(res) < nbz) then {
 
 	     t = time({ res = __polynomialsZerosSafe(p, dom); });

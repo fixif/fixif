@@ -27,9 +27,9 @@ def iterSimpleGabarit():
 @mark.parametrize("method", ('matlab','scipy'))
 @mark.parametrize("q", ('64','48','32', '16'))
 def test_CheckIfRealizationInGabarit(g,type,method, q):
-	H = g.to_dTF(method=method, ftype=type, designMargin=1e-3)
-	wl=int(q)
-	#for R in iterAllRealizations(Filter(tf=H)):
+        H = g.to_dTF(method=method, ftype=type, designMargin=1e-3)
+        wl=int(q)
+        #for R in iterAllRealizations(Filter(tf=H)):
 	Rapprox = State_Space(Filter(tf=H)).quantize(wl)
 	print ('------> Checking Realization: %s') % (Rapprox._structureName)
 	check, margin, res = CheckIfRealizationInGabarit(g, Rapprox)
