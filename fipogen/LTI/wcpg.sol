@@ -15,7 +15,7 @@ if (__do_wcpg_binding) then {
 procedure wcpg(Amat, Bmat, Cmat, Dmat, n, p, q, eps) {
 	  var res;
 
-	  res = __wcpg(Amat, Bmat, Cmat, Dmat, n, p, q, eps);
+	  res = __wcpg(Amat, Bmat, Cmat, Dmat, n, p, q, round(eps,prec,RD));
 
 	  return res;
 };
