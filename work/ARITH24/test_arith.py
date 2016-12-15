@@ -27,12 +27,12 @@ def iterSimpleGabarit():
 fakeFilter = random_Filter(2,1,1)
 
 
-#@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
+@mark.parametrize("g", iterSimpleGabarit(), ids=lambda x:x.type)
 #@mark.parametrize("type", ('butter', 'cheby2', 'ellip'))
 #@mark.parametrize("method", ('scipy',))
 @mark.parametrize("wl", (8,16,32))
 @mark.parametrize("SandO", iterStructuresAndOptions(fakeFilter), ids=lambda x:x[0].name)
-def test_CheckIfRealizationInGabarit(SandO, wl, g=iterSimpleGabarit().next(), type='ellip', method='scipy'):
+def test_CheckIfRealizationInGabarit(SandO, wl, g, type='ellip', method='scipy'):
 
 	# create the initial transfer function (designMargin = 0)
 	H = g.to_dTF(method=method, ftype=type, designMargin=0)
