@@ -67,7 +67,11 @@ class optionManager(object):
 	def __str__(self):
 		return "&".join( k+"="+v for k,v in self._options.items() )
 	
-	def getValues( self, d={} ):
+	def getValues( self, d=None ):
+		#TODO: si d est None, alors on renvoie le dico de finalValues...
+		# when d is not given
+		if d is None:
+			d={}
 		# merge the dictionary d and the finalValue dictionary, and return it
 		return dict( self._finalValues.items() + d.items() )
 	
@@ -92,11 +96,11 @@ def createImageFromLaTeX(baseName,latexStr,outputFormat):
 		tex_file.write( latexStr )
 		tex_file.close()
 		# compile latex and convert to image format
-		print "Compile Latex"
-		call( "echo $PATH", shell=True)
-		call( "cd "+GENERATED_PATH+" && pdflatex --shell-escape FPF.tex >output.log", shell=True)
+		print("Compile Latex")
+		call("echo $PATH", shell=True)
+		call("cd "+GENERATED_PATH+" && pdflatex --shell-escape FPF.tex >output.log", shell=True)
 		#TODO: check if pdflatex has compiled without errors (call returns the output code)
-		print "Done"
+		print("Done")
 		call("cp " + GENERATED_PATH + "FPF." + outputFormat + " \"" + CACHE_PATH + filename + "\"", shell=True)
 	# then return image file 
 	if outputFormat=="pdf":

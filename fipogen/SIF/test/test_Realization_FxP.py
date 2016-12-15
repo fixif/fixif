@@ -72,10 +72,10 @@ def test_computeMSBSIF():
 
 	msb_ext = SS.compute_MSB_allvar_extended(u_bar, lsb_t, lsb_x, lsb_y)
 	if ((msb != msb_ext).any()):
-		print 'MSB computed with taking into account the propagation of the error due to the format (msb, lsb) differs from the initial format. Changing MSBs.\n'
-		print 'new MSBs:'
+		print('MSB computed with taking into account the propagation of the error due to the format (msb, lsb) differs from the initial format. Changing MSBs.\n')
+		print('new MSBs:')
 		msb = msb_ext
-		print msb
+		print(msb)
 
 	msb_t = [msb[0, i] for i in range(0, SS.l)]
 	msb_x = [msb[0, i] for i in range(SS.l, SS.l + SS.n)]
@@ -99,13 +99,13 @@ def test_computeMSBSIF():
 
 	f_handle.close()
 
-	print 'Filter: \n'
-	print SS
-	print 'y_out was initially set to: %d\n' %l_y_out
-	print 'LSBs:\n'
-	print lsb
-	print 'MSBs:\n'
-	print msb
+	print('Filter: \n')
+	print(SS)
+	print('y_out was initially set to: %d\n' %l_y_out)
+	print('LSBs:\n')
+	print(lsb)
+	print('MSBs:\n')
+	print(msb)
 
 	nSimulations = 50
 	u = np.random.rand(1,nSimulations)

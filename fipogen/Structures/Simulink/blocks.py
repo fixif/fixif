@@ -43,7 +43,9 @@ class Block(object):
 
 
 class Gain(Block):
-	def __init__(self, bel, constants={}):
+	def __init__(self, bel, constants=None):
+		if constants is None:
+			constants = {}
 		super(Gain, self).__init__(bel)
 		self.label = "k"+self.sid
 

@@ -103,7 +103,7 @@ def test_minimumMargin(g):
 	print(g.findMinimumMargin(H))
 
 def test_cql():
-        g = Gabarit(48000,[ (0,9600), (12000,None) ], [(0,-1), -20])
-        H = g.to_dTF(method='matlab', ftype='cheby1')
-        print(H)
-        print(g.findMinimumMargin(H))
+	g = Gabarit(48000,[ (0,9600), (12000,None) ], [(0,-1), -20])
+	H = g.to_dTF(method='matlab', ftype='cheby1')
+	print(H)
+	print(g.findMinimumMargin(H))

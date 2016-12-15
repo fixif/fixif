@@ -25,7 +25,7 @@ def dynMethodAdder(t_class):
 
 	How to use it: decorate the class declaration, and that's all
 	>>> @dynMethodAdder
-	>>> class toto:
+	>>> class toto(object):
 	>>>     pass
 
 	"""

@@ -31,12 +31,15 @@ from numpy import mat
 from fipogen.LTI.Filter import random_Filter
 
 
-def importSimulink( fileName, constants={}):
+def importSimulink( fileName, constants=None):
 	""" create a Realization object from a Simulink diagram (a slx file)
 	Parameters:
 		- fileName: name of the slx file
 		- constants: dictionary of name->value, to give values to constant used in gain blocks
 	"""
+	# empty dictionary if no constants
+	if constants is None:
+		constants={}
 	# check slx file
 	if not is_zipfile(fileName):
 		raise ValueError( "importSimulink: the file doesn't exist or is not a valid slx file")
@@ -54,7 +57,7 @@ def importSimulink( fileName, constants={}):
 	# blocks and lines
 	mysys.printblocks()
 	mysys.printlines()
-	print "\nInitial Equations"
+	print("\nInitial Equations")
 	mysys.printequations()
 
 	# Call summerge() before expandeqgain()
@@ -63,7 +66,7 @@ def importSimulink( fileName, constants={}):
 	mysys.summerge()
 	mysys.summerge()
 	mysys.expandeqgain() # put gain as Sum coeff 
-	print "\nFinal Equations"
+	print("\nFinal Equations")
 	mysys.printequations()
 
 	# SIF Generation
@@ -78,14 +81,14 @@ def importSimulink( fileName, constants={}):
 
 
 	mysif.reorganize()
-	print "\n\nSIF corresponding to initial diagram:"
-	print mysif	
+	print("\n\nSIF corresponding to initial diagram:")
+	print(mysif)
 
-	print "\nSystem variables:"
-	print "input u", u
-	print "state x", x
-	print "inter t", t
-	print "output y", y
+	print("\nSystem variables:")
+	print("input u", u)
+	print("state x", x)
+	print("inter t", t)
+	print("output y", y)
 
 	return Realization( None,
 						(mat(mysif.J,dtype='float'), mat(mysif.K,dtype='float'), mat(mysif.L,dtype='float'), mat(mysif.M,dtype='float'), mat(mysif.N,dtype='float'), mat(mysif.P,dtype='float'), mat(mysif.Q,dtype='float'), mat(mysif.R,dtype='float'), mat(mysif.S,dtype='float')),

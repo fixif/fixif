@@ -11,7 +11,7 @@ from scipy.io import loadmat
 
 D=loadmat("ARITH23_BLTH_ex.mat")
 for sifName in ["SIF_LWDF", "SIF_SS", "SIF_rho", "SIF_DFI"]:
-	print "\n\n---------------- Structure "+sifName+" ----------------\n"
+	print("\n\n---------------- Structure "+sifName+" ----------------\n")
 	Z=[]
 	for i in range(4,13):
 		if D[sifName][0][0][i].dtype == np.dtype('uint8'):
@@ -22,8 +22,8 @@ for sifName in ["SIF_LWDF", "SIF_SS", "SIF_rho", "SIF_DFI"]:
 	Stilde, Serror = SIFH_to_SIFHstar(S, 8, True)
 
 
-	print "\n### Z erreur ###\n"
-	print "WCPG erreur : "
+	print("\n### Z erreur ###\n")
+	print("WCPG erreur : ")
 	print(Serror.dSS.WCPG())
 
 

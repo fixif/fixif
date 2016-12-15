@@ -94,20 +94,20 @@ def test_WCPGmp( S ):
 		S_H = H_hat.to_dSSmp()
 		S_delta = Sq - S_H
 		W = S_delta.WCPGmp(prec)
-		print ('WCPG = %s') % W[0]
+		print ('WCPG = %s' % W[0])
 		l.append(W[0])
 		if str(W[0]) =='0':
 			break
 
-	print l
+	print( l )
 	for i in range(0, len(l)-1):
 		if l[i]>l[i+1]:
-			print 'l[%d] > l[%d]' % (i, i+1)
+			print ('l[%d] > l[%d]' % (i, i+1))
 		elif l[i] == l[i + 1]:
-			print 'l[%d] > l[%d]' % (i, i + 1)
+			print ('l[%d] > l[%d]' % (i, i + 1))
 
 		else:
-			print 'l[%d] < l[%d]' % (i, i + 1)
+			print ('l[%d] < l[%d]' % (i, i + 1))
 
 
 
