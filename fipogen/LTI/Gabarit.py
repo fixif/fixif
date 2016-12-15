@@ -22,8 +22,8 @@ from scipy.signal import iirdesign, freqz
 from numpy import array, pi, log10, infty
 from numpy.random import seed as set_seed, choice, randint, uniform
 
-#import matplotlib.pyplot as plt
-#from matplotlib.patches import Rectangle
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 
 import mpmath
 import sollya
@@ -141,20 +141,26 @@ class Band(object):
 
 		assert( betaInf < betaSup)
 
-		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": betaInf, "betaSup": betaSup}
+		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": sollya.round(betaInf, 53, sollya.RU), "betaSup": sollya.round(betaSup,53, sollya.RD)}
 
-	def Rectangle(self, minG):
+	def Rectangle(self, dB, minG=-200):
 		"""
 		Returns a rectangle object, to be used with matplotlib
 		The rectangle corresponds to the (stop/pass) band to draw on a Bode diagram
 		Parameters:
+		- dB: (boolean) True if the scale is logarithmic (dB)
 		- minG: minimum y-value for the plot
 		"""
-
-		if self.isPassBand:
-			return Rectangle((self.F1, self.passGains[0]), (self.F2 - self.F1), self.passGains[1] - self.passGains[0], facecolor="red", alpha=0.3)
+		if dB:
+			if self.isPassBand:
+				return Rectangle((self.F1, self.passGains[0]), (self.F2 - self.F1), self.passGains[1] - self.passGains[0], facecolor="red", alpha=0.3)
+			else:
+				return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
 		else:
-			return Rectangle((self.F1, self.stopGain), self.F2 - self.F1, minG, facecolor="red", alpha=0.3)
+			if self.isPassBand:
+				return Rectangle((self.F1, 10**(self.passGains[0]/20.0)), (self.F2 - self.F1), 10**(self.passGains[1]/20.0) - 10**(self.passGains[0]/20.0), facecolor="red", alpha=0.3)
+			else:
+				return Rectangle((self.F1, 10**(self.stopGain/20.0)), self.F2 - self.F1, -10**(self.stopGain/20.0), facecolor="red", alpha=0.3)
 
 
 	def applyDesignMargin(self, margin):
@@ -306,7 +312,7 @@ class Gabarit(object):
 				de = matlabEng.fdesign.__getattr__(self.type)(*matlabParams)
 				h = matlabEng.design(de, ftype,'SystemObject',1)
 			except Exception as e:
-				raise ValueError("Matlab cannot deal with the following gabarit:\n%s\n%s"%(self,e), exc_info=True)
+				raise ValueError("Matlab cannot deal with the following gabarit:\n%s\n%s"%(self,e))
 			numM,denM = matlabEng.tf(h, nargout=2)
 			# transform to numpy array
 			num = array(numM._data.tolist())
@@ -320,21 +326,30 @@ class Gabarit(object):
 		return dTF(num, den)
 
 
-	def plot(self, tf=None):
+	def plot(self, tf=None, dB=True):
 		"""
-		Plot a gabarit, and a transfer function (if given)
+		Plot a gabarit , and a transfer function (if given)
+		The y-scale can be in dB or not
+		Parameters:
+			- tf: (dTF) the transfer function to plot
+			- dB: (boolean)
 		"""
 		minG = -200
 		if tf:
 			w, h = freqz(tf.num.transpose(), tf.den.transpose())
-			plt.plot( (self._Fs * 0.5 / pi) * w, 20*log10(abs(h)) )
-			minG = min(20*log10(abs(h)))
+			if dB:
+				plt.plot( (self._Fs * 0.5 / pi) * w, 20*log10(abs(h)) )
+				minG = min(20 * log10(abs(h)))
+			else:
+				plt.plot((self._Fs * 0.5 / pi)*w, abs(h))
+
 
 		currentAxis = plt.gca()
 		for b in self._bands:
-			currentAxis.add_patch( b.Rectangle(minG))
+			currentAxis.add_patch( b.Rectangle(dB, minG))
 
 		plt.show()
+
 
 
 
@@ -359,6 +374,7 @@ class Gabarit(object):
 		constraints = [b.sollyaConstraint(margin) for b in self._bands]
 
 		# run sollya check
+		#print("-> calling checkModulusFilterInSpecification")
 		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints, prec)
 		sollya.parse("presentResults")(res)
 

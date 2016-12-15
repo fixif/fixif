@@ -32,7 +32,7 @@ fakeFilter = random_Filter(2,1,1)
 #@mark.parametrize("method", ('scipy',))
 @mark.parametrize("wl", (8,16,32))
 @mark.parametrize("SandO", iterStructuresAndOptions(fakeFilter), ids=lambda x:x[0].name)
-def test_CheckIfRealizationInGabarit(SandO, wl, g, type='ellip', method='scipy'):
+def test_CheckIfRealizationInGabarit(SandO, wl, g, type='butter', method='scipy'):
 
 	# create the initial transfer function (designMargin = 0)
 	H = g.to_dTF(method=method, ftype=type, designMargin=0)
@@ -50,7 +50,7 @@ def test_CheckIfRealizationInGabarit(SandO, wl, g, type='ellip', method='scipy')
 	check, margin, res = CheckIfRealizationInGabarit(g, Rapprox)
 	if check:
 		print ('------> Realization %s is in Gabarit with margin = %s') % (R.structureName, margin)
-		print ('------> The Sollya result is %s') % (res)
+		#print ('------> The Sollya result is %s') % (res)
 	else:
 		print ('------> Something went wrong! ...')
 		print ('------> The Sollya result is %s') % (res)
