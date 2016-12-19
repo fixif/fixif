@@ -109,7 +109,7 @@ def simple_cleaned_SoP(list_cst, list_var,beta_final):
 	#Products.sort(key=lambda x: x.fpr().gamma,reverse = True)
 	st = "("*(len(Products)+1)
 	for i in range(len(Products)):
-		st += "%d * %s)"%(list_cst[i].integer,list_var_name[i]) + (Products[i].FPR.gamma>Products[i].FPR.gamma)* ( (">> %d ") %(Products[i].FPR.gamma-Products[i].FPR.gamma) )
+		st += "%d * %s)"%(list_cst[i].mantissa, list_var_name[i]) + (Products[i].FPR.gamma > Products[i].FPR.gamma) * ((">> %d ") % (Products[i].FPR.gamma - Products[i].FPR.gamma))
 	st += (delta_max>0)* ">> %d )"%(delta_max)
 	return st
 

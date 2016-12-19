@@ -231,9 +231,9 @@ def Constant_service(constInter):
 		
 		dico = { 'error' : '', 
 			'FPF' : str(C.FPF), 
-			'integer' : C.integer,
+			'integer' : C.mantissa,
 			'lsb' : C.FPF.lsb,
-			'FPF_image' : BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=YG&binary_point=yes&label=none&intfrac=no&power2=no&bits=' + tobin(C.integer,C.FPF.wl),
+			'FPF_image' : BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=YG&binary_point=yes&label=none&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
 			'approx' : C.approx,
 			'error_abs' : '%.4e'%(C.value-C.approx,),
 			'error_rel' : '%.4e'%((C.value-C.approx)/C.value,)
