@@ -277,7 +277,7 @@ class Variable(object):
 
 		# compute integer values with a positive (or zero) shift onto the constant
 		#NX = ((cst.integer >> cst_rshift)*self.integers[0] , (cst.integer >> cst_rshift)*self.integers[1])
-		NX = ((cst.integer * self.integers[0])>>rshift , (cst.integer * self.integers[1])>>rshift)
+		NX = ((cst.mantissa * self.integers[0]) >> rshift , (cst.mantissa * self.integers[1]) >> rshift)
 		# if cst.value > 0 then Ninf <-- NX[0], else Ninf <-- NX[1]. In both cases Ninf <-- min(NX)
 		Ninf = min(NX)
 		# same reasoning for Nsup, Nsup <-- max(NX)

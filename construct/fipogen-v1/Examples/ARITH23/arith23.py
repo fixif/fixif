@@ -6,7 +6,7 @@ import numpy as np
 import LTI
 import Structures
 import SIF
-from oSoP.Constant import Constant
+from FxP.Constant import Constant
 
 from scipy.io import loadmat
 

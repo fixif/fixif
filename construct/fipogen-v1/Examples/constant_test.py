@@ -1,4 +1,4 @@
-from oSoP.Constant import Constant
+from FxP.Constant import Constant
 
 
 c = Constant(0.00132801779278,16)

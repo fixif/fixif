@@ -3,7 +3,7 @@
 from Functions.matlab_files_reader import coef2msb
 from numpy import matrix
 import numpy
-from oSoP.Constant import Constant
+from FxP.Constant import Constant
 from math import log, ceil, floor
 from scipy.io import loadmat
 

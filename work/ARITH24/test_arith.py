@@ -46,14 +46,14 @@ def test_CheckIfRealizationInGabarit(SandO, wl, g, type='butter', method='scipy'
 	Rapprox = R.quantize(wl)
 
 	# check if realization in Gabarit
-	print ('------> Checking Realization: %s') % (R.structureName)
+	print('------> Checking Realization: %s' % (R.structureName))
 	check, margin, res = CheckIfRealizationInGabarit(g, Rapprox)
 	if check:
-		print ('------> Realization %s is in Gabarit with margin = %s') % (R.structureName, margin)
+		print('------> Realization %s is in Gabarit with margin = %s' % (R.structureName, margin))
 		#print ('------> The Sollya result is %s') % (res)
 	else:
-		print ('------> Something went wrong! ...')
-		print ('------> The Sollya result is %s') % (res)
+		print('------> Something went wrong! ...')
+		print('------> The Sollya result is %s' % res)
 	print('Asserting now')
 	assert (check)
 

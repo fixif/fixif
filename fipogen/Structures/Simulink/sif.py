@@ -48,7 +48,7 @@ class Sif(object):
 		sum = [teq.out for teq in system.equations if system.getblockbysid(teq.out).type == 'Sum']
 		t = [s for s in sum if  system.getblockbysid(s).isoutblock() == False]
 		y = [s for s in sum if  system.getblockbysid(s).isoutblock() == True]
-		 # add support for output on Gain block
+		# add support for output on Gain block
 		g = [xeq.out for xeq in system.equations if system.getblockbysid(xeq.out).type == 'Gain']
 		y += [s for s in g if  system.getblockbysid(s).isoutblock() == True]
 

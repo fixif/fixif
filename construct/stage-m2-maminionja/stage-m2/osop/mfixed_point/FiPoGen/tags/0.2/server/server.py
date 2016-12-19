@@ -19,9 +19,9 @@ from jinja2 import Environment, FileSystemLoader
 
 
 # oSoP packages
-from oSoP.FPF import FPF
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.FPF import FPF
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 
 # utilities and path definition
 from utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin
@@ -231,9 +231,9 @@ def Constant_service(constInter):
 		
 		dico = { 'error' : '', 
 			'FPF' : str(C.FPF), 
-			'integer' : C.integer,
+			'integer' : C.mantissa,
 			'lsb' : C.FPF.lsb,
-			'FPF_image' : BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=YG&binary_point=yes&label=none&intfrac=no&power2=no&bits=' + tobin(C.integer,C.FPF.wl),
+			'FPF_image' : BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=YG&binary_point=yes&label=none&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
 			'approx' : C.approx,
 			'error_abs' : '%.4e'%(C.value-C.approx,),
 			'error_rel' : '%.4e'%((C.value-C.approx)/C.value,)

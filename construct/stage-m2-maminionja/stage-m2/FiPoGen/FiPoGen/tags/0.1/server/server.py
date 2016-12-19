@@ -15,10 +15,10 @@ from jinja2 import Environment, FileSystemLoader
 
 
 # oSoP packages
-from oSoP.FPF import FPF
+from FxP.FPF import FPF
 from SoP_bits_cleaner.Test_suppr_bits import simple_cleaned_SoP
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 
 from math import floor, ceil, log
 

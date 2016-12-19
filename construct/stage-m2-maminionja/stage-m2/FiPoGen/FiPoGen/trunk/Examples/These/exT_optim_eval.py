@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ex_gen import *
-from oSoP.Constant import Constant
+from FxP.Constant import Constant
 from math import floor, log
 
 def coef2msb(M):

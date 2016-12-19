@@ -194,7 +194,7 @@ class Variable(object):
 		cst_rshift = cst_rshift>0 and cst_rshift or 0
 
 		# compute integer values with a positive (or zero) shift onto the constant
-		NX = ((cst.integer >> cst_rshift)*self.integers[0] , (cst.integer >> cst_rshift)*self.integers[1])
+		NX = ((cst.mantissa >> cst_rshift) * self.integers[0] , (cst.mantissa >> cst_rshift) * self.integers[1])
 		# if cst.value > 0 then Ninf <-- NX[0], else Ninf <-- NX[1]. In both cases Ninf <-- min(NX)
 		Ninf = min(NX)
 		# same reasoning for Nsup, Nsup <-- max(NX)
