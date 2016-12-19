@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf8
 
 """Class FPF to store a Fixed-Point Format
 
@@ -6,6 +6,20 @@ A fixed-point format is determined by a signed-property (signed or unsigned) and
 - wordlength (wl)
 - most significant bit
 - least significant bit"""
+
+
+__author__ = "Thibault Hilaire, Benoit Lopez"
+__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__credits__ = ["Thibault Hilaire", "Benoit Lopez"]
+
+__license__ = "CECILL-C"
+__version__ = "0.4"
+__maintainer__ = "Thibault Hilaire"
+__email__ = "thibault.hilaire@lip6.fr"
+__status__ = "Beta"
+
+
+
 
 
 import re
