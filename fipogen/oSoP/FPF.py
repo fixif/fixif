@@ -38,7 +38,7 @@ class FPF(object):
 		signed (boolean): indicates if the format is signed (True) or unsigned (False)
 	"""
 
-	def __init__(self, wl = None, msb = None, lsb = None, signed = True, formatStr = None):
+	def __init__(self, wl=None, msb=None, lsb=None, signed=True, formatStr=None):
 		"""Constructor for a FPF object
 		can be constructed from wordlength, msb and lsb (only 2 of the 3 are required), *but also* from a string (formatStr)
 		
@@ -57,26 +57,26 @@ class FPF(object):
 		if formatStr:
 			fmt_q = reobj_q.match(formatStr)		# check Q-notation
 			fmt_p = reobj_p.match(formatStr)		# check Parentheses-notation
-			if fmt_q :
-				signed, msb,lsb = fmt_q.groups()
+			if fmt_q:
+				signed, msb, lsb = fmt_q.groups()
 				signed = (signed != 'u')
 				msb = int(msb)-1
 				lsb = -int(lsb)
 				wl = msb + 1 - lsb
 			elif fmt_p:
-				signed, msb,lsb = fmt_p.groups()
+				signed, msb, lsb = fmt_p.groups()
 				signed = (signed != 'u')
 				msb = int(msb)
 				lsb = int(lsb)
 				wl = msb + 1 - lsb
 			else:
-				raise ValueError("'%s' is a Wrong format"%formatStr)
+				raise ValueError("'%s' is a Wrong format" % formatStr)
 
 		# check if wl/msb/lsb are coherent
-		if wl< (2 if signed else 1) and (wl is not None):
+		if wl < (2 if signed else 1) and (wl is not None):
 			raise ValueError("Wrong format")
 		
-		#If wl, msb and lsb are all given, but with wl different than msb+1-lsb, then error
+		# If wl, msb and lsb are all given, but with wl different than msb+1-lsb, then error
 		elif wl is not None and msb is not None and lsb is not None:
 			if wl != msb + 1 - lsb:
 				raise ValueError("wl, msb and lsb should satisfy wl = msb +1 - lsb")
@@ -87,14 +87,14 @@ class FPF(object):
 			
 		# if only wl and lsb are given, compute msb
 		elif wl is not None and lsb is not None and msb is None:
-			msb = wl + lsb -1
+			msb = wl + lsb - 1
 			
 		# if only msb and lsb are given, compute wl
-		elif wl is None and lsb is not None and  msb is not None:
+		elif wl is None and lsb is not None and msb is not None:
 			wl = msb + 1 - lsb
 		
 		else:
-			raise ValueError( 'Not enough values are given (msb/lsb/wl')
+			raise ValueError('Not enough values are given (msb/lsb/wl')
 		
 		# store the values
 		self._wl = wl
@@ -129,19 +129,19 @@ class FPF(object):
 			
 	def wml(self):
 		"""Returns the tuple (wl,msb,lsb)"""
-		return (self._wl, self._msb, self._lsb)
+		return self._wl, self._msb, self._lsb
 
 	
-	def shift(self,d):
+	def shift(self, d):
 		"""Right shift of d bits and decrease msb without changing beta."""
-		#TODO: warning si le shift est negatif
+		# TODO: warning si le shift est negatif
 		self._msb += d
 		self._lsb += d
 
 		
 	def __copy__(self):
 		"""Returns a copy of a given FPF"""
-		#TODO: check if necessary
+		# TODO: check if necessary
 		return FPF(wl=self._wl, msb=self._msb, signed=self._signed)	
 
 	
@@ -155,22 +155,22 @@ class FPF(object):
 
 	def Qnotation(self):
 		"""Returns the Q-notation (ex. "Q5.6") """
-		return "%sQ%d.%d"%('u'*(not self._signed),self._msb+1,-self._lsb)
+		return "%sQ%d.%d" % ('u'*(not self._signed), self._msb+1, -self._lsb)
 
 	
 	def ParenthesesNotation(self):
 		"""Returns the Parentheses-notation (ex. "(5,-6)") """
-		return "%s(%d,%d)" % ('u'*(not self._signed), self._msb,self._lsb)	
+		return "%s(%d,%d)" % ('u'*(not self._signed), self._msb, self._lsb)
 
 		
-	def approx(self,r):
+	def approx(self, r):
 		"""Convert a real number in this FPF
 		Args:
 			r: real number to convert in this FPF
 		Returns:
 			an approximation of r, expressed in this FPF
 		"""
-		return 2**(self._lsb)*round(r*2**(-self._lsb))
+		return 2**self._lsb*round(r*2**(-self._lsb))
 
 
 	def minmax(self):
@@ -179,9 +179,9 @@ class FPF(object):
 			a tuple (min, max)
 		"""
 		if self._signed:
-			return ( -2**self._msb, 2**self._msb-2**self.lsb)
+			return -2**self._msb, 2**self._msb-2**self.lsb
 		else:
-			return ( 0, 2**(self._msb-1) - 2**self.lsb) 
+			return 0, 2**(self._msb-1) - 2**self.lsb
 			
 	
 	def LaTeX(self, y_origin=0, colors=None,  binary_point=False, label='no', notation='mlsb', numeric=False, intfrac=False, power2=False, hatches=None, bits=None, x_shift=0, drawMissing=False, **other_params):
@@ -211,13 +211,13 @@ class FPF(object):
 			colors = ('sign', 'integer', 'fractional')
 		pattern = 'pattern=north west lines, pattern color=blue'
 		if not hatches:
-			hatches = ( float('inf'), float('-inf') )			# hack to set msb=infty and lsb=-infty when hatches are not displayed
+			hatches = (float('inf'), float('-inf'))			# hack to set msb=infty and lsb=-infty when hatches are not displayed
 		# prepare labels (numerical values, msb/lsb, integer/fractional parts, etc.)
 		# fpf_str: string describing the FPF used for the label
 		if numeric:
-			fpf_str = self.Qnotation() if notation=='ifwl' else self.ParenthesesNotation()
+			fpf_str = self.Qnotation() if notation == 'ifwl' else self.ParenthesesNotation()
 		else:
-			if notation=='ifwl':
+			if notation == 'ifwl':
 				fpf_str = 'u'*(not self._signed) + 'Qi.f'
 			else:
 				fpf_str = 'u'*(not self._signed) + '(m,\ell)'
@@ -225,15 +225,15 @@ class FPF(object):
 		str_wl = 'w'
 		if numeric:
 			str_wl = str_wl+'='+str(self._wl)
-		if notation=='ifwl':
-			str_integer = 'i' if self._msb>0 else '-i'
-			str_frac = 'f' if self._lsb<0 else '-f'
+		if notation == 'ifwl':
+			str_integer = 'i' if self._msb > 0 else '-i'
+			str_frac = 'f' if self._lsb < 0 else '-f'
 			if numeric:
 				str_integer = str_integer+'='+str(abs(self._msb+1))
 				str_frac = str_frac+'='+str(abs(self._lsb))
 		else:
-			str_integer = 'm+1' if self._msb>0 else '-m-1'
-			str_frac = '-\ell' if self._lsb<0 else '\ell'
+			str_integer = 'm+1' if self._msb > 0 else '-m-1'
+			str_frac = '-\ell' if self._lsb < 0 else '\ell'
 			if numeric:
 				str_integer = str_integer+'='+str(abs(self._msb+1))
 				str_frac = str_frac+'='+str(abs(self._lsb))
@@ -243,7 +243,7 @@ class FPF(object):
 			str_msb = self._msb
 			str_msbm1 = self._msb - 1
 		else:
-			if notation=='ifwl':
+			if notation == 'ifwl':
 				str_lsb = '-f'
 				str_msb = 'i-1'
 				str_msbm1 = 'i-2'
@@ -254,16 +254,16 @@ class FPF(object):
 		# Comment
 		st = "\t%FPF="+self.ParenthesesNotation()+"\n"
 		# create a generator of the bits values (or a generator of a None list)
-		bits = ( b for b in bits ) if bits else (None for b in range(self._wl))
+		bits = (b for b in bits) if bits else (None for b in range(self._wl))
 		# One rectangle per bit
 		firstSigned = self._signed		# True if self is signed. Still True if we do not enter in the 1st loop (when integer part<0)
-		for m in range( -self._msb-1, min(0,-self._lsb) ):
-			st += "\t\\draw (%f,%f) rectangle ++(1,1) [%s,%s] node[midway] {%s};\n"%(m+x_shift,y_origin, colors[0 if firstSigned else 1], pattern if -m>hatches[0]+1 else '', bits.next() or ('s' if firstSigned else ''))
+		for m in range(-self._msb-1, min(0, -self._lsb)):
+			st += "\t\\draw (%f,%f) rectangle ++(1,1) [%s,%s] node[midway] {%s};\n" % (m+x_shift, y_origin, colors[0 if firstSigned else 1], pattern if -m > hatches[0]+1 else '', bits.next() or ('s' if firstSigned else ''))
 			firstSigned = False
-		for l in range( -min(0,self._msb+1), -self._lsb ):
-			st += "\t\\draw (%f,%f) rectangle ++(1,1) [%s,%s] node[midway] {%s};\n"%(l+x_shift,y_origin, colors[0 if firstSigned else 2], pattern if -l<hatches[1]+1 	else '', bits.next() or ('s' if firstSigned else ''))
-			firstSigned=False
-		#dashed rectangle for "missing bits" around the binary-point position
+		for l in range(-min(0, self._msb+1), -self._lsb):
+			st += "\t\\draw (%f,%f) rectangle ++(1,1) [%s,%s] node[midway] {%s};\n" % (l+x_shift, y_origin, colors[0 if firstSigned else 2], pattern if -l < hatches[1]+1 else '', bits.next() or ('s' if firstSigned else ''))
+			firstSigned = False
+		# dashed rectangle for "missing bits" around the binary-point position
 		if drawMissing:
 			for m in range(0, -self._msb-1):
 				st += "\t\\draw (%f,%f) [dashed] rectangle ++(1,1);\n" % (m+x_shift, y_origin)
@@ -271,41 +271,41 @@ class FPF(object):
 				st += "\t\\draw (%f,%f) [dashed] rectangle ++(1,1);\n" % (l+x_shift, y_origin)
 		# Binary-point position
 		if binary_point:
-			st +='\t\\draw[black,fill] (0,%f) circle [radius=0.1cm];\n'%(y_origin,)
+			st += '\t\\draw[black,fill] (0,%f) circle [radius=0.1cm];\n' % (y_origin, )
 		# Label format
-		if label=='above':
-			st +='\t\\draw (%f,%f) node[above] {$%s$};\n'%((-self._lsb-self._msb-1)/2, y_origin+1,fpf_str)
-		elif label=='below':
-			st += '\t\\draw (%f,%f) node[below] {$%s$};\n'%((-self._lsb-self._msb-1)/2, y_origin,fpf_str)
-		elif label=='right':
-			st += '\t\\draw (%f,%f) node[right] {$%s$};\n'%(0 if drawMissing and self._lsb>0 else -self._lsb,y_origin+0.5,fpf_str)
-		elif label=='left':
-			st += '\t\\draw (%f,%f) node[left] {$%s$};\n'%(0 if drawMissing and self._msb<0 else -self._msb-1,y_origin+0.5,fpf_str)
+		if label == 'above':
+			st += '\t\\draw (%f,%f) node[above] {$%s$};\n' % ((-self._lsb-self._msb-1)/2, y_origin+1, fpf_str)
+		elif label == 'below':
+			st += '\t\\draw (%f,%f) node[below] {$%s$};\n' % ((-self._lsb-self._msb-1)/2, y_origin, fpf_str)
+		elif label == 'right':
+			st += '\t\\draw (%f,%f) node[right] {$%s$};\n' % (0 if drawMissing and self._lsb > 0 else -self._lsb, y_origin+0.5, fpf_str)
+		elif label == 'left':
+			st += '\t\\draw (%f,%f) node[left] {$%s$};\n' % (0 if drawMissing and self._msb < 0 else -self._msb-1, y_origin+0.5, fpf_str)
 		# Integer/fractional part display (with arrows)
 		if intfrac:
-			if self._msb+1!=0:
-				y_msb = y_origin - (0.35 if self._msb+1>0 else 0.70)
-				st += '\t\\draw[|<->|] (%f,%f) -- (0,%f) node[midway,fill=white!30] {$%s$};\n'%( -self._msb-1, y_msb, y_msb, str_integer)
-			if self._lsb!=0:
+			if self._msb+1 != 0:
+				y_msb = y_origin - (0.35 if self._msb+1 > 0 else 0.70)
+				st += '\t\\draw[|<->|] (%f,%f) -- (0,%f) node[midway,fill=white!30] {$%s$};\n' % (-self._msb-1, y_msb, y_msb, str_integer)
+			if self._lsb != 0:
 				# fractional part: from -min(0,self._alpha) to  self._gamma
-				y_lsb = y_origin - (0.35 if self._lsb<0 else 0.70)
-				st += '\t\\draw[|<->|] (0,%f) -- (%f,%f) node[midway,fill=white!30] {$%s$};\n'%(  y_lsb, -self._lsb, y_lsb, str_frac)
-			st += '\t\\draw[|<->|] (%f,%f) -- (%f,%f) node[midway,fill=white!30] {$%s$};\n'%( -self._msb-1, y_origin-0.7, -self._lsb, y_origin-0.7, str_wl)
+				y_lsb = y_origin - (0.35 if self._lsb < 0 else 0.70)
+				st += '\t\\draw[|<->|] (0,%f) -- (%f,%f) node[midway,fill=white!30] {$%s$};\n' % (y_lsb, -self._lsb, y_lsb, str_frac)
+			st += '\t\\draw[|<->|] (%f,%f) -- (%f,%f) node[midway,fill=white!30] {$%s$};\n' % (-self._msb-1, y_origin-0.7, -self._lsb, y_origin-0.7, str_wl)
 		# Display the power of 2
 		if power2:
 			# sign bit : -2^(msb)
 			if self._signed:
-				st += "\t\\draw (%f,%f) node[above] {$-2^{%s}$};\n"%(-self._msb-1+0.5, y_origin+1, str_msb)
+				st += "\t\\draw (%f,%f) node[above] {$-2^{%s}$};\n" % (-self._msb-1+0.5, y_origin+1, str_msb)
 			# 2^0
-			if self._msb-1>0>self._lsb:
-				st += "\t\\draw (-0.5,%f) node[above] {$2^0$};\n"%(y_origin+1)
+			if self._msb-1 > 0 > self._lsb:
+				st += "\t\\draw (-0.5,%f) node[above] {$2^0$};\n" % (y_origin+1, )
 			# 2^-1
-			if self._msb-1>-1>self._lsb:
-				st += "\t\\draw (0.5,%f) node[above] {$2^{-1}$};\n"%(y_origin+1)
+			if self._msb-1 > -1 > self._lsb:
+				st += "\t\\draw (0.5,%f) node[above] {$2^{-1}$};\n" % (y_origin+1,)
 			# most signifiant bit (excluding sign bit) : 2^(msb-1) or 2^msb
-			st += "\t\\draw (%f,%f) node[above] {$2^{%s}$};\n"%(-(self._msb+1 if self._signed else self._msb+2)+1.5, y_origin+1 , str_msbm1 if self._signed else str_msb)	
+			st += "\t\\draw (%f,%f) node[above] {$2^{%s}$};\n" % (-(self._msb+1 if self._signed else self._msb+2)+1.5, y_origin+1, str_msbm1 if self._signed else str_msb)
 			# less signifiant bit (excluding sign bit) : 2^lsb
-			st += "\t\\draw (%f,%f) node[above] {$2^{%s}$};\n"%(-self._lsb-0.5, y_origin+1, str_lsb)
+			st += "\t\\draw (%f,%f) node[above] {$2^{%s}$};\n" % (-self._lsb-0.5, y_origin+1, str_lsb)
 		
 		# Returns the full string
 		return st
