@@ -19,9 +19,9 @@ from jinja2 import Environment, FileSystemLoader
 
 
 # oSoP packages
-from oSoP.FPF import FPF
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.FPF import FPF
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 
 # utilities and path definition
 from utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin

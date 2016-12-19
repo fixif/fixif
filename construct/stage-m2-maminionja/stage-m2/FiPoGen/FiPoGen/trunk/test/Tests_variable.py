@@ -1,7 +1,7 @@
 import unittest
-from oSoP.FPF import FPF
-from oSoP.Constant import Constant
-from oSoP.Variable import Variable
+from FxP.FPF import FPF
+from FxP.Constant import Constant
+from FxP.Variable import Variable
 
 
 

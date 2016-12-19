@@ -15,7 +15,7 @@ __status__ = "Beta"
 from fipogen.LTI import dSS
 from fipogen.SIF import SIF
 
-from oSoP.Constant import Constant
+from FxP.Constant import Constant
 import numpy as np
 
 def convertToFix(M,w):

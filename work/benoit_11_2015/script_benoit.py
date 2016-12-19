@@ -3,8 +3,8 @@
 
 from SIF.SIF_tilde_error import *
 
-from oSoP.Constant import Constant
-from oSoP.oSoP_Generator import best_oSoP_gen_from_dict
+from FxP.Constant import Constant
+from FxP.oSoP_Generator import best_oSoP_gen_from_dict
 
 from scipy.io import loadmat
 

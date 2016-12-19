@@ -1,6 +1,6 @@
 import unittest
-from oSoP.FPF import FPF
-from oSoP.Constant import Constant
+from FxP.FPF import FPF
+from FxP.Constant import Constant
 
 
 ########################################################################

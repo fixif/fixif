@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
-from oSoP.FPR import FPR
-from oSoP.Variable import Variable
+from FxP.FPR import FPR
+from FxP.Variable import Variable
 from random import randint
 from math import floor,ceil,log
 

@@ -18,9 +18,9 @@ from bottle import route, run, error, static_file, request, post, get, response
 from jinja2 import Environment, FileSystemLoader
 
 # oSoP packages
-from fipogen.oSoP import FPF
-from fipogen.oSoP import Variable
-from fipogen.oSoP import Constant
+from fipogen.FxP import FPF
+from fipogen.FxP import Variable
+from fipogen.FxP import Constant
 
 # utilities and path definition
 from utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin

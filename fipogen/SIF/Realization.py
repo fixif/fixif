@@ -21,7 +21,7 @@ from fipogen.SIF import SIF
 from fipogen.func_aux import dynMethodAdder
 from fipogen.LTI import Filter
 from fipogen.LTI import dSS
-from fipogen.oSoP import Constant
+from fipogen.FxP import Constant
 import numpy as np
 from copy import copy
 

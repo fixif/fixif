@@ -3,11 +3,11 @@
 
 from SIF.SIF_tilde_error import *
 
-from oSoP.Constant import Constant
-from oSoP.oSoP_Generator import best_oSoP_gen_from_dict
-from oSoP.FPF import FPF
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.Constant import Constant
+from FxP.oSoP_Generator import best_oSoP_gen_from_dict
+from FxP.FPF import FPF
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 
 from copy import copy
 

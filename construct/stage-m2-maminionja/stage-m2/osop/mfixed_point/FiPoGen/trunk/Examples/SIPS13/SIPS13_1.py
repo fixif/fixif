@@ -2,10 +2,10 @@
 
 # Exemples pour SIPS-13
 
-from oSoP.oSoP_Generator import oSoP_Generator
-from oSoP.FPR import FPR
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.oSoP_Generator import oSoP_Generator
+from FxP.FPR import FPR
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 from copy import deepcopy
 
 

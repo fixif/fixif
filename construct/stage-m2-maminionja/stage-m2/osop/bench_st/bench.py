@@ -1,5 +1,5 @@
 import pickle, copy_reg, os
-from oSoP.oSoP_class_st import oSoP_st
+from FxP.oSoP_class_st import oSoP_st
 
 #for filename in ["liste_osops.pkl","liste_osops_19.pkl","liste_osops_32.pkl"]:
 for filename in ["liste_osops_32.pkl"]:
