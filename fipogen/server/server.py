@@ -221,12 +221,7 @@ def Constant_service(constInter):
 	# get the constant
 	if const:
 		try:
-			#TODO: conversion str->float... faire avec GMP?
-			value=float(const.string)
-		except:
-			return {'error':'The constant must be a real value'}
-		try:
-			C = Constant( value=value, wl=WL, signed=signed, fpf=F)
+			C = Constant( value=const.string, wl=WL, signed=signed, fpf=F)
 		except ValueError as e:
 			return { 'error' : str(e)}
 		
