@@ -77,16 +77,18 @@ class Structure(object):
 			Ropt = { k:v[0] for k,v in self._options.items() }
 		else:
 			Ropt = {}
-		# check the options
+
+		#TODO: vérifier les options correctement (faut-il rajouter aussi les paramètres? voir la rhoDFIIt qui peut avoir besoin de paramètres comme les gammas)
+		# # check the options
 		for opt, val in options.items():
-			if self._options is None:
-				raise ValueError( self._shortName + ": the option " + opt + "=" + str(val) + " is not correct")
-			if opt not in self._options:
-				raise ValueError( self._shortName + ": the input argument " + opt + " doesn't exist")
-			if val not in self._options[opt]:
-				raise ValueError( self._shortName + ": the option " + opt + "=" + str(val) + " is not correct")
-			# fill the dictionary of option's value with the options given
-			Ropt[opt] = val
+		# 	if self._options is None:
+		# 		raise ValueError( self._shortName + ": the option " + opt + "=" + str(val) + " is not correct")
+		# 	if opt not in self._options:
+		# 		raise ValueError( self._shortName + ": the input argument " + opt + " doesn't exist")
+		# 	if val not in self._options[opt]:
+		# 		raise ValueError( self._shortName + ": the option " + opt + "=" + str(val) + " is not correct")
+		# 	# fill the dictionary of option's value with the options given
+		 	Ropt[opt] = val
 
 		# call the "factory" function
 		d = self._make( filter, **Ropt)

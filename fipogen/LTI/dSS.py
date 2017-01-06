@@ -796,7 +796,7 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
 	# Apply masks.
 	B *= Bmask
 	C *= Cmask
-	D *= Dmask
+	#D *= Dmask
 
 	return dSS(A, B, C, D)
 
