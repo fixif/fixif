@@ -659,7 +659,7 @@ class SIF(object):
 \begin{tikzpicture}
 \tikzstyle{one} = [rectangle, draw, ultra thin, fill=red!20, minimum size=1mm, inner sep=0mm]
 \tikzstyle{minusone} = [rectangle, draw, ultra thin, fill=blue!20, minimum size=1mm, inner sep=0mm]
-\tikzstyle{power2} = [diamond, draw, ultra thin, fill=red!20, minimum size=1.4mm, inner sep=0mm]
+\tikzstyle{power2} = [regular polygon, regular polygon sides=3, draw, ultra thin, fill=red!20, minimum size=1.4mm, inner sep=0mm]
 \tikzstyle{coef} = [circle, draw, ultra thin, fill=orange, minimum size=1mm, inner sep=0mm]
 \matrix[nodes={},row sep=0.5mm,column sep=0.5mm]{
 %s
