@@ -1,9 +1,9 @@
 # Exemples pour DASIP-12
 
-from oSoP.oSoP_Generator import oSoP_Generator,oSoP_Generator2
-from oSoP.FPR import FPR
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.oSoP_Generator import oSoP_Generator,oSoP_Generator2
+from FxP.FPR import FPR
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 from scipy.signal.filter_design import butter
 from control import TransferFunction
 from control.matlab import tf

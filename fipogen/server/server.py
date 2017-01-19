@@ -18,9 +18,9 @@ from bottle import route, run, error, static_file, request, post, get, response
 from jinja2 import Environment, FileSystemLoader
 
 # oSoP packages
-from fipogen.oSoP import FPF
-from fipogen.oSoP import Variable
-from fipogen.oSoP import Constant
+from fipogen.FxP import FPF
+from fipogen.FxP import Variable
+from fipogen.FxP import Constant
 
 # utilities and path definition
 from utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin
@@ -221,23 +221,18 @@ def Constant_service(constInter):
 	# get the constant
 	if const:
 		try:
-			#TODO: conversion str->float... faire avec GMP?
-			value=float(const.string)
-		except:
-			return {'error':'The constant must be a real value'}
-		try:
-			C = Constant( value=value, wl=WL, signed=signed, fpf=F)
+			C = Constant( value=const.string, wl=WL, signed=signed, fpf=F)
 		except ValueError as e:
 			return { 'error' : str(e)}
 		
 		dico = { 'error': '', 
 			'FPF': str(C.FPF), 
-			'integer': C.integer,
+			'integer': C.mantissa,
 			'lsb': C.FPF.lsb,
-			'bits': tobin(C.integer,C.FPF.wl), 
-			'FPF_image': BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.integer,C.FPF.wl),
+			'bits': tobin(C.mantissa, C.FPF.wl),
+			'FPF_image': BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
 			'approx': C.approx,
-			'latex': C.FPF.LaTeX(notation="mlsb",numeric=False,colors=colorThemes["RB"],binary_point=True,label="no",intfrac=False,power2=False,bits=tobin(C.integer,C.FPF.wl)),
+			'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
 			'error_abs': '%.4e'%(C.value-C.approx,),
 			'error_rel': '%.4e'%((C.value-C.approx)/C.value,)
 		}

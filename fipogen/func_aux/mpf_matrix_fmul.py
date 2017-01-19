@@ -25,7 +25,7 @@ def mpf_matrix_fmul(A, B):
 		try:
 			A = python2mpf_matrix(A)
 		except ValueError as e:
-			raise ValueError('Cannot compute exact product of two matrices. %s') % e
+			raise ValueError('Cannot compute exact product of two matrices. %s' % e)
 	else:
 		if not isinstance(A, mpmath.matrix):
 			raise ValueError('Cannot compute exact product of two matrices: unexpected input type, excpected numpy.matrix or mpmath.matrix but got %s') %type(A)
@@ -34,7 +34,7 @@ def mpf_matrix_fmul(A, B):
 		try:
 			B = python2mpf_matrix(B)
 		except ValueError as e:
-			raise ValueError('Cannot compute exact product of two matrices. %s') % e
+			raise ValueError('Cannot compute exact product of two matrices. %s' % e)
 	else:
 		if not isinstance(B, mpmath.matrix):
 			raise ValueError('Cannot compute exact product of two matrices: unexpected input type, excpected numpy.matrix or mpmath.matrix but got %s') % type(B)
@@ -61,7 +61,7 @@ def mpf_matrix_fmul(A, B):
 				tmp = mpmath.fmul(A[i,k], B[k,j], exact=True)
 				C[i,j] = mpmath.fadd(C[i,j], tmp, exact=True)
 				if mpmath.isnan(C[i,j]) or mpmath.isinf(C[i,j]):
-					print('WARNING: in matrix multiplication an abnormal number (NaN/Inf) occured: %f') % C[i,j]
+					print('WARNING: in matrix multiplication an abnormal number (NaN/Inf) occured: %f' % C[i,j])
 
 
 	return C

@@ -2,7 +2,7 @@
 
 from numpy import matrix
 import numpy
-from oSoP.Constant import Constant
+from FxP.Constant import Constant
 from math import log, ceil, floor
 from scipy.io import loadmat
 

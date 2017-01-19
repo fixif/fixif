@@ -9,7 +9,7 @@ from os import listdir
 
 from Functions.matlab_files_reader import MatlabDict2FilterExample_SIF
 from Functions.optimization import *
-from fipogen.oSoP import best_oSoP_gen_from_dict
+from fipogen.FxP import best_oSoP_gen_from_dict
 
 
 # /!\ ATTENTION /!\

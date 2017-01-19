@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from oSoP.FPF import FPF
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.FPF import FPF
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 from copy import copy
 
 from numpy import matrix

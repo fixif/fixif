@@ -1,9 +1,9 @@
 # Exemple
 
-from oSoP.oSoP_Generator import oSoP_Generator2, best_oSoP_gen
-from oSoP.FPF import FPF
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.oSoP_Generator import oSoP_Generator2, best_oSoP_gen
+from FxP.FPF import FPF
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 from copy import copy
 
 N=4

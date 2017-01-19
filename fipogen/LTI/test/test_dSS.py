@@ -132,7 +132,7 @@ def test_wcpgMP( S ):
 
 	W = S.WCPGmp()
 
-	print W
+	print(W)
 
 	assert True
 

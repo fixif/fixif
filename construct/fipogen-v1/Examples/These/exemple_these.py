@@ -2,8 +2,8 @@
 
 from ex_gen import *
 from datetime import datetime
-from oSoP.Adder import Adder
-from oSoP.oSoP_Generator import best_oSoP_gen_from_dict
+from FxP.Adder import Adder
+from FxP.oSoP_Generator import best_oSoP_gen_from_dict
 from exT_optim_eval import *
 from pickle import dump
 

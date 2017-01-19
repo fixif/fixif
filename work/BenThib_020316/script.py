@@ -3,11 +3,11 @@
 
 from SIF.SIF_tilde_error import *
 
-from oSoP.Constant import Constant
-from oSoP.oSoP_Generator import best_oSoP_gen_from_dict
-from oSoP.FPF import FPF
-from oSoP.Variable import Variable
-from oSoP.Constant import Constant
+from FxP.Constant import Constant
+from FxP.oSoP_Generator import best_oSoP_gen_from_dict
+from FxP.FPF import FPF
+from FxP.Variable import Variable
+from FxP.Constant import Constant
 
 from copy import copy
 
@@ -35,7 +35,7 @@ D=loadmat("ARITH23_BLTH_ex.mat")
 listSIF = ["SIF_SS", "SIF_rho", "SIF_LWDF"]
 #listSIF = ["SIF_LWDF"]
 for sifName in listSIF:
-	print "\n\n---------------- Structure "+sifName+" ----------------\n"
+	print("\n\n---------------- Structure "+sifName+" ----------------\n")
 	Et[sifName] = []
 	Es[sifName] = []
 	Ett[sifName] = []
@@ -52,7 +52,7 @@ for sifName in listSIF:
 	ny = S.p
 
 	for wl_var in range(4,33):
-		print "LARGEUR : ",wl_var
+		print("LARGEUR : ",wl_var)
 		wl_cst = wl_var
 		wl_op = 2*wl_var
 
@@ -115,8 +115,8 @@ for sifName in listSIF:
 		Stilde, Serror = SIFH_to_SIFHstar(S, wl_var)
 		Etilde = Serror.dSS.WCPG()[0,0]*u_max
 		Estar = Serror.dSS.WCPG()[0,1:]*Eps.transpose()[1:,0]
-		print Etilde,Estar[0,0], Estar[0,0]/Etilde
-		print Serror.dSS.WCPG()*Eps.transpose()
+		print(Etilde,Estar[0,0], Estar[0,0]/Etilde)
+		print(Serror.dSS.WCPG()*Eps.transpose())
 		Et[sifName].append(Etilde)
 		Es[sifName].append(Estar[0,0])
 		Ett[sifName].append(Etilde+Estar[0,0])

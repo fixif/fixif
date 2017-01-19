@@ -63,7 +63,7 @@ class System(object):
 				else:
 					newblock = blockclass[blocktype](b)
 			except KeyError:
-				print blocktype + " is an unsupported block"
+				print(blocktype + " is an unsupported block")
 				sys.exit()
 			blocks[b.get("SID")] = newblock 
 	
@@ -93,11 +93,11 @@ class System(object):
 		# Susbsystem Processing
 		# Manage connection in lines ( can be done in block)
 		# --> do it before block inlist / outlist update ( this step rely on lines)
-		print "\nSubsystem processing ..."
+		print("\nSubsystem processing ...")
 		i=0
 		for subsys in [ b for b in self.blocks.values() if b.type == 'SubSystem']:
 			i += 1
-			print "subsys : ",i , subsys
+			print("subsys : ",i , subsys)
 			# Subsystem input shortcuting
 			for port in range(1, subsys.inports+1):
 				# Search block feeding SubSystem
@@ -106,15 +106,15 @@ class System(object):
 						sblock = line.srcsid
 						sport = line.srcport
 						inputline = line
-						print "-- inport --"
-						print line 
+						print("-- inport --")
+						print(line)
 						break
 			
 				# check existence of inputline ( inport connection)	
 				try: 
 					inputline
 				except NameError:
-					print "error - SubSystem : Inport not connected"
+					print("error - SubSystem : Inport not connected")
 					sys.exit()
 
 				# Search in Subsystem connection
@@ -123,13 +123,13 @@ class System(object):
 						iblock = line.dstsid
 						iport = line.dstport
 						inportline = line
-						print line
+						print(line)
 						break
 				
 				try:
 					inportline
 				except NameError:
-					print "error - SubSystem : internal connection"
+					print("error - SubSystem : internal connection")
 					sys.exit()
 
 				# Search connected blocks in Subsystem and remake connection
@@ -151,14 +151,14 @@ class System(object):
 						oblock = line.srcsid
 						oport = line.srcport
 						outportline = line
-						print "-- ouport --"
-						print line
+						print("-- ouport --")
+						print(line)
 						break
 
 				try:
 					outportline
 				except NameError:
-					print "error- SubSystem : internal connection"
+					print("error- SubSystem : internal connection")
 					sys.exit()
 
 				# Search block feeding the outport
@@ -173,7 +173,7 @@ class System(object):
 				try:		
 					sline
 				except NameError:
-					print "error - Subsystem : Ouport not connected"
+					print("error - Subsystem : Ouport not connected")
 
 				# Search connected blocks in Subsystem
 				# ( put in a try except block)
@@ -193,7 +193,7 @@ class System(object):
 		try:
 			subsys
 		except NameError:
-			print " no SubSystem"
+			print(" no SubSystem")
 		# End of SubSystem processing
 
 
@@ -296,7 +296,7 @@ class System(object):
 				if block not in inputs:
 					inputs.append(block)	
 
-			print inputs
+			print(inputs)
 	
 		if eq.out in inputs:
 			return True
@@ -314,9 +314,9 @@ class System(object):
 
 
 	def printequations(self):
-		print "out {termes:coeff}"
+		print("out {termes:coeff}")
 		for eq in self.equations:
-			print eq.out, eq.termes
+			print(eq.out, eq.termes)
 
 
 	def getblockbysid(self, sid):
@@ -350,17 +350,17 @@ class System(object):
 		return tblocks	
 	
 	def printblocks(self):
-		print "\x1b[32m\nBlocks list : ", len(self.blocks)
-		print "\x1b[0m[SID, BlockType, Name, inputs]"
+		print("\x1b[32m\nBlocks list : ", len(self.blocks))
+		print("\x1b[0m[SID, BlockType, Name, inputs]")
 		for sid in self.blocks:
 			block = self.getblockbysid(sid)
-			print block.sid, block.type, block.name, [b.sid for b in block.inlist.values()] 
+			print(block.sid, block.type, block.name, [b.sid for b in block.inlist.values()])
 
 	def printlines(self):
-		print "\x1b[32m\nLines list : ", len(self.lines)
-		print "\x1b[0m[Src, Dst]"
+		print("\x1b[32m\nLines list : ", len(self.lines))
+		print("\x1b[0m[Src, Dst]")
 		for line in self.lines:
-			print line
+			print(line)
 
 	def getsysvar(self):
 		""" Return classified System variables name lists

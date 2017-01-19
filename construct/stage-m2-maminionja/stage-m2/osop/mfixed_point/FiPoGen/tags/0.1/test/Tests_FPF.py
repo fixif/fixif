@@ -1,5 +1,5 @@
 import unittest
-from oSoP.FPF import FPF
+from FxP.FPF import FPF
 
 ########################################################################
 class Test_FPF(unittest.TestCase):

@@ -18,16 +18,17 @@ __status__ = "Beta"
 
 
 from fipogen.LTI import dSS
-from fipogen.func_aux import dynMethodAdder, python2mpf_matrix
+from fipogen.func_aux import dynMethodAdder
 import numpy as np
 
 from numpy import c_, r_, eye, zeros, matrix as mat
 from numpy.linalg import inv
 from math import log
 from copy import copy
-from fipogen.func_aux import mpf_matrix_lt_inverse, mpf_matrix_fsub, mpf_matrix_fadd, mpf_matrix_fmul, python2mpf_matrix
+from fipogen.func_aux import mpf_matrix_lt_inverse, mpf_matrix_fadd, mpf_matrix_fmul
 
-def isTrivial ( x, epsilon ):
+
+def isTrivial(x, epsilon):
 	"""
 	isTrivial(x, epsilon)
 
@@ -99,7 +100,6 @@ class SIF(object):
 		----------
 		JtoS: tuple (J, K, L, M, N, P, Q, R, S)
 		dJtodS: tuple (dJ, dK, dL, dM, dN, dP, dQ, dR, dS) -> if None, they are computed from J to S matrices (0 if the coefficient is close to a power of 2 (with epsilondZ error))
-		plant: dSS object corresponding to the plant if we are in Closed-Loop context
 
 		Returns
 		-------
@@ -124,7 +124,7 @@ class SIF(object):
 
 
 
-	def _build_AZtoDZ( self ):
+	def _build_AZtoDZ(self):
 		# compute AZ, BZ, CZ and DZ matrices
 		AZ = self.K * self._invJ * self.M + self.P
 		BZ = self.K * self._invJ * self.N + self.Q
@@ -174,7 +174,7 @@ class SIF(object):
 
 
 
-	def _build_M1M2N1N2( self ):
+	def _build_M1M2N1N2(self):
 		# compute the useful matrices M1, M2, N1 and N2
 		self._M1 = c_[self.K * self._invJ, eye(self._n), zeros((self._n, self._p))]
 		self._M2 = c_[self.L * self._invJ, zeros((self._p, self._n)), eye(self._p)]
@@ -204,7 +204,7 @@ class SIF(object):
 
 
 
-	def _build_fromZ( self ):
+	def _build_fromZ(self):
 		self._build_AZtoDZ()
 		self._build_M1M2N1N2()
 
@@ -212,24 +212,24 @@ class SIF(object):
 	# Only matrix Z is kept in memory
 	# JtoS extracted from Z matrix, dJtodS from dZ resp.
 	@property
-	def invJ( self ):
+	def invJ(self):
 		return self._invJ
 
 	# AZ to DZ getters
 	@property
-	def AZ( self ):
+	def AZ(self):
 		return self._dSS._A
 
 	@property
-	def BZ( self ):
+	def BZ(self):
 		return self._dSS._B
 
 	@property
-	def CZ( self ):
+	def CZ(self):
 		return self._dSS._C
 
 	@property
-	def DZ( self ):
+	def DZ(self):
 		return self._dSS._D
 
 	@property
@@ -239,17 +239,17 @@ class SIF(object):
 
 	# Wo and Wc are from AZ to DZ state space
 	@property
-	def Wo( self ):
+	def Wo(self):
 		return self._dSS.Wo
 
 	@property
-	def Wc( self ):
+	def Wc(self):
 		return self._dSS.Wc
 
 
 	# Z, dZ getters
 	@property
-	def Z( self ):
+	def Z(self):
 		return self._Z
 
 	@property
@@ -264,7 +264,7 @@ class SIF(object):
 
 
 	@property
-	def dZ( self ):
+	def dZ(self):
 		return self._dZ
 
 	# Z, dZ setters
@@ -285,39 +285,39 @@ class SIF(object):
 		return self.J, self.K, self.L, self.M, self.N, self.P, self.Q, self.R, self.S
 
 	@property
-	def J( self ):
+	def J(self):
 		return -self._Z[0: self._l, 0: self._l]
 
 	@property
-	def K( self ):
+	def K(self):
 		return self._Z[self._l: self._l + self._n, 0: self._l]
 
 	@property
-	def L( self ):
+	def L(self):
 		return self._Z[self._l + self._n: self._l + self._n + self._p, 0:self._l]
 
 	@property
-	def M( self ):
+	def M(self):
 		return self._Z[0: self._l, self._l: self._l + self._n]
 
 	@property
-	def N( self ):
+	def N(self):
 		return self._Z[0: self._l, self._l + self._n: self._l + self._n + self._q]
 
 	@property
-	def P( self ):
+	def P(self):
 		return self._Z[self._l: self._l + self._n, self._l: self._l + self._n]
 
 	@property
-	def Q( self ):
+	def Q(self):
 		return self._Z[self._l: self._l + self._n, self._l + self._n: self._l + self._n + self._q]
 
 	@property
-	def R( self ):
+	def R(self):
 		return self._Z[self._l + self._n: self._l + self._n + self._p, self._l: self._l + self._n]
 
 	@property
-	def S( self ):
+	def S(self):
 		return self._Z[self._l + self._n: self._l + self._n + self._p, self._l + self._n: self._l + self._n + self._q]
 
 
@@ -327,39 +327,39 @@ class SIF(object):
 		return self.dJ, self.dK, self.dL, self.dM, self.dN, self.dP, self.dQ, self.dR, self.dS
 
 	@property
-	def dJ( self ):
+	def dJ(self):
 		return -self._dZ[0: self._l, 0: self._l]
 
 	@property
-	def dK( self ):
+	def dK(self):
 		return self._dZ[self._l: self._l + self._n, 0: self._l]
 
 	@property
-	def dL( self ):
+	def dL(self):
 		return self._dZ[self._l + self._n: self._l + self._n + self._p, 0:self._l]
 
 	@property
-	def dM( self ):
+	def dM(self):
 		return self._dZ[0: self._l, self._l: self._l + self._n]
 
 	@property
-	def dN( self ):
+	def dN(self):
 		return self._dZ[0: self._l, self._l + self._n: self._l + self._n + self._q]
 
 	@property
-	def dP( self ):
+	def dP(self):
 		return self._dZ[self._l: self._l + self._n, self._l: self._l + self._n]
 
 	@property
-	def dQ( self ):
+	def dQ(self):
 		return self._dZ[self._l: self._l + self._n, self._l + self._n: self._l + self._n + self._q]
 
 	@property
-	def dR( self ):
+	def dR(self):
 		return self._dZ[self._l + self._n: self._l + self._n + self._p, self._l: self._l + self._n]
 
 	@property
-	def dS( self ):
+	def dS(self):
 		return self._dZ[self._l + self._n: self._l + self._n + self._p, self._l + self._n: self._l + self._n + self._q]
 
 
@@ -478,16 +478,15 @@ class SIF(object):
 				pb = a[1] if a[0]!=X.shape[0] else b[1]
 				raise ValueError( "The matrix %s is a %dx%d matrix, instead of being a %dx%d matrix (to be consistent with matrix %s)" % (name, X.shape[0], X.shape[1], a[0], b[0], pb) )
 
-		return (l[0],n[0], p[0], q[0])
+		return l[0],n[0], p[0], q[0]
 
 
 	@property
-	def size( self ):
+	def size(self):
 		"""
 		Returns size of realization : a tuple (l, n, p, q)
 		"""
-
-		return (self._l, self._n, self._p, self._q)
+		return self._l, self._n, self._p, self._q
 
 	@property
 	def n(self):
@@ -503,7 +502,7 @@ class SIF(object):
 		return self._l
 
 
-	def __str__( self ):
+	def __str__(self):
 		"""
 		Returns a string describing the SIF
 		"""
@@ -627,3 +626,43 @@ class SIF(object):
 	def Hepsilon(self):
 		return dSS(self.AZ, self._M1, self.CZ, self._M2)
 
+
+
+	def getTiKZSparseMatrix(self):
+		"""
+		Produce the TikZ code to display the parse Z matrix
+		1, -1 and power of 2 are displayed with blue rectangles, red rectangles and triangles
+		0 are not shown
+		other parameters (non trivials) are orange triangles
+
+		Returns a TikZ string
+		"""
+		tikzLines = []
+		l,n,p,q = self.size
+		for i in range(l+n+p):
+			line = []
+			for j in range(l+n+q):
+				# check the value of the coefficient Z(i,j)
+				if self.Z[i,j]==1:
+					line.append(r"\node [one] {};")
+				elif self.Z[i,j]==-1:
+					line.append(r"\node [minusone] {};")
+				elif self.Z[i,j] == 0:
+					line.append(r"")
+				elif self.dZ[i,j]==0:
+					line.append(r"\node [power2] {};")
+				else:
+					line.append(r"\node [coef] {};")
+			tikzLines.append("&".join(line) + r"\\" + "\n")
+
+		return r"""
+\begin{tikzpicture}
+\tikzstyle{one} = [rectangle, draw, ultra thin, fill=red!20, minimum size=1mm, inner sep=0mm]
+\tikzstyle{minusone} = [rectangle, draw, ultra thin, fill=blue!20, minimum size=1mm, inner sep=0mm]
+\tikzstyle{power2} = [regular polygon, regular polygon sides=3, draw, ultra thin, fill=red!20, minimum size=1.4mm, inner sep=0mm]
+\tikzstyle{coef} = [circle, draw, ultra thin, fill=orange, minimum size=1mm, inner sep=0mm]
+\matrix[nodes={},row sep=0.5mm,column sep=0.5mm]{
+%s
+};
+\end{tikzpicture}
+""" % ("".join(tikzLines))
