@@ -3,9 +3,13 @@ dodebug = false;
 
 procedure debug(l = ...) {
 	  var i;
+	  var oldDisplay;
 	  if (dodebug) then {
+	     oldDisplay = display;
+	     display = dyadic!;
 	     for i in l do write(i);
 	     write("\n");
+	     display = oldDisplay!;
 	  };
 };
 
@@ -180,6 +184,7 @@ procedure genericHorner(p, X, baseCoeff, baseAdd, baseMul, data) {
 */
 procedure rationalAdd(a, b, data) {
           var p, q, r, s, u, v;
+
           p = a.p;
           q = a.q;
           r = b.p;
@@ -191,7 +196,8 @@ procedure rationalAdd(a, b, data) {
              u = p * s + r * q;
              v = q * s;
           };
-          return { .p = u, .q = v };
+
+          return { .p = horner(u), .q = horner(v) };
 };
 
 /* Given two rational functions a and b, both represented as
@@ -204,6 +210,7 @@ procedure rationalAdd(a, b, data) {
 */
 procedure rationalSub(a, b, data) {
           var p, q, r, s, u, v;
+
           p = a.p;
           q = a.q;
           r = b.p;
@@ -215,7 +222,8 @@ procedure rationalSub(a, b, data) {
              u = p * s - r * q;
              v = q * s;
           };
-          return { .p = u, .q = v };
+
+          return { .p = horner(u), .q = horner(v) };
 };
 
 /* Given two rational functions a and b, both represented as
@@ -228,12 +236,14 @@ procedure rationalSub(a, b, data) {
 */
 procedure rationalMul(a, b, data) {
           var u, v;
+	  
           u = a.p * b.p;
           v = a.q * b.q;
           if (u == 0) then {
              v = 1;
           };
-          return { .p = u, .q = v };
+
+          return { .p = horner(u), .q = horner(v) };
 };
 
 /* Given two functions a and b, mapping the reals to complex numbers,
@@ -308,12 +318,20 @@ procedure complexConst(c, data) {
 
 */
 procedure composePolynomialRationalParametrization(p) {
-          return genericHorner(p, { .re = { .p = 1 - _x_^2, .q = 1 + _x_^2 },
-                                    .im = { .p = 2 * _x_, .q = 1 + _x_^2 } },
-                               complexConst,
-                               complexAdd,
-                               complexMul,
-                               "blyad");
+	  var res;
+
+	  debug("starting composePolynomialRationalParametrization");	
+
+          res = genericHorner(p, { .re = { .p = 1 - _x_^2, .q = 1 + _x_^2 },
+                                   .im = { .p = 2 * _x_, .q = 1 + _x_^2 } },
+                              complexConst,
+                              complexAdd,
+                              complexMul,
+                              "blyad");
+
+	  debug("finished with composePolynomialRationalParametrization");	
+
+	  return res;
 };
 
 /* Given a real number c, returns the rational function
@@ -335,11 +353,19 @@ procedure rationalConst(c, data) {
 
 */
 procedure composePolynomialInXi(p) {
-          return genericHorner(p, { .p = 1 - 2 * _x_, .q = _x_ * (1 - _x_) },
-                               rationalConst,
-                               rationalAdd,
-                               rationalMul,
-                               "blyad");
+	  var res;
+
+	  debug("starting composePolynomialInXi");	
+
+          res = genericHorner(p, { .p = 1 - 2 * _x_, .q = _x_ * (1 - _x_) },
+                              rationalConst,
+                              rationalAdd,
+                              rationalMul,
+                              "blyad");
+
+	  debug("finished with composePolynomialInXi");	
+
+	  return res;
 };
 
 
@@ -500,15 +526,31 @@ procedure wrappednumberrootstimed(p, dom) {
 	  return res;
 };
 
-procedure wrappednumberroots(p, dom) {
+procedure wrappednumberrootsnaive(p, dom) {
 	  var res, t;
 	  var oldDisplay;
 
-	  debug("starting wrappednumberroots");
+	  debug("starting wrappednumberrootsnaive, p = ", p, ", dom = ", dom);
 
 	  t = time({ res = wrappednumberrootstimed(p, dom); }); 
 
-	  debug("wrappednumberroots gave res = ", res, " and took ", ceil(1000 * t), "ms");
+	  debug("wrappednumberrootsnaive gave res = ", res, " and took ", ceil(1000 * t), "ms");
+
+	  return res;
+};
+
+procedure wrappednumberroots(p, dom) {
+	  var q, domQ, t, y, res;
+
+	  t = round(mid(dom), prec, RN);
+	  q = horner(p(_x_ + t));
+	  domQ = dom - t;
+	  y = evaluate(q, domQ);
+	  if (0 in y) then {
+	     res = wrappednumberrootsnaive(p, dom);
+	  } else {
+	     res = 0;
+	  };
 
 	  return res;
 };
@@ -1529,7 +1571,7 @@ procedure __checkModulusFilterInSpecificationInner(b, a, specifications) {
 procedure checkModulusFilterInSpecification(b, a, specifications, p) {
 	  var t, r;
 	  var oldPrec, oldPoints;
-	  
+
 	  oldPrec = prec;
 	  prec = p!;
 	  oldPoints = points;
