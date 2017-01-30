@@ -79,7 +79,7 @@ def ComputeTheta(S, H_hat, g, margin):
 
 	S_delta = S - S_H
 
-	# compute WCPG while it doesn't make sense (wcpgm_margin is not too big compare to WCPG value)
+	# compute WCPG while it doesn't make sense (wcpgm_margin is not too big compared to WCPG value)
 	WCPG = S_delta.WCPGmp( wcpg_margin / 8 )[0]
 	while WCPG < wcpg_margin / 16 and wcpg_margin> wcpg_margin_ini*1e-15:
 		wcpg_margin /= 10
@@ -89,7 +89,9 @@ def ComputeTheta(S, H_hat, g, margin):
 
 	W = WCPG + wcpg_margin / 8
 	if W >= max(margin, wcpg_margin):
-		return (False, None)
+		if W >= g.maxGain()/10.0:
+			raise ValueError('WCPG is larger than g.maxGain()/10.0')
+		return (False, W)
 	else:
 		return (True, W)
 
@@ -136,7 +138,9 @@ def CheckIfRealizationInGabarit(g, R):
 		if ThetaCheck:
 			check, res = g.check_dTF(H_hat, margin=verification_margin)
 			if check:
-				return (True, sollya.round( sollya.max(0, margin - Theta ), 53, sollya.RU), res)
+				margin = sollya.max(0, margin - Theta)
+				marginDB = abs(sollya.log10(10**(g.maxGain()/20) + margin))
+				return (True, sollya.round( margin, 53, sollya.RU), sollya.round( marginDB, 53, sollya.RU) , res)
 			else:
 				margin = max( margin+Theta, g.findMinimumMargin(H_hat, initMargin=verification_margin) )
 		else:
