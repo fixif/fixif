@@ -406,7 +406,8 @@ class Gabarit(object):
 
 				# if the old margin is lower than the new margin, and it is not the first iteration
 				if oldDeltaMargin <= deltaMargin and oldDeltaMargin != -infty and margin != 0:
-					raise ValueError("deltaMargin does not decrease")
+					print ("deltaMargin does not decrease:\n old=%s\n new=%s") % (oldDeltaMargin, deltaMargin)
+					#raise ValueError("deltaMargin does not decrease")
 
 				# increase the margin
 				#margin += deltaMargin

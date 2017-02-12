@@ -30,7 +30,7 @@ eng = None
 
 
 
-def makeLWDF( filter):
+def makeLWDF(filter):
 	"""
 
 	"""
@@ -42,7 +42,9 @@ def makeLWDF( filter):
 
 	# run appropriate function in matlab
 	#TODO (Nastia): insert appropriate Python code here -> :-)
+	eng.addpath('construct', 'fwrtoolbox')
 	eng.eval('R=ButterLWDF2FWR( %d, %f);'%(filter.n, filter.Wn), nargout=0)
+	#eng.eval('R=tfLWDF2FWR( %f, %f);'%(matlab.double(filter.dTF.num[0].tolist()), matlab.double(filter.dTF.num[0].tolist())), nargout=0)
 	R = eng.eval('struct(R)')
 
 	# build SIF
