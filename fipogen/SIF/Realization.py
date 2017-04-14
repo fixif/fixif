@@ -241,9 +241,12 @@ class Realization(SIF):
 
 		wcpg = S_ext.dSS.WCPG()
 
+
 		#compute the error filter deltaH which corresponds to the extended SIF
 		deltaH = S_ext.computeDeltaSIF()
 		wcpgDeltaH = deltaH.dSS.WCPG()
+
+
 
 		# compute msb via formula
 		# msb_i = ceil( log2 ( (<<H>> * u_bar)_i + (<<deltaH>> * 2^lsb_ext)_i ))
