@@ -1,3 +1,4 @@
+import sollya
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
@@ -370,6 +371,30 @@ class dSSmp(object):
 
 
 
+	def simulate_rounded(self, u, prec=53):
+
+		#suppose u is a mpmath matrix
+		xk = mpmath.mp.zeros(self._n, 1)
+
+		#xk = mpf_matrix_to_sollya(xk)[0]
+
+		nSimulations = u.shape[1]
+		yk = mpmath.mp.zeros(self._p, nSimulations)
+
+		yk_sollya = mpf_matrix_to_sollya(yk)[0]
+		for i in range(0, nSimulations):
+			xkp1 = mpf_matrix_fmul(self._A, xk)
+			xkp1 = mpf_matrix_fadd(xkp1, mpf_matrix_fmul(self._B, u[:, i]))
+
+			yk[:, i] = mpf_matrix_fmul(self._C, xk)
+			yk[:, i] = mpf_matrix_fadd(yk[:, i], mpf_matrix_fmul(self._D, u[:, i]))
+
+
+			xk = mpmath.matrix([float(sollya.round(mpf_matrix_to_sollya(xkp1)[0][j], prec, sollya.RN)) for j in range(0, self._n)])
+			yk_sollya[i] = sollya.round(mpf_matrix_to_sollya(yk[:,i])[0][0], prec, sollya.RN)
+
+		return yk_sollya
+
 
 
 	def simulate(self, u, exact=True, x0=None):
@@ -436,8 +461,6 @@ class dSSmp(object):
 
 				for i in range(0, xk.rows):
 					xk[i, 0] = mpmath.fadd(xkp1[i, 0], mpmath.mp.zero, prec=64, rounding='n')
-
-
 
 		return yk
 

@@ -20,6 +20,7 @@ from fipogen.LTI import dTF, iter_random_dTF
 from fipogen.func_aux import python2mpf_matrix
 import mpmath
 import pytest
+import numpy
 
 
 def my_assert_allclose_mp(A, AA, abs_tol):
@@ -71,7 +72,6 @@ def test_to_dSS( H ):
 	HH = S.to_dTF()
 
 	H.assert_close( HH )
-
 
 
 

@@ -51,8 +51,6 @@ def flopoco(self, LSB_y_out, u_bar):
 
 
 
-
-
 def _compute_LSB(self, l_y_out):
 
 	l_y_out = np.matrix([l_y_out])

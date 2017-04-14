@@ -18,7 +18,7 @@ def mpf_matrix_to_sollya(A):
 
 	Returns
 	-------
-	S - list of n + m  sollya objects
+	S - list of n * m  sollya objects
 	m - number of rows
 	n - number of columns
 	"""

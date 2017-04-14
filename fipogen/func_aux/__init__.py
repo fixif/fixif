@@ -16,3 +16,4 @@ from mpf_matrix_to_sollya import mpf_matrix_to_sollya
 from sollya_matrix_print import sollya_matrix_print
 from MatlabHelper import MatlabHelper
 from MPFMatrix import MPFMatrix
+from sollya_matrix_to_numpy import sollya_matrix_to_numpy

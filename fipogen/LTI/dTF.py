@@ -17,7 +17,7 @@ __status__ = "Beta"
 
 import mpmath
 import numpy
-from numpy import ndenumerate, array, zeros, matrix, matrix, set_printoptions, empty
+from numpy import ndenumerate, array, zeros, matrix, matrix, set_printoptions, empty, float64
 from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
@@ -49,13 +49,14 @@ class dTF(object):
 			self._den = den/den[0,0]
 
 		# filter order
-		if den.shape!=num.shape:
-			raise ValueError( 'Numerator and denomintator must have same length !')
+		#if den.shape!=num.shape:
+		#	raise ValueError( 'Numerator and denomintator must have same length !')
 
 		self._order = num.shape[1]-1
 
 		# cached sollya numerator and denominator
 		self._sollya = None
+		self._WCPG = None
 
 	@property
 	def num(self):
@@ -154,46 +155,35 @@ class dTF(object):
 		assert( norm(snum-onum)<eps )
 		assert( norm(sden-oden)<eps )
 
-	def WCPG_tf(self):
-
+	def WCPG(self):
 		r"""
-		Compute the Worst Case Peak Gain of the state space
-
-		.. math::
-			\langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
-
-		Using algorithm developed in paper :
-		[CIT001]_
-
-		.. [CIT001]
-			Lozanova & al., calculation of WCPG
+		Copute the Worst Case Peak Gain of a SISO filter described with its transfer function
 
 		"""
 		# compute the WCPG value if it's not already done
 		if self._WCPG is None:
-
 			try:
-				num = array(self.num)
-				denum = array(self.den)
-				num_size = num.shape
-				den_size = denum.shape
-				W = empty((1, 1), dtype=numpy.float64)
+				# noinspection PyUnusedLocal
+				num = self._num
+				denum = self._den
+				Nb = self._num.shape[1]
+				Na = self._den.shape[1]
+				W = empty((1, 1), dtype=float64)
 
-				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q);"
-				support_code = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q);'
-				err = inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support_code,
-							 libraries=["WCPG"])
+				code = "return_val = WCPG_tf( &W[0,0], &num[0,0], &denum[0,0], Nb, Na);"
+				support = 'extern "C" int WCPG_tf(double *W, double *num, double *denum, uint64_t Nb, uint64_t Na);'
+				err = inline(code, ['W', 'num', 'denum', 'Nb', 'Na'], support_code=support, libraries=["WCPG"])
 				if err == 0:
-					# change numpy display formatter, so that we can display the full coefficient in hex (equivalent to printf("%a",...) in C)
+					# change numpy display formatter, so that we can display the full coefficient in hex
+					# (equivalent to printf("%a",...) in C)
 					set_printoptions(formatter={'float_kind': lambda x: x.hex()})
 					print(self)
-					raise ValueError("WCPG_tf: cannot compute WCPG")
+					raise ValueError("WCPG: cannot compute WCPG")
 				self._WCPG = mat(W)
 			except:
 				raise ValueError("dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
 
 		return self._WCPG
-
 
 
 

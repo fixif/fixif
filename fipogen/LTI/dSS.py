@@ -345,6 +345,49 @@ class dSS(object):
 		return self._H2norm
 
 
+
+
+	def WCPG_mp(self):
+		r"""
+		Compute the Worst Case Peak Gain of the state space
+
+		.. math::
+			\langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
+
+		Using algorithm developed in paper :
+		[CIT001]_
+
+		.. [CIT001]
+			Lozanova & al., calculation of WCPG
+
+		"""
+		# compute the WCPG value if it's not already done
+		if self._WCPG is None:
+
+			try:
+				# noinspection PyUnusedLocal
+				A, B, C, D = array(self._A), array(self._B), array(self._C), array(self._D)
+				n, p, q = self.size
+				W = empty((p, q), dtype=float64)
+				mpeps = 2**-120
+
+				#int WCPG_ABCD_mprec(mpfr_t *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q, mpfr_t mpeps);
+				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q, mpeps);"
+				support = 'extern "C" int WCPG_ABCD_mprec(double *W, double *A, double *B, double *C, double *D, ' \
+				          'uint64_t n, uint64_t p, mpfr_t mpeps);'
+				err = inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q', 'mpeps'], support_code=support, libraries=["WCPG"])
+				if err == 0:
+					# change numpy display formatter, so that we can display the full coefficient in hex
+					# (equivalent to printf("%a",...) in C)
+					set_printoptions(formatter={'float_kind': lambda x: x.hex()})
+					print(self)
+					raise ValueError("WCPG: cannot compute WCPG")
+				self._WCPG = mat(W)
+			except:
+				raise ValueError("dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
+
+		return self._WCPG
+
 	def WCPG(self):
 		r"""
 		Compute the Worst Case Peak Gain of the state space

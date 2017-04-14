@@ -32,7 +32,7 @@ for i in range(1,6):
 			Eint[i,0] = mpi(0, E[i,0])
 	deltaT = -numpy.linalg.inv(S.J)*E
 	deltaY = S.L*deltaT
-	print mnorm(deltaY, p='f')
+	print 'Tree no. %d: %s'% (i, mnorm(deltaY, p='f'))
 
 
 
