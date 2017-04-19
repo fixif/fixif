@@ -19,7 +19,7 @@ from jinja2 import Environment, FileSystemLoader
 
 # oSoP packages
 from fipogen.FxP import FPF
-from fipogen.FxP import Variable
+#from fipogen.FxP import Variable
 from fipogen.FxP import Constant
 
 # utilities and path definition
