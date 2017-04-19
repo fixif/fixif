@@ -577,6 +577,84 @@ class dSS(object):
 		num, den = ss2tf(self._A, self._B, self._C, self._D)
 		return dTF(num[0], den)
 
+	def simplify(self):
+		"""
+		This function tries to simplify the state-space msystem.
+		It may occur that matrix A contains one or several rows that contain only zeros.
+		In this case we have that the corresponding state-space variable depends only on
+		the term B[i,:]*u(k):
+		x1(k+1) = A[1,:] * x(k) +  B[1,:]*u(k)
+		..
+		xi(k+1) = B[i,:]*u(k)
+		...
+		y(k) = C * x(k) + D * u(k)
+
+		Then, we can re-write
+		x1(k+1) = A[1,:] * x(k) +  B[1,:]*u(k)
+		..
+		xi(k+1) = 0
+		...
+		y(k) = C * x(k) + C[:,i]*(B[i,:]*u(k)) + D * u(k)
+
+		or in matrix form:
+
+			A' is the matrix A with column i and row i deleted
+			C' is the matrix C with column i deleted
+
+			then,
+
+			x(k+1) = A' * x(k) + B * u(k)
+			y(k)   = C' * x(k) + (D + C[:, i] * B[i,:]) * u(k)
+
+		Returns
+		-------
+
+		"""
+
+
+
+
+		newS = self
+
+		while newS.n > numpy.linalg.matrix_rank(newS._A):
+			l = list()
+			for i in range(0, newS.n):
+				if numpy.count_nonzero(newS._A[i,:]) == 0:
+					l.append(i)
+
+			A = newS._A
+			B = newS._B
+			C = newS._C
+			D = newS._D
+
+
+			while len(l) > 0:
+				index = l.pop()
+
+				A = numpy.delete(A, index, 1)
+				A = numpy.delete(A, index, 0)
+
+				D = D + C[:, index] * B[index, :]
+
+				C = numpy.delete(C, index, 1)
+
+				B = numpy.delete(B, index, 0)
+
+
+			newS = dSS(A, B, C, D)
+
+			print ("number of states: %d \n rank: %d " % (newS.n , numpy.linalg.matrix_rank(newS._A)))
+
+		return newS
+
+
+
+
+
+
+
+
+
 
 	def assert_close(self, other, atol=1e-12):
 		"""

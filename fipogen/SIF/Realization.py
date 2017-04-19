@@ -211,14 +211,16 @@ class Realization(SIF):
 		C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])	#R
 		C3 = np.bmat([ [np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])	#S
 
-
+		print self.J
 		#building an extended SIF
 		S_ext = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
 
 		#print "New number of outputs: "
 		#print S_ext.p
 
-		wcpg = S_ext.dSS.WCPG()
+		SS = S_ext.dSS.simplify()
+
+		wcpg = SS.WCPG()
 
 		#print "WCPG:"
 		#print wcpg

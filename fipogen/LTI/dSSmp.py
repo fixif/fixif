@@ -331,7 +331,7 @@ class dSSmp(object):
 		mpmath.mp.prec = oldprec
 		return dTFmp(b, a)
 
-	def WCPGmp(self, delta):
+	def WCPGmp(self, delta=2**-53):
 		"""
 		This functions computes the WCPG of the state-space system
 		with absolute error bounded by delta.

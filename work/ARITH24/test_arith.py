@@ -4,11 +4,12 @@ from arith import CheckIfRealizationInGabarit
 from fipogen.LTI import Gabarit, Filter, dTF
 from fipogen.SIF import Realization
 from fipogen.LTI import random_Filter
-from fipogen.Structures import iterStructuresAndOptions, State_Space, rhoDFII, DFI, DFII
+from fipogen.Structures import iterStructuresAndOptions, State_Space, rhoDFII, DFI, DFII, LWDF
 
 import pytest
 from pytest import mark, fixture
 from pytest import raises
+import numpy
 
 # a simple gabarit iterator
 def iterSimpleGabarit():
@@ -57,6 +58,53 @@ def test_CheckIfRealizationInGabarit(SandO, wl, type, method='matlab'):
 
 
 
+
+def test_example1_LWDF():
+
+
+	# These are the coefficients of an alliptic filter created with MATLAB
+	#filter has passband in [0, 0.1] with ripple 0.1dB and stopband from 0.3
+	#with minimum attenuation -80dB
+	#
+	# b = numpy.matrix([3.770838943200613e-04, \
+	#                   - 2.024690051110791e-04, \
+	#                   3.407766155670199e-04, \
+	#                   3.407766155670199e-04, \
+	#                   - 2.024690051110791e-04, \
+	#                   3.770838943200613e-04])
+	# a = numpy.matrix([1.000000000000000e+00, \
+	#                   - 4.340164570232563e+00, \
+	#                   7.668918353331406e+00, \
+	#                   - 6.884599315526233e+00, \
+	#                   3.136630548401215e+00, \
+	#                   - 5.797542329642728e-01])
+
+
+	g = Gabarit(48000, [(0, 2400), (7200, None)], [(0, -0.2), -80.1])
+
+	TF = g.to_dTF(ftype='ellip', method='matlab', centeredZero=True)
+	F = Filter(num=TF.num, den=TF.den)
+	R = LWDF.makeRealization(F)
+	w = 16
+	Rq = R.quantize(w)
+
+	check, margin, marginDB, res = CheckIfRealizationInGabarit(g, R)
+	if check:
+		print(
+		'------> Realization %s is in Gabarit with\n margin = %s\n marginDB = %s' % (R.structureName, margin, marginDB))
+	else:
+		print('------> Something went wrong! ...')
+	#assert (check)
+
+	check, margin, marginDB, res = CheckIfRealizationInGabarit(g, Rq)
+	if check:
+		print(
+			'------> Realization %s quantized to w=%d is in Gabarit with\n margin = %s\n marginDB = %s' % (
+			R.structureName, w, margin, marginDB))
+	else:
+		print('------> Something went wrong! ...')
+
+	assert (check)
 
 #
 # def test_StrangeError():

@@ -138,7 +138,12 @@ def Realization_to_Flopoco(R, u_bar=1, lsb_u=-12, msb_u=0, lsb_y=-12, T=100):
 	print "MSB positions: %s" % msb
 	print "error bidget: %s" % str(error_budget)
 
+
+
 	u_test, y_test = doSimulations(R, lsb_u, nSimulations=T, exact=True, prec=53)
+
+	Z = R.Z
+
 
 
 	fileID = './SIF-' + time.strftime("%d%m%Y-%H%M%S")
