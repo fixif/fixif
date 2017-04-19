@@ -245,7 +245,7 @@ class Gabarit(object):
 	def bands(self):
 		return self._bands
 
-	def to_dTF(self, ftype='butter', method='scipy', designMargin = 0):
+	def to_dTF(self, ftype='butter', method='scipy', designMargin = 0, centeredZero=False):
 		"""
 		This methods HELPS to find a transfer function that *should* satisfy the gabarit
 		It is just here to quickly determine a transfer function that satisfy the gabarit in a simple way
@@ -320,8 +320,9 @@ class Gabarit(object):
 		else:
 			num, den = iirdesign(*scipyParams, analog=False, ftype=ftype)
 
-		# go back to pass gain not centered in 0dB
-		num = num*10**(centerPassGain/20.0)
+		if not centeredZero:
+			# go back to pass gain not centered in 0dB
+			num = num*10**(centerPassGain/20.0)
 
 		return dTF(num, den)
 
@@ -407,6 +408,7 @@ class Gabarit(object):
 				# if the old margin is lower than the new margin, and it is not the first iteration
 				if oldDeltaMargin <= deltaMargin and oldDeltaMargin != -infty and margin != 0:
 					print ("deltaMargin does not decrease:\n old=%s\n new=%s") % (oldDeltaMargin, deltaMargin)
+					#deltaMargin *=2
 					#raise ValueError("deltaMargin does not decrease")
 
 				# increase the margin

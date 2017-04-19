@@ -1,4 +1,3 @@
-from numpy.random.mtrand import randint, rand
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
@@ -10,6 +9,7 @@ __maintainer__ = "Anastasia Volkova"
 __email__ = "Anastasia.Volkova@lip6.fr"
 __status__ = "Beta"
 
+from numpy.random.mtrand import randint, rand
 from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mpf_matrix_to_sollya
 import mpmath
 import numpy
@@ -43,7 +43,7 @@ class dTFmp(object):
 		if a.cols > 1 and a.rows == 1:
 			a = a.transpose()
 
-		if a.cols != 1 or  b.cols!= 1 or b.rows != a.rows :
+		if a.cols != 1 or  b.cols!= 1: # or b.rows != a.rows :
 			raise ValueError('Cannot create a dTFmp pbject: incorrect sizes')
 
 
