@@ -4,9 +4,11 @@
 
 """
 
+
 # Paths
 class Config:
-	'''simple class to store the config'''
+	"""simple class to store the config"""
 	cache = ''
 	generated = ''
 	views = 'views/'
+	baseURL = ''

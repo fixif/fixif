@@ -10,8 +10,6 @@ from bottle import route, run, error, static_file, request, post, get, response
 from bottle import jinja2_template as template
 from bottle import Jinja2Template, TEMPLATE_PATH
 from bottle import install, default_app
-# jinja is the template engine used
-from jinja2 import Environment, FileSystemLoader
 
 # FiPoGen packages
 from fipogen.FxP import FPF
@@ -38,8 +36,6 @@ TEMPLATE_PATH[:] = ['templates/']
 lit = "[+-]?\\d+(?:\\.\\d+)?"										# literal
 reobj_constant = re.compile("^"+lit+"$")							# regex defining a constant
 reobj_interval = re.compile("^\\[("+lit+");("+lit+")\\]$")			# regex defining an interval
-
-
 
 
 # --- Specific pages ---
@@ -147,7 +143,7 @@ def FPF_service(FPForm, outputFormat):
 	elif outputFormat == 'json':
 		return {'latex': latexFPF, 'interval': '[%f;%f]' % F.minmax(), 'quantization': '2^%d = %f' % (F.lsb, 2**F.lsb)}
 	else:
-		return "\t%Generated from " + BASE_URL + "FPF/" + FPForm + ".tex?" + request.query_string + "\n" + latexFPF
+		return "\t%Generated from " + Config.baseURL + "FPF/" + FPForm + ".tex?" + request.query_string + "\n" + latexFPF
 
 
 # TODO: - régler le découpage de la page (à gauche le formulaire, à droite *centré* l'image avec les liens et le code
@@ -218,7 +214,7 @@ def Constant_service(constInter):
 		        'integer': C.mantissa,
 		        'lsb': C.FPF.lsb,
 		        'bits': tobin(C.mantissa, C.FPF.wl),
-		        'FPF_image': BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
+		        'FPF_image': Config.baseURL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
 		        'approx': C.approx,
 		        'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
 		        'error_abs': '%.4e' % (float(C.value)-C.approx,),
@@ -240,7 +236,7 @@ def Constant_service(constInter):
 		
 		dico = {'error': '',
 		        'FPF': str(I.FPF),
-		        'FPF_image': BASE_URL+'FPF/' + str(I.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
+		        'FPF_image': Config.baseURL+'FPF/' + str(I.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
 		        'latex': I.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False)
 		        }
 		return dico
@@ -298,7 +294,7 @@ def Sum_service(outputFormat):
 		# create the image from the latex
 		return createImageFromLaTeX(sumName+"?"+str(options), latexStr, outputFormat)
 	else:
-		return "\t%Generated from "+BASE_URL+"Sum.tex?"+request.query_string+"\n"+latexFPF
+		return "\t%Generated from "+Config.baseURL+"Sum.tex?"+request.query_string+"\n"+latexFPF
 
 
 # /aSoP
@@ -425,6 +421,7 @@ def runServer(host, port, debug, cache, generated):
 	# store the paths
 	Config.cache = cache
 	Config.generated = generated
+	Config.baseURL = 'http://%s:%s/' % (host, port)
 
 	# clean caches in Debug mode
 	if debug:

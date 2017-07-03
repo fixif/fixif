@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from docopt import docopt
 import logging
 from logging.handlers import RotatingFileHandler

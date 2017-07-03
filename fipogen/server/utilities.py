@@ -12,9 +12,11 @@ from path import Config
 
 
 # Define the colors for the different color themes (named "BW" and "YG" for the moment)
-colorThemes = {"YG": ("orange!60","yellow!30","green!15","Yellow&amp;Green"), "BW": ("black!60","black!30","white",'Black&amp;White'), "RB": ("red!40","blue!15","purple!15","Red&amp;Blue")}
+colorThemes = {"YG": ("orange!60", "yellow!30", "green!15", "Yellow&amp;Green"),
+               "BW": ("black!60", "black!30", "white", 'Black&amp;White'),
+               "RB": ("red!40", "blue!15", "purple!15", "Red&amp;Blue")}
 
-#Define the available image formats
+# Define the available image formats
 imageFormats = ('pdf', 'jpg', 'png', 'tiff', 'eps')
 
 
@@ -40,16 +42,16 @@ class optionManager:
 		self._options = {}			# dictionary parameter/value
 		self._finalValues = {}      # dictionary parameter/final returned value
 
-	def addOptionalOption( self, parameterName, method, defaultValue):
+	def addOptionalOption(self, parameterName, method, defaultValue):
 		# get the value associated with the parameterName, if exits (otherwise, use the defaultValue)
-		value = self._query.get( parameterName, defaultValue)
+		value = self._query.get(parameterName, defaultValue)
 
 		# transform this value to a final value via the method (can be a disctionary, a list or a function)
 		if isinstance(method, dict):
 			if value not in method:
 				value = defaultValue
 			finalValue = method[value]
-		elif isinstance(method,list) or isinstance(method,tuple):
+		elif isinstance(method, list) or isinstance(method, tuple):
 			if value not in method:
 				value = defaultValue
 			finalValue = value
@@ -61,14 +63,14 @@ class optionManager:
 				value = defaultValue
 	
 		# store the value and final value
-		self._options[ parameterName ] = value
-		self._finalValues[ parameterName ] = finalValue
+		self._options[parameterName] = value
+		self._finalValues[parameterName] = finalValue
 		
 	def __str__(self):
-		return "&".join( k+"="+v for k,v in self._options.items() )
+		return "&".join(k+"="+v for k, v in self._options.items())
 	
-	def getValues( self, d=None ):
-		#TODO: si d est None, alors on renvoie le dico de finalValues...
+	def getValues(self, d=None):
+		# TODO: si d est None, alors on renvoie le dico de finalValues...
 		# when d is not given
 		if d is None:
 			d = {}
@@ -91,18 +93,18 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 	""""create an image from LaTeX code
 	the function generate the associated pdf file (or take it from the cache if it already exists)
 	and then convert it in the right outputFormat"""
-	filename = baseName+"." +outputFormat
+	filename = baseName+"." + outputFormat
 	# check if already created
 	if not exists(Config.cache+filename):
 		# write the latex code in a file and compile it
-		tex_file = open( Config.generated+"FPF.tex", "w" )
-		tex_file.write( latexStr )
+		tex_file = open(Config.generated+"FPF.tex", "w")
+		tex_file.write(latexStr)
 		tex_file.close()
 		# compile latex and convert to image format
 		print("Compile Latex")
 		call("echo $PATH", shell=True)
 		call("cd "+Config.generated+" && pdflatex --shell-escape FPF.tex >output.log", shell=True)
-		#TODO: check if pdflatex has compiled without errors (call returns the output code)
+		# TODO: check if pdflatex has compiled without errors (call returns the output code)
 		print("Done")
 		call("cp " + Config.generated + "FPF." + outputFormat + " \"" + Config.cache + filename + "\"", shell=True)
 	# then return image file 
@@ -116,11 +118,11 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 def clean_caches():
 	"""Clean caches (remove all files in the cache directory)"""
 	# TODO: potentially very dangerous !!!
-	call("rm "+Config.cache+ "* ",shell=True)
+	call("rm " + Config.cache + "* ", shell=True)
 
 
 def tobin(x, wl=8):
 	"""Convert an integer x in binary
 	Returns a string of it's binary representation (two's complement)
 	from : http://code.activestate.com/recipes/219300-format-integer-as-binary-string/ """
-	return "".join(map(lambda y:str((x>>y)&1), range(wl-1, -1, -1)))	
+	return "".join(map(lambda y: str((x >> y) & 1), range(wl-1, -1, -1)))
