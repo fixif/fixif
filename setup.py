@@ -22,6 +22,8 @@ setup(
 		"matlabengineforpython",
 		"sollya",
 		"cython",
+		"bottle",
+		"jinja2",
 		"mpmath"
 	],
 ) 
