@@ -57,7 +57,7 @@ def template( name, ctx={}):
 @route('/index.html')
 def main():
 	"""Returns the main page '/index.html'"""
-	return template( 'index.html')
+	return template('index.html')
 
 # 404 error
 @error(404)
@@ -74,7 +74,7 @@ def error404( error):
 @route('/FPF.html')
 def input_FPF():
 	"""Returns the /FPF page that display Fixed-Point Format"""
-	return template('FPF.html', {'imageFormats':imageFormats, 'colors':reversed(colorThemes.items())})
+	return template('FPF.html', {'imageFormats':imageFormats, 'colors':reversed(list(colorThemes.items()))})
 
 
 # /Constant
@@ -92,7 +92,7 @@ def input_Constant():
 def input_Sum():
 	"""Returns the /Sum page
 	that display a sum of fixed-point numbers"""
-	return template('Sum.html', {'imageFormats':imageFormats, 'colors':reversed(colorThemes.items()) })
+	return template('Sum.html', {'imageFormats':imageFormats, 'colors':reversed(list(colorThemes.items())) })
 
 
 #### Services ####

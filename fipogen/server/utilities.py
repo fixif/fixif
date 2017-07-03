@@ -73,7 +73,10 @@ class optionManager(object):
 		if d is None:
 			d={}
 		# merge the dictionary d and the finalValue dictionary, and return it
-		return dict( self._finalValues.items() + d.items() )
+		# in Python 3.5+: return {**d, **self._finalValues}
+		z = d.copy()
+		z.update(self._finalValues)
+		return z
 	
 	def __getitem__(self, attr):
 		# 
