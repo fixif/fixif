@@ -24,6 +24,7 @@ setup(
 		"cython",
 		"bottle",
 		"jinja2",
+		"docopt",
 		"mpmath"
 	],
 ) 

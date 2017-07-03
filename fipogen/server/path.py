@@ -5,8 +5,8 @@
 """
 
 # Paths
-CACHE_PATH = "cache/"
-TEMPLATE_PATH = "templates/"
-GENERATED_PATH = "../Generated/LaTeX/"
-VIEWS_PATH = "views/"
-BASE_URL = 'http://localhost:8080/'
+class Config:
+	'''simple class to store the config'''
+	cache = ''
+	generated = ''
+	views = 'views/'

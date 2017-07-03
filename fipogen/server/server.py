@@ -2,34 +2,37 @@
 
 """
 Web server used to display web pages as front-end for the FiPoGen tool suite.
-
-To run it correctly, the path should be set at the root of FiPoGen, (ie, with `export PYTHONPATH=~/work/thesards/Benoit/FiPoGen` for example)
-and the server should be run from server folder.
-The server is now listing to port 8080
-
+the run server is run from runServer.py
 """
-
-
 
 # bottle is the web server used
 from bottle import route, run, error, static_file, request, post, get, response
-
+from bottle import jinja2_template as template
+from bottle import Jinja2Template, TEMPLATE_PATH
+from bottle import install, default_app
 # jinja is the template engine used
 from jinja2 import Environment, FileSystemLoader
 
-# oSoP packages
+# FiPoGen packages
 from fipogen.FxP import FPF
 from fipogen.FxP import Variable
 from fipogen.FxP import Constant
 
 # utilities and path definition
 from utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin
-from path import VIEWS_PATH, TEMPLATE_PATH, BASE_URL		# paths
+from path import Config		# paths
 
 from operator import attrgetter
-
+from functools import wraps										# use to wrap a logger for bottle
 import os
 import re
+from logging import getLogger
+
+
+# weblogger
+weblogger = getLogger('bottle')
+# Path to the template
+TEMPLATE_PATH[:] = ['templates/']
 
 # regexs
 lit = "[+-]?\\d+(?:\\.\\d+)?"										# literal
@@ -37,13 +40,6 @@ reobj_constant = re.compile("^"+lit+"$")							# regex defining a constant
 reobj_interval = re.compile("^\\[("+lit+");("+lit+")\\]$")			# regex defining an interval
 
 
-def template(name, ctx={}):
-	"""This template function is defined, so as we can use Jinja template exactly as we use the bottle template
-	The base_url iis add in the dictionnary used for the rendering
-	"""
-	t = jinja2_env.get_template(name)
-	ctx['base_url'] = BASE_URL
-	return t.render(**ctx)
 
 
 # --- Specific pages ---
@@ -218,16 +214,16 @@ def Constant_service(constInter):
 			return {'error': str(e)}
 		
 		dico = {'error': '',
-				'FPF': str(C.FPF),
-				'integer': C.mantissa,
-				'lsb': C.FPF.lsb,
-				'bits': tobin(C.mantissa, C.FPF.wl),
-				'FPF_image': BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
-				'approx': C.approx,
-				'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
-				'error_abs': '%.4e' % (float(C.value)-C.approx,),
-				'error_rel': '%.4e' % ((float(C.value)-C.approx)/float(C.value),)
-				}
+		        'FPF': str(C.FPF),
+		        'integer': C.mantissa,
+		        'lsb': C.FPF.lsb,
+		        'bits': tobin(C.mantissa, C.FPF.wl),
+		        'FPF_image': BASE_URL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
+		        'approx': C.approx,
+		        'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
+		        'error_abs': '%.4e' % (float(C.value)-C.approx,),
+		        'error_rel': '%.4e' % ((float(C.value)-C.approx)/float(C.value),)
+		        }
 		return dico 
 	# or get the interval		
 	elif inter:
@@ -243,10 +239,10 @@ def Constant_service(constInter):
 			return {'error': str(e)}
 		
 		dico = {'error': '',
-				'FPF': str(I.FPF),
-				'FPF_image': BASE_URL+'FPF/' + str(I.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
-				'latex': I.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False)
-		}
+		        'FPF': str(I.FPF),
+		        'FPF_image': BASE_URL+'FPF/' + str(I.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
+		        'latex': I.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False)
+		        }
 		return dico
 		
 	else:
@@ -308,7 +304,7 @@ def Sum_service(outputFormat):
 # /aSoP
 @route('/aSoP')
 def input_SoP():
-	return static_file('aSoP.html', root=VIEWS_PATH)
+	return static_file('aSoP.html', root=Config.views)
 
 
 # /aSoP when data are posted
@@ -344,13 +340,13 @@ def aSoP_submit():
 		try:
 			w, i1, i2 = wi.split(',')
 			var_w.append(int(w))
-			var_i.append((float(i1),float(i2)))
+			var_i.append((float(i1), float(i2)))
 		except:
 			return "Invalid wordlength,inteval format"
 	# now call Benoit's function to do the aSoP...
 	interval_var = []	
 	for w, i in zip(var_w, var_i):
-		interval_var.append(Variable(value_inf=i[0], value_sup=i[1], beta=w))
+		interval_var.append(Variable(value_inf=i[0], value_sup=i[1], wl=w))         # beta=w changed in wl=w
 	return simple_cleaned_SoP(cons, interval_var, beta_final)
 
 	# or return dummy string
@@ -361,7 +357,7 @@ def aSoP_submit():
 @route('/clean-caches')
 def clean():
 	clean_caches()
-	return static_file('clean-caches.html', root=VIEWS_PATH)
+	return static_file('clean-caches.html', root=Config.views)
 
 
 # --- Specific files, to be returned  ---
@@ -369,14 +365,14 @@ def clean():
 @route('/style.css')
 def css():
 	"""Returns the '/style.css' file located in the 'views' folder"""
-	return static_file('style.css', root=VIEWS_PATH)
+	return static_file('style.css', root=Config.views)
 
 
 # JS files
 @route('/<filename>.js')
 def js(filename):
 	"""Returns the '/*.js' files"""
-	return static_file(filename+'.js', root=VIEWS_PATH)
+	return static_file(filename+'.js', root=Config.views)
 
 
 # logos and basic image
@@ -384,14 +380,14 @@ def js(filename):
 def getImage(image_name, outputFormat):
 	"""Returns the /*.jpg or /*.gif images
 	"""
-	return static_file(image_name+'.'+outputFormat, root=VIEWS_PATH)
+	return static_file(image_name+'.'+outputFormat, root=Config.views)
 
 
 # favicon
 @get('/favicon.ico')
 def get_favicon():
 	"""Returns the favicon"""
-	return static_file('favicon.ico', root=VIEWS_PATH)
+	return static_file('favicon.ico', root=Config.views)
 
 
 # a test page
@@ -402,22 +398,53 @@ def test():
 	return template('test.html')
 
 
-DEBUG = True		# set this to True for debug
+# add a logger wrapper for bottle (in order to log its activity)
+# See http://stackoverflow.com/questions/31080214/python-bottle-always-logs-to-console-no-logging-to-file
+def log_to_logger(fn):
+	"""	Wrap a Bottle request so that a log line is emitted after it's handled."""
+	@wraps(fn)
+	def _log_to_logger(*_args, **_kwargs):
+		actual_response = fn(*_args, **_kwargs)
+		weblogger.info('%s %s %s %s' % (request.remote_addr, request.method, request.url, response.status))
+		return actual_response
+	return _log_to_logger
 
-# initialize the template engine
-if DEBUG:
-	jinja2_env = Environment(loader=FileSystemLoader(TEMPLATE_PATH), cache_size=0)
-else:
-	jinja2_env = Environment(loader=FileSystemLoader(TEMPLATE_PATH))
-# clean caches in Debug mode
-if DEBUG:
-	clean_caches()
 
-# some checks
-# TODO: check that we can run pdflatex
-os.environ["PATH"] = os.getenv("PATH")+":/usr/texbin:/usr/local/bin/"		# Q&D : add the paths to run it on 'Bethmale' with Eclipse...
 
-# TODO: check that we can copy files in generated folder
-# TODO: etc.
-# run the server
-run(host='localhost', port=8080, debug=DEBUG, reloader=False)
+
+
+def runServer(host, port, debug, cache, generated):
+	"""Run the webserver
+	Parameters:
+	- host: (string) name of the host (usually 'localhost')
+	- port: (int) port of the server (ususally 8080)
+	- debug: (bool) True if debug mode
+	- cache: (string) path where to cache the files
+	- generated: (string) path where to generate the LaTeX files
+	"""
+	# store the paths
+	Config.cache = cache
+	Config.generated = generated
+
+	# clean caches in Debug mode
+	if debug:
+		clean_caches()
+
+	# some checks
+	# TODO: check that we can run pdflatex
+	# TODO: add this in the command line
+	os.environ["PATH"] = os.getenv("PATH") + ":/usr/texbin:/usr/local/bin/"  # Q&D : add the paths to run it on 'Bethmale' with Eclipse...
+
+	# TODO: check that we can copy files in generated folder
+	# TODO: etc.
+
+	# add the base url to all the templates
+	Jinja2Template.defaults['base_url'] = 'http://%s:%s/' % (host, port)
+	# configure the web server
+	install(log_to_logger)
+	weblogger.info("Run the web server on port %d...", port)
+	default_app().catchall = True  # all the exceptions/errors are catched, and re-routed to error500
+	# run the server
+	run(host='localhost', port=8080, debug=debug, quiet=not debug, reloader=False)
+
+
