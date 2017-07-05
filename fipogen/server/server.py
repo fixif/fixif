@@ -13,7 +13,7 @@ from bottle import install, default_app
 
 # FiPoGen packages
 from fipogen.FxP import FPF
-#from fipogen.FxP import Variable
+from fipogen.FxP import Variable
 from fipogen.FxP import Constant
 
 # utilities and path definition
@@ -220,8 +220,8 @@ def Constant_service(constInter):
 		        'FPF_image': Config.baseURL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
 		        'approx': nstr(C.approx),
 		        'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
-		        'error_abs':  nstr ((C.value)-C.approx),
-		        'error_rel':  ((float(C.value)-C.approx)/float(C.value),)
+		        'error_abs':  nstr (float(C.value)-C.approx),
+		        'error_rel':  nstr((float(C.value)-C.approx)/(float(C.value))),
 		        }
 		return dico 
 	# or get the interval		
@@ -233,7 +233,7 @@ def Constant_service(constInter):
 		except:
 			return {'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
 		try:
-			I = Variable(value_inf=val_inf, value_sup=val_sup, wl=WL, signed=signed, fpf=F)
+			I = Variable.Variable(value_inf=val_inf, value_sup=val_sup, wl=WL, signed=signed, fpf=F)
 		except ValueError as e:
 			return {'error': str(e)}
 		
