@@ -5,7 +5,7 @@
 """
 
 from os.path import exists
-from subprocess import call
+from subprocess import call, Popen, PIPE
 from bottle import static_file
 
 from fipogen.server.path import Config
@@ -104,19 +104,21 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 		tex_file.write(latexStr)
 		tex_file.close()
 		# compile latex and convert to image format
-
-		# print("Compile Latex")
+		command1 = "cd " + Config.generated + " && " + " pdflatex -shell-escape FPF.tex "
+		command2 = "cp " + Config.generated + "FPF." + outputFormat + " \"" + Config.cache + filename + "\""
 		latexLogger.info("Compile Latex")
-		call("echo $PATH", shell=True)
-		call("pwd")
-
-		#latexLogger.info(call("cd "+Config.generated, shell=True))
-		call("echo \"" + Config.generated + "FPF.tex\" > input", shell=True)
-		latexLogger.info(call("cd " + Config.generated + " && " + "echo \"FPF.tex\" > input" + " && pdflatex -shell-escape < input > output.log", shell=True))
+		#latexLogger.info(call("cd " + Config.generated + " && " + " && pdflatex -shell-escape FPF.tex > output.log",shell=True))
 		# TODO: check if pdflatex has compiled without errors (call returns the output code)
-		# print("Done")
-		latexLogger.info(call("echo $pwd", shell = True))
-		latexLogger.info(call("cp " + Config.generated + "FPF." + outputFormat + " \"" + Config.cache + filename + "\"", shell=True))
+
+		proc =Popen(command1,stdout= PIPE,shell=True)
+		out, err = proc.communicate();
+
+		latexLogger.info(command1 + "\n" + str(out))
+
+		proc = Popen(command2, stdout=PIPE, shell=True)
+		out, err = proc.communicate();
+		latexLogger.info(command2 + "\n")
+
 		latexLogger.info("Done")
 	# then return image file
 	if outputFormat == "pdf":
