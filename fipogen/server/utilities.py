@@ -8,8 +8,9 @@ from os.path import exists
 from subprocess import call
 from bottle import static_file
 
-from path import Config
+from fipogen.server.path import Config
 
+import logging
 
 # Define the colors for the different color themes (named "BW" and "YG" for the moment)
 colorThemes = {"YG": ("orange!60", "yellow!30", "green!15", "Yellow&amp;Green"),
@@ -19,6 +20,8 @@ colorThemes = {"YG": ("orange!60", "yellow!30", "green!15", "Yellow&amp;Green"),
 # Define the available image formats
 imageFormats = ('pdf', 'jpg', 'png', 'tiff', 'eps')
 
+# Corresponds to log of latex compilation
+latexLogger = logging.getLogger('Latex')
 
 class optionManager:
 	"""class to mangage and process the parameters (here coming from an html form)
@@ -101,13 +104,21 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 		tex_file.write(latexStr)
 		tex_file.close()
 		# compile latex and convert to image format
-		print("Compile Latex")
+
+		# print("Compile Latex")
+		latexLogger.info("Compile Latex")
 		call("echo $PATH", shell=True)
-		call("cd "+Config.generated+" && pdflatex --shell-escape FPF.tex >output.log", shell=True)
+		call("pwd")
+
+		#latexLogger.info(call("cd "+Config.generated, shell=True))
+		call("echo \"" + Config.generated + "FPF.tex\" > input", shell=True)
+		latexLogger.info(call("cd " + Config.generated + " && " + "echo \"FPF.tex\" > input" + " && pdflatex -shell-escape < input > output.log", shell=True))
 		# TODO: check if pdflatex has compiled without errors (call returns the output code)
-		print("Done")
-		call("cp " + Config.generated + "FPF." + outputFormat + " \"" + Config.cache + filename + "\"", shell=True)
-	# then return image file 
+		# print("Done")
+		latexLogger.info(call("echo $pwd", shell = True))
+		latexLogger.info(call("cp " + Config.generated + "FPF." + outputFormat + " \"" + Config.cache + filename + "\"", shell=True))
+		latexLogger.info("Done")
+	# then return image file
 	if outputFormat == "pdf":
 		return static_file(filename, root=Config.cache, mimetype="application/pdf")
 	else:
@@ -118,7 +129,7 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 def clean_caches():
 	"""Clean caches (remove all files in the cache directory)"""
 	# TODO: potentially very dangerous !!!
-	call("rm " + Config.cache + "* ", shell=True)
+	# call("rm " + Config.cache + "* ", shell=True)
 
 
 def tobin(x, wl=8):

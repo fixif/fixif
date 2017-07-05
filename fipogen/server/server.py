@@ -13,12 +13,12 @@ from bottle import install, default_app
 
 # FiPoGen packages
 from fipogen.FxP import FPF
-from fipogen.FxP import Variable
+#from fipogen.FxP import Variable
 from fipogen.FxP import Constant
 
 # utilities and path definition
-from utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin
-from path import Config		# paths
+from fipogen.server.utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin
+from fipogen.server.path import Config		# paths
 
 from operator import attrgetter
 from functools import wraps										# use to wrap a logger for bottle

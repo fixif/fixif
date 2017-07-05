@@ -19,7 +19,7 @@ Options:
   -p PORT --port=PORT          web server port [default: 8080].
   -H HOST --host=HOST          Server host [default: localhost].
   -C PATH --cache=PATH         Cache path [default: cache/]
-  -G PATH --generated=PATH     Generated files path [default: ../Generated/LaTeX/] 
+  -G PATH --generated=PATH     Generated files path [default: ../generated/LaTeX/] 
   --debug                      Debug mode (clear caches, log and display everything)
 """
 
