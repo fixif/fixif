@@ -108,7 +108,7 @@ def createImageFromLaTeX(baseName,latexStr,outputFormat):
 
 def clean_caches():
 	"""Clean caches (remove all files in the cache directory)"""
-	call( "rm "+CACHE_PATH+ "* ",shell=True)
+	call( "rm "+CACHE_PATH+ "/* ",shell=True)
 	
 	
 def tobin(x, wl=8):

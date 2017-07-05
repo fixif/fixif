@@ -33,7 +33,7 @@ class optionManager:
 		options.addOptionalOption( 'isOk', {'yes':True,'no':False}, 'yes')
 		options.addOptionalOption( 'width', lambda x:int(x), '100')
 		
-	For that purpose, the optionManager is composed of rules. Each rules will associated a parameterName to a) a method and b) a defaultValue
+	For that purpose, the optionManager is composed of rules. Each rules will associate a parameterName to a) a method and b) a defaultValue
 	a method transform the value associated with the parameter to a final returned value. A method can be a dictionary, a liste/tuple or a function.
 	If the value is not in the dictionary, the list or cannot be transformed by the function, the value associated to the defaultValue is returned
 	
@@ -106,7 +106,7 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 		# compile latex and convert to image format
 		command1 = "cd " + Config.generated + " && " + " pdflatex -shell-escape FPF.tex "
 		command2 = "cp " + Config.generated + "FPF." + outputFormat + " \"" + Config.cache + filename + "\""
-		latexLogger.info("Compile Latex")
+		latexLogger.info("##\tCompile Latex\t##")
 		#latexLogger.info(call("cd " + Config.generated + " && " + " && pdflatex -shell-escape FPF.tex > output.log",shell=True))
 		# TODO: check if pdflatex has compiled without errors (call returns the output code)
 
@@ -119,7 +119,7 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 		out, err = proc.communicate();
 		latexLogger.info(command2 + "\n")
 
-		latexLogger.info("Done")
+		latexLogger.info("##\tDone\t##")
 	# then return image file
 	if outputFormat == "pdf":
 		return static_file(filename, root=Config.cache, mimetype="application/pdf")

@@ -3,7 +3,7 @@
 from docopt import docopt
 import logging
 from logging.handlers import RotatingFileHandler
-from server import runServer
+from fipogen.server.server import runServer
 
 
 usage = """

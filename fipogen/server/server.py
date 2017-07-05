@@ -26,6 +26,9 @@ import os
 import re
 from logging import getLogger
 
+#from mpmath
+from mpmath import nstr
+
 
 # weblogger
 weblogger = getLogger('bottle')
@@ -215,10 +218,10 @@ def Constant_service(constInter):
 		        'lsb': C.FPF.lsb,
 		        'bits': tobin(C.mantissa, C.FPF.wl),
 		        'FPF_image': Config.baseURL+'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
-		        'approx': C.approx,
+		        'approx': nstr(C.approx),
 		        'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
-		        'error_abs': '%.4e' % (float(C.value)-C.approx,),
-		        'error_rel': '%.4e' % ((float(C.value)-C.approx)/float(C.value),)
+		        'error_abs':  nstr ((C.value)-C.approx),
+		        'error_rel':  ((float(C.value)-C.approx)/float(C.value),)
 		        }
 		return dico 
 	# or get the interval		
