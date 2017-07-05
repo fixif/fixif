@@ -132,6 +132,11 @@ def clean_caches():
 	"""Clean caches (remove all files in the cache directory)"""
 	# TODO: potentially very dangerous !!!
 	# call("rm " + Config.cache + "* ", shell=True)
+	try:
+		call("rm -r " + Config.cache)
+		call("mkdir " + Config.cache)
+	except:
+		pass
 
 
 def tobin(x, wl=8):
