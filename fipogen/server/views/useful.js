@@ -85,7 +85,7 @@ function msgValidConstInterval( ci)
 }
 
 
-/* verify an Constant_or_interval input, and set the custom validity message */
+/* verify a Constant_or_interval input, and set the custom validity message */
 function verifyConstInterval(ci)
 {
 	ci.setCustomValidity( msgValidConstInterval( ci.value) );
@@ -105,4 +105,20 @@ function verifyFPForWL(fpfORwl)
 	// mix FPF validity message and wordlength validity message
 	fpfORwl.setCustomValidity ( msgValidFPF( fpfORwl.value) && msgWL );
 }
-
+function verifyConstIntLines(inputStr)
+{
+	/*Contains each lines of the text entered*/
+	var arrStrs = inputStr.value.split('\n');
+	/*Returning error is the problem with the last entered value*/
+	var ret;
+	for(i =0; i < arrStrs.length; i++)
+	{
+		if(arrStrs[i]!= "")
+		{
+			ret = msgValidConstInterval(arrStrs[i]);
+			console.log(arrStrs[i]);
+			console.log(ret);
+		}
+	}
+	inputStr.setCustomValidity(ret);
+}
