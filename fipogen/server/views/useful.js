@@ -122,3 +122,12 @@ function verifyConstIntLines(inputStr)
 	}
 	inputStr.setCustomValidity(ret);
 }
+function verifyEachChar(inputStr)
+{
+	console.log("The last char suit:");
+	console.log((inputStr.value.charAt(inputStr.value.length-3)));
+	// if((inputStr.value.charAt(inputStr.value.length-1) <= '0' || inputStr.value.charAt(inputStr.value.length-1) >='9') && (inputStr.value.charAt(inputStr.value.length-1) != '\n' || inputStr.value.charAt(inputStr.value.length-1)!= '.'))
+	// 	inputStr.setCustomValidity('Entered character is not a number')
+	inputStr.setCustomValidity(1)
+
+}

@@ -12,12 +12,13 @@ function validate()
 	//var ci = $('#ci').val();// get the constant/interval
 	var ci_s = $('#ci').val().split("\n");
 	var ci = "";
+	//todo: use join
 	for(i = 0; i < ci_s.length; i++)
 	{
 	    if(ci_s[i].length!= 0)
 		{
 	    	ci+= ci_s[i];
-	    	ci+="-"
+	    	ci+="@" //todo: change the char @
 		}
 	}
 	var wl = $('#wl').val();		// get the wordlength/FPF
@@ -30,73 +31,52 @@ function validate()
 	/* get the json */
 	$.ajax({ url: q}).done( function( data)
 	{
+	    console.log("Data:");
 	    console.log(data);
-	    //console.log("before if");
-		if (data["0"]["error"])
+	    console.log("Afterwards!")
+		html = "";
+		html = "<table style=\"width:100%\">\n";
+		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mentissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n</tr>";
+		for(i=0; i < Object.keys(data).length; i++)
 		{
-			$("#result").html("<span style='color:#FF0000'>Error: "+data[0]["error"]+"</span>")
+		    html += "<tr>"
+			html += "<td>" + ci_s[i]+ "</td>";
+		    if(!data[i]['error'])
+		    {
+                html += "<td>" + data[i]["integer"] + "</td>\n";
+                html += "<td>" + data[i]["lsb"] + "</td>\n";
+                html += "<td>" + data[i]["FPF"] + "</td>\n";
+                html += "<td>" + data[i]["error_abs"] + "</td>\n";
+                html += "<td>" + data[i]["error_rel"] + "</td>\n";
+            }
+            else
+			{
+				html += "<td>" + data[i]['error'] + "</td>\n";
+			}
+            html += "</tr>";
 		}
-		else
+		html += "</table>";
+		/*Table for images: */
+		html += "<table style=\"width:100%\">\n";
+		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Image</th></tr>";
+		for(i=0; i < Object.keys(data).length; i++)
 		{
-		    /*Look at the code written in server.py see what you return and change the following code: */
-			/* FPF */
-//			html = "Fixed-Point Representation: " + data["FPF"] + "<br/>\n";
-//			html += "<a href='"+ data["FPF_image"]+"'><img id='FPF_image'></a><br/>\n";
-//			{% for img in imageFormats %}
-//				html += "<a id='a_{{img}}' href='" + data["FPF_image"].replace("jpg","{{img}}") + "'>{{img}}</a>&nbsp;&nbsp;\n";
-//			{% endfor %}
-//			html += "<br/>\n";
-//			/* constant */
-//			if (data["integer"])
-//			{
-//				html += "The constant is approximated by " + data["integer"] + "*2^" + data["lsb"] + " (ie " + data["approx"] + ")<br/>\n";
-//				html += data["integer"] + " ->  " + data["bits"] + "<sub>2</sub> (2's complement binary)<br/>\n";
-//				html += "Absolute error: " + data["error_abs"] + "<br/>\n";
-//				html += "Relative error: " + data["error_rel"] + "<br/>\n";
-//			}
-//			/* latex code */
-//			html += "Latex code:<br>\n";
-//			html += "<div id='latex_code'><code>" + data["latex"].split("\n").join("<br/>") + "</code></div>\n";
-//			/* display the result */
-//			$("#result").html(html);
-//			/* load the image */
-//			$("#FPF_image").attr('src', '{{base_url}}spinner.gif');	/* first load the spinner */
-//			$("#FPF_image").attr('src', data["FPF_image"]);		/* and then load the image */
-//
-			html = "";
-			html = "<table style=\"width:100%\">\n";
-			html += "<tr>\n<th>Const/Interval</th>\n <th>Mentissa</th> \n<th>LSB</th>>\n <th>FPF</th>\n<th>Absolute Error</th>\n<th>Real Error</th>\n</tr>";
-			for(i=0; i < Object.keys(data).length; i++)
+		    html += "<tr>"
+			html += "<td  align = left >" + ci_s[i]+ "</td>";
+		    //TODO: check if the link will later on cause a problem: Ask Hilaire
+			if(!data[i]['error'])
 			{
-			    html += "<tr>"
-				html += "<td>" + ci_s[i]+ "</td>";
-			    html += "<td>" + data[i]["integer"]+ "</td>\n";
-			    html += "<td>" + data[i]["lsb"]+ "</td>\n";
-				html += "<td>" + data[i]["FPF"]+ "</td>\n";
-				html += "<td>" + data[i]["error_abs"]+ "</td>\n";
-				html += "<td>" + data[i]["error_rel"] + "</td>\n";
-				html += "</tr>";
-			}
-			html += "</table>";
-
-			/*Table for images: */
-			html += "<table style=\"width:100%\">\n";
-			html += "<tr>\n<th>number</th>\n <th>Image</th></tr>";
-			for(i=0; i < Object.keys(data).length; i++)
+                html += "<td  align = left >" + "<a href=\"" + data[i]["FPF_image"] + "\">" + "<img src=" + data[i]["FPF_image"] + " alt=" + "Mountain View" + "/>" + "</td>\n";
+            }
+            else
 			{
-			    html += "<tr>"
-				html += "<td>" + ci_s[i]+ "</td>";
-			    //TODO: check if the link will later on cause a problem: Ask Hilaire
-			    console.log(data[i]["FPF_image"])
-				console.log("<td>" + "<img src=" + data[i]["FPF_image"] + " alt=" + "Mountain View" +"style=" + "width:304px;height:228px;\">" + "</td>\n");
-			    html += "<td>" + "<a href=\"" + data[i]["FPF_image"] +"\">" + "<img src=" + data[i]["FPF_image"] + " alt=" + "Mountain View"+ "/>"+ "</td>\n";
-				html += "</tr>";
+				html += "<td>" + data[i]['error'] + "</td>\n";
 			}
-			html += "</table>";
-
-
-			$("#result").html(html);
+			html += "</tr>";
 		}
+		html += "</table>";
+
+		$("#result").html(html);
 
 	});
 }
@@ -115,7 +95,8 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	<div>
 	<!-- form -->
 	<form method="POST" action="javascript:validate();" id="form">
-		<label for="ci">Constants:</label><br><textarea class="yesno" id="ci" rows="5" cols="10" required onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this);"/></textarea></br>
+		<label for="ci">Constants:</label><br><textarea class="yesno" style ="overflow:inherit" id="ci" rows="5" cols="10" required onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this);"/></textarea></br>
+		<label for="ci">Or upload the file containing constants and intervals:</label>
 		<label for="wl">Word Length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
 		<input type="submit"/> </label>
 
@@ -128,14 +109,14 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
 	</div>
 </div>
-	
+
 	</div>
 </div>
 
 <!--
 	Fixed-Point Representation: <br/>
 	The constant is approximated by: <br/>
-	Absolute error: <br/> 
+	Absolute error: <br/>
 	Relative error:<br/>
 	<div class="r-container">
 	<div id="result">
@@ -149,7 +130,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
  -->
 
 
-	
-	
+
+
 
 {% endblock %}

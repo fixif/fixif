@@ -188,7 +188,7 @@ def Constant_service(constantsInter):
     if "FPF" in q:
         try:
             F = FPF(formatStr=q["FPF"])
-            WL = F.wl
+            WL = None
         except:
             return {"error": "invalid FPF"}
     # or get the word-length
@@ -211,66 +211,48 @@ def Constant_service(constantsInter):
     # todo cont.: for new line in constInter do the following lines
 
     returningJson={}
-    boolConst = False
-    boolInterval = False
+
     counter = 0
-    for constInter in constantsInter.split("-"):
+    for constInter in constantsInter.split("@"):
         if len(constInter) != 0:
             const = reobj_constant.match(constInter)
             inter = reobj_interval.match(constInter)
-            boolConst = False
-            boolInterval = False
-            try:
-                if const is not None:
-                    boolConst = True
-                else:
-                    boolConst = False
-            except:
-                print("")
-            try:
-                if inter is not None:
-                    boolInterval = True
-            except:
-                print("")
 
             # get the constant
-            if boolConst is True:
+            if const:
                 try:
                     C = Constant(value=const.string, wl=WL, signed=signed, fpf=F)
+                    dico = {}
+                    dico = returnDictionaryConstant(C)
+                    returningJson[counter] = dico
                 except ValueError as e:
                     print(str(e)) # Todo: delete
-                    return {'error': str(e)}
-                dico = {}
-                dico = returnDictionaryConstant(C)
-                # instead of return I should add to the list I'm making
-                returningJson[counter] = dico
-            elif boolInterval is True:
+                    returningJson[counter] = {'error': str(e)}
+            elif inter:
                 try:
                     val_inf = float(inter.group(1))
                     val_sup = float(inter.group(2))
                 # TODO: conversion str->float... faire avec GMP?
                 except:
-                    return {'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
+                    returningJson[counter] = {'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
                 try:
-                    print("before I")
                     I = Variable.Variable(value_inf=val_inf, value_sup=val_sup, wl=WL, signed=signed, fpf=F)
-                    print("after I")
+                    dico = {}
+                    dico = {'error': '',
+                            'FPF': str(I.FPF),
+                            'FPF_image': Config.baseURL + 'FPF/' + str(
+                                I.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
+                            'latex': I.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"],
+                                                 binary_point=True,
+                                                 label="no", intfrac=False, power2=False)
+                            }
+                    returningJson[counter] = dico
                 except ValueError as e:
                     print("error printing: " + str(e))
-                    return {'error': str(e)}
-                dico = {}
-                dico = {'error': '',
-                        'FPF': str(I.FPF),
-                        'FPF_image': Config.baseURL + 'FPF/' + str(
-                            I.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
-                        'latex': I.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,
-                                             label="no", intfrac=False, power2=False)
-                        }
-                # instead of return I should add to the list I'm making
-                returningJson[counter] =dico
+                    returningJson[counter] = {'error': str(e)}
             else:
-                return {
-                    'error': "The url should contain the constant or the interval (ex '/Constant/12.44' or '/Constant/[-120;10])'"}
+                dico = {}
+                returningJson[counter] ={ 'error': "The url should contain the constant or the interval (ex '/Constant/12.44' or '/Constant/[-120;10])'"}
             counter += 1
     return returningJson
 

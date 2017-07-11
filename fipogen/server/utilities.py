@@ -145,6 +145,7 @@ def tobin(x, wl=8):
 	"""Convert an integer x in binary
 	Returns a string of it's binary representation (two's complement)
 	from : http://code.activestate.com/recipes/219300-format-integer-as-binary-string/ """
+	x = int(x)
 	return "".join(map(lambda y: str((x >> y) & 1), range(wl-1, -1, -1)))
 
 def returnDictionaryConstant(C):
@@ -152,8 +153,8 @@ def returnDictionaryConstant(C):
 	if float(C.value) != 0:
 		dico = {'error': '',
 				'FPF': str(C.FPF),
-				'integer': C.mantissa,
-				'lsb': C.FPF.lsb,
+				'integer': nstr(C.mantissa),
+				'lsb': str(C.FPF.lsb),
 				'bits': tobin(C.mantissa, C.FPF.wl),
 				'FPF_image': Config.baseURL + 'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
 				'approx': nstr(C.approx),
@@ -164,8 +165,8 @@ def returnDictionaryConstant(C):
 	else:
 		dico = {'error': '',
 				'FPF': str(C.FPF),
-				'integer': C.mantissa,
-				'lsb': C.FPF.lsb,
+				'integer': nstr(C.mantissa),
+				'lsb': str(C.FPF.lsb),
 				'bits': tobin(C.mantissa, C.FPF.wl),
 				'FPF_image': Config.baseURL + 'FPF/' + str(
 					C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(
