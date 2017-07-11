@@ -78,7 +78,23 @@ function validate()
 				html += "</tr>";
 			}
 			html += "</table>";
-			console.log(html);
+
+			/*Table for images: */
+			html += "<table style=\"width:100%\">\n";
+			html += "<tr>\n<th>number</th>\n <th>Image</th></tr>";
+			for(i=0; i < Object.keys(data).length; i++)
+			{
+			    html += "<tr>"
+				html += "<td>" + ci_s[i]+ "</td>";
+			    //TODO: check if the link will later on cause a problem: Ask Hilaire
+			    console.log(data[i]["FPF_image"])
+				console.log("<td>" + "<img src=" + data[i]["FPF_image"] + " alt=" + "Mountain View" +"style=" + "width:304px;height:228px;\">" + "</td>\n");
+			    html += "<td>" + "<a href=\"" + data[i]["FPF_image"] +"\">" + "<img src=" + data[i]["FPF_image"] + " alt=" + "Mountain View"+ "/>"+ "</td>\n";
+				html += "</tr>";
+			}
+			html += "</table>";
+
+
 			$("#result").html(html);
 		}
 
