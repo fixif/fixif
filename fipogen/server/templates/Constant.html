@@ -20,8 +20,6 @@ function validate()
 	    	ci+="-"
 		}
 	}
-	console.log("ci suit: ")
-	console.log(ci);
 	var wl = $('#wl').val();		// get the wordlength/FPF
 	/* build the query */
 	var q = '{{base_url}}Constant/' + ci + '?';
@@ -32,7 +30,7 @@ function validate()
 	/* get the json */
 	$.ajax({ url: q}).done( function( data)
 	{
-	    console.log(data["0"]);
+	    console.log(data);
 	    //console.log("before if");
 		if (data["0"]["error"])
 		{
@@ -67,11 +65,13 @@ function validate()
 //
 			html = "";
 			html = "<table style=\"width:100%\">\n";
-			html += "<tr>\n<th>Const/Interval</th>\n<th>FPF</th>\n<th>Absolute Error</th>\n<th>Real Error</th>\n</tr>";
+			html += "<tr>\n<th>Const/Interval</th>\n <th>Mentissa</th> \n<th>LSB</th>>\n <th>FPF</th>\n<th>Absolute Error</th>\n<th>Real Error</th>\n</tr>";
 			for(i=0; i < Object.keys(data).length; i++)
 			{
 			    html += "<tr>"
 				html += "<td>" + ci_s[i]+ "</td>";
+			    html += "<td>" + data[i]["integer"]+ "</td>\n";
+			    html += "<td>" + data[i]["lsb"]+ "</td>\n";
 				html += "<td>" + data[i]["FPF"]+ "</td>\n";
 				html += "<td>" + data[i]["error_abs"]+ "</td>\n";
 				html += "<td>" + data[i]["error_rel"] + "</td>\n";
@@ -100,9 +100,8 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	<!-- form -->
 	<form method="POST" action="javascript:validate();" id="form">
 		<label for="ci">Constants:</label><br><textarea class="yesno" id="ci" rows="5" cols="10" required onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this);"/></textarea></br>
-		<label for="wl">If you wish to add a word length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
-		<input type="submit"/><br>
-			if not we will choose the best word length for you. </label>
+		<label for="wl">Word Length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
+		<input type="submit"/> </label>
 
 	</form>
 	</div>

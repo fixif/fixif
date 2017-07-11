@@ -19,6 +19,7 @@ from fipogen.FxP import Constant
 # utilities and path definition
 from fipogen.server.utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin
 from fipogen.server.path import Config  # paths
+from fipogen.server.utilities import returnDictionaryConstant
 
 from operator import attrgetter
 from functools import wraps  # use to wrap a logger for bottle
@@ -27,7 +28,8 @@ import re
 import json
 from logging import getLogger
 
-# from mpmath
+
+
 from mpmath import nstr
 
 # weblogger
@@ -183,7 +185,6 @@ def Constant_service(constantsInter):
 		error_rel: relative error"""
     # get the FPF
     q = request.query
-    print("constantsInter: " + constantsInter)
     if "FPF" in q:
         try:
             F = FPF(formatStr=q["FPF"])
@@ -210,52 +211,40 @@ def Constant_service(constantsInter):
     # todo cont.: for new line in constInter do the following lines
 
     returningJson={}
+    boolConst = False
+    boolInterval = False
     counter = 0
     for constInter in constantsInter.split("-"):
         if len(constInter) != 0:
             const = reobj_constant.match(constInter)
             inter = reobj_interval.match(constInter)
-            boolConstant = False
+            boolConst = False
             boolInterval = False
             try:
-                const
                 if const is not None:
-                    boolConstant = True
-            except NameError:
+                    boolConst = True
+                else:
+                    boolConst = False
+            except:
                 print("")
             try:
-                inter
                 if inter is not None:
                     boolInterval = True
-            except NameError:
+            except:
                 print("")
 
             # get the constant
-            if boolConstant:
+            if boolConst is True:
                 try:
                     C = Constant(value=const.string, wl=WL, signed=signed, fpf=F)
                 except ValueError as e:
                     print(str(e)) # Todo: delete
                     return {'error': str(e)}
                 dico = {}
-                dico = {'error': '',
-                        'FPF': str(C.FPF),
-                        'integer': C.mantissa,
-                        'lsb': C.FPF.lsb,
-                        'bits': tobin(C.mantissa, C.FPF.wl),
-                        'FPF_image': Config.baseURL + 'FPF/' + str(
-                            C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(
-                            C.mantissa, C.FPF.wl),
-                        'approx': nstr(C.approx),
-                        'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,
-                                             label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
-                        'error_abs': nstr(float(C.value) - C.approx),
-                        'error_rel': nstr((float(C.value) - C.approx) / (float(C.value))), # Todo: for 0 you will have an exception!
-                        }
+                dico = returnDictionaryConstant(C)
                 # instead of return I should add to the list I'm making
                 returningJson[counter] = dico
-            # or get the interval
-            elif boolInterval:
+            elif boolInterval is True:
                 try:
                     val_inf = float(inter.group(1))
                     val_sup = float(inter.group(2))
@@ -263,8 +252,11 @@ def Constant_service(constantsInter):
                 except:
                     return {'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
                 try:
+                    print("before I")
                     I = Variable.Variable(value_inf=val_inf, value_sup=val_sup, wl=WL, signed=signed, fpf=F)
+                    print("after I")
                 except ValueError as e:
+                    print("error printing: " + str(e))
                     return {'error': str(e)}
                 dico = {}
                 dico = {'error': '',

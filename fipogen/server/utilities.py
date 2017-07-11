@@ -10,6 +10,8 @@ from bottle import static_file
 
 from fipogen.server.path import Config
 
+from mpmath import nstr
+
 import logging
 
 # Define the colors for the different color themes (named "BW" and "YG" for the moment)
@@ -144,3 +146,34 @@ def tobin(x, wl=8):
 	Returns a string of it's binary representation (two's complement)
 	from : http://code.activestate.com/recipes/219300-format-integer-as-binary-string/ """
 	return "".join(map(lambda y: str((x >> y) & 1), range(wl-1, -1, -1)))
+
+def returnDictionaryConstant(C):
+	dico = {}
+	if float(C.value) != 0:
+		dico = {'error': '',
+				'FPF': str(C.FPF),
+				'integer': C.mantissa,
+				'lsb': C.FPF.lsb,
+				'bits': tobin(C.mantissa, C.FPF.wl),
+				'FPF_image': Config.baseURL + 'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
+				'approx': nstr(C.approx),
+				'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
+				'error_abs': nstr(float(C.value) - C.approx),
+				'error_rel': nstr((float(C.value) - C.approx) / (float(C.value))),
+				}
+	else:
+		dico = {'error': '',
+				'FPF': str(C.FPF),
+				'integer': C.mantissa,
+				'lsb': C.FPF.lsb,
+				'bits': tobin(C.mantissa, C.FPF.wl),
+				'FPF_image': Config.baseURL + 'FPF/' + str(
+					C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(
+					C.mantissa, C.FPF.wl),
+				'approx': nstr(C.approx),
+				'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,
+									 label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
+				'error_abs': str(0),
+				'error_rel': str(0),
+				}
+	return dico
