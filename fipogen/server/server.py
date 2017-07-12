@@ -208,8 +208,6 @@ def Constant_service(constantsInter):
     else:
         signed = True
 
-    # todo cont.: for new line in constInter do the following lines
-
     returningJson={}
 
     counter = 0

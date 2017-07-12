@@ -150,31 +150,15 @@ def tobin(x, wl=8):
 
 def returnDictionaryConstant(C):
 	dico = {}
-	if float(C.value) != 0:
-		dico = {'error': '',
-				'FPF': str(C.FPF),
-				'integer': nstr(C.mantissa),
-				'lsb': str(C.FPF.lsb),
-				'bits': tobin(C.mantissa, C.FPF.wl),
-				'FPF_image': Config.baseURL + 'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
-				'approx': nstr(C.approx),
-				'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
-				'error_abs': nstr(float(C.value) - C.approx),
-				'error_rel': nstr((float(C.value) - C.approx) / (float(C.value))),
-				}
-	else:
-		dico = {'error': '',
-				'FPF': str(C.FPF),
-				'integer': nstr(C.mantissa),
-				'lsb': str(C.FPF.lsb),
-				'bits': tobin(C.mantissa, C.FPF.wl),
-				'FPF_image': Config.baseURL + 'FPF/' + str(
-					C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(
-					C.mantissa, C.FPF.wl),
-				'approx': nstr(C.approx),
-				'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,
-									 label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
-				'error_abs': str(0),
-				'error_rel': str(0),
-				}
+	dico = {'error': '',
+			'FPF': str(C.FPF),
+			'integer': nstr(C.mantissa),
+			'lsb': str(C.FPF.lsb),
+			'bits': tobin(C.mantissa, C.FPF.wl),
+			'FPF_image': Config.baseURL + 'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
+			'approx': nstr(C.approx),
+			'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
+			'error_abs': nstr(C.absError),
+			'error_rel': nstr(C.realError),
+			}
 	return dico

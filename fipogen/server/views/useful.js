@@ -110,24 +110,31 @@ function verifyConstIntLines(inputStr)
 	/*Contains each lines of the text entered*/
 	var arrStrs = inputStr.value.split('\n');
 	/*Returning error is the problem with the last entered value*/
-	var ret;
-	for(i =0; i < arrStrs.length; i++)
+	var ret = "" ;
+	for(var i =0; i < arrStrs.length; i++)
 	{
 		if(arrStrs[i]!= "")
 		{
-			ret = msgValidConstInterval(arrStrs[i]);
-			console.log(arrStrs[i]);
-			console.log(ret);
+			var result= msgValidConstInterval(arrStrs[i]);
+			if(result.length > 0)
+				ret = result;
 		}
 	}
 	inputStr.setCustomValidity(ret);
 }
 function verifyEachChar(inputStr)
 {
-	console.log("The last char suit:");
-	console.log((inputStr.value.charAt(inputStr.value.length-3)));
-	// if((inputStr.value.charAt(inputStr.value.length-1) <= '0' || inputStr.value.charAt(inputStr.value.length-1) >='9') && (inputStr.value.charAt(inputStr.value.length-1) != '\n' || inputStr.value.charAt(inputStr.value.length-1)!= '.'))
-	// 	inputStr.setCustomValidity('Entered character is not a number')
-	inputStr.setCustomValidity(1)
+    var lastChar = inputStr.value.charAt(inputStr.value.length-1);
+    console.log("The last char suit:");
+    console.log(inputStr.value.length);
+    console.log(lastChar);
+	if((lastChar < '0' || lastChar > '9') && (lastChar!= '\n' && lastChar != '.'))
+	{
+        inputStr.setCustomValidity('Entered character is not a number');
+    }
+    else
+	{
+		verifyConstIntLines(inputStr);
+	}
 
 }

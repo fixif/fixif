@@ -6,21 +6,76 @@
 <script>
 
 /* called when the form is submitted; call the image */
-function validate()
+
+function checkSubmit()
 {
-    /*Making of ci_s*/
-	//var ci = $('#ci').val();// get the constant/interval
-	var ci_s = $('#ci').val().split("\n");
-	var ci = "";
-	//todo: use join
-	for(i = 0; i < ci_s.length; i++)
+
+    if( $('#text').val().length == 0 &&  $('#fileupload').val().length == 0 )
 	{
-	    if(ci_s[i].length!= 0)
+	    alert("You must either upload a file or enter the constants manually!");
+	}
+	else if($('#text').val().length != 0 &&  $('#fileupload').val().length != 0 )
+	{
+	    alert("You can't upload a file and enter constants manually at the same time!");
+	}
+	else
+	{
+	    /*Input is given by text area*/
+	    if($('#text').val().length != 0 )
 		{
-	    	ci+= ci_s[i];
-	    	ci+="@" //todo: change the char @
+		    var ci_s = $('#ci').val().split("\n");
+			var ci = "";
+			//todo: use join
+			for(var i = 0; i < ci_s.length; i++)
+			{
+	    		if(ci_s[i].length!= 0)
+				{
+	    			ci+= ci_s[i];
+	    			ci+="@" //todo: change the char @
+				}
+			}
+
+	    	validate(ci, ci_s);
+		}
+		/*Input is given by file*/
+	    else
+		{
+			var doc = document.getElementById("fileupload");
+			var reader = new FileReader();
+			var resultingString;
+			for(var i = 0; i < doc.files.length; i++)
+			{
+			    var file = doc.files[i];
+				reader.readAsText(file);
+        		$(reader).on('load', processFile);
+			}
+
+
 		}
 	}
+}
+function processFile(e) {
+    var file = e.target.result,
+        results;
+    if (file && file.length) {
+        results = file.split("\n");
+        var ci = "";
+			//todo: use join
+			for(var i = 0; i < results.length; i++)
+			{
+	    		if(results[i].length!= 0)
+				{
+	    			ci+= results[i];
+	    			ci+="@" //todo: change the char @
+				}
+			}
+
+	    	validate(ci, results);
+    }
+}
+function validate(ci, ci_s)
+{
+    /*Making of ci_s*/
 	var wl = $('#wl').val();		// get the wordlength/FPF
 	/* build the query */
 	var q = '{{base_url}}Constant/' + ci + '?';
@@ -31,9 +86,6 @@ function validate()
 	/* get the json */
 	$.ajax({ url: q}).done( function( data)
 	{
-	    console.log("Data:");
-	    console.log(data);
-	    console.log("Afterwards!")
 		html = "";
 		html = "<table style=\"width:100%\">\n";
 		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mentissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n</tr>";
@@ -94,9 +146,10 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 <div class="container">
 	<div>
 	<!-- form -->
-	<form method="POST" action="javascript:validate();" id="form">
-		<label for="ci">Constants:</label><br><textarea class="yesno" style ="overflow:inherit" id="ci" rows="5" cols="10" required onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this);"/></textarea></br>
+	<form method="POST" action="javascript:checkSubmit();" id="form">
+		<label for="ci">Constants:</label><br><textarea id="text" class="yesno" style ="overflow:inherit" id="ci" rows="5" cols="10" onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/></textarea></br>
 		<label for="ci">Or upload the file containing constants and intervals:</label>
+		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload"><br>
 		<label for="wl">Word Length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
 		<input type="submit"/> </label>
 
