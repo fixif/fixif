@@ -112,7 +112,14 @@ function validate(ci, ci_s)
                 html += startStr + data[i]["FPF"] + "</td>\n";
                 html += startStr + data[i]["error_abs"] + "</td>\n";
                 html += startStr + data[i]["error_rel"] + "</td>\n";
-                html += startStr + data[i]["error"] + "</td>\n";
+                if(data[i]['error'])
+				{
+                	html += startStr + data[i]["error"] + "</td>\n";
+				}
+				else
+				{
+				    html += startStr + "No error" + "</td>\n";
+				}
            		 html += "</tr>";
 		}
 		html += "</table>";

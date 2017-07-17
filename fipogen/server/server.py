@@ -246,20 +246,20 @@ def Constant_service(constantsInter):
                     else:
                         wlForInt = F.wl
 
-                    C = Constant(value=str(val_sup), wl=wlForInt)
-                    if(float(Constant(value=str(val_inf), wl=WL).FPF.msb) > float(C.FPF.msb)):
-                        C = Constant(value=str(val_inf), wl=wlForInt)
+                    C = Constant(value=val_sup, wl=wlForInt)
+                    if(float(Constant(value=val_inf, wl=wlForInt).FPF.msb) > float(C.FPF.msb)):
+                        C = Constant(value=val_inf, wl=wlForInt)
 
                     dico = {}
-
-                    dico = {'error': '',
-                            'FPF': str(C.FPF),
-                            'FPF_image': Config.baseURL + 'FPF/' + str(
-                                C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
-                            'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"],
-                                                 binary_point=True,
-                                                 label="no", intfrac=False, power2=False)
-                            }
+                    dico = returnDictionaryConstant(C)
+                    # dico = {'error': '',
+                    #         'FPF': str(C.FPF),
+                    #         'FPF_image': Config.baseURL + 'FPF/' + str(
+                    #             C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
+                    #         'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"],
+                    #                              binary_point=True,
+                    #                              label="no", intfrac=False, power2=False)
+                    #         }
                     #Todo: Until here!
                     returningJson[counter] = dico
                 except ValueError as e:
