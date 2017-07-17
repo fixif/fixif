@@ -224,8 +224,12 @@ def Constant_service(constantsInter):
                     dico = returnDictionaryConstant(C)
                     returningJson[counter] = dico
                 except ValueError as e:
-                    print(str(e)) # Todo: delete
-                    returningJson[counter] = {'error': str(e)}
+                    Cs = Constant(value=const.string, wl=F.wl, signed=signed)
+                    dico= {}
+                    dico = returnDictionaryConstant(Cs)
+                    errStr = "Not possible with the asked FPF; suggestion: " + str(Cs.FPF)
+                    dico["error"] = errStr;
+                    returningJson[counter] = dico
             elif inter:
                 try:
                     val_inf = float(inter.group(1))
@@ -234,16 +238,29 @@ def Constant_service(constantsInter):
                 except:
                     returningJson[counter] = {'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
                 try:
-                    I = Variable.Variable(value_inf=val_inf, value_sup=val_sup, wl=WL, signed=signed, fpf=F)
+                    # I = Variable.Variable(value_inf=val_inf, value_sup=val_sup, wl=WL, signed=signed, fpf=F)
+                    #Todo: IDK whether the following lines make any sense or not!
+
+                    if(F is None):
+                        wlForInt = WL
+                    else:
+                        wlForInt = F.wl
+
+                    C = Constant(value=str(val_sup), wl=wlForInt)
+                    if(float(Constant(value=str(val_inf), wl=WL).FPF.msb) > float(C.FPF.msb)):
+                        C = Constant(value=str(val_inf), wl=wlForInt)
+
                     dico = {}
+
                     dico = {'error': '',
-                            'FPF': str(I.FPF),
+                            'FPF': str(C.FPF),
                             'FPF_image': Config.baseURL + 'FPF/' + str(
-                                I.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
-                            'latex': I.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"],
+                                C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
+                            'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"],
                                                  binary_point=True,
                                                  label="no", intfrac=False, power2=False)
                             }
+                    #Todo: Until here!
                     returningJson[counter] = dico
                 except ValueError as e:
                     print("error printing: " + str(e))

@@ -5,55 +5,51 @@
 <script src="{{base_url}}useful.js"></script>
 <script>
 
-/* called when the form is submitted; call the image */
-
-function checkSubmit()
+/* Loads and processes the text in the .txt uploaded file. */
+function loadTxt()
 {
+    var doc = document.getElementById("fileupload");
+    var reader = new FileReader();
+    var file = doc.files[0];
 
-    if( $('#text').val().length == 0 &&  $('#fileupload').val().length == 0 )
-	{
-	    alert("You must either upload a file or enter the constants manually!");
-	}
-	else if($('#text').val().length != 0 &&  $('#fileupload').val().length != 0 )
-	{
-	    alert("You can't upload a file and enter constants manually at the same time!");
-	}
-	else
-	{
-	    /*Input is given by text area*/
-	    if($('#text').val().length != 0 )
-		{
-		    var ci_s = $('#ci').val().split("\n");
-			var ci = "";
+    reader.readAsText(file);
+    $(reader).on('load', fillUpTxtArea);
+
+ }
+ /* Disables upload option when some text is entered in text area. */
+ function disableUpload()
+ {
+     console.log("changed");
+     if( $('#text').val().length != 0)
+	     document.getElementById("fileupload").disabled = true;
+     else
+         document.getElementById("fileupload").disabled = false;
+ }
+
+ /* Fills up text area with content of uploaded text in input file. */
+function fillUpTxtArea(e)
+{
+    console.log("in fill up")
+    var file = e.target.result,
+        results;
+    if (file && file.length) {
+        results = file.split("\n");
+        var ci = "";
 			//todo: use join
-			for(var i = 0; i < ci_s.length; i++)
+			for(var i = 0; i < results.length; i++)
 			{
-	    		if(ci_s[i].length!= 0)
+	    		if(results[i].length!= 0)
 				{
-	    			ci+= ci_s[i];
-	    			ci+="@" //todo: change the char @
+	    			ci+= results[i];
+	    			ci+="@" ;//todo: change the char @
 				}
 			}
+			console.log(results.join("\n"));
 
-	    	validate(ci, ci_s);
-		}
-		/*Input is given by file*/
-	    else
-		{
-			var doc = document.getElementById("fileupload");
-			var reader = new FileReader();
-			var resultingString;
-			for(var i = 0; i < doc.files.length; i++)
-			{
-			    var file = doc.files[i];
-				reader.readAsText(file);
-        		$(reader).on('load', processFile);
-			}
-
-
-		}
-	}
+			$("textarea#text").val(results.join("\n"));
+    }
 }
+/* The function that processes the content uploaded in the file upload input */
 function processFile(e) {
     var file = e.target.result,
         results;
@@ -66,15 +62,23 @@ function processFile(e) {
 	    		if(results[i].length!= 0)
 				{
 	    			ci+= results[i];
-	    			ci+="@" //todo: change the char @
+	    			ci+="@" ;//todo: change the char @
 				}
 			}
+			console.log(results.join("\n"));
 
+			$("textarea#text").val(results.join("\n"));
 	    	validate(ci, results);
     }
 }
+
+/* called when the form is submitted; call the image */
 function validate(ci, ci_s)
 {
+    var ci_s = $('#text').val().split("\n");
+	var ci = "";
+	//todo: use join
+	ci = ci_s.join("@");
     /*Making of ci_s*/
 	var wl = $('#wl').val();		// get the wordlength/FPF
 	/* build the query */
@@ -88,24 +92,28 @@ function validate(ci, ci_s)
 	{
 		html = "";
 		html = "<table style=\"width:100%\">\n";
-		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mentissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n</tr>";
+		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mentissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n <th align = left>Status</th>\n </tr>";
 		for(i=0; i < Object.keys(data).length; i++)
 		{
 		    html += "<tr>"
 			html += "<td>" + ci_s[i]+ "</td>";
-		    if(!data[i]['error'])
+
+		    var startStr = "<td>"
+		    if(data[i]['error'])
 		    {
-                html += "<td>" + data[i]["integer"] + "</td>\n";
-                html += "<td>" + data[i]["lsb"] + "</td>\n";
-                html += "<td>" + data[i]["FPF"] + "</td>\n";
-                html += "<td>" + data[i]["error_abs"] + "</td>\n";
-                html += "<td>" + data[i]["error_rel"] + "</td>\n";
-            }
-            else
+		        startStr = "<td style=\"color:darkred\">";
+		    }
+		    else
 			{
-				html += "<td>" + data[i]['error'] + "</td>\n";
+			    startStr = "<td>";
 			}
-            html += "</tr>";
+                html += startStr + data[i]["integer"] + "</td>\n";
+                html += startStr + data[i]["lsb"] + "</td>\n";
+                html += startStr + data[i]["FPF"] + "</td>\n";
+                html += startStr + data[i]["error_abs"] + "</td>\n";
+                html += startStr + data[i]["error_rel"] + "</td>\n";
+                html += startStr + data[i]["error"] + "</td>\n";
+           		 html += "</tr>";
 		}
 		html += "</table>";
 		/*Table for images: */
@@ -115,14 +123,13 @@ function validate(ci, ci_s)
 		{
 		    html += "<tr>"
 			html += "<td  align = left >" + ci_s[i]+ "</td>";
-		    //TODO: check if the link will later on cause a problem: Ask Hilaire
 			if(!data[i]['error'])
 			{
                 html += "<td  align = left >" + "<a href=\"" + data[i]["FPF_image"] + "\">" + "<img src=" + data[i]["FPF_image"] + " alt=" + "Loading..." + "style=\"width:128px;height:128px;\"	"+"/>" + "</td>\n";
             }
             else
 			{
-				html += "<td>" + data[i]['error'] + "</td>\n";
+				html += "<td>" + "<p style=\"color:darkred\" >" + data[i]['error'] + "</p>" +"</td>\n";
 			}
 			html += "</tr>";
 		}
@@ -146,10 +153,10 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 <div class="container">
 	<div>
 	<!-- form -->
-	<form method="POST" action="javascript:checkSubmit();" id="form">
-		<label for="ci">Constants:</label><br><textarea id="text" class="yesno" style ="overflow:inherit" id="ci" rows="5" cols="10" onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/></textarea></br>
-		<label for="ci">Or upload the file containing constants and intervals:</label>
-		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload"><br>
+	<form method="POST" action="javascript:validate();" id="form">
+		<label>Constants:</label><br><textarea id="text" class="yesno" style ="overflow:inherit" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/></textarea></br>
+		<label>Or upload the file containing constants and intervals:</label>
+		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'><br>
 		<label for="wl">Word Length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
 		<input type="submit"/> </label>
 
