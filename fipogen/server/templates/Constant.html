@@ -5,6 +5,12 @@
 <script src="{{base_url}}useful.js"></script>
 <script>
 
+function clearUpload()
+{
+    $("#fileupload").val('');
+    $("#text").val('');
+}
+
 /* Loads and processes the text in the .txt uploaded file. */
 function loadTxt()
 {
@@ -24,6 +30,25 @@ function loadTxt()
 	     document.getElementById("fileupload").disabled = true;
      else
          document.getElementById("fileupload").disabled = false;
+
+//     var ci_s = $('#text').val().split("\n");
+//     var resultingString = "";
+//     for(var i =0; i < ci_s.length; i++)
+//	 {
+//	     if(ci_s[i].match(expC) || ci_s[i].match(expI))
+//		 {
+//		     resultingString+= "<span style=\"color:green;\">" + ci_s[i] + "\n" +"</span>";
+//		 }
+//		 else
+//		 {
+//		     if(ci_s[i].length >0)
+//			     resultingString += ci_s[i] + "\n";
+//		 }
+//	 }
+//	 //$("textarea#text").val(resultingString);
+//	 $("textarea#text").val($(resultingString).html());
+
+
  }
 
  /* Fills up text area with content of uploaded text in input file. */
@@ -161,9 +186,11 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	<div>
 	<!-- form -->
 	<form method="POST" action="javascript:validate();" id="form">
-		<label>Constants:</label><br><textarea id="text" class="yesno" style ="overflow:inherit" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/></textarea></br>
+		<label>Constants:</label><br>
+		<textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br>
 		<label>Or upload the file containing constants and intervals:</label>
-		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'><br>
+		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
+		<button id="file-reset" type="button" onclick="clearUpload()">Reset file</button><br>
 		<label for="wl">Word Length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
 		<input type="submit"/> </label>
 
