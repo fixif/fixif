@@ -5,10 +5,12 @@
 <script src="{{base_url}}useful.js"></script>
 <script>
 
+/* Clears the uplaoded file */
 function clearUpload()
 {
     $("#fileupload").val('');
-    $("#text").val('');
+    $("#fileupload").disabled = false;
+    $("#text").html('');
 }
 
 /* Loads and processes the text in the .txt uploaded file. */
@@ -25,33 +27,67 @@ function loadTxt()
  /* Disables upload option when some text is entered in text area. */
  function disableUpload()
  {
-     console.log("changed");
-     if( $('#text').val().length != 0)
+     console.log($('#text').val());
+     if( $('#text').text().toString().length != 0)
 	     document.getElementById("fileupload").disabled = true;
      else
          document.getElementById("fileupload").disabled = false;
 
-//     var ci_s = $('#text').val().split("\n");
-//     var resultingString = "";
-//     for(var i =0; i < ci_s.length; i++)
-//	 {
-//	     if(ci_s[i].match(expC) || ci_s[i].match(expI))
-//		 {
-//		     resultingString+= "<span style=\"color:green;\">" + ci_s[i] + "\n" +"</span>";
-//		 }
-//		 else
-//		 {
-//		     if(ci_s[i].length >0)
-//			     resultingString += ci_s[i] + "\n";
-//		 }
-//	 }
-//	 //$("textarea#text").val(resultingString);
-//	 $("textarea#text").val($(resultingString).html());
-
-
  }
+ /* Validates the data in text area and changes the color of correct ones to green. */
+function validateTextArea()
+{
+    console.log("in clickSubmit text area:");
+    console.log($('#text').html().toString());
 
- /* Fills up text area with content of uploaded text in input file. */
+    console.log("text: ");
+    var text = $('#text').html().toString();
+    console.log(text);
+    var htmlTagsRegex = /(<([^>]+)>)/ig
+	text = text.replace(htmlTagsRegex, "\n");
+    text = text.replace(/&nbsp/, "\n");
+	console.log(text);
+
+     var rawArray =text.split("\n");
+     var ci_s = [];
+     var resultingString = "";
+
+     for(var i=0; i < rawArray.length; i++)
+	 {
+	     for(var j = 0; j < rawArray[i].split(" ").length; j++)
+		 {
+		     ci_s[ci_s.length]=rawArray[i].split(" ")[j];
+//		     console.log("ci_s[] : ");
+//             console.log(ci_s[i]);
+
+             ci_s[ci_s.length-1] = ci_s[ci_s.length-1].trim();
+//             console.log("ci_s[] 2: ");
+//			 console.log(ci_s[i]);
+         }
+     }
+
+    for(var i =0; i < ci_s.length; i++)
+
+	{
+	     if(ci_s[i].match(expC) || ci_s[i].match(expI))
+		 {
+		     resultingString+= "<span style=\"color:green;\">" + ci_s[i] +"\n"+ "<br></span>";
+		 }
+		 else
+		 {
+		     if(ci_s[i].length >0)
+			     resultingString += "<span style=\"color:darkred;\">" + ci_s[i] + "\n"+ "<br></span>";
+		 }
+	 }
+	 resultingString+= "<br>"
+
+	 //$("#text").html(resultingString);
+	console.log("inside div: ");
+	console.log(resultingString);
+	 $('#text').html(resultingString);
+}
+
+ /* Loads the text in the uploaded text file and fills up the text area with its content. */
 function fillUpTxtArea(e)
 {
     console.log("in fill up")
@@ -71,38 +107,18 @@ function fillUpTxtArea(e)
 			}
 			console.log(results.join("\n"));
 
-			$("textarea#text").val(results.join("\n"));
+			$("#text").html(results.join("\n"));
+			validateTextArea();
     }
 }
-/* The function that processes the content uploaded in the file upload input */
-function processFile(e) {
-    var file = e.target.result,
-        results;
-    if (file && file.length) {
-        results = file.split("\n");
-        var ci = "";
-			//todo: use join
-			for(var i = 0; i < results.length; i++)
-			{
-	    		if(results[i].length!= 0)
-				{
-	    			ci+= results[i];
-	    			ci+="@" ;//todo: change the char @
-				}
-			}
-			console.log(results.join("\n"));
 
-			$("textarea#text").val(results.join("\n"));
-	    	validate(ci, results);
-    }
-}
 
 /* called when the form is submitted; call the image */
-function validate(ci, ci_s)
+function clickSubmit(ci, ci_s)
 {
-    var ci_s = $('#text').val().split("\n");
+    //var ci_s = $('#text').val().split("\n");
+	var	ci_s = $('#text').text().toString().split("\n");
 	var ci = "";
-	//todo: use join
 	ci = ci_s.join("@");
     /*Making of ci_s*/
 	var wl = $('#wl').val();		// get the wordlength/FPF
@@ -185,9 +201,12 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 <div class="container">
 	<div>
 	<!-- form -->
-	<form method="POST" action="javascript:validate();" id="form">
-		<label>Constants:</label><br>
-		<textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br>
+	<form method="POST" action="javascript:clickSubmit();" id="form">
+		<label>Constants:</label>
+		<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
+		<div contenteditable="true" id="text" name="text" oninput="disableUpload();" onkeyup="if(event.keyCode == 13 || event.keyCode == 8) validateTextArea() " style="width:500px;height: 100px; padding:1px;border:lightgrey 2px inset; overflow:hidden;overflow-y:scroll;">
+		<br />
+		</div>
 		<label>Or upload the file containing constants and intervals:</label>
 		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
 		<button id="file-reset" type="button" onclick="clearUpload()">Reset file</button><br>

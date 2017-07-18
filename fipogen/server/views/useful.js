@@ -138,3 +138,8 @@ function verifyEachChar(inputStr)
 	}
 
 }
+
+function processDiv()
+{
+
+}
