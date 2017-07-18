@@ -238,33 +238,31 @@ def Constant_service(constantsInter):
                 except:
                     returningJson[counter] = {'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
                 try:
-                    # I = Variable.Variable(value_inf=val_inf, value_sup=val_sup, wl=WL, signed=signed, fpf=F)
-                    #Todo: IDK whether the following lines make any sense or not!
-
-                    if(F is None):
-                        wlForInt = WL
+                    print("in try")
+                    if WL:
+                        print("in if wl")
+                        C = Constant(value=val_sup, wl=WL)
+                        if (float(Constant(value=val_inf, wl=WL).FPF.msb) > float(C.FPF.msb)):
+                            C = Constant(value=val_inf, wl=WL)
                     else:
-                        wlForInt = F.wl
+                        print("in else")
+                        C = Constant(value=val_sup, fpf=F)
+                        if (float(Constant(value=val_inf, fpf=F).FPF.msb) > float(C.FPF.msb)):
+                            C = Constant(value=val_inf, fpf=F)
 
-                    C = Constant(value=val_sup, wl=wlForInt)
-                    if(float(Constant(value=val_inf, wl=wlForInt).FPF.msb) > float(C.FPF.msb)):
-                        C = Constant(value=val_inf, wl=wlForInt)
 
                     dico = {}
                     dico = returnDictionaryConstant(C)
-                    # dico = {'error': '',
-                    #         'FPF': str(C.FPF),
-                    #         'FPF_image': Config.baseURL + 'FPF/' + str(
-                    #             C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=none&intfrac=no&power2=no',
-                    #         'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"],
-                    #                              binary_point=True,
-                    #                              label="no", intfrac=False, power2=False)
-                    #         }
-                    #Todo: Until here!
                     returningJson[counter] = dico
-                except ValueError as e:
-                    print("error printing: " + str(e))
-                    returningJson[counter] = {'error': str(e)}
+                except ValueError as e:  # None of the interval values could be represented with the given format
+                    Cs = Constant(value=val_sup, wl=F.wl, signed=signed)
+                    if float(Constant(value=val_inf, wl=F.wl).FPF.msb) > float(Cs.FPF.msb):
+                        Cs = Constant(value=val_inf, wl=F.wl)
+                    dico = {}
+                    dico = returnDictionaryConstant(Cs)
+                    errStr = "Not possible with the asked FPF; suggestion: " + str(Cs.FPF)
+                    dico["error"] = errStr;
+                    returningJson[counter] = dico
             else:
                 dico = {}
                 returningJson[counter] ={ 'error': "The url should contain the constant or the interval (ex '/Constant/12.44' or '/Constant/[-120;10])'"}

@@ -139,7 +139,26 @@ function verifyEachChar(inputStr)
 
 }
 
-function processDiv()
+function processDiv(text)
 {
+    var htmlTagsRegex = /(<([^>]+)>)/ig
+	text = text.replace(htmlTagsRegex, "\n");
+    //text = text.replace(/&nbsp/, "");
+	text = text.replace("&nbsp;", "");
+
+     var rawArray =text.split("\n");
+     var ci_s = [];
+
+     for(var i=0; i < rawArray.length; i++)
+	 {
+	     for(var j = 0; j < rawArray[i].split(" ").length; j++)
+		 {
+		     ci_s[ci_s.length]=rawArray[i].split(" ")[j];
+             ci_s[ci_s.length-1] = ci_s[ci_s.length-1].trim();
+             console.log("ci_s in func: ");
+             console.log(ci_s[ci_s.length-1]);
+         }
+     }
+     return ci_s;
 
 }

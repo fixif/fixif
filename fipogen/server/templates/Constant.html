@@ -37,39 +37,17 @@ function loadTxt()
  /* Validates the data in text area and changes the color of correct ones to green. */
 function validateTextArea()
 {
-    console.log("in clickSubmit text area:");
-    console.log($('#text').html().toString());
-
-    console.log("text: ");
+    var resultingString = ""; // The string that will hold the html tags inside the div after validation
     var text = $('#text').html().toString();
-    console.log(text);
-    var htmlTagsRegex = /(<([^>]+)>)/ig
-	text = text.replace(htmlTagsRegex, "\n");
-    text = text.replace(/&nbsp/, "\n");
+    var ci_s = processDiv(text); // returns an array of entries that were entered in the editable div except new lines, spaces...
+	console.log("text:");
 	console.log(text);
-
-     var rawArray =text.split("\n");
-     var ci_s = [];
-     var resultingString = "";
-
-     for(var i=0; i < rawArray.length; i++)
-	 {
-	     for(var j = 0; j < rawArray[i].split(" ").length; j++)
-		 {
-		     ci_s[ci_s.length]=rawArray[i].split(" ")[j];
-//		     console.log("ci_s[] : ");
-//             console.log(ci_s[i]);
-
-             ci_s[ci_s.length-1] = ci_s[ci_s.length-1].trim();
-//             console.log("ci_s[] 2: ");
-//			 console.log(ci_s[i]);
-         }
-     }
-
+	console.log("ci_s:")
+	console.log(ci_s.join("\n"));
     for(var i =0; i < ci_s.length; i++)
 
 	{
-	     if(ci_s[i].match(expC) || ci_s[i].match(expI))
+	     if(ci_s[i].match(expC) || ci_s[i].match(expI)) //if it's an interval or constants then it's correct and gets the color green
 		 {
 		     resultingString+= "<span style=\"color:green;\">" + ci_s[i] +"\n"+ "<br></span>";
 		 }
@@ -85,6 +63,10 @@ function validateTextArea()
 	console.log("inside div: ");
 	console.log(resultingString);
 	 $('#text').html(resultingString);
+
+	 var div = document.getElementById("text");
+
+
 }
 
  /* Loads the text in the uploaded text file and fills up the text area with its content. */
@@ -133,7 +115,7 @@ function clickSubmit(ci, ci_s)
 	{
 		html = "";
 		html = "<table style=\"width:100%\">\n";
-		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mentissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n <th align = left>Status</th>\n </tr>";
+		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mantissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n <th align = left>Status</th>\n </tr>";
 		for(i=0; i < Object.keys(data).length; i++)
 		{
 		    html += "<tr>"
@@ -204,8 +186,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	<form method="POST" action="javascript:clickSubmit();" id="form">
 		<label>Constants:</label>
 		<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
-		<div contenteditable="true" id="text" name="text" oninput="disableUpload();" onkeyup="if(event.keyCode == 13 || event.keyCode == 8) validateTextArea() " style="width:500px;height: 100px; padding:1px;border:lightgrey 2px inset; overflow:hidden;overflow-y:scroll;">
-		<br />
+		<div contenteditable="true" id="text" name="text" oninput="disableUpload();" onkeyup="if(event.keyCode == 13) validateTextArea() " class="text-div-editable">
 		</div>
 		<label>Or upload the file containing constants and intervals:</label>
 		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
