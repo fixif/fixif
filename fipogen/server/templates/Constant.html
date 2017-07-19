@@ -38,7 +38,56 @@ function loadTxt()
 function validateTextArea()
 {
     var resultingString = ""; // The string that will hold the html tags inside the div after validation
-    var text = $('#text').html().toString();
+	//test starts:
+	console.log("--------TESTING----------");
+	var div = document.getElementById('text');
+	var children = div.children;
+	console.log(children.length);
+	console.log("div cont suit: ");
+    console.log(div.textContent.toString());
+    console.log("child count: ");
+    console.log(div.children.length);
+    console.log("the html: ");
+    console.log(div.innerHTML.toString());
+
+    if(children.length > 2)
+    {
+        for(var i = 0; i < children.length; i++)
+        {
+            console.log(children[i].textContent);
+            if(children[i].textContent.match(expC) || children[i].textContent.match(expI))
+            {
+                children[i].style.color='green';
+            }
+            else
+            {
+                children[i].style.color='darkred';
+            }
+        }
+    }
+    else if(div.children.length == 1 && div.textContent.toString().length >0)
+    {
+//        console.log("in else");
+//        var spanEl = document.createElement("SPAN");
+//        var textEl = document.createTextNode(div.textContent.toString());
+//        spanEl.appendChild(textEl);
+//        spanEl.appendChild(document.createElement("br"));
+//        console.log(div.textContent.toString());
+//        if(div.textContent.toString().match(expC) || div.textContent.toString().match(expI))
+//        {
+//            spanEl.style.color = 'green';
+//        }
+//        else
+//        {
+//            spanEl.style.color = 'darkred';
+//        }
+//        div.textContent = "";
+//        div.appendChild(spanEl);
+
+    }
+
+    //test ends
+    /*var text = $('#text').html().toString();
     var ci_s = processDiv(text); // returns an array of entries that were entered in the editable div except new lines, spaces...
 	console.log("text:");
 	console.log(text);
@@ -62,7 +111,8 @@ function validateTextArea()
 	 //$("#text").html(resultingString);
 	console.log("inside div: ");
 	console.log(resultingString);
-	 $('#text').html(resultingString);
+	 $('#text').html(resultingString);*/
+
 
 	 var div = document.getElementById("text");
 
@@ -72,7 +122,8 @@ function validateTextArea()
  /* Loads the text in the uploaded text file and fills up the text area with its content. */
 function fillUpTxtArea(e)
 {
-    console.log("in fill up")
+    console.log("in fill up");
+    var div = document.getElementById('text');
     var file = e.target.result,
         results;
     if (file && file.length) {
@@ -85,11 +136,16 @@ function fillUpTxtArea(e)
 				{
 	    			ci+= results[i];
 	    			ci+="@" ;//todo: change the char @
+					var spanEl = document.createElement("SPAN");
+    				var textEl = document.createTextNode(results[i].toString());
+    				spanEl.appendChild(textEl);
+                    spanEl.appendChild(document.createElement("br"));
+                    div.appendChild(spanEl);
 				}
 			}
 			console.log(results.join("\n"));
 
-			$("#text").html(results.join("\n"));
+			//$("#text").html(results.join("\n"));
 			validateTextArea();
     }
 }
@@ -187,6 +243,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 		<label>Constants:</label>
 		<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
 		<div contenteditable="true" id="text" name="text" oninput="disableUpload();" onkeyup="if(event.keyCode == 13) validateTextArea() " class="text-div-editable">
+		<br>
 		</div>
 		<label>Or upload the file containing constants and intervals:</label>
 		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
