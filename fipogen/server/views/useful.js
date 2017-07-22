@@ -162,3 +162,34 @@ function processDiv(text)
      return ci_s;
 
 }
+ /* Validates the data in text area and changes the color of correct ones to green. */
+function validateTextArea()
+{
+	var div = document.getElementById('text');
+	var children = div.children;
+    console.log(div.innerHTML.toString());
+    console.log(div.innerText);
+
+    if(children.length > 2)
+    {
+        for(var i = 0; i < children.length; i++)
+        {
+            children[i].id = "child" + i;
+            //children[i].className += "yesno";
+           $("#child"+i).addClass('yesno');
+			if(children[i].textContent.match(expC) || children[i].textContent.match(expI))
+            {
+                //children[i].style.color='green';
+				children[i].setCustomValidity ='';
+            }
+            else
+            {
+                //children[i].style.color='darkred';
+				children[i].setCustomValidity ='error';
+            }
+        }
+    }
+
+	console.log(div.innerHTML.toString());
+
+}

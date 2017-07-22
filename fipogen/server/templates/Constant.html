@@ -3,230 +3,278 @@
 
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="{{base_url}}useful.js"></script>
+<script src="https://jakiestfu.github.io/Medium.js/bower_components/rangy-official/rangy-core.js"></script>
+<script src="https://jakiestfu.github.io/Medium.js/bower_components/rangy-official/rangy-classapplier.js"></script>
+<script src="https://jakiestfu.github.io/Medium.js/bower_components/undo/undo.js"></script>
+<script src="https://jakiestfu.github.io/Medium.js/medium.js"></script>
 <script>
-
-/* Clears the uplaoded file */
-function clearUpload()
-{
-    $("#fileupload").val('');
-    $("#fileupload").disabled = false;
-    $("#text").html('');
-}
-
-/* Loads and processes the text in the .txt uploaded file. */
-function loadTxt()
-{
-    var doc = document.getElementById("fileupload");
-    var reader = new FileReader();
-    var file = doc.files[0];
-
-    reader.readAsText(file);
-    $(reader).on('load', fillUpTxtArea);
-
- }
- /* Disables upload option when some text is entered in text area. */
- function disableUpload()
- {
-     console.log($('#text').val());
-     if( $('#text').text().toString().length != 0)
-	     document.getElementById("fileupload").disabled = true;
-     else
-         document.getElementById("fileupload").disabled = false;
-
- }
- /* Validates the data in text area and changes the color of correct ones to green. */
-function validateTextArea()
-{
-    var resultingString = ""; // The string that will hold the html tags inside the div after validation
-	//test starts:
-	console.log("--------TESTING----------");
-	var div = document.getElementById('text');
-	var children = div.children;
-	console.log(children.length);
-	console.log("div cont suit: ");
-    console.log(div.textContent.toString());
-    console.log("child count: ");
-    console.log(div.children.length);
-    console.log("the html: ");
-    console.log(div.innerHTML.toString());
-
-    if(children.length > 2)
+    $( window ).load(loadedDiv);
+    $("#text").ready(loadedDiv);
+    function loadedDiv()
     {
-        for(var i = 0; i < children.length; i++)
+        console.log("loaded");
+        var div = document.getElementById("text");
+        var med = new Medium({
+            element: document.getElementById("text"),
+            placeholder: "\n",
+            modifier: 'auto',
+            mode: Medium.richMode,
+            maxLength: -1,
+            autofocus: false,
+            autoHR: true,
+            modifiers: {
+                'b': 'bold',
+                'i': 'italicize',
+                'u': 'underline',
+                'v': 'paste'
+            },
+            tags: {
+                'break': 'div',
+                'paragraph': 'p',
+                'horizontalRule': 'p'
+            },
+            cssClasses: {
+                editor: 'Medium-changed',
+                pasteHook: 'Medium-paste-hook',
+                placeholder: 'Medium-placeholder',
+                clear: 'Medium-clear'
+            },
+            keyContext: {
+                'enter': function(e, element) {
+                    var sib = element.previousSibling;
+                    console.log("children: " + div.childNodes.length);
+                    console.log("html: " + div.innerHTML);
+                    if(sib.tagName != undefined)
+                    {
+                        if (sib.textContent.trim().match(expC) || sib.textContent.trim().match(expI))
+                        {
+                            sib.style.color= 'green';
+                            sib.textContent= sib.textContent.trim();
+//						sib.classList.add("yesno");
+//						sib.setCustomValidity('');
+                        }
+                        else
+                        {
+                            sib.style.color= 'darkred';
+                            sib.textContent= sib.textContent.trim();
+// sib.classList.add("yesno");
+//						sib.setCustomValidity('error: je sais pas quoi');
+                        }
+                    }
+                }
+            },
+
+
+        });
+        med.placeholder=" ";
+        //div.className="text-div-editable";
+        //med.clear();
+
+    }
+
+	/* Clears the uplaoded file */
+    function clearUpload()
+    {
+        $("#fileupload").val('');
+        $("#fileupload").disabled = false;
+        $("#text").html('');
+    }
+
+	/* Loads and processes the text in the .txt uploaded file. */
+    function loadTxt()
+    {
+        var doc = document.getElementById("fileupload");
+        var reader = new FileReader();
+        var file = doc.files[0];
+
+        reader.readAsText(file);
+        $(reader).on('load', fillUpTxtArea);
+
+    }
+	/* Disables upload option when some text is entered in text area. */
+    function disableUpload()
+    {
+        //console.log($('#text').val());
+        if( $('#text').text().toString().length != 0)
+            document.getElementById("fileupload").disabled = true;
+        else
+            document.getElementById("fileupload").disabled = false;
+
+    }
+
+	/* WORKS CORECCTLY DO NOT TOUCH. works with innerText*/
+    function validateTextArea_2()
+    {
+        var div = document.getElementById('text');
+        console.log(div.innerHTML);
+        console.log("text:-"+div.innerText+"-");
+        ci_s = div.innerText.split("\n");
+        elementsArray = [];
+        console.log("ci length: " + ci_s.length);
+
+        for(var i =0; i < ci_s.length-1; i++)
         {
-            console.log(children[i].textContent);
-            if(children[i].textContent.match(expC) || children[i].textContent.match(expI))
-            {
-                children[i].style.color='green';
-            }
+            console.log("ci-s[i]:-" + ci_s[i] +"-end");
+            var divEl = document.createElement("DIV");
+            if(ci_s[i].trim().length >0)
+                var textEl = document.createTextNode(ci_s[i].trim());
             else
+                var textEl = document.createTextNode("");
+            divEl.appendChild(textEl);
+            divEl.appendChild(document.createElement("br"));
+            divEl.style.color = 'red';
+            if(ci_s[i].match(expC) || ci_s[i].match(expI))
             {
-                children[i].style.color='darkred';
+                divEl.style.color = 'green';
             }
+            elementsArray[i] = divEl;
         }
+        divEl.id="child" + i;
+        div.innerText = "";
+        div.innerHTML = "";
+
+        console.log("After first try:\n"+div.innerHTML+"end");
+        $("#text").empty();
+        console.log("After sec try:");
+        console.log(div.innerHTML+"end");
+
+        for(var i =0; i < elementsArray.length; i++)
+            div.appendChild(elementsArray[i]);
+
     }
-    else if(div.children.length == 1 && div.textContent.toString().length >0)
+
+	/* Loads the text in the uploaded text file and fills up the text area with its content. */
+    function fillUpTxtArea(e)
     {
-//        console.log("in else");
-//        var spanEl = document.createElement("SPAN");
-//        var textEl = document.createTextNode(div.textContent.toString());
-//        spanEl.appendChild(textEl);
-//        spanEl.appendChild(document.createElement("br"));
-//        console.log(div.textContent.toString());
-//        if(div.textContent.toString().match(expC) || div.textContent.toString().match(expI))
-//        {
-//            spanEl.style.color = 'green';
-//        }
-//        else
-//        {
-//            spanEl.style.color = 'darkred';
-//        }
-//        div.textContent = "";
-//        div.appendChild(spanEl);
-
-    }
-
-    //test ends
-    /*var text = $('#text').html().toString();
-    var ci_s = processDiv(text); // returns an array of entries that were entered in the editable div except new lines, spaces...
-	console.log("text:");
-	console.log(text);
-	console.log("ci_s:")
-	console.log(ci_s.join("\n"));
-    for(var i =0; i < ci_s.length; i++)
-
-	{
-	     if(ci_s[i].match(expC) || ci_s[i].match(expI)) //if it's an interval or constants then it's correct and gets the color green
-		 {
-		     resultingString+= "<span style=\"color:green;\">" + ci_s[i] +"\n"+ "<br></span>";
-		 }
-		 else
-		 {
-		     if(ci_s[i].length >0)
-			     resultingString += "<span style=\"color:darkred;\">" + ci_s[i] + "\n"+ "<br></span>";
-		 }
-	 }
-	 resultingString+= "<br>"
-
-	 //$("#text").html(resultingString);
-	console.log("inside div: ");
-	console.log(resultingString);
-	 $('#text').html(resultingString);*/
-
-
-	 var div = document.getElementById("text");
-
-
-}
-
- /* Loads the text in the uploaded text file and fills up the text area with its content. */
-function fillUpTxtArea(e)
-{
-    console.log("in fill up");
-    var div = document.getElementById('text');
-    var file = e.target.result,
-        results;
-    if (file && file.length) {
-        results = file.split("\n");
-        var ci = "";
-			//todo: use join
-			for(var i = 0; i < results.length; i++)
-			{
-	    		if(results[i].length!= 0)
-				{
-	    			ci+= results[i];
-	    			ci+="@" ;//todo: change the char @
-					var spanEl = document.createElement("SPAN");
-    				var textEl = document.createTextNode(results[i].toString());
-    				spanEl.appendChild(textEl);
+        console.log("in fill up");
+        var div = document.getElementById('text');
+        var file = e.target.result,
+            results;
+        if (file && file.length) {
+            results = file.split("\n");
+            var ci = "";
+            //todo: use join
+            for(var i = 0; i < results.length; i++)
+            {
+                if(results[i].length!= 0)
+                {
+                    ci+= results[i];
+                    ci+="@" ;//todo: change the char @
+                    var spanEl = document.createElement("SPAN");
+                    var textEl = document.createTextNode(results[i].toString());
+                    spanEl.appendChild(textEl);
                     spanEl.appendChild(document.createElement("br"));
                     div.appendChild(spanEl);
-				}
-			}
-			console.log(results.join("\n"));
+                }
+            }
+            console.log(results.join("\n"));
 
-			//$("#text").html(results.join("\n"));
-			validateTextArea();
+            //$("#text").html(results.join("\n"));
+            validateTextArea();
+        }
     }
-}
 
 
-/* called when the form is submitted; call the image */
-function clickSubmit(ci, ci_s)
-{
-    //var ci_s = $('#text').val().split("\n");
-	var	ci_s = $('#text').text().toString().split("\n");
-	var ci = "";
-	ci = ci_s.join("@");
-    /*Making of ci_s*/
-	var wl = $('#wl').val();		// get the wordlength/FPF
-	/* build the query */
-	var q = '{{base_url}}Constant/' + ci + '?';
-	if (msgValidFPF(wl)=='')
-		q = q + 'FPF='+wl;
-	else
-		q = q + 'WL='+wl;
-	/* get the json */
-	$.ajax({ url: q}).done( function( data)
-	{
-		html = "";
-		html = "<table style=\"width:100%\">\n";
-		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mantissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n <th align = left>Status</th>\n </tr>";
-		for(i=0; i < Object.keys(data).length; i++)
-		{
-		    html += "<tr>"
-			html += "<td>" + ci_s[i]+ "</td>";
+	/* called when the form is submitted; call the image */
+    function clickSubmit(ci, ci_s)
+    {
+        //var ci_s = $('#text').val().split("\n");
+        var	ci_s =[];
+        var div = document.getElementById('text');
+        var children = div.children;
+        if(children.length > 1)
+        {
+            for(var i = 0; i < children.length; i++)
+            {
+                ci_s[ci_s.length] = children[i].textContent.toString();
+            }
+        }
 
-		    var startStr = "<td>"
-		    if(data[i]['error'])
-		    {
-		        startStr = "<td style=\"color:darkred\">";
-		    }
-		    else
-			{
-			    startStr = "<td>";
-			}
+
+        var ci = "";
+        ci = ci_s.join("@");
+		/*Making of ci_s*/
+        var wl = $('#wl').val();		// get the wordlength/FPF
+		/* build the query */
+        var q = '{{base_url}}Constant/' + ci + '?';
+        if (msgValidFPF(wl)=='')
+            q = q + 'FPF='+wl;
+        else
+            q = q + 'WL='+wl;
+		/* get the json */
+        $.ajax({ url: q}).done( function( data)
+        {
+            html = "";
+            html = "<table style=\"width:100%\">\n";
+            html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mantissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n <th align = left>Status</th>\n </tr>";
+            for(i=0; i < Object.keys(data).length; i++)
+            {
+                html += "<tr>"
+                html += "<td>" + ci_s[i]+ "</td>";
+
+                var startStr = "<td>"
+                if(data[i]['error'])
+                {
+                    startStr = "<td style=\"color:darkred\">";
+                }
+                else
+                {
+                    startStr = "<td>";
+                }
                 html += startStr + data[i]["integer"] + "</td>\n";
                 html += startStr + data[i]["lsb"] + "</td>\n";
                 html += startStr + data[i]["FPF"] + "</td>\n";
                 html += startStr + data[i]["error_abs"] + "</td>\n";
                 html += startStr + data[i]["error_rel"] + "</td>\n";
                 if(data[i]['error'])
-				{
-                	html += startStr + data[i]["error"] + "</td>\n";
-				}
-				else
-				{
-				    html += startStr + "No error" + "</td>\n";
-				}
-           		 html += "</tr>";
-		}
-		html += "</table>";
-		/*Table for images: */
-		html += "<table style=\"width:100%\">\n";
-		html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Image</th></tr>";
-		for(i=0; i < Object.keys(data).length; i++)
-		{
-		    html += "<tr>"
-			html += "<td  align = left >" + ci_s[i]+ "</td>";
-			if(!data[i]['error'])
-			{
-                html += "<td  align = left >" + "<a href=\"" + data[i]["FPF_image"] + "\">" + "<img src=" + data[i]["FPF_image"] + " alt=" + "Loading..." + "style=\"width:128px;height:128px;\"	"+"/>" + "</td>\n";
+                {
+                    html += startStr + data[i]["error"] + "</td>\n";
+                }
+                else
+                {
+                    html += startStr + "No error" + "</td>\n";
+                }
+                html += "</tr>";
             }
-            else
-			{
-				html += "<td>" + "<p style=\"color:darkred\" >" + data[i]['error'] + "</p>" +"</td>\n";
-			}
-			html += "</tr>";
-		}
-		html += "</table>";
+            html += "</table>";
+			/*Table for images: */
+            html += "<table style=\"width:100%\">\n";
+            html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Image</th></tr>";
+            for(i=0; i < Object.keys(data).length; i++)
+            {
+                html += "<tr>"
+                html += "<td  align = left >" + ci_s[i]+ "</td>";
+                if(!data[i]['error'])
+                {
+                    html += "<td  align = left >" + "<a href=\"" + data[i]["FPF_image"] + "\">" + "<img src=" + data[i]["FPF_image"] + " alt=" + "Loading..." + "style=\"width:128px;height:128px;\"	"+"/>" + "</td>\n";
+                }
+                else
+                {
+                    html += "<td>" + "<p style=\"color:darkred\" >" + data[i]['error'] + "</p>" +"</td>\n";
+                }
+                html += "</tr>";
+            }
+            html += "</table>";
 
-		$("#result").html(html);
+            $("#result").html(html);
 
-	});
+        });
+    }
+
+function checkEmpty()
+{
+    var text =document.getElementById("text");
+    console.log("checked the doc");
+    console.log("in check: "+ text.innerHTML);
+    if(text.childNodes.length== 0)
+	{
+	    var p = document.createElement("P");
+	    var intext=document.createElement("br");
+		p.appendChild(intext);
+	 	text.appendChild(p);
+	}
+	console.log("in check: "+ text.innerHTML);
 }
-
-
 </script>
 {% endblock%}
 
@@ -236,32 +284,34 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
 <p>
 
-<div class="container">
-	<div>
-	<!-- form -->
-	<form method="POST" action="javascript:clickSubmit();" id="form">
-		<label>Constants:</label>
-		<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
-		<div contenteditable="true" id="text" name="text" oninput="disableUpload();" onkeyup="if(event.keyCode == 13) validateTextArea() " class="text-div-editable">
-		<br>
-		</div>
-		<label>Or upload the file containing constants and intervals:</label>
-		<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
-		<button id="file-reset" type="button" onclick="clearUpload()">Reset file</button><br>
-		<label for="wl">Word Length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
-		<input type="submit"/> </label>
+	<div class="container" >
+		<div>
+			<!-- form -->
+			<form method="POST" action="javascript:clickSubmit();" id="form" >
+				<label onclick="loadedDiv();" >Constants:</label>
+				<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
+				<div id ="bigDiv" style="display: table-row-group;">
+					<div  id="text" name="text"  contenteditable="true"  >
+						<p><br></p>
+					</div>
+</div>
+<label>Or upload the file containing constants and intervals:</label>
+<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
+<button id="file-reset" type="button" onclick="clearUpload()">Reset file</button><br>
+<label for="wl">Word Length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
+	<input type="submit"/> </label>
 
-	</form>
-	</div>
-	<!--  result -->
-	<div id="result">
+</form>
+</div>
+<!--  result -->
+<div id="result">
 
 
 
-	</div>
+</div>
 </div>
 
-	</div>
+</div>
 </div>
 
 <!--
