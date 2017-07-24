@@ -1,11 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
 	name= 'fipogen',
 	version= '0.4',
 	author= 'Thibault Hilaire, Joachim Kruithof, Benoit Lopez, Anastasia Volkova',
 	author_email= 'thibault.hilaire@lip6.fr',
-	packages= ['fipogen'],
+	packages= find_packages(),  #TODO: list manually the packages we want (FxP, LTI, etc.)
 	scripts= [],
 #    url='http://pypi.python.org/pypi/fipogen/',
 	license= 'CeCCIL-B',
@@ -27,4 +27,5 @@ setup(
 		"docopt",
 		"mpmath"
 	],
+	include_package_data=True
 ) 
