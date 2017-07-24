@@ -26,6 +26,7 @@ var expP = /^([su]?)\(([+-]?[0-9]+),([+-]?[0-9]+)\)$/;	// Parentheses-notation
 var lit = "[+-]?\\d+(?:\\.\\d+)?";
 var expC = new RegExp( "^"+lit+"$");					// literal constant
 var expI = new RegExp( "^\\[("+lit+");("+lit+")\\]$");			// interval
+var separators = new Set(["\n", "\t", ",", " "]); 	// text separators
 
 /* check if a string is a valid FPF (Q notation or parentheses) 
  * and return the appropriate error message (or '' if no error) */
@@ -92,7 +93,7 @@ function verifyConstInterval(ci)
 }
 
 /* verify an FPF_or_wordlength input, and set the custom validity message */
-function verifyFPForWL(fpfORwl)
+function verifyWL(fpfORwl)
 {
 	// check for a wordlength (integer >2)
 	var msgWL = '';
@@ -103,7 +104,11 @@ function verifyFPForWL(fpfORwl)
 	else if (+fpfORwl.value<2)
 		msgWL = 'A wordlength should be greater than 1';
 	// mix FPF validity message and wordlength validity message
-	fpfORwl.setCustomValidity ( msgValidFPF( fpfORwl.value) && msgWL );
+	fpfORwl.setCustomValidity ( msgWL );
+}
+function verifyFPF(FPF)
+{
+	FPF.setCustomValidity(msgValidFPF( FPF.value))
 }
 function verifyConstIntLines(inputStr)
 {
@@ -141,25 +146,22 @@ function verifyEachChar(inputStr)
 
 function processDiv(text)
 {
-    var htmlTagsRegex = /(<([^>]+)>)/ig
-	text = text.replace(htmlTagsRegex, "\n");
-    //text = text.replace(/&nbsp/, "");
-	text = text.replace("&nbsp;", "");
+	var ci_s = [];
+	var str = "";
+	for(var i =0; i < text.length; i++)
+	{
+		if(!separators.has(text.charAt(i)))
+		{
+			str += text.charAt(i);
+		}
+		else if(str)
+		{
+			ci_s[ci_s.length] = str;
+			str = "";
+		}
+	}
 
-     var rawArray =text.split("\n");
-     var ci_s = [];
-
-     for(var i=0; i < rawArray.length; i++)
-	 {
-	     for(var j = 0; j < rawArray[i].split(" ").length; j++)
-		 {
-		     ci_s[ci_s.length]=rawArray[i].split(" ")[j];
-             ci_s[ci_s.length-1] = ci_s[ci_s.length-1].trim();
-             console.log("ci_s in func: ");
-             console.log(ci_s[ci_s.length-1]);
-         }
-     }
-     return ci_s;
+	return ci_s;
 
 }
  /* Validates the data in text area and changes the color of correct ones to green. */

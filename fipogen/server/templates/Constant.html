@@ -8,15 +8,15 @@
 <script src="https://jakiestfu.github.io/Medium.js/bower_components/undo/undo.js"></script>
 <script src="https://jakiestfu.github.io/Medium.js/medium.js"></script>
 <script>
-    $( window ).load(loadedDiv);
-    $("#text").ready(loadedDiv);
+    //    $( window ).load(loadedDiv);
+    //    $("#text").ready(loadedDiv);
     function loadedDiv()
     {
         console.log("loaded");
         var div = document.getElementById("text");
         var med = new Medium({
             element: document.getElementById("text"),
-           // placeholder: "\n",
+            placeholder: "insert text here",
             modifier: 'auto',
             mode: Medium.richMode,
             maxLength: -1,
@@ -34,36 +34,58 @@
                 'horizontalRule': 'p'
             },
             cssClasses: {
-                editor: 'Medium-changed',
+                editor: 'Medium',
                 pasteHook: 'Medium-paste-hook',
-                //placeholder: 'Medium-placeholder',
+                placeholder: 'Medium-placeholder',
                 clear: 'Medium-clear'
             },
             keyContext: {
-                'enter': function(e, element) {
+                'enter': function(e, element)
+                {
                     var sib = element.previousSibling;
                     console.log("children: " + div.childNodes.length);
                     console.log("html: " + div.innerHTML);
+//                    validateTextArea_2();
+//                    if(div.innerHTML.charAt(0)!= '<')
+//                    {
+//						var val = "";
+//						var len = 0;
+//						for(var i =0; i< div.innerHTML.length; i++)
+//						{
+//						    if(div.innerHTML.charAt(i) != '<')
+//						        val+= div.innerHTML.charAt(i);
+//						    else
+//							{
+//							    len = i;
+//						        break;
+//						    }
+//						}
+//						div.innerHTML = div.innerHTML.substr(len, div.innerHTML.length);
+//						var par = document.createElement("p");
+//						par.appendChild(document.createTextNode(val));
+//
+//						par.nextSibling(sib);
+//						div.clear();
+//						div.appendChild(par);
+//						sib = par;
+//                    }
                     if(sib.tagName != undefined)
                     {
                         if (sib.textContent.trim().match(expC) || sib.textContent.trim().match(expI))
                         {
                             sib.style.color= 'green';
                             sib.textContent= sib.textContent.trim();
-//						sib.classList.add("yesno");
-//						sib.setCustomValidity('');
                         }
                         else
                         {
                             sib.style.color= 'darkred';
                             sib.textContent= sib.textContent.trim();
-// sib.classList.add("yesno");
-//						sib.setCustomValidity('error: je sais pas quoi');
+
                         }
                     }
-                }
-            },
 
+                },
+            }
 
         });
         med.placeholder=" ";
@@ -176,25 +198,20 @@
 
 
 	/* called when the form is submitted; call the image */
-    function clickSubmit(ci, ci_s)
+    function clickSubmit()
     {
-        //var ci_s = $('#text').val().split("\n");
-        var	ci_s =[];
-        var div = document.getElementById('text');
-        var children = div.children;
-        if(children.length > 1)
-        {
-            for(var i = 0; i < children.length; i++)
-            {
-                ci_s[ci_s.length] = children[i].textContent.toString();
-            }
-        }
+        var div = document.getElementById("text");
+        var ci_s =processDiv(div.innerText);
+        var ci = ci_s.join("@");
 
-
-        var ci = "";
-        ci = ci_s.join("@");
 		/*Making of ci_s*/
         var wl = $('#wl').val();		// get the wordlength/FPF
+
+		if(wl.length == 0)
+		{
+		    wl = $('#FPF').val();
+		}
+
 		/* build the query */
         var q = '{{base_url}}Constant/' + ci + '?';
         if (msgValidFPF(wl)=='')
@@ -261,20 +278,20 @@
         });
     }
 
-function checkEmpty()
-{
-    var text =document.getElementById("text");
-    console.log("checked the doc");
-    console.log("in check: "+ text.innerHTML);
-    if(text.childNodes.length== 0)
-	{
-	    var p = document.createElement("P");
-	    var intext=document.createElement("br");
-		p.appendChild(intext);
-	 	text.appendChild(p);
-	}
-	console.log("in check: "+ text.innerHTML);
-}
+    function checkEmpty()
+    {
+        var text =document.getElementById("text");
+        console.log("checked the doc");
+        console.log("in check: "+ text.innerHTML);
+        if(text.childNodes.length== 0)
+        {
+            var p = document.createElement("P");
+            var intext=document.createElement("br");
+            p.appendChild(intext);
+            text.appendChild(p);
+        }
+        console.log("in check: "+ text.innerHTML);
+    }
 </script>
 {% endblock%}
 
@@ -284,31 +301,38 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
 <p>
 
-	<div class="container" >
-		<div>
-			<!-- form -->
-			<form method="POST" action="javascript:clickSubmit();" id="form" >
-				<label onclick="loadedDiv();" >Constants:</label>
-				<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
-				<div id ="bigDiv" style="display: table-row-group;">
-					<div  id="text" name="text"  contenteditable="true"  >
-						<p><br></p>
-					</div>
-</div>
-<label>Or upload the file containing constants and intervals:</label>
-<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
-<button id="file-reset" type="button" onclick="clearUpload()">Reset file</button><br>
-<label for="wl">Word Length enter it here: <input class="yesno" id="wl" type="text" required onkeyup="verifyFPForWL(this);" size="8"/>
-	<input type="submit"/> </label>
+<div class="container" >
+	<div style="display: inline-block">
+		<!-- form -->
+		<h2 class="heads"> Form</h2>
+		<form method="POST" action="javascript:clickSubmit();" id="form" class="wrapper">
+			<label  class="constantsLabel">Constants:</label>
+			<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
+			<!--<div id ="bigDiv" style="display: table-row-group;">-->
+			<div  id="text" name="text"  contenteditable="true" class = "constantsText" >
 
-</form>
-</div>
-<!--  result -->
-<div id="result">
+				<!--</div>-->
+			</div>
+			<label class="uploadLabel">Import a file:</label>
+			<label  class="uploadButton">
+				<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
+			</label>
+			<label class="five">It will be displayed in the upper text area.</label>
+			<label for="wl" class="wlLabel">Word Length: </label>
+			<input class="yesno wlInput" id="wl" type="text" onkeyup="verifyWL(this);" size="8"/>
+			<label class="FPFLabel"> or the FPF:</label>
+			<input class="yesno FPFInput"  id="FPF" type="text"  onkeyup="verifyFPF(this);" size="8"/>
+			<button id="file-reset" type="button" onclick="clearUpload()" class="uploadButton resetButton">Reset</button>
+			<input type="submit" class="submitButton"/>
+		</form>
+		<h2 class="heads"> Result</h2>
+	<!--  result -->
+	</div>
+		<div id="result" >
+
+	</div>
 
 
-
-</div>
 </div>
 
 </div>
