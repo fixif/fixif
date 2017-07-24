@@ -133,6 +133,7 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 def clean_caches():
 	"""Clean caches (remove all files in the cache directory)"""
 	# TODO: potentially very dangerous !!!
+	# TODO: check if Config.cache is not empty !
 	# call("rm " + Config.cache + "* ", shell=True)
 	try:
 		call("rm -r " + Config.cache)
@@ -145,6 +146,7 @@ def tobin(x, wl=8):
 	"""Convert an integer x in binary
 	Returns a string of it's binary representation (two's complement)
 	from : http://code.activestate.com/recipes/219300-format-integer-as-binary-string/ """
+	# TODO: to move to constant class ! (and use mpmath for that)
 	x = int(x)
 	return "".join(map(lambda y: str((x >> y) & 1), range(wl-1, -1, -1)))
 
