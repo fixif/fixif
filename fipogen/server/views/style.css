@@ -311,6 +311,7 @@ text-decoration: none;
 			grid-column: 3 / 4;
 			grid-row: 5;
 			text-align: left;
+            width: 100px;
 
 		}
 		.FPFLabel {
@@ -321,7 +322,7 @@ text-decoration: none;
 			grid-column: 6;
 			grid-row: 5;
 			text-align: left;
-            
+            width: 100px;
 		}
 		.resetButton
 		{
