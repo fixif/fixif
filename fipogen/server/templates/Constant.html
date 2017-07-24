@@ -196,7 +196,21 @@
         }
     }
 
+	function disableFPF()
+	{
 
+	    if($('#wl').val() > 0)
+			document.getElementById("FPF").disabled= true;
+	    else
+	        document.getElementById("FPF").disabled= false;
+    }
+    function disableWL()
+	{
+	    if($('#FPF').val() > 0)
+		    document.getElementById("wl").disabled=true;
+	    else
+			document.getElementById("wl").disabled=false;
+	}
 	/* called when the form is submitted; call the image */
     function clickSubmit()
     {
@@ -306,7 +320,8 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 		<!-- form -->
 		<h2 class="heads"> Form</h2>
 		<form method="POST" action="javascript:clickSubmit();" id="form" class="wrapper">
-			<p  class="constantsLabel tooltip">Constants:
+			<p  class="constantsLabel tooltip" >Constants:
+				<!--<img src="tooltip.jpg" width="15" height="15" style="float: right; display: inline-block;" >-->
 				<span class="tooltiptext">Enter your constants or intervals here</span>
 			</p>
 			<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
@@ -321,9 +336,9 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 			</label>
 			<label class="five">It will be displayed in the upper text area.</label>
 			<label for="wl" class="wlLabel">Word Length: </label>
-			<input class="yesno wlInput" id="wl" type="text" onkeyup="verifyWL(this);" size="8"/>
+			<input class="yesno wlInput" id="wl" type="text" onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
 			<label class="FPFLabel"> or the FPF:</label>
-			<input class="yesno FPFInput"  id="FPF" type="text"  onkeyup="verifyFPF(this);" size="8"/>
+			<input class="yesno FPFInput"  id="FPF" type="text"  onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
 			<button id="file-reset" type="button" onclick="clearUpload()" class="uploadButton resetButton">Reset</button>
 			<input type="submit" class="submitButton"/>
 		</form>
