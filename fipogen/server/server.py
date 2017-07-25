@@ -113,6 +113,16 @@ def FPF_service(FPForm, outputFormat):
 		bits: binary value to be displayed (nothing if no bit is given)
 	"""
     # check if the FPF is valid
+
+    # TODO: Change the name of the generated file:
+    """
+    Qd on demande une constante sur un grand nombre de bits (j'ai fait 124 bits), on a l'erreur suivante:
+    127.0.0.1 - - [24/Jul/2017 22:18:52] "GET /Constant/121545@12121?WL=125 HTTP/1.1" 200 22523
+    cp: cache/Q18_107?numeric=no&power2=no&intfrac=no&bits=01110110101100100100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000&width=500&binary_point=yes&notation=mlsb&drawMissing=no&label=no&height=1300&y_origin=0&colors=RB.jpg: File name too long
+    Cela est du au fait que le champs bits est trop grand, ce qui donne un nom de fichier stocké en cache trop grand. Une solution pourrait-être de former le nom du fichier autrement : en stockant un hash (genre md5) pour le nom du fichier dès que le nom devient trop grand. On peut aussi, au lieu de stocker tous les bits dans le nom, juste stocker la même chose en décimal (ou en hexa), mais cela ne fait que repousser le problème.
+    À mon avis, la bonne solution est de faire un mélange des deux (on ne met plus "bits=...." dans le nom du fichier, mais value=..., et dès que le nom du fichier dépasse le nombre maximum de caractères pour un fichier (255 sous Mac, 4069 sous Unix, le tout étant défini dans limits.h, cf https://stackoverflow.com/questions/32807560/how-do-i-get-in-python-the-maximum-filesystem-path-length-in-unix)
+    """
+
     FPForm = FPForm.replace('_', '.')  # allow '_' (underscore) characters, and translate them in '.' (point)
     try:
         F = FPF(formatStr=FPForm)
