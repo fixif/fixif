@@ -115,7 +115,7 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 		proc =Popen(command1,stdout= PIPE,shell=True)
 		out, err = proc.communicate();
 
-		latexLogger.info(command1 + "\n" + str(out))
+		latexLogger.info(command1 + "\n" + str(out)) #TODO: just print the error
 
 		proc = Popen(command2, stdout=PIPE, shell=True)
 		out, err = proc.communicate();

@@ -4,40 +4,40 @@
 <script src="{{base_url}}useful.js"></script>
 <script>
 
-/* called when the form is submitted; call the image */
-function validate()
-{
-	/* build the query */
-	var q = queryString("form","FPF");	// build the query
-	var fpf = $('#FPF').val();
-	/* AJAX call */
-	$.ajax({ url: '{{base_url}}FPF/' + fpf + '.json?' +q}).done( function( data)		
-	{
-		if (data["error"])
-		{
-			$("#result").html("<span style='color:#FF0000'>Error: "+data["error"]+"</span>")	
-		}
-		else
-		{
-			html = "Interval: " + data["interval"] + "<br/>\n";
-			html += "Quantization step: " + data["quantization"] + "<br/>\n";
-			/* FPF image */
-			html += "<a href=''><img id='FPF_image'></a><br/>\n";
-			{% for img in imageFormats %}
-				html += "<a id='a_{{img}}' href='" + '{{base_url}}FPF/' + fpf +'.{{img}}?'+q + "'>{{img}}</a>&nbsp;&nbsp;\n";
-			{% endfor %}
-			html += "<br/>\n";
-			/* latex code */
-			html += "Latex code:<br>\n";
-			html += "<div id='latex_code'><code>" + data["latex"].split("\n").join("<br/>") + "</code></div>\n";
-			/* display the result */
-			$("#result").html(html);
-			/* load the image */
-			$("#FPF_image").attr('src', '{{base_url}}spinner.gif');	/* first load the spinner */
-			$("#FPF_image").attr('src', '{{base_url}}FPF/'+fpf+'.jpg?'+q+'&width=400' );		/* and then load the image */
-		}
-	});
-}
+	/* called when the form is submitted; call the image */
+    function validate()
+    {
+		/* build the query */
+        var q = queryString("form","FPF");	// build the query
+        var fpf = $('#FPF').val();
+		/* AJAX call */
+        $.ajax({ url: '{{base_url}}FPF/' + fpf + '.json?' +q}).done( function( data)
+        {
+            if (data["error"])
+            {
+                $("#result").html("<span style='color:#FF0000'>Error: "+data["error"]+"</span>")
+            }
+            else
+            {
+                html = "Interval: " + data["interval"] + "<br/>\n";
+                html += "Quantization step: " + data["quantization"] + "<br/>\n";
+				/* FPF image */
+                html += "<a href=''><img id='FPF_image'></a><br/>\n";
+                {% for img in imageFormats %}
+                html += "<a id='a_{{img}}' href='" + '{{base_url}}FPF/' + fpf +'.{{img}}?'+q + "'>{{img}}</a>&nbsp;&nbsp;\n";
+                {% endfor %}
+                html += "<br/>\n";
+				/* latex code */
+                html += "Latex code:<br>\n";
+                html += "<div id='latex_code'><code>" + data["latex"].split("\n").join("<br/>") + "</code></div>\n";
+				/* display the result */
+                $("#result").html(html);
+				/* load the image */
+                $("#FPF_image").attr('src', '{{base_url}}spinner.gif');	/* first load the spinner */
+                $("#FPF_image").attr('src', '{{base_url}}FPF/'+fpf+'.jpg?'+q+'&width=400' );		/* and then load the image */
+            }
+        });
+    }
 
 
 </script>
@@ -47,61 +47,70 @@ function validate()
 Blablabla... This page allows to display a Fixed-Point Format, and export it in LaTeX (Tikz), pdf of jpeg.
 
 
-<div>
-<div class="l-container">
-	<div>
-	<h3>Input </h3>
-	<form method="POST" action="javascript:validate();" id="form">
-		<div style="background-color: lightgrey; display: inline-block; width: 400px; height: 100px;" >
-		<label for="FPF" style="padding: 10px">Fixed-Point Format: </label><input class="yesno" id="FPF" type="text" onkeyup="verifyFPF(this);" required  size="7"/><br>
+<div class="container">
+	<div style="display:inline-block">
 
-			<div style="background-color: whitesmoke; background-position: inherit" >
-			<label style="padding: 10px"> Enter your input format.</label>
+		<form method="POST" action="javascript:validate();" id="form" class="wrapperFPF">
+			<!--<div style="border-color: #0c7fb0; border: px">-->
+					<label class="heading1">The FPF format</label>
+					<label for="FPF" class="labelFPF1">Fixed-Point Format: </label>
+					<div class="inputFPF1">
+						<input class="yesno" id="FPF" type="text" onkeyup="verifyFPF(this);" required  size="7"/>
+					</div>
+					<label class="labelExp"> Enter your input format.</label>
+			<!--</div>-->
+				<!--<div class="container2">-->
+					<div for="notation" class="notationChoice">Notation:
+					<select name="notation" style="width: auto; height: 20px">
+						<option value="mlsb">MSB/LSB</option>
+						<option value="ifwl">integer/fractional parts</option>
+					</select>
+					</div>
+
+					<div class="checkboxFrac">
+						<input type="checkbox" name="intfrac" />Display integer/fractional parts:
+					</div>
+
+					<div for="colors" class="labelChoice">Color:
+					<select name="colors" style="width: auto; height: 20px">
+						{% for k,c in colors %}
+						<option value="{{k}}">{{c[3]}}</option>
+						{% endfor %}
+					</select>
+					</div>
+
+					<div class="checkboxPow2">
+						<input type="checkbox" name="power2" />Display power-of-2:
+					</div>
+
+					<div  class="colorChoice">Label:
+					<select name="label" style="width: auto; height: 20px">
+						<option value="none">None</option>
+						<option value="left">Left</option>>
+						<option value="right">Right</option>
+						<option value="above">Above</option>
+						<option value="below">Below</option>
+					</select>
+					</div>
+			<div class="checkboxBinary">
+				<input type="checkbox" name="binary_point" checked /> Display binary point
 			</div>
-		</div>
+			<div class="checkboxNumVals">
+			<input name="numeric" type="checkbox"  />Numerical values (instead of symbolic)
+			</div>
 
-		<div>
-		<label for="notation">Notation: </label>
-		<select name="notation">
-			<option value="mlsb">MSB/LSB</option>
-			<option value="ifwl">integer/fractional parts</option>>
-		</select>
-		<br/>
-		<input name="numeric" type="checkbox">Numerical values (instead of symbolic)
-		<p/>
+		<input type="submit" class="submitFPF"/>
+				<!--</div>-->
+			<!--</div>-->
+		</form>
 
-		<label for="colors">Color: </label>
-		<select name="colors">
-			{% for k,c in colors %}
-			<option value="{{k}}">{{c[3]}}</option>
-			{% endfor %}
-		</select>
-		<br/>
-		<input type="checkbox" name="binary_point" checked/> Display binary point
-		<br/>
-		<label for="label">Label: </label>
-		<select name="label">
-			<option value="none">None</option>
-			<option value="left">Left</option>>
-			<option value="right">Right</option>
-			<option value="above">Above</option>
-			<option value="below">Below</option>
-		</select>
-		<br/>
-		<input type="checkbox" name="intfrac"/>Display integer/fractional parts:
-		<br/>
-		<input type="checkbox" name="power2"/>Display power-of-2:
-		<p/>
 
-		<input type="submit"/>
-		</div>
-	</form>
 	</div>
 
-<div class="r-container">
-	<div id="result">
+	<div class="r-container">
+		<div id="result">
+		</div>
 	</div>
-</div>
 
 </div>
 
