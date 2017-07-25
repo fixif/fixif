@@ -198,15 +198,16 @@
 
 	function disableFPF()
 	{
-
-	    if($('#wl').val() > 0)
+		console.log(":disableFPF");
+	    if($('#wl').val().length > 0)
 			document.getElementById("FPF").disabled= true;
 	    else
 	        document.getElementById("FPF").disabled= false;
     }
     function disableWL()
 	{
-	    if($('#FPF').val() > 0)
+	    console.log(":disablewl");
+	    if($('#FPF').val().length > 0)
 		    document.getElementById("wl").disabled=true;
 	    else
 			document.getElementById("wl").disabled=false;
@@ -306,6 +307,15 @@
         }
         console.log("in check: "+ text.innerHTML);
     }
+
+    jQuery(function ($) {
+    var $inputs = $('input[name=wl],input[name=FPF]');
+    $inputs.on('input', function () {
+        // Set the required property of the other input to false if this input is not empty.
+        $inputs.not(this).prop('required', !$(this).val().length);
+    });
+});
+
 </script>
 {% endblock%}
 
@@ -324,22 +334,19 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 				<!--<img src="tooltip.jpg" width="15" height="15" style="float: right; display: inline-block;" >-->
 				<span class="tooltiptext">Enter your constants or intervals here</span>
 			</p>
-			<!-- <textarea id="text" class="yesno" style ="overflow:inherit;" rows="5" cols="10" oninput='disableUpload()' onkeyup="if(event.keyCode == 13 || event.keyCode == 8) verifyConstIntLines(this); else verifyEachChar(this);"/> </textarea></br> -->
-			<!--<div id ="bigDiv" style="display: table-row-group;">-->
-			<div  id="text" name="text"  contenteditable="true" class = "constantsText" >
+			<div  id="text" name="text"  contenteditable="true" class = "constantsText"  >
 
-				<!--</div>-->
 			</div>
 			<label class="uploadLabel">Import a file:</label>
 			<label  class="uploadButton">
 				<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
 			</label>
-			<label class="five">It will be displayed in the upper text area.</label>
+			<label class="five">(It will be displayed in the upper text area.)</label>
 			<label for="wl" class="wlLabel">Word Length: </label>
-			<input class="yesno wlInput" id="wl" type="text" onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
+			<input class="yesno wlInput" id="wl" type="input" required onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
 			<label class="FPFLabel"> or the FPF:</label>
-			<input class="yesno FPFInput"  id="FPF" type="text"  onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
-			<button id="file-reset" type="button" onclick="clearUpload()" class="uploadButton resetButton">Reset</button>
+			<input class="yesno FPFInput"  id="FPF"  type="input"  required onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
+			<button id="file-reset"  type="button" onclick="clearUpload()" class="uploadButton resetButton">Reset</button>
 			<input type="submit" class="submitButton"/>
 		</form>
 		<h2 class="heads"> Result</h2>
