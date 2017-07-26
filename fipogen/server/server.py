@@ -255,14 +255,11 @@ def Constant_service(constantsInter):
                 except:
                     returningJson[counter] = {'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
                 try:
-                    print("in try")
                     if WL:
-                        print("in if wl")
                         C = Constant(value=val_sup, wl=WL)
                         if (float(Constant(value=val_inf, wl=WL).FPF.msb) > float(C.FPF.msb)):
                             C = Constant(value=val_inf, wl=WL)
                     else:
-                        print("in else")
                         C = Constant(value=val_sup, fpf=F)
                         if (float(Constant(value=val_inf, fpf=F).FPF.msb) > float(C.FPF.msb)):
                             C = Constant(value=val_inf, fpf=F)

@@ -288,6 +288,7 @@ text-decoration: none;
 .notationChoice {
   grid-column: 1;
   grid-row: 7;
+    min-width: 300px;
     padding: 1em;
   grid-gap: 10px;
 }
@@ -308,6 +309,7 @@ text-decoration: none;
   grid-row: 8;
     padding: 1em;
   grid-gap: 10px;
+    min-width: 400px;
 }
 .colorChoice {
   grid-column: 1;

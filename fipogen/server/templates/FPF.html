@@ -28,8 +28,8 @@
                 {% endfor %}
                 html += "<br/>\n";
 				/* latex code */
-                html += "Latex code:<br>\n";
-                html += "<div id='latex_code'><code>" + data["latex"].split("\n").join("<br/>") + "</code></div>\n";
+                html += "<button onclick='showLatexCode()'>" + "Latex code:" + "</button>";
+                html += "<div id='latex_code' style='display: none'><code>" + data["latex"].split("\n").join("<br/>") + "</code></div>\n";
 				/* display the result */
                 $("#result").html(html);
 				/* load the image */
@@ -37,6 +37,11 @@
                 $("#FPF_image").attr('src', '{{base_url}}FPF/'+fpf+'.jpg?'+q+'&width=400' );		/* and then load the image */
             }
         });
+    }
+
+    function showLatexCode()
+	{
+		document.getElementById("latex_code").style.display="block";
     }
 
 
@@ -69,7 +74,7 @@ Blablabla... This page allows to display a Fixed-Point Format, and export it in 
 					</div>
 
 					<div class="checkboxFrac">
-						<input type="checkbox" name="intfrac" />Display integer/fractional parts:
+						<input type="checkbox" name="intfrac" />Display integer/fractional parts
 					</div>
 
 					<div for="colors" class="labelChoice">Color:
@@ -81,7 +86,7 @@ Blablabla... This page allows to display a Fixed-Point Format, and export it in 
 					</div>
 
 					<div class="checkboxPow2">
-						<input type="checkbox" name="power2" />Display power-of-2:
+						<input type="checkbox" name="power2" />Display power-of-2
 					</div>
 
 					<div  class="colorChoice">Label:
