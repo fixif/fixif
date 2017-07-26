@@ -92,6 +92,8 @@
 		dlButt.id= "dl-res";
 		dlButt.innerHTML = "Download the results";
 		dlButt.style.minHeight= '30px';
+		dlButt.setAttribute('onclick', 'dlResFile();');
+		document.getElementById("result").innerHTML = dlButt.outerHTML;
 
         var div = document.getElementById("text");
         var ci_s =processDiv(div.innerText);
@@ -170,8 +172,8 @@
             }
             html += "</table>";
 
-            $("#result").html(dlButt.outerHTML +"<br>"+ html);
-//			document.getElementById("result").inne\nrHTML += html;
+//            $("#result").html(dlButt.outerHTML +"<br>"+ html);
+			document.getElementById("result").innerHTML += html;
         });
     }
 
