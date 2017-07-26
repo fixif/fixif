@@ -134,7 +134,6 @@ def clean_caches():
 	"""Clean caches (remove all files in the cache directory)"""
 	# TODO: potentially very dangerous !!!
 	# TODO: check if Config.cache is not empty !
-	# call("rm " + Config.cache + "* ", shell=True)
 	try:
 		call("rm -r " + Config.cache)
 		call("mkdir " + Config.cache)

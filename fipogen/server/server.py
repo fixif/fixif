@@ -28,6 +28,8 @@ import re
 import json
 from logging import getLogger
 
+import hashlib
+
 
 
 from mpmath import nstr
@@ -147,6 +149,11 @@ def FPF_service(FPForm, outputFormat):
     options.addOptionalOption("drawMissing", {"yes": True, "no": False}, "no")
     # generate LaTeX code for the FPF only
     latexFPF = F.LaTeX(**options.getValues())
+
+    # initializing the hash object
+    m = hashlib.md5()
+    m.update(str(options).encode('UTF-16'))
+
     # create and return image (or latex code)
     if outputFormat != 'tex' and outputFormat != 'json':
         # prepare the conversion argument (in the LaTeX class 'standalone')
@@ -158,7 +165,7 @@ def FPF_service(FPForm, outputFormat):
         latexStr = template("latex-FPF.tex",
                             options.getValues({"FPF": latexFPF, "format": outputFormat, "convert": convert}))
         # and create the image from the latex
-        return createImageFromLaTeX(F.Qnotation().replace('.', '_') + "?" + str(options), latexStr, outputFormat)
+        return createImageFromLaTeX(F.Qnotation().replace('.', '_') + "?" + m.hexdigest(), latexStr, outputFormat)
     elif outputFormat == 'json':
         return {'latex': latexFPF, 'interval': '[%f;%f]' % F.minmax(),
                 'quantization': '2^%d = %f' % (F.lsb, 2 ** F.lsb)}
