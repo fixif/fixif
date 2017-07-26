@@ -3,98 +3,11 @@
 
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="{{base_url}}useful.js"></script>
-<script src="https://jakiestfu.github.io/Medium.js/bower_components/rangy-official/rangy-core.js"></script>
-<script src="https://jakiestfu.github.io/Medium.js/bower_components/rangy-official/rangy-classapplier.js"></script>
-<script src="https://jakiestfu.github.io/Medium.js/bower_components/undo/undo.js"></script>
-<script src="https://jakiestfu.github.io/Medium.js/medium.js"></script>
 <script>
-    //    $( window ).load(loadedDiv);
-    //    $("#text").ready(loadedDiv);
-    function loadedDiv()
-    {
-        console.log("loaded");
-        var div = document.getElementById("text");
-        var med = new Medium({
-            element: document.getElementById("text"),
-            placeholder: "insert text here",
-            modifier: 'auto',
-            mode: Medium.richMode,
-            maxLength: -1,
-            autofocus: false,
-            autoHR: true,
-            modifiers: {
-                'b': 'bold',
-                'i': 'italicize',
-                'u': 'underline',
-                'v': 'paste'
-            },
-            tags: {
-                'break': 'div',
-                'paragraph': 'p',
-                'horizontalRule': 'p'
-            },
-            cssClasses: {
-                editor: 'Medium',
-                pasteHook: 'Medium-paste-hook',
-                placeholder: 'Medium-placeholder',
-                clear: 'Medium-clear'
-            },
-            keyContext: {
-                'enter': function(e, element)
-                {
-                    var sib = element.previousSibling;
-                    console.log("children: " + div.childNodes.length);
-                    console.log("html: " + div.innerHTML);
-//                    validateTextArea_2();
-//                    if(div.innerHTML.charAt(0)!= '<')
-//                    {
-//						var val = "";
-//						var len = 0;
-//						for(var i =0; i< div.innerHTML.length; i++)
-//						{
-//						    if(div.innerHTML.charAt(i) != '<')
-//						        val+= div.innerHTML.charAt(i);
-//						    else
-//							{
-//							    len = i;
-//						        break;
-//						    }
-//						}
-//						div.innerHTML = div.innerHTML.substr(len, div.innerHTML.length);
-//						var par = document.createElement("p");
-//						par.appendChild(document.createTextNode(val));
-//
-//						par.nextSibling(sib);
-//						div.clear();
-//						div.appendChild(par);
-//						sib = par;
-//                    }
-                    if(sib.tagName != undefined)
-                    {
-                        if (sib.textContent.trim().match(expC) || sib.textContent.trim().match(expI))
-                        {
-                            sib.style.color= 'green';
-                            sib.textContent= sib.textContent.trim();
-                        }
-                        else
-                        {
-                            sib.style.color= 'darkred';
-                            sib.textContent= sib.textContent.trim();
 
-                        }
-                    }
+	var resultJson;
 
-                },
-            }
-
-        });
-        med.placeholder=" ";
-        //div.className="text-div-editable";
-        //med.clear();
-
-    }
-
-	/* Clears the uplaoded file */
+	/* Clears the uploaded file */
     function clearUpload()
     {
         $("#fileupload").val('');
@@ -124,51 +37,10 @@
 
     }
 
-	/* WORKS CORECCTLY DO NOT TOUCH. works with innerText*/
-    function validateTextArea_2()
-    {
-        var div = document.getElementById('text');
-        console.log(div.innerHTML);
-        console.log("text:-"+div.innerText+"-");
-        ci_s = div.innerText.split("\n");
-        elementsArray = [];
-        console.log("ci length: " + ci_s.length);
-
-        for(var i =0; i < ci_s.length-1; i++)
-        {
-            console.log("ci-s[i]:-" + ci_s[i] +"-end");
-            var divEl = document.createElement("DIV");
-            if(ci_s[i].trim().length >0)
-                var textEl = document.createTextNode(ci_s[i].trim());
-            else
-                var textEl = document.createTextNode("");
-            divEl.appendChild(textEl);
-            divEl.appendChild(document.createElement("br"));
-            divEl.style.color = 'red';
-            if(ci_s[i].match(expC) || ci_s[i].match(expI))
-            {
-                divEl.style.color = 'green';
-            }
-            elementsArray[i] = divEl;
-        }
-        divEl.id="child" + i;
-        div.innerText = "";
-        div.innerHTML = "";
-
-        console.log("After first try:\n"+div.innerHTML+"end");
-        $("#text").empty();
-        console.log("After sec try:");
-        console.log(div.innerHTML+"end");
-
-        for(var i =0; i < elementsArray.length; i++)
-            div.appendChild(elementsArray[i]);
-
-    }
 
 	/* Loads the text in the uploaded text file and fills up the text area with its content. */
     function fillUpTxtArea(e)
     {
-        console.log("in fill up");
         var div = document.getElementById('text');
         var file = e.target.result,
             results;
@@ -191,36 +63,44 @@
             }
             console.log(results.join("\n"));
 
-            //$("#text").html(results.join("\n"));
             validateTextArea();
         }
     }
 
+    /* When an input is given to wl, FPF must be disabled */
 	function disableFPF()
 	{
-		console.log(":disableFPF");
 	    if($('#wl').val().length > 0)
 			document.getElementById("FPF").disabled= true;
 	    else
 	        document.getElementById("FPF").disabled= false;
     }
+
+    /* When an input is given to FPF, wl must be disabled */
     function disableWL()
 	{
-	    console.log(":disablewl");
 	    if($('#FPF').val().length > 0)
 		    document.getElementById("wl").disabled=true;
 	    else
 			document.getElementById("wl").disabled=false;
 	}
+
 	/* called when the form is submitted; call the image */
     function clickSubmit()
     {
+		var dlButt = document.createElement("button");	// The button corresponding to download the results file
+		dlButt.id= "dl-res";
+		dlButt.innerHTML = "Download the results";
+		dlButt.style.minHeight= '30px';
+
         var div = document.getElementById("text");
         var ci_s =processDiv(div.innerText);
         var ci = ci_s.join("@");
 
+
+
 		/*Making of ci_s*/
-        var wl = $('#wl').val();		// get the wordlength/FPF
+        var wl = $('#wl').val();		// gets the wordlength/FPF
 
 		if(wl.length == 0)
 		{
@@ -233,13 +113,15 @@
             q = q + 'FPF='+wl;
         else
             q = q + 'WL='+wl;
-		/* get the json */
+
+        /* get the json */
         $.ajax({ url: q}).done( function( data)
         {
+            resultJson= data;
             html = "";
             html = "<table style=\"width:100%\">\n";
             html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mantissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n <th align = left>Status</th>\n </tr>";
-            for(i=0; i < Object.keys(data).length; i++)
+            for(var i=0; i < Object.keys(data).length ; i++)
             {
                 html += "<tr>"
                 html += "<td>" + ci_s[i]+ "</td>";
@@ -272,7 +154,7 @@
 			/*Table for images: */
             html += "<table style=\"width:100%\">\n";
             html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Image</th></tr>";
-            for(i=0; i < Object.keys(data).length; i++)
+            for(var i=0; i < Object.keys(data).length  ; i++)
             {
                 html += "<tr>"
                 html += "<td  align = left >" + ci_s[i]+ "</td>";
@@ -288,31 +170,38 @@
             }
             html += "</table>";
 
-            $("#result").html(html);
-
+            $("#result").html(dlButt.outerHTML +"<br>"+ html);
+//			document.getElementById("result").inne\nrHTML += html;
         });
     }
 
-    function checkEmpty()
-    {
-        var text =document.getElementById("text");
-        console.log("checked the doc");
-        console.log("in check: "+ text.innerHTML);
-        if(text.childNodes.length== 0)
-        {
-            var p = document.createElement("P");
-            var intext=document.createElement("br");
-            p.appendChild(intext);
-            text.appendChild(p);
-        }
-        console.log("in check: "+ text.innerHTML);
-    }
+    /* Called when "Download the result's button is clicked".
+    Code taken from : https://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server/18197341?noredirect=1#answer-3665147 */
+    function dlResFile()
+	{
+	    var ci_s =processDiv(document.getElementById("text").innerText); /* The constants or intervals given as input */
+	    var strFile = "Const/Int\t\t\t\tlsb\t\t\t\tFPF\n"; /* The string to put in downloadable file */
 
+		for(var i = 0; i < ci_s.length; i++)
+		{
+		    strFile += ci_s[i] + "\t\t\t\t" + resultJson[i]["lsb"] + "\t\t\t\t" + resultJson[i]["FPF"] + "\n";
+		}
+
+	    var a = window.document.createElement('a');
+        a.href = window.URL.createObjectURL(new Blob([strFile], {type: 'text'}));
+        a.download = 'result.txt';
+
+        document.getElementById("result").appendChild(a); // Append anchor to body.
+        a.click();
+
+        document.getElementById("result").removeChild(a); // Remove anchor from body
+	}
+
+	/* To set one of wl or FPF required for submit */
     jQuery(function ($) {
     var $inputs = $('input[name=wl],input[name=FPF]');
     $inputs.on('input', function () {
-        // Set the required property of the other input to false if this input is not empty.
-        $inputs.not(this).prop('required', !$(this).val().length);
+        $inputs.not(this).prop('required', !$(this).val().length);	// Set the required property of the other input to false if this input is not empty.
     });
 });
 
@@ -339,7 +228,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 			</div>
 			<label class="uploadLabel">Import a file:</label>
 			<label  class="uploadButton">
-				<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'>
+				<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'/>
 			</label>
 			<label class="five">(It will be displayed in the upper text area.)</label>
 			<label for="wl" class="wlLabel">Word Length: </label>
@@ -353,6 +242,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	<!--  result -->
 	</div>
 		<div id="result" >
+
 
 	</div>
 

@@ -17,7 +17,7 @@ from fipogen.FxP import Variable
 from fipogen.FxP import Constant
 
 # utilities and path definition
-from fipogen.server.utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats, tobin
+from fipogen.server.utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats
 from fipogen.server.path import Config  # paths
 from fipogen.server.utilities import returnDictionaryConstant
 
@@ -180,9 +180,9 @@ def FPF_service(FPForm, outputFormat):
 @route('/Constant/<constantsInter>')
 def Constant_service(constantsInter):
     """Service that generates all the information for the transformation of a constant
-	It returns a JSON object, containing, the FPF, the integer associated, the errors, etc.
+	It returns a JSON object, containing dictionaries of: the FPF, the integer associated, the errors, etc. of the constants and intervals given in constantsInter.
 	Ex: answer to /Constant/zzzz?option1=xxx&option2=yyy
-	where zzzz is a constant or an interval
+	where zzzz is string of constants or a intervals seperated by @
 	
 	Possible options:
 		FPF: string describing the FPF (Q-notation or parenthesis notation) 
@@ -190,7 +190,7 @@ def Constant_service(constantsInter):
 			-> only one of these two options should be given !
 		signed: (bool) indicates if the constant is represented with a signed constant
 
-	It returns a json object with the following fields
+	It returns a json object containing dictionaries related to each constant or interval with the following fields
 		error: (string) indicates if there is an error
 		FPF: (string) the FPF used for the conversion (usefull if the WL was given)
 		FPF_image: (url) the url used for the image of the FPF

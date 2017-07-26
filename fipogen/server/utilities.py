@@ -150,6 +150,8 @@ def tobin(x, wl=8):
 	return "".join(map(lambda y: str((x >> y) & 1), range(wl-1, -1, -1)))
 
 def returnDictionaryConstant(C):
+	""" Takes a constant c and builds a dictionary containing its attributes
+	Returns a dictionary"""
 	dico = {}
 	dico = {'error': '',
 			'FPF': str(C.FPF),
@@ -163,3 +165,4 @@ def returnDictionaryConstant(C):
 			'error_rel': nstr(C.realError),
 			}
 	return dico
+
