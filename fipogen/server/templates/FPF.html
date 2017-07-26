@@ -49,7 +49,7 @@ Blablabla... This page allows to display a Fixed-Point Format, and export it in 
 
 <div class="container">
 	<div style="display:inline-block">
-
+		<h2 class="heads"> Form</h2>
 		<form method="POST" action="javascript:validate();" id="form" class="wrapperFPF">
 			<!--<div style="border-color: #0c7fb0; border: px">-->
 					<label class="heading1">The FPF format</label>
@@ -57,9 +57,10 @@ Blablabla... This page allows to display a Fixed-Point Format, and export it in 
 					<div class="inputFPF1">
 						<input class="yesno" id="FPF" type="text" onkeyup="verifyFPF(this);" required  size="7"/>
 					</div>
-					<label class="labelExp"> Enter your input format.</label>
+					<label class="labelExp"> Enter your input format in Q form (example: Q4.9), then choose from the options below.</label>
 			<!--</div>-->
 				<!--<div class="container2">-->
+					<label class="heading22"><hr>Options</label>
 					<div for="notation" class="notationChoice">Notation:
 					<select name="notation" style="width: auto; height: 20px">
 						<option value="mlsb">MSB/LSB</option>
@@ -103,14 +104,15 @@ Blablabla... This page allows to display a Fixed-Point Format, and export it in 
 				<!--</div>-->
 			<!--</div>-->
 		</form>
-
-
-	</div>
-
-	<div class="r-container">
+		<h2 class="heads"> Result</h2>
 		<div id="result">
 		</div>
+
 	</div>
+
+	<!--<div class="r-container">-->
+
+	<!--</div>-->
 
 </div>
 
