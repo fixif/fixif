@@ -26,11 +26,15 @@
                 {% for img in imageFormats %}
                 html += "<a id='a_{{img}}' href='" + '{{base_url}}FPF/' + fpf +'.{{img}}?'+q + "'>{{img}}</a>&nbsp;&nbsp;\n";
                 {% endfor %}
-                html += "<br/>\n";
+                html += "<br>\n";
+                html += "<br>\n";
 				/* latex code */
-                html += "<button onclick='showLatexCode()'>" + "Latex code:" + "</button>";
-                html += "<div id='latex_code' style='display: none'><code>" + data["latex"].split("\n").join("<br/>") + "</code></div>\n";
-				/* display the result */
+				html += "<details>\n";
+                html += "<summary >" + "Latex code:" + "</summary>\n";
+                html += "<br>\n";
+                html += "<div id='latex_code'><code>\n" + data["latex"].split("\n").join("<br/>") + "</code></div>\n";
+				html += "</details>\n";
+                /* display the result */
                 $("#result").html(html);
 				/* load the image */
                 $("#FPF_image").attr('src', '{{base_url}}spinner.gif');	/* first load the spinner */
@@ -41,7 +45,10 @@
 
     function showLatexCode()
 	{
-		document.getElementById("latex_code").style.display="block";
+	    if(document.getElementById("latex_code").style.display=="none")
+			document.getElementById("latex_code").style.display="block";
+	    else
+	        document.getElementById("latex_code").style.display="none";
     }
 
 
@@ -50,7 +57,6 @@
 
 {% block content %}
 Blablabla... This page allows to display a Fixed-Point Format, and export it in LaTeX (Tikz), pdf of jpeg.
-
 
 <div class="container">
 	<div style="display:inline-block">
