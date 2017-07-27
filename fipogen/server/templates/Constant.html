@@ -29,7 +29,6 @@
 	/* Disables upload option when some text is entered in text area. */
     function disableUpload()
     {
-        //console.log($('#text').val());
         if( $('#text').text().toString().length != 0)
             document.getElementById("fileupload").disabled = true;
         else
@@ -47,13 +46,12 @@
         if (file && file.length) {
             results = file.split("\n");
             var ci = "";
-            //todo: use join
             for(var i = 0; i < results.length; i++)
             {
                 if(results[i].length!= 0)
                 {
                     ci+= results[i];
-                    ci+="@" ;//todo: change the char @
+                    ci+="@" ;
                     var spanEl = document.createElement("SPAN");
                     var textEl = document.createTextNode(results[i].toString());
                     spanEl.appendChild(textEl);
@@ -61,7 +59,6 @@
                     div.appendChild(spanEl);
                 }
             }
-            console.log(results.join("\n"));
 
             validateTextArea();
         }
@@ -219,28 +216,28 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 <div class="container" >
 	<div style="display: inline-block">
 		<!-- form -->
-		<h2 class="heads"> Form</h2>
-		<form method="POST" action="javascript:clickSubmit();" id="form" class="wrapper">
-			<p  class="constantsLabel tooltip" >Constants:
+		<h2 class="headings"> Form</h2>
+		<form method="POST" action="javascript:clickSubmit();" id="form" class="wrapper-constants-form">
+			<p  class="first-label-constants-form tooltip" >Constants:
 				<!--<img src="tooltip.jpg" width="15" height="15" style="float: right; display: inline-block;" >-->
 				<span class="tooltiptext">Enter your constants or intervals here</span>
 			</p>
-			<div  id="text" name="text"  contenteditable="true" class = "constantsText"  >
+			<div  id="text" name="text"  contenteditable="true" class = "div-text-constants-from"  >
 
 			</div>
-			<label class="uploadLabel">Import a file:</label>
-			<label  class="uploadButton">
-				<input type="file" accept = ".txt" name="fileupload" value="fileupload" id="fileupload" onchange='loadTxt()'/>
-			</label>
-			<label class="five">(It will be displayed in the upper text area.)</label>
-			<label for="wl" class="wlLabel">Word Length: </label>
-			<input class="yesno wlInput" id="wl" type="input" required onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
-			<label class="FPFLabel"> or the FPF:</label>
-			<input class="yesno FPFInput"  id="FPF"  type="input"  required onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
-			<button id="file-reset"  type="button" onclick="clearUpload()" class="uploadButton resetButton">Reset</button>
-			<input type="submit" class="submitButton"/>
+			<label class="upload-label-constants-form">Import a file:</label>
+			<span  class="upload-span-constants-form">
+				<input type="file" accept = ".txt" name="fileupload" style="background-color: lightgrey" value="fileupload" id="fileupload" onchange='loadTxt(this.files)'/>
+			</span>
+			<label class="explanation-constants-form">(It will be displayed in the upper text area.)</label>
+			<label for="wl" class="wl-label-constants-form">Word Length: </label>
+			<input class="yesno wl-input-constants-form" id="wl" type="input" required onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
+			<label class="FPF-label-constants-form"> or the FPF:</label>
+			<input class="yesno FPF-input-constants-form" id="FPF" type="input" required onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
+			<button id="file-reset"  type="button" onclick="clearUpload()" class="upload-span-constants-form reset-button-constants-form">Reset</button>
+			<input type="submit" class="submit-button-constants-form"/>
 		</form>
-		<h2 class="heads"> Result</h2>
+		<h2 class="headings"> Result</h2>
 	<!--  result -->
 	</div>
 		<div id="result" >

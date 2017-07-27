@@ -224,112 +224,106 @@ text-decoration: none;
 }
         /* Form style page FPF */
 * {box-sizing: border-box;}
-.wrapperFPF {
+.wrapper-FPF {
   max-width: 940px;
   margin: 0 auto;
 }
 
-.wrapperFPF > label {
+.wrapper-FPF > label {
   border-radius: 2px;
   min-width:200px;
   min-height: 20px;
   padding: 5px;
 }
 
-.wrapperFPF > input {
+.wrapper-FPF > input {
   border-radius: 2px;
   min-width:100px;
   min-height: 20px;
 }
 
 
-.wrapperFPF {
+.wrapper-FPF {
   display: grid;
 	grid-template-columns: repeat(10, 1fr);
 	grid-gap: 5px;
 	grid-auto-rows: minmax(30px, auto);
 
 }
-.container1 {
-  grid-column: 1 / 7;
-  grid-row: 1 / 4;
-}
-.heading1 {
+
+.first-heading-FPF-form {
   grid-column: 1;
   grid-row: 1 ;
   font-size: large;
   font-weight: bold;
 
 }
-.labelFPF1 {
+.first-label-FPF-form {
   grid-row: 3;
   grid-column: 1;
 }
-.inputFPF1 {
+.format-input-FPF-form {
   grid-column: 2;
   grid-row: 3;
 }
-.labelExp {
+.explanation-label-FPF-form {
   grid-column: 1 /3;
   grid-row: 4;
   width: 500px;
   padding-top:10px;
 }
-.container2{
-  grid-column: 1/ 7;
-  grid-row: 5 / 9;
-}
-.heading22 {
+
+.second-heading-FPF-form {
   grid-column: 1;
   grid-row: 6;
   font-size: large;
   font-weight: bold;
 }
-.notationChoice {
+.notation-choice-FPF-form {
   grid-column: 1;
   grid-row: 7;
     min-width: 300px;
     padding: 1em;
   grid-gap: 10px;
 }
-.checkboxFrac {
+.checkbox-fract-FPF-form {
   grid-column: 2;
   grid-row: 7;
     padding: 1em;
   grid-gap: 10px;
 }
-.labelChoice {
+.choice-label-FPF-form {
   grid-column: 1;
   grid-row: 8;
     padding: 1em;
   grid-gap: 10px;
 }
-.checkboxPow2 {
+.checkbox-power2-FPF-form {
   grid-column: 2;
   grid-row: 8;
     padding: 1em;
   grid-gap: 10px;
     min-width: 400px;
 }
-.colorChoice {
+.color-choice-FPF-form {
   grid-column: 1;
   grid-row: 9;
     padding: 1em;
   grid-gap: 10px;
 }
-.checkboxBinary {
+.checkbox-binary-FPF-form {
   grid-column: 2;
   grid-row: 9;
     padding: 1em;
   grid-gap: 10px;
 }
-.checkboxNumVals {
+.checkbox-num-vals-FPF-form {
   grid-column: 2;
   grid-row: 10;
     padding: 1em;
   grid-gap: 10px;
 }
-.submitFPF {
+.submit-FPF-form {
   grid-column: 3;
   grid-row: 11;
 }
@@ -338,26 +332,26 @@ text-decoration: none;
 		/* Form style(page constants) follows */
 
 		* {box-sizing: border-box;}
-		.wrapper {
+		.wrapper-constants-form {
 			max-width: 940px;
 			margin: 0 auto;
 		}
 
-		.wrapper > div {
+		.wrapper-constants-form > div {
 			border: 2px solid #0090d3;
 			border-radius: 2px;
 			padding: 1em;
 			background-color: lightgrey;
 
 		}
-		.wrapper > label {
+		.wrapper-constants-form > label {
 			color: #060200;
 			max-height: 50px;
 			min-width: 50px;
 
 			text-align: left;
 		}
-		.wrapper > input {
+		.wrapper-constants-form > input {
 			/*border: 2px solid #0090d3;*/
 			border-radius: 2px;
 			max-height: 30px;
@@ -366,7 +360,7 @@ text-decoration: none;
 			min-height: 10px;
 
 		}
-		.wrapper > button {
+		.wrapper-constants-form > button {
 			background-color: rgba(0, 144, 211, 0.22);
 			/*border: 2px solid #0090d3;*/
 			border-radius: 2px;
@@ -376,7 +370,7 @@ text-decoration: none;
 			text-align: center;
 		}
 
-		.wrapper {
+		.wrapper-constants-form {
 			display: grid;
 			grid-template-columns: repeat(10, 1fr);
 			grid-gap: 5px;
@@ -384,11 +378,11 @@ text-decoration: none;
 			/*grid-auto-columns: minmax(10px, auto);*/
 
 		}
-		.constantsLabel {
+		.first-label-constants-form {
 			grid-column: 1;
 			grid-row: 1;
 		}
-		.constantsText {
+		.div-text-constants-from {
 			grid-column: 2 / 6;
 			grid-row: 1 / 3;
 			overflow:hidden;
@@ -397,19 +391,19 @@ text-decoration: none;
 			height: 100px;
 
 		}
-		.uploadLabel {
+		.upload-label-constants-form {
 			grid-row: 3  ;
 			grid-column: 2;
 			width: 150px;
 			height: 20px;
 		}
-		.uploadButton {
+		.upload-span-constants-form {
 			grid-column: 3;
 			grid-row: 3;
-			text-align: left;
-
+			/*text-align: left;*/
+            /*padding: 20px;*/
 		}
-		.five {
+		.explanation-constants-form {
 			grid-column: 2 / 5;
 			grid-row: 3;
 			width: 400px;
@@ -417,38 +411,38 @@ text-decoration: none;
 
 			/*max-height: 100px;*/
 		}
-		.wlLabel {
+		.wl-label-constants-form {
 			grid-column: 2;
 			grid-row: 5;
 		}
-		.wlInput {
+		.wl-input-constants-form {
 			grid-column: 3 / 4;
 			grid-row: 5;
 			text-align: left;
             width: 100px;
 		}
-		.FPFLabel {
+		.FPF-label-constants-form {
 			grid-column: 5 ;
 			grid-row: 5;
 		}
-		.FPFInput {
+		.FPF-input-constants-form {
 			grid-column: 6;
 			grid-row: 5;
 			text-align: left;
             width: 100px;
 		}
-		.resetButton
+		.reset-button-constants-form
 		{
 			grid-row: 7;
 			grid-column: 2;
 		}
-		.submitButton
+		.submit-button-constants-form
 		{
 			grid-row: 7;
 			grid-column: 6;
 			background-color: lightgreen;
 		}
-		.heads
+		.headings
 		{
 			background-color: #0090d3;
 			color: white;

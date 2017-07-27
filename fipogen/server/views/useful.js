@@ -130,9 +130,6 @@ function verifyConstIntLines(inputStr)
 function verifyEachChar(inputStr)
 {
     var lastChar = inputStr.value.charAt(inputStr.value.length-1);
-    console.log("The last char suit:");
-    console.log(inputStr.value.length);
-    console.log(lastChar);
 	if((lastChar < '0' || lastChar > '9') && (lastChar!= '\n' && lastChar != '.'))
 	{
         inputStr.setCustomValidity('Entered character is not a number');
@@ -169,8 +166,6 @@ function validateTextArea()
 {
 	var div = document.getElementById('text');
 	var children = div.children;
-    console.log(div.innerHTML.toString());
-    console.log(div.innerText);
 
     if(children.length > 2)
     {
@@ -192,6 +187,5 @@ function validateTextArea()
         }
     }
 
-	console.log(div.innerHTML.toString());
 
 }

@@ -54,30 +54,30 @@ Blablabla... This page allows to display a Fixed-Point Format, and export it in 
 
 <div class="container">
 	<div style="display:inline-block">
-		<h2 class="heads"> Form</h2>
-		<form method="POST" action="javascript:validate();" id="form" class="wrapperFPF">
+		<h2 class="headings"> Form</h2>
+		<form method="POST" action="javascript:validate();" id="form" class="wrapper-FPF">
 			<!--<div style="border-color: #0c7fb0; border: px">-->
-					<label class="heading1">The FPF format</label>
-					<label for="FPF" class="labelFPF1">Fixed-Point Format: </label>
-					<div class="inputFPF1">
+					<label class="first-heading-FPF-form">The FPF format</label>
+					<label for="FPF" class="first-label-FPF-form">Fixed-Point Format: </label>
+					<div class="format-input-FPF-form">
 						<input class="yesno" id="FPF" type="text" onkeyup="verifyFPF(this);" required  size="7"/>
 					</div>
-					<label class="labelExp"> Enter your input format in Q form (example: Q4.9), then choose from the options below.</label>
+					<label class="explanation-label-FPF-form"> Enter your input format in Q form (example: Q4.9), then choose from the options below.</label>
 			<!--</div>-->
 				<!--<div class="container2">-->
-					<label class="heading22"><hr>Options</label>
-					<div for="notation" class="notationChoice">Notation:
+					<label class="second-heading-FPF-form"><hr>Options</label>
+					<div for="notation" class="notation-choice-FPF-form">Notation:
 					<select name="notation" style="width: auto; height: 20px">
 						<option value="mlsb">MSB/LSB</option>
 						<option value="ifwl">integer/fractional parts</option>
 					</select>
 					</div>
 
-					<div class="checkboxFrac">
+					<div class="checkbox-fract-FPF-form">
 						<input type="checkbox" name="intfrac" />Display integer/fractional parts
 					</div>
 
-					<div for="colors" class="labelChoice">Color:
+					<div for="colors" class="choice-label-FPF-form">Color:
 					<select name="colors" style="width: auto; height: 20px">
 						{% for k,c in colors %}
 						<option value="{{k}}">{{c[3]}}</option>
@@ -85,11 +85,11 @@ Blablabla... This page allows to display a Fixed-Point Format, and export it in 
 					</select>
 					</div>
 
-					<div class="checkboxPow2">
+					<div class="checkbox-power2-FPF-form">
 						<input type="checkbox" name="power2" />Display power-of-2
 					</div>
 
-					<div  class="colorChoice">Label:
+					<div  class="color-choice-FPF-form">Label:
 					<select name="label" style="width: auto; height: 20px">
 						<option value="none">None</option>
 						<option value="left">Left</option>>
@@ -98,18 +98,18 @@ Blablabla... This page allows to display a Fixed-Point Format, and export it in 
 						<option value="below">Below</option>
 					</select>
 					</div>
-			<div class="checkboxBinary">
+			<div class="checkbox-binary-FPF-form">
 				<input type="checkbox" name="binary_point" checked /> Display binary point
 			</div>
-			<div class="checkboxNumVals">
+			<div class="checkbox-num-vals-FPF-form">
 			<input name="numeric" type="checkbox"  />Numerical values (instead of symbolic)
 			</div>
 
-		<input type="submit" class="submitFPF"/>
+		<input type="submit" class="submit-FPF-form"/>
 				<!--</div>-->
 			<!--</div>-->
 		</form>
-		<h2 class="heads"> Result</h2>
+		<h2 class="headings"> Result</h2>
 		<div id="result">
 		</div>
 
