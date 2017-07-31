@@ -79,4 +79,5 @@ target/
 # FIPOGEN
 generated/code
 generated/LaTeX
+generated/latex
 server/cache
