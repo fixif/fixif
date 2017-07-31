@@ -232,9 +232,12 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 			<label class="explanation-constants-form">(It will be displayed in the upper text area.)</label>
 			<label for="wl" class="wl-label-constants-form">Word Length: </label>
 			<input class="yesno wl-input-constants-form" id="wl" type="input" required onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
-			<label class="FPF-label-constants-form"> or the FPF:</label>
+
+			<label class="or-label-constants-form">or</label>
+
+			<label class="FPF-label-constants-form"> the FPF:</label>
 			<input class="yesno FPF-input-constants-form" id="FPF" type="input" required onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
-			<button id="file-reset"  type="button" onclick="clearUpload()" class="upload-span-constants-form reset-button-constants-form">Reset</button>
+			<button id="file-reset"  type="button" onclick="clearUpload()" class="reset-button-constants-form">Reset</button>
 			<input type="submit" class="submit-button-constants-form"/>
 		</form>
 		<h2 class="headings"> Result</h2>
