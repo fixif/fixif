@@ -32,3 +32,10 @@ $ py.test fipogen/LTI -v
 - Run some specific tests (like those with the name 'wcpg')
 $ py.test -v -k wcpg
 
+-----
+AUTHORS
+- Thibault HILAIRE
+- Benoit LOPEZ
+- Joachim KRUITHOF
+- Anastasia VOLKOVA
+-
