@@ -420,6 +420,11 @@ def js(filename):
     """Returns the '/*.js' files"""
     return static_file(filename + '.js', root=Config.views)
 
+# ACE files
+@route('/ace-builds-master/src/<filename>.js')
+def ACE(filename):
+    """Returns the ace files"""
+    return static_file(filename + '.js', root=Config.views + 'ace-builds-master/src/')
 
 # logos and basic image
 @route('/<image_name>.<outputFormat:re:jpg|gif>')

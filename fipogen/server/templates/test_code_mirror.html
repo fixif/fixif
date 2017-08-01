@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CodeMirror</title>
+    <link rel="stylesheet" type="text/css" href="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.css">
+</head>
+<body>
+    <h3>"title: test</h3>
+    <textarea id="codemirror-textarea"></textarea>
+
+
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.js"></script>
+    <script>
+        $(document).ready(function(){
+            //code here...
+            var code = document.getElementById("codemirror-textarea");
+            var editor = CodeMirror.fromTextArea(code, {
+                lineNumbers : true,
+                mode:  "javascript",
+                smartIndent: true,
+            });
+            editor.setValue("function myScript(){return 100;}\n");
+            editor.mode ="javascript";
+            editor.smartIndent = true;
+            console.log("val: " + editor.getValue());
+        });
+
+    </script>
+
+
+
+</body>
+</html>
