@@ -3,30 +3,192 @@
 <head>
     <title>CodeMirror</title>
     <link rel="stylesheet" type="text/css" href="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.css">
+    <!--<link rel="stylesheet" href="../plugins/codemirror/codemirror-5.28.0/addon/lint/lint.css">-->
 </head>
+<style>
+    .CodeMirror-lint-markers {
+        width: 16px;
+    }
+
+    .CodeMirror-lint-tooltip {
+        background-color: #ffd;
+        border: 1px solid black;
+        border-radius: 4px 4px 4px 4px;
+        color: black;
+        font-family: monospace;
+        font-size: 10pt;
+        overflow: hidden;
+        padding: 2px 5px;
+        position: fixed;
+        white-space: pre;
+        white-space: pre-wrap;
+        z-index: 100;
+        max-width: 600px;
+        opacity: 0;
+        transition: opacity .4s;
+        -moz-transition: opacity .4s;
+        -webkit-transition: opacity .4s;
+        -o-transition: opacity .4s;
+        -ms-transition: opacity .4s;
+    }
+
+    .CodeMirror-lint-mark-error, .CodeMirror-lint-mark-warning {
+        background-position: left bottom;
+        background-repeat: repeat-x;
+    }
+
+    .CodeMirror-lint-mark-error {
+        background-image:
+                url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==")
+    ;
+    }
+
+    .CodeMirror-lint-mark-warning {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJFhQXEbhTg7YAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAMklEQVQI12NkgIIvJ3QXMjAwdDN+OaEbysDA4MPAwNDNwMCwiOHLCd1zX07o6kBVGQEAKBANtobskNMAAAAASUVORK5CYII=");
+    }
+
+    .CodeMirror-lint-marker-error, .CodeMirror-lint-marker-warning {
+        background-position: center center;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        display: inline-block;
+        height: 16px;
+        width: 16px;
+        vertical-align: middle;
+        position: relative;
+    }
+
+    .CodeMirror-lint-message-error, .CodeMirror-lint-message-warning {
+        padding-left: 18px;
+        background-position: top left;
+        background-repeat: no-repeat;
+    }
+
+    .CodeMirror-lint-marker-error, .CodeMirror-lint-message-error {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII=");
+    }
+
+    .CodeMirror-lint-marker-warning, .CodeMirror-lint-message-warning {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAANlBMVEX/uwDvrwD/uwD/uwD/uwD/uwD/uwD/uwD/uwD6twD/uwAAAADurwD2tQD7uAD+ugAAAAD/uwDhmeTRAAAADHRSTlMJ8mN1EYcbmiixgACm7WbuAAAAVklEQVR42n3PUQqAIBBFUU1LLc3u/jdbOJoW1P08DA9Gba8+YWJ6gNJoNYIBzAA2chBth5kLmG9YUoG0NHAUwFXwO9LuBQL1giCQb8gC9Oro2vp5rncCIY8L8uEx5ZkAAAAASUVORK5CYII=");
+    }
+
+    .CodeMirror-lint-marker-multiple {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAMAAADzjKfhAAAACVBMVEUAAAAAAAC/v7914kyHAAAAAXRSTlMAQObYZgAAACNJREFUeNo1ioEJAAAIwmz/H90iFFSGJgFMe3gaLZ0od+9/AQZ0ADosbYraAAAAAElFTkSuQmCC");
+        background-repeat: no-repeat;
+        background-position: right bottom;
+        width: 100%; height: 100%;
+    }
+
+</style>
 <body>
-    <h3>"title: test</h3>
-    <textarea id="codemirror-textarea"></textarea>
+<h3>title: test</h3>
+<textarea id="text"></textarea>
 
 
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script type="text/javascript" src="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.js"></script>
-    <script>
-        $(document).ready(function(){
-            //code here...
-            var code = document.getElementById("codemirror-textarea");
-            var editor = CodeMirror.fromTextArea(code, {
-                lineNumbers : true,
-                mode:  "javascript",
-                smartIndent: true,
-            });
-            editor.setValue("function myScript(){return 100;}\n");
-            editor.mode ="javascript";
-            editor.smartIndent = true;
-            console.log("val: " + editor.getValue());
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript" src="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.js"></script>
+<!--<script src="../plugins/codemirror/codemirror-5.28.0/mode/javascript/javascript.js"></script>-->
+<script src="../plugins/codemirror/codemirror-5.28.0/addon/mode/simple.js"></script>
+<script src="../plugins/codemirror/codemirror-5.28.0/addon/lint/lint.js"></script>
+<!--<script src="../plugins/codemirror/codemirror-5.28.0/addon/lint/lint.css"></script>-->
+<script src="../plugins/codemirror/codemirror-5.28.0/addon/lint/json-lint.js"></script>
+<script src="../plugins/codemirror/codemirror-5.28.0/addon/lint/javascript-lint.js"></script>
+<!--<script src="../plugins/codemirror/codemirror-5.28.0/addon/lint/css-lint.js"></script>-->
+
+<script>
+var lit = "[+-]?\\d+(?:\\.\\d+)?";
+var expC = new RegExp( "^"+lit+"$");					// literal constant
+var expI = new RegExp( "^\\[("+lit+");("+lit+")\\]$");
+
+    CodeMirror.defineSimpleMode("simplemode", {
+        // The start state contains the rules that are intially used
+        start: [
+            // The regex matches the token, the token property contains the type
+            {regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string"},
+            // You can match multiple tokens at once. Note that the captured
+            // groups must span the whole string in this case
+            {regex: /(function)(\s+)([a-z$][\w$]*)/,
+                token: ["keyword", null, "variable-2"]},
+            // Rules are matched in the order in which they appear, so there is
+            // no ambiguity between this one and the one above
+            {regex: /true|false|null|undefined/, token: "atom"},
+            {regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
+                token: "number"},
+            {regex: /\/(?:[^\\]|\\.)*?\//, token: "variable-3"},
+            // A next property will cause the mode to move to a different state
+            {regex: /\/\*/, token: "comment", next: "comment"},
+            {regex: /[-+\/*=<>!]+/, token: "operator"},
+            // indent and dedent properties guide autoindentation
+            {regex: /[\{\[\(]/, indent: true},
+            {regex: /[\}\]\)]/, dedent: true},
+            {regex: /[a-z$][\w$]*/, token: "variable"},
+            // You can embed other modes with the mode property. This rule
+            // causes all code between << and >> to be highlighted with the XML
+            // mode.
+            {regex: /<</, token: "meta", mode: {spec: "xml", end: />>/}}
+        ],
+        // The multi-line comment state.
+        comment: [
+            {regex: /.*?\*\//, token: "comment", next: "start"},
+            {regex: /.*/, token: "comment"}
+        ],
+        // The meta property contains global information about the mode. It
+        // can contain properties like lineComment, which are supported by
+        // all modes, and also directives like dontIndentStates, which are
+        // specific to simple modes.
+        meta: {
+            dontIndentStates: ["comment"],
+            lineComment: "//"
+        }
+    });
+
+    /* ------------------------------------------------------- */
+    $(document).ready(function(){
+        //code here...
+        var code = document.getElementById("text");
+        var editor = CodeMirror.fromTextArea(code, {
+            lineNumbers : true,
+            matchBrackets: true,
+//            mode:  "javascript",
+//                smartIndent: true,
+            gutters: ["CodeMirror-lint-markers"],
+//            lint : true,
+        });
+//        editor.setValue("function myScri;pt(){return 100;}\n");
+        editor.mode ="simplemode";
+        editor.smartIndent = true;
+        editor.on("keyup", function(cm, e) {
+            var str = cm.getValue();
+            console.log("val:" + cm.getValue());
+            for(var i =0; i < str.split("\n").length; i++)
+            {
+                console.log(str.split("\n")[i]);
+                if(!(str.split("\n")[i].match(expC) || str.split("\n")[i].match(expI)))
+                    cm.setGutterMarker(i, "CodeMirror-lint-markers", makeMarker1());
+                else
+                    cm.setGutterMarker(i, "CodeMirror-lint-markers", makeMarker2());
+            }
         });
 
-    </script>
+    });
+
+    function makeMarker1() {
+  var marker = document.createElement("div");
+  marker.style.color = "#d03434";
+  marker.innerHTML = "<br>";
+      marker.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII='";
+  return marker;
+}
+
+    function makeMarker2() {
+  var marker = document.createElement("div");
+  marker.style.backgroundColor = "#5bec40";
+  marker.innerHTML = "<br>";
+
+  return marker;
+}
+
+</script>
 
 
 
