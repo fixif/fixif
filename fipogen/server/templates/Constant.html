@@ -1,18 +1,165 @@
 {% extends "base.html" %}
+
+
+{% block content %}
+<style>
+    .CodeMirror-lint-markers {
+        width: 16px;
+    }
+</style>
+<link rel="stylesheet" type="text/css" href="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.css">
+
+Blablabla... This page allows to convert a real constant (literal constant or an interval, e.g. <i>0.124</i> or <i>[-100;100]</i>) into a fixed-point representation.
+
+<p>
+
+	<div class="container" >
+		<div style="display: inline-block">
+			<!-- form -->
+			<h2 class="headings"> Form</h2>
+			<form method="POST" action="javascript:clickSubmit();" id="form" class="wrapper-constants-form">
+<p  class="first-label-constants-form tooltip" >Constants:
+	<!--<img src="tooltip.jpg" width="15" height="15" style="float: right; display: inline-block;" >-->
+	<span class="tooltiptext">Enter your constants or intervals here</span>
+</p>
+<div  id="text-container" class = "div-text-constants-from"  >
+	<textarea id="text"></textarea>
+</div>
+<label class="upload-label-constants-form">Import a file:</label>
+<span  class="upload-span-constants-form">
+				<input type="file" accept = ".txt" name="fileupload" style="background-color: lightgrey" value="fileupload" id="fileupload" onchange='loadTxt(this.files)'/>
+			</span>
+<label class="explanation-constants-form">(It will be displayed in the upper text area.)</label>
+<label for="wl" class="wl-label-constants-form">Word Length: </label>
+<input class="yesno wl-input-constants-form" id="wl" type="input" required onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
+
+<label class="or-label-constants-form">or</label>
+
+<label class="FPF-label-constants-form"> the FPF:</label>
+<input class="yesno FPF-input-constants-form" id="FPF" type="input" required onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
+<button id="file-reset"  type="button" onclick="clearUpload()" class="reset-button-constants-form">Reset</button>
+<input type="submit" class="submit-button-constants-form"/>
+</form>
+<h2 class="headings"> Result</h2>
+<!--  result -->
+</div>
+<div id="result" >
+
+
+</div>
+
+
+</div>
+
+</div>
+</div>
+
+<!--
+	Fixed-Point Representation: <br/>
+	The constant is approximated by: <br/>
+	Absolute error: <br/>
+	Relative error:<br/>
+	<div class="r-container">
+	<div id="result">
+		<img id='FPF_image'><br/>
+		{% for img in imageFormats %}
+			<a id='a_{{img}}' href=''>{{img}}</a>&nbsp;&nbsp;
+		{% endfor %}
+		<br/>
+		<table border=1><div id='str_latex'></div></table>
+	</div>
+ -->
+
+
+
+
+
+{% endblock %}
+
 {% block script %}
 
+<script type="text/javascript" src="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.js"></script>
+<script src="../plugins/codemirror/codemirror-5.28.0/addon/mode/simple.js"></script>
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="{{base_url}}useful.js"></script>
+
+
 <script>
 
-	var resultJson;
+    var resultJson;
+	var editor;
+
+    var lit = "[+-]?\\d+(?:\\.\\d+)?";
+    var expC = new RegExp( "^"+lit+"$");
+    var expI = new RegExp( "^\\[("+lit+");("+lit+")\\]$");
+
+    CodeMirror.defineSimpleMode("simplemode", {
+        // The start state contains the rules that are intially used
+        start: [
+        ],
+        // The multi-line comment state.
+        comment: [
+        ],
+    });
+
+	/* ------------------------------------------------------- */
+    $(document).ready(function(){
+        //code here...
+        var code = document.getElementById("text");
+        editor = CodeMirror.fromTextArea(code, {
+            lineNumbers : true,
+            matchBrackets: true,
+            gutters: ["CodeMirror-lint-markers"],
+        });
+        editor.mode ="simplemode";
+        editor.smartIndent = true;
+        editor.on("keyup", function(cm, e) {
+            var str = cm.getValue();
+            console.log("val:" + cm.getValue());
+            var lines= str.split("\n");
+            for(var i =0; i < lines.length; i++)
+            {
+                console.log(lines[i]);
+                if(lines[i].trim().length >0)
+                {
+                    if(!(lines[i].match(expC) || lines[i].match(expI)))
+                        cm.setGutterMarker(i, "CodeMirror-lint-markers", returnWrongElement());
+                    else
+                        cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
+                }
+                else
+                    cm.setGutterMarker(i, "CodeMirror-lint-markers", null);
+            }
+        });
+
+    });
+
+    function returnWrongElement() {
+        var marker = document.createElement("div");
+        marker.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAASlQTFRFvEJC4WtrUgAAMgAA/hsb/ysrPgAAqEFB23p61XFxiSEhhjIy3Xt70nV1iSMjsTIy94uL95+f0mVlhhERkioq3nFx/KWl7X5+qSIiZwICvCoq94eH1FJS3Fxc+4qKriIiXQEBIAAAawEBwCIi+nBw+3FxsxsbXwAAEQAAGQAAigcH6T8/4Tk5eQUFBQAAmwsL3ykp+05O+kpK2ygokRQUpQ8P5x4ezB0d0CEh/UJC5S8vnRwcxhMTzyYmfQIChAQE0i8vwCIipQcH6zIy0yoqhQQEAAAAIgAAigUF1DMz6D09nQsLYQICoxoahAoKAAAAEwAAhgsLnxgYWwIC+n199nR0+WRk9V5e/2dn+lNT+1RU/zEx+EBA+UlJ/zAw+klJ+l5e/khI////+j8McAAAAFR0Uk5TAAAAAAAAACWujw4bp5gWhPv0gwwWnPv1ZH759I6f+vFeG5v5+vzzgg8Wo/76jQwpt/78qCE4v/b3/rUwuu16g/CtsP3naAcKcev8ozqtZwYHb6syI9ODJAAAAAFiS0dEYiu5HTwAAAB2SURBVAjXY2Dn4ORiYOTm4eVj4BcQFBIWERUTl2CQlAqRlpGVC5VXYFBUUg5TUQ1XU9dgYNLU0o6I0NHVY2Zg0TcwjIwyMjZhZTA1i44xt4i1tLJmsImLt7Wzd0hIdGRwcnZxdXP38PTyZvDx9fNnZgsIDAoGACHbEu2OSfg/AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDEzLTEyLTMwVDIzOjI3OjEwKzAxOjAwk0r5nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxMy0xMi0zMFQyMzoyNzoxMCswMTowMOIXQSAAAAAASUVORK5CYII=')";
+		marker.style.backgroundPosition="center";
+        marker.style.backgroundRepeat= "no-repeat";
+        marker.innerHTML = "<br>";
+        return marker;
+    }
+
+    function returnCorrectElement() {
+        var marker = document.createElement("div");
+        marker.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAOpQTFRFAAAAGm0SZKdXLJ4PMo8ZFF4AETkCMnUKMW8RIk4GSXsmN6IALogAGW0SFm0SBTkKImkbir2DksSPN3wzChwIIG8NH3ALIGwLebppxei9PpA3Knwcb75bZ7lOJHMNIm8GbLxOo+COU65BDWAHK5MOftZcWb0vXL8vh95fVrwuGnIEABwAIXYAOrIGW9cebd4wVcgYLIMGBCkADS4ANYkGT8cNh91NR5YbCC0AFTkBTJoYj+BVs+2Cb6hGFUABHEgAaqk3dK9EJFANDioAETMAuOKxo96RZslHhtxgTMwTbt8wa98olOtY////X+LKJAAAAEV0Uk5TAAAAAAAAAAAAAAAAACQ1ASCvzkcBMSMcqv7ISNC2JRun+/ebxv64r/z6mBeU9v7++ZcVFJH4+psWFJf5/J8XFpadGxMUq3HNRwAAAAFiS0dETYBoIGUAAABmSURBVAjXY2AAA0ZePn4Ii0lAUEiYQURUjJlFXELSVYpBWkZWTl5B0U1JmUHFXVVNXcNDU0ubQUfXU0/fy8DQiJXB2MTU28fM3IKNgYHd0sraxtaOA2QQp72DoxMXxFBuZxceEA0AK08Lb2nEcnIAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTMtMTItMzBUMjM6Mjc6MTcrMDE6MDBW7ccSAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDEzLTEyLTMwVDIzOjI3OjE3KzAxOjAwJ7B/rgAAAABJRU5ErkJggg==')" ;
+        marker.style.backgroundPosition="center";
+        marker.style.backgroundRepeat= "no-repeat";
+        marker.innerHTML = "<br>";
+
+        return marker;
+    }
 
 	/* Clears the uploaded file */
     function clearUpload()
     {
         $("#fileupload").val('');
         $("#fileupload").disabled = false;
-        $("#text").html('');
+//        $("#text").html('');
+    	editor.setValue("");
     }
 
 	/* Loads and processes the text in the .txt uploaded file. */
@@ -46,54 +193,41 @@
         if (file && file.length) {
             results = file.split("\n");
             var ci = "";
-            for(var i = 0; i < results.length; i++)
-            {
-                if(results[i].length!= 0)
-                {
-                    ci+= results[i];
-                    ci+="@" ;
-                    var spanEl = document.createElement("SPAN");
-                    var textEl = document.createTextNode(results[i].toString());
-                    spanEl.appendChild(textEl);
-                    spanEl.appendChild(document.createElement("br"));
-                    div.appendChild(spanEl);
-                }
-            }
-
-            validateTextArea();
+			editor.setValue(results.join('\n'));
+//            validateTextArea(editor);
         }
     }
 
-    /* When an input is given to wl, FPF must be disabled */
-	function disableFPF()
-	{
-	    if($('#wl').val().length > 0)
-			document.getElementById("FPF").disabled= true;
-	    else
-	        document.getElementById("FPF").disabled= false;
+	/* When an input is given to wl, FPF must be disabled */
+    function disableFPF()
+    {
+        if($('#wl').val().length > 0)
+            document.getElementById("FPF").disabled= true;
+        else
+            document.getElementById("FPF").disabled= false;
     }
 
-    /* When an input is given to FPF, wl must be disabled */
+	/* When an input is given to FPF, wl must be disabled */
     function disableWL()
-	{
-	    if($('#FPF').val().length > 0)
-		    document.getElementById("wl").disabled=true;
-	    else
-			document.getElementById("wl").disabled=false;
-	}
+    {
+        if($('#FPF').val().length > 0)
+            document.getElementById("wl").disabled=true;
+        else
+            document.getElementById("wl").disabled=false;
+    }
 
 	/* called when the form is submitted; call the image */
     function clickSubmit()
     {
-		var dlButt = document.createElement("button");	// The button corresponding to download the results file
-		dlButt.id= "dl-res";
-		dlButt.innerHTML = "Download the results";
-		dlButt.style.minHeight= '30px';
-		dlButt.setAttribute('onclick', 'dlResFile();');
-		document.getElementById("result").innerHTML = dlButt.outerHTML;
+        var dlButt = document.createElement("button");	// The button corresponding to download the results file
+        dlButt.id= "dl-res";
+        dlButt.innerHTML = "Download the results";
+        dlButt.style.minHeight= '30px';
+        dlButt.setAttribute('onclick', 'dlResFile();');
+        document.getElementById("result").innerHTML = dlButt.outerHTML;
 
-        var div = document.getElementById("text");
-        var ci_s =processDiv(div.innerText);
+//        var div = document.getElementById("text");
+        var ci_s =processDiv(editor.getValue());
         var ci = ci_s.join("@");
 
 
@@ -101,10 +235,10 @@
 		/*Making of ci_s*/
         var wl = $('#wl').val();		// gets the wordlength/FPF
 
-		if(wl.length == 0)
-		{
-		    wl = $('#FPF').val();
-		}
+        if(wl.length == 0)
+        {
+            wl = $('#FPF').val();
+        }
 
 		/* build the query */
         var q = '{{base_url}}Constant/' + ci + '?';
@@ -113,7 +247,7 @@
         else
             q = q + 'WL='+wl;
 
-        /* get the json */
+		/* get the json */
         $.ajax({ url: q}).done( function( data)
         {
             resultJson= data;
@@ -170,23 +304,23 @@
             html += "</table>";
 
 //            $("#result").html(dlButt.outerHTML +"<br>"+ html);
-			document.getElementById("result").innerHTML += html;
+            document.getElementById("result").innerHTML += html;
         });
     }
 
-    /* Called when "Download the result's button is clicked".
-    Code taken from : https://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server/18197341?noredirect=1#answer-3665147 */
+	/* Called when "Download the result's button is clicked".
+	 Code taken from : https://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server/18197341?noredirect=1#answer-3665147 */
     function dlResFile()
-	{
-	    var ci_s =processDiv(document.getElementById("text").innerText); /* The constants or intervals given as input */
-	    var strFile = "Const/Int\t\t\t\tlsb\t\t\t\tFPF\n"; /* The string to put in downloadable file */
+    {
+        var ci_s =processDiv(editor.getValue()); /* The constants or intervals given as input */
+        var strFile = "Const/Int\t\t\t\tlsb\t\t\t\tFPF\n"; /* The string to put in downloadable file */
 
-		for(var i = 0; i < ci_s.length; i++)
-		{
-		    strFile += ci_s[i] + "\t\t\t\t" + resultJson[i]["lsb"] + "\t\t\t\t" + resultJson[i]["FPF"] + "\n";
-		}
+        for(var i = 0; i < ci_s.length; i++)
+        {
+            strFile += ci_s[i] + "\t\t\t\t" + resultJson[i]["lsb"] + "\t\t\t\t" + resultJson[i]["FPF"] + "\n";
+        }
 
-	    var a = window.document.createElement('a');
+        var a = window.document.createElement('a');
         a.href = window.URL.createObjectURL(new Blob([strFile], {type: 'text'}));
         a.download = 'result.txt';
 
@@ -194,84 +328,15 @@
         a.click();
 
         document.getElementById("result").removeChild(a); // Remove anchor from body
-	}
+    }
 
 	/* To set one of wl or FPF required for submit */
     jQuery(function ($) {
-    var $inputs = $('input[name=wl],input[name=FPF]');
-    $inputs.on('input', function () {
-        $inputs.not(this).prop('required', !$(this).val().length);	// Set the required property of the other input to false if this input is not empty.
+        var $inputs = $('input[name=wl],input[name=FPF]');
+        $inputs.on('input', function () {
+            $inputs.not(this).prop('required', !$(this).val().length);	// Set the required property of the other input to false if this input is not empty.
+        });
     });
-});
 
 </script>
 {% endblock%}
-
-
-{% block content %}
-Blablabla... This page allows to convert a real constant (literal constant or an interval, e.g. <i>0.124</i> or <i>[-100;100]</i>) into a fixed-point representation.
-
-<p>
-
-<div class="container" >
-	<div style="display: inline-block">
-		<!-- form -->
-		<h2 class="headings"> Form</h2>
-		<form method="POST" action="javascript:clickSubmit();" id="form" class="wrapper-constants-form">
-			<p  class="first-label-constants-form tooltip" >Constants:
-				<!--<img src="tooltip.jpg" width="15" height="15" style="float: right; display: inline-block;" >-->
-				<span class="tooltiptext">Enter your constants or intervals here</span>
-			</p>
-			<div  id="text" name="text"  contenteditable="true" class = "div-text-constants-from"  >
-
-			</div>
-			<label class="upload-label-constants-form">Import a file:</label>
-			<span  class="upload-span-constants-form">
-				<input type="file" accept = ".txt" name="fileupload" style="background-color: lightgrey" value="fileupload" id="fileupload" onchange='loadTxt(this.files)'/>
-			</span>
-			<label class="explanation-constants-form">(It will be displayed in the upper text area.)</label>
-			<label for="wl" class="wl-label-constants-form">Word Length: </label>
-			<input class="yesno wl-input-constants-form" id="wl" type="input" required onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
-
-			<label class="or-label-constants-form">or</label>
-
-			<label class="FPF-label-constants-form"> the FPF:</label>
-			<input class="yesno FPF-input-constants-form" id="FPF" type="input" required onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
-			<button id="file-reset"  type="button" onclick="clearUpload()" class="reset-button-constants-form">Reset</button>
-			<input type="submit" class="submit-button-constants-form"/>
-		</form>
-		<h2 class="headings"> Result</h2>
-	<!--  result -->
-	</div>
-		<div id="result" >
-
-
-	</div>
-
-
-</div>
-
-</div>
-</div>
-
-<!--
-	Fixed-Point Representation: <br/>
-	The constant is approximated by: <br/>
-	Absolute error: <br/>
-	Relative error:<br/>
-	<div class="r-container">
-	<div id="result">
-		<img id='FPF_image'><br/>
-		{% for img in imageFormats %}
-			<a id='a_{{img}}' href=''>{{img}}</a>&nbsp;&nbsp;
-		{% endfor %}
-		<br/>
-		<table border=1><div id='str_latex'></div></table>
-	</div>
- -->
-
-
-
-
-
-{% endblock %}

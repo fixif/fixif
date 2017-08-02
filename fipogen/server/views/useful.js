@@ -162,9 +162,11 @@ function processDiv(text)
 
 }
  /* Validates the data in text area and changes the color of correct ones to green. */
-function validateTextArea()
+function validateTextArea(editor)
 {
-	var div = document.getElementById('text');
+	// if(editor.getValue.length() == 0)
+	// 	document.getElementById("")
+/*	var div = document.getElementById('text');
 	var children = div.children;
 
     if(children.length > 2)
@@ -184,8 +186,7 @@ function validateTextArea()
                 //children[i].style.color='darkred';
 				children[i].setCustomValidity ='error';
             }
-        }
-    }
-
-
+        }*/
 }
+
+

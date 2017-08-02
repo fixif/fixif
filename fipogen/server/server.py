@@ -420,11 +420,29 @@ def js(filename):
     """Returns the '/*.js' files"""
     return static_file(filename + '.js', root=Config.views)
 
-# ACE files
-@route('/ace-builds-master/src/<filename>.js')
-def ACE(filename):
+# # ACE files
+# @route('/ace-builds-master/src/<filename>.js')
+# def ACE(filename):
+#     """Returns the ace files"""
+#     return static_file(filename + '.js', root=Config.views + 'ace-builds-master/src/')
+
+# Code Mirror, mostly files in lib directory
+@route('/plugins/codemirror/codemirror-5.28.0/<path>/<filename>.js')
+def plugins(filename, path):
     """Returns the ace files"""
-    return static_file(filename + '.js', root=Config.views + 'ace-builds-master/src/')
+    return static_file(filename + '.js', root='plugins/codemirror/codemirror-5.28.0/' + path + '/')
+
+# Code Mirror style file
+@route('/plugins/codemirror/codemirror-5.28.0/<path>/<filename>.css')
+def plugins(filename, path):
+    """Returns the ace files"""
+    return static_file(filename + '.css', root='plugins/codemirror/codemirror-5.28.0/' + path + '/')
+
+# Code Mirror 2 layers
+@route('/plugins/codemirror/codemirror-5.28.0/<path1>/<path2>/<filename>.js')
+def plugins(filename, path1, path2):
+    """Returns the ace files"""
+    return static_file(filename + '.js', root='plugins/codemirror/codemirror-5.28.0/' + path1 + '/' + path2 + '/')
 
 # logos and basic image
 @route('/<image_name>.<outputFormat:re:jpg|gif>')

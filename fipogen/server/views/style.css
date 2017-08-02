@@ -340,7 +340,6 @@ text-decoration: none;
 		.wrapper-constants-form > div {
 			border: 2px solid #0090d3;
 			border-radius: 2px;
-			padding: 1em;
 			background-color: lightgrey;
 
 		}
@@ -348,11 +347,9 @@ text-decoration: none;
 			color: #060200;
 			max-height: 50px;
 			min-width: 150px;
-
 			text-align: left;
 		}
 		.wrapper-constants-form > input {
-			/*border: 2px solid #0090d3;*/
 			border-radius: 2px;
 			max-height: 30px;
 			max-width: 100px;
@@ -362,7 +359,6 @@ text-decoration: none;
 		}
 		.wrapper-constants-form > button {
 			background-color: rgba(0, 144, 211, 0.22);
-			/*border: 2px solid #0090d3;*/
 			border-radius: 2px;
 			max-height: 30px;
 			max-width: 50px;
@@ -389,6 +385,7 @@ text-decoration: none;
 			overflow-y:scroll;
 			width:520px;
 			height: 100px;
+            padding: 0px;
 
 		}
 		.upload-label-constants-form {
