@@ -82,13 +82,15 @@
 </style>
 <body>
 <h3>title: test</h3>
-<textarea id="text"></textarea>
-
+<div style="width: 500px; height: 200px;">
+    <textarea id="text" style="width: 500px; height: 200px;"></textarea>
+</div>
 
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript" src="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.js"></script>
 <!--<script src="../plugins/codemirror/codemirror-5.28.0/mode/javascript/javascript.js"></script>-->
 <script src="../plugins/codemirror/codemirror-5.28.0/addon/mode/simple.js"></script>
+<script type="text/jaascript" src = "https://codemirror.net/addon/scroll/simplescrollbars.js"></script>
 
 <script>
 var lit = "[+-]?\\d+(?:\\.\\d+)?";
@@ -111,8 +113,9 @@ var expI = new RegExp( "^\\[("+lit+");("+lit+")\\]$");
         var editor = CodeMirror.fromTextArea(code, {
             lineNumbers : true,
             matchBrackets: true,
-            gutters: ["CodeMirror-lint-markers"],
+            gutters: ["CodeMirror-lint-markers"]
         });
+        editor.scrollbarStyle="simple";
         editor.mode ="simplemode";
         editor.smartIndent = true;
         editor.on("keyup", function(cm, e) {

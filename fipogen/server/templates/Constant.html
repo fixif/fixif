@@ -8,7 +8,7 @@
     }
 </style>
 <link rel="stylesheet" type="text/css" href="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.css">
-
+<link rel="stylesheet" href="../plugins/codemirror/codemirror-5.28.0/addon/scroll/simplescrollbars.css">
 Blablabla... This page allows to convert a real constant (literal constant or an interval, e.g. <i>0.124</i> or <i>[-100;100]</i>) into a fixed-point representation.
 
 <p>
@@ -23,7 +23,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	<span class="tooltiptext">Enter your constants or intervals here</span>
 </p>
 <div  id="text-container" class = "div-text-constants-from"  >
-	<textarea id="text"></textarea>
+	<textarea id="text" position="absolute" ></textarea>
 </div>
 <label class="upload-label-constants-form">Import a file:</label>
 <span  class="upload-span-constants-form">
@@ -80,8 +80,11 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
 <script type="text/javascript" src="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.js"></script>
 <script src="../plugins/codemirror/codemirror-5.28.0/addon/mode/simple.js"></script>
+<script src="../plugins/codemirror/codemirror-5.28.0/addon/scroll/simplescrollbars.js"></script>
+<!--<script type="text/javascript" src = "https://codemirror.net/addon/scroll/simplescrollbars.js"></script>-->
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="{{base_url}}useful.js"></script>
+
 
 
 <script>
@@ -108,12 +111,16 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         var code = document.getElementById("text");
         editor = CodeMirror.fromTextArea(code, {
             lineNumbers : true,
-            matchBrackets: true,
+//            matchBrackets: true,
             gutters: ["CodeMirror-lint-markers"],
+//			lineWrapping: true,
         });
+
+        editor.lineWrapping = true;
+        editor.scrollbarStyle = "simple";
         editor.mode ="simplemode";
         editor.smartIndent = true;
-        editor.on("keyup", function(cm, e) {
+        editor.on("change", function(cm, e) {
             var str = cm.getValue();
             console.log("val:" + cm.getValue());
             var lines= str.split("\n");
@@ -187,14 +194,16 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	/* Loads the text in the uploaded text file and fills up the text area with its content. */
     function fillUpTxtArea(e)
     {
-        var div = document.getElementById('text');
         var file = e.target.result,
             results;
         if (file && file.length) {
             results = file.split("\n");
             var ci = "";
 			editor.setValue(results.join('\n'));
-//            validateTextArea(editor);
+			editor.focus();
+			editor.setCursor({line: results.length, ch: 0});
+
+//            validateTextArea(editor); todo: :|
         }
     }
 

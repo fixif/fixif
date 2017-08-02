@@ -438,11 +438,17 @@ def plugins(filename, path):
     """Returns the ace files"""
     return static_file(filename + '.css', root='plugins/codemirror/codemirror-5.28.0/' + path + '/')
 
-# Code Mirror 2 layers
+# Code Mirror 2 layers: js
 @route('/plugins/codemirror/codemirror-5.28.0/<path1>/<path2>/<filename>.js')
 def plugins(filename, path1, path2):
     """Returns the ace files"""
     return static_file(filename + '.js', root='plugins/codemirror/codemirror-5.28.0/' + path1 + '/' + path2 + '/')
+
+# Code Mirror 2 layers: css
+@route('/plugins/codemirror/codemirror-5.28.0/<path1>/<path2>/<filename>.css')
+def plugins(filename, path1, path2):
+    """Returns the ace files"""
+    return static_file(filename + '.css', root='plugins/codemirror/codemirror-5.28.0/' + path1 + '/' + path2 + '/')
 
 # logos and basic image
 @route('/<image_name>.<outputFormat:re:jpg|gif>')
