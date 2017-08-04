@@ -748,7 +748,7 @@ window.expParser = /*
     }
 
     function peg$parseInteger() {
-      var s0, s1, s2, s3;
+      var s0, s1, s2, s3, s4;
 
       peg$silentFails++;
       if (input.charCodeAt(peg$currPos) === 101) {
@@ -826,12 +826,27 @@ window.expParser = /*
                 }
               }
               if (s2 !== peg$FAILED) {
+                s3 = [];
                 if (peg$c35.test(input.charAt(peg$currPos))) {
-                  s3 = input.charAt(peg$currPos);
+                  s4 = input.charAt(peg$currPos);
                   peg$currPos++;
                 } else {
-                  s3 = peg$FAILED;
+                  s4 = peg$FAILED;
                   if (peg$silentFails === 0) { peg$fail(peg$c36); }
+                }
+                if (s4 !== peg$FAILED) {
+                  while (s4 !== peg$FAILED) {
+                    s3.push(s4);
+                    if (peg$c35.test(input.charAt(peg$currPos))) {
+                      s4 = input.charAt(peg$currPos);
+                      peg$currPos++;
+                    } else {
+                      s4 = peg$FAILED;
+                      if (peg$silentFails === 0) { peg$fail(peg$c36); }
+                    }
+                  }
+                } else {
+                  s3 = peg$FAILED;
                 }
                 if (s3 !== peg$FAILED) {
                   s1 = [s1, s2, s3];
@@ -915,3 +930,29 @@ window.expParser = /*
     parse:       peg$parse
   };
 })();
+/*
+Expression
+  = Term (_ ("+" / "-") _ Term)*
+
+Term
+  = Factor (_ ("*" / "/") _ Factor)*
+
+MathFunctions
+	= ["cos"] / ["sin"] / ["cot"] / ["tan"] / ["ln"] / ["sinh"] / ["cosh"] / "log"Integer
+
+Factor
+  = _ MathFunctions*_"(" _ Expression _ ")"
+  / Float / Integer
+
+Float
+	= Integer*"."Integer
+
+Integer "integer"
+  = "e" /"pi" / _ [0-9]+ / _ "-"*[0-9]+
+
+
+
+_ "whitespace"
+  = [ \t\n\r]*
+
+*/

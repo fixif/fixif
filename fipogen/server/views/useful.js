@@ -145,48 +145,20 @@ function processDiv(text)
 {
 	var ci_s = [];
 	var str = "";
-	for(var i =0; i < text.length; i++)
-	{
-		if(!separators.has(text.charAt(i)))
-		{
-			str += text.charAt(i);
-		}
-		else if(str)
-		{
-			ci_s[ci_s.length] = str;
-			str = "";
-		}
-	}
+	ci_s= text.split("\n");
+	// for(var i =0; i < text.length; i++)
+	// {
+	// 	if(!separators.has(text.charAt(i)))
+	// 	{
+	// 		str += text.charAt(i);
+	// 	}
+	// 	else if(str)
+	// 	{
+	// 		ci_s[ci_s.length] = str;
+	// 		str = "";
+	// 	}
+	// }
 
 	return ci_s;
 
 }
- /* Validates the data in text area and changes the color of correct ones to green. */
-function validateTextArea(editor)
-{
-	// if(editor.getValue.length() == 0)
-	// 	document.getElementById("")
-/*	var div = document.getElementById('text');
-	var children = div.children;
-
-    if(children.length > 2)
-    {
-        for(var i = 0; i < children.length; i++)
-        {
-            children[i].id = "child" + i;
-            //children[i].className += "yesno";
-           $("#child"+i).addClass('yesno');
-			if(children[i].textContent.match(expC) || children[i].textContent.match(expI))
-            {
-                //children[i].style.color='green';
-				children[i].setCustomValidity ='';
-            }
-            else
-            {
-                //children[i].style.color='darkred';
-				children[i].setCustomValidity ='error';
-            }
-        }*/
-}
-
-

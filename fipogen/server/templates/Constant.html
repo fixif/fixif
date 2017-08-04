@@ -94,15 +94,8 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
 
 <script>
-
-	console.log("success!");
-
     var resultJson;
 	var editor;
-
-    var lit = "[+-]?\\d+(?:\\.\\d+)?";
-    var expC = new RegExp( "^"+lit+"$");
-    var expI = new RegExp( "^\\[("+lit+");("+lit+")\\]$");
 
     CodeMirror.defineSimpleMode("simplemode", {
         // The start state contains the rules that are intially used
@@ -137,8 +130,8 @@ Blablabla... This page allows to convert a real constant (literal constant or an
                 console.log(lines[i]);
                 if(lines[i].trim().length >0)
                 {
-                    try {
-//                    if(!(lines[i].match(expC) || lines[i].match(expI)))
+                    try
+					{
                     	expParser.parse(lines[i]);
                         cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
                     }
@@ -186,7 +179,6 @@ Blablabla... This page allows to convert a real constant (literal constant or an
     {
         $("#fileupload").val('');
         $("#fileupload").disabled = false;
-//        $("#text").html('');
     	editor.setValue("");
     }
 
