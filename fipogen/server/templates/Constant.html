@@ -85,9 +85,17 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="{{base_url}}useful.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pegjs/0.7.0/peg.min.js"></script>
+<script src="{{base_url}}require.js"></script>
+<script src="{{base_url}}const-parser.js"></script>
+<script src="{{base_url}}int-parser.js"></script>
+
+
 
 
 <script>
+
+	console.log("success!");
 
     var resultJson;
 	var editor;
@@ -129,10 +137,23 @@ Blablabla... This page allows to convert a real constant (literal constant or an
                 console.log(lines[i]);
                 if(lines[i].trim().length >0)
                 {
-                    if(!(lines[i].match(expC) || lines[i].match(expI)))
-                        cm.setGutterMarker(i, "CodeMirror-lint-markers", returnWrongElement());
-                    else
+                    try {
+//                    if(!(lines[i].match(expC) || lines[i].match(expI)))
+                    	expParser.parse(lines[i]);
                         cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
+                    }
+                    catch (exceptionExp)
+					{
+					    try
+						{
+						    intParser.parse(lines[i]);
+						    cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
+						}
+						catch(exceptionInt)
+						{
+                        	cm.setGutterMarker(i, "CodeMirror-lint-markers", returnWrongElement());
+						}
+                    }
                 }
                 else
                     cm.setGutterMarker(i, "CodeMirror-lint-markers", null);
