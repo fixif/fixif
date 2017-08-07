@@ -455,13 +455,15 @@ text-decoration: none;
 			color: white;
 		}
 
-.tooltip {
+.tooltip
+{
     position: relative;
-    display: inline-block;
+    /*display: inline-block;*/
 
 }
 
-.tooltip .tooltiptext {
+.tooltip .tooltiptext
+{
     visibility: hidden;
     width: 120px;
     background-color: #0090d3;
@@ -476,6 +478,9 @@ text-decoration: none;
     top: 100%;
     left: 50%;
     margin-left: -60px;
+
+
+    /*background-position: top left;*/
 }
 
 .tooltip:hover .tooltiptext {

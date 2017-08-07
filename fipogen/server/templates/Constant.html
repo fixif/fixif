@@ -18,7 +18,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 			<!-- form -->
 			<h2 class="headings"> Form</h2>
 			<form method="POST" action="javascript:clickSubmit();" id="form" class="wrapper-constants-form">
-<p  class="first-label-constants-form tooltip" >Constants:
+<p  class="first-label-constants-form tooltip" style="display: inline-block" >Constants:
 	<!--<img src="tooltip.jpg" width="15" height="15" style="float: right; display: inline-block;" >-->
 	<span class="tooltiptext">Enter your constants or intervals here</span>
 </p>
@@ -135,16 +135,16 @@ Blablabla... This page allows to convert a real constant (literal constant or an
                     	expParser.parse(lines[i]);
                         cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
                     }
-                    catch (exceptionExp)
+                    catch (e)
 					{
 					    try
 						{
 						    intParser.parse(lines[i]);
 						    cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
 						}
-						catch(exceptionInt)
+						catch(e)
 						{
-                        	cm.setGutterMarker(i, "CodeMirror-lint-markers", returnWrongElement());
+                        	cm.setGutterMarker(i, "CodeMirror-lint-markers", returnWrongElement(buildErrorMessage(lines[i])));
 						}
                     }
                 }
@@ -155,12 +155,22 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
     });
 
-    function returnWrongElement() {
+    function returnWrongElement(msgStr) {
         var marker = document.createElement("div");
+
+        var msg = document.createElement("span");
+        msg.classList.add("tooltiptext");
+        msg.style.paddingLeft = "50px";
+        msg.style.width = "400px";
+        msg.style.height = "40px";
+        msg.innerText = msgStr;
+
         marker.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAASlQTFRFvEJC4WtrUgAAMgAA/hsb/ysrPgAAqEFB23p61XFxiSEhhjIy3Xt70nV1iSMjsTIy94uL95+f0mVlhhERkioq3nFx/KWl7X5+qSIiZwICvCoq94eH1FJS3Fxc+4qKriIiXQEBIAAAawEBwCIi+nBw+3FxsxsbXwAAEQAAGQAAigcH6T8/4Tk5eQUFBQAAmwsL3ykp+05O+kpK2ygokRQUpQ8P5x4ezB0d0CEh/UJC5S8vnRwcxhMTzyYmfQIChAQE0i8vwCIipQcH6zIy0yoqhQQEAAAAIgAAigUF1DMz6D09nQsLYQICoxoahAoKAAAAEwAAhgsLnxgYWwIC+n199nR0+WRk9V5e/2dn+lNT+1RU/zEx+EBA+UlJ/zAw+klJ+l5e/khI////+j8McAAAAFR0Uk5TAAAAAAAAACWujw4bp5gWhPv0gwwWnPv1ZH759I6f+vFeG5v5+vzzgg8Wo/76jQwpt/78qCE4v/b3/rUwuu16g/CtsP3naAcKcev8ozqtZwYHb6syI9ODJAAAAAFiS0dEYiu5HTwAAAB2SURBVAjXY2Dn4ORiYOTm4eVj4BcQFBIWERUTl2CQlAqRlpGVC5VXYFBUUg5TUQ1XU9dgYNLU0o6I0NHVY2Zg0TcwjIwyMjZhZTA1i44xt4i1tLJmsImLt7Wzd0hIdGRwcnZxdXP38PTyZvDx9fNnZgsIDAoGACHbEu2OSfg/AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDEzLTEyLTMwVDIzOjI3OjEwKzAxOjAwk0r5nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxMy0xMi0zMFQyMzoyNzoxMCswMTowMOIXQSAAAAAASUVORK5CYII=')";
 		marker.style.backgroundPosition="center";
         marker.style.backgroundRepeat= "no-repeat";
-        marker.innerHTML = "<br>";
+
+        marker.classList.add("tooltip");
+        marker.innerHTML += msg.outerHTML + "<br>";
         return marker;
     }
 
@@ -173,6 +183,21 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
         return marker;
     }
+
+	function buildErrorMessage(s)
+	{
+    	var numberOfSeperators = 0;
+    	for(var i =0 ; i < s.length; i++)
+		{
+		    if(s.charAt(i) == ';' || s.charAt(i) == ';')
+		        numberOfSeperators ++;
+		}
+		if(s.trim().charAt(0) == '[' && s.trim().charAt(s.length -1) == ']' && numberOfSeperators == 1)
+		    return "Enter a correct mathematical expression inside the interval";
+    	if(s.trim().charAt(0) == '[' || s.trim().charAt(s.length -1) == ']' || numberOfSeperators > 1)
+    	    return "Correct interval format: [exp;exp] or [exp,exp]";
+    	return "Enter a correct mathematical expression";
+  	}
 
 	/* Clears the uploaded file */
     function clearUpload()
