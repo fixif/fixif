@@ -166,18 +166,16 @@ def returnDictionaryConstant(C):
 			}
 	return dico
 
-def evaluateInputConstantsPage(inputStr , wl):
-	input = inputStr.split("@")
+def evaluateInputConstantsPage(input , wl):
 	inputFile = open("input.sollya", "w")
 
 	inputFile.writelines(["verbosity=0;"])
+	inputFile.writelines(["display=decimal;"])
 	inputFile.writelines(["prec = " + str(wl) + ";"])
 
-	for i in range(0, len(input)):
-		inputFile.writelines(["x"+str(i)+"=" + input[i] + ";"])
+	inputFile.writelines(["x=" + input + ";"])
 
-	for i in range(0, len(input)):
-		inputFile.writelines(["x" + str(i) + ";"])
+	inputFile.writelines(["x ;"])
 
 	inputFile.close()
 
@@ -186,11 +184,12 @@ def evaluateInputConstantsPage(inputStr , wl):
 	resultstr = ""
 	type(out.decode())
 	outs = out.decode().split("\n")
+	# todo: change here
 	for i in range(0, len(outs)):
-		if i >= 2 :
+		if i >= 3:
 			resultstr += outs[i] + "\n"
-	print(resultstr)
-	return resultstr
+	# print(resultstr)
+	return outs[3]
 
 
 

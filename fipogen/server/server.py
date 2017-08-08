@@ -226,15 +226,35 @@ def Constant_service(constantsInter):
         signed = True
 
     returningJson={}
-    if WL:
-        exps = evaluateInputConstantsPage(constantsInter, WL).split("\n")
-    else:
-        exps = evaluateInputConstantsPage(constantsInter, F.wl).split("\n")
+
+
+    # ------------------------- testing
+    exps = []
+    for i in range(0, len(constantsInter.split("@"))):
+        line = constantsInter.split("@")[i]
+        const = reobj_constant.match(line)
+        inter = reobj_interval.match(line)
+        if const or inter:
+           exps.append(line)
+        else:
+            if WL:
+                exps.append(evaluateInputConstantsPage(line, WL))
+            else:
+                exps.append(evaluateInputConstantsPage(line, F.wl))
+        # print(exps[len(exps)-1])
+    # -------------------------- end of testing
+
+
+    # if WL:
+    #     exps = evaluateInputConstantsPage(constantsInter, WL).split("\n")
+    # else:
+    #     exps = evaluateInputConstantsPage(constantsInter, F.wl).split("\n")
 
     counter = 0
     for constInter in exps:
 
         if len(constInter) != 0:
+            #todo : change the const and int checking
             const = reobj_constant.match(constInter)
             inter = reobj_interval.match(constInter)
 

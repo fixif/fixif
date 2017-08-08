@@ -112,9 +112,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         var code = document.getElementById("text");
         editor = CodeMirror.fromTextArea(code, {
             lineNumbers : true,
-//            matchBrackets: true,
             gutters: ["CodeMirror-lint-markers"],
-//			lineWrapping: true,
         });
 
         editor.lineWrapping = true;
@@ -123,11 +121,9 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         editor.smartIndent = true;
         editor.on("change", function(cm, e) {
             var str = cm.getValue();
-            console.log("val:" + cm.getValue());
             var lines= str.split("\n");
             for(var i =0; i < lines.length; i++)
             {
-                console.log(lines[i]);
                 if(lines[i].trim().length >0)
                 {
                     try
