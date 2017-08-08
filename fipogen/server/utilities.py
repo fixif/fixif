@@ -170,7 +170,7 @@ def evaluateInputConstantsPage(inputStr , wl):
 	input = inputStr.split("@")
 	inputFile = open("input.sollya", "w")
 
-	inputFile.writelines(["roundingwarnings = off;"])
+	inputFile.writelines(["verbosity=0;"])
 	inputFile.writelines(["prec = " + str(wl) + ";"])
 
 	for i in range(0, len(input)):
@@ -187,9 +187,9 @@ def evaluateInputConstantsPage(inputStr , wl):
 	type(out.decode())
 	outs = out.decode().split("\n")
 	for i in range(0, len(outs)):
-		if i >= 2:
+		if i >= 2 :
 			resultstr += outs[i] + "\n"
-
+	print(resultstr)
 	return resultstr
 
 
