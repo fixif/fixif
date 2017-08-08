@@ -1,0 +1,1 @@
+roundingwarnings = off;prec = 12;x0=cos(pi);x1=log2(100);x2=0.1;x3=[12;90];x0;x1;x2;x3;

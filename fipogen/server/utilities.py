@@ -109,11 +109,11 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 		command1 = "cd " + Config.generated + " && " + " pdflatex -shell-escape FPF.tex "
 		command2 = "cp " + Config.generated + "FPF." + outputFormat + " \"" + Config.cache + filename + "\""
 		latexLogger.info("##\tCompile Latex\t##")
-		#latexLogger.info(call("cd " + Config.generated + " && " + " && pdflatex -shell-escape FPF.tex > output.log",shell=True))
+
 		# TODO: check if pdflatex has compiled without errors (call returns the output code)
 
-		proc =Popen(command1,stdout= PIPE,shell=True)
-		out, err = proc.communicate();
+		proc =Popen(command1, stdout= PIPE, shell=True)
+		out, err = proc.communicate()
 
 		latexLogger.info(command1 + "\n")
 
@@ -165,4 +165,33 @@ def returnDictionaryConstant(C):
 			'error_rel': nstr(C.realError),
 			}
 	return dico
+
+def evaluateInputConstantsPage(inputStr , wl):
+	input = inputStr.split("@")
+	inputFile = open("input.sollya", "w")
+
+	inputFile.writelines(["roundingwarnings = off;"])
+	inputFile.writelines(["prec = " + str(wl) + ";"])
+
+	for i in range(0, len(input)):
+		inputFile.writelines(["x"+str(i)+"=" + input[i] + ";"])
+
+	for i in range(0, len(input)):
+		inputFile.writelines(["x" + str(i) + ";"])
+
+	inputFile.close()
+
+	proc = Popen("sollya input.sollya", stdout=PIPE, shell=True)
+	out, err = proc.communicate()
+	resultstr = ""
+	type(out.decode())
+	outs = out.decode().split("\n")
+	for i in range(0, len(outs)):
+		if i >= 2:
+			resultstr += outs[i] + "\n"
+
+	return resultstr
+
+
+
 

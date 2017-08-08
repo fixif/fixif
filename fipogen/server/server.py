@@ -19,7 +19,7 @@ from fipogen.FxP import Constant
 # utilities and path definition
 from fipogen.server.utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats
 from fipogen.server.path import Config  # paths
-from fipogen.server.utilities import returnDictionaryConstant
+from fipogen.server.utilities import returnDictionaryConstant , evaluateInputConstantsPage
 
 from operator import attrgetter
 from functools import wraps  # use to wrap a logger for bottle
@@ -226,9 +226,14 @@ def Constant_service(constantsInter):
         signed = True
 
     returningJson={}
+    if WL:
+        exps = evaluateInputConstantsPage(constantsInter, WL).split("\n")
+    else:
+        exps = evaluateInputConstantsPage(constantsInter, F.wl).split("\n")
 
     counter = 0
-    for constInter in constantsInter.split("@"):
+    for constInter in exps:
+
         if len(constInter) != 0:
             const = reobj_constant.match(constInter)
             inter = reobj_interval.match(constInter)
