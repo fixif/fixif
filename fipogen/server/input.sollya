@@ -1,1 +1,1 @@
-verbosity=0;display=decimal;prec = 32;x=[log2(2); log10(100)];x ;
+verbosity=0;display=decimal;prec = 320;x=0x1243;x ;

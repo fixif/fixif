@@ -166,12 +166,14 @@ def returnDictionaryConstant(C):
 			}
 	return dico
 
-def evaluateInputConstantsPage(input , wl):
+
+def evaluateExp(input, wl):
+	""" Takes a mathematical expression and evaluates its value with Sollya from bash """
 	inputFile = open("input.sollya", "w")
 
 	inputFile.writelines(["verbosity=0;"])
 	inputFile.writelines(["display=decimal;"])
-	inputFile.writelines(["prec = " + str(wl) + ";"])
+	inputFile.writelines(["prec = " + str(wl * 10) + ";"])
 
 	inputFile.writelines(["x=" + input + ";"])
 
@@ -181,15 +183,10 @@ def evaluateInputConstantsPage(input , wl):
 
 	proc = Popen("sollya input.sollya", stdout=PIPE, shell=True)
 	out, err = proc.communicate()
-	resultstr = ""
 	type(out.decode())
 	outs = out.decode().split("\n")
-	# todo: change here
-	for i in range(0, len(outs)):
-		if i >= 3:
-			resultstr += outs[i] + "\n"
-	# print(resultstr)
-	return outs[3]
+
+	return outs[len(outs)-1]
 
 
 

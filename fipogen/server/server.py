@@ -19,7 +19,7 @@ from fipogen.FxP import Constant
 # utilities and path definition
 from fipogen.server.utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats
 from fipogen.server.path import Config  # paths
-from fipogen.server.utilities import returnDictionaryConstant , evaluateInputConstantsPage
+from fipogen.server.utilities import returnDictionaryConstant , evaluateExp
 
 from operator import attrgetter
 from functools import wraps  # use to wrap a logger for bottle
@@ -225,36 +225,26 @@ def Constant_service(constantsInter):
     else:
         signed = True
 
-    returningJson={}
+    returningJson = {}
 
 
-    # ------------------------- testing
-    exps = []
+    exps = []   # List containing input constants or intervals or their evaluation.
     for i in range(0, len(constantsInter.split("@"))):
         line = constantsInter.split("@")[i]
         const = reobj_constant.match(line)
         inter = reobj_interval.match(line)
         if const or inter:
-           exps.append(line)
+            exps.append(line)
         else:
             if WL:
-                exps.append(evaluateInputConstantsPage(line, WL))
+                exps.append(evaluateExp(line, WL))
             else:
-                exps.append(evaluateInputConstantsPage(line, F.wl))
-        # print(exps[len(exps)-1])
-    # -------------------------- end of testing
-
-
-    # if WL:
-    #     exps = evaluateInputConstantsPage(constantsInter, WL).split("\n")
-    # else:
-    #     exps = evaluateInputConstantsPage(constantsInter, F.wl).split("\n")
+                exps.append(evaluateExp(line, F.wl))
 
     counter = 0
     for constInter in exps:
 
         if len(constInter) != 0:
-            #todo : change the const and int checking
             const = reobj_constant.match(constInter)
             inter = reobj_interval.match(constInter)
 
