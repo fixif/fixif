@@ -185,10 +185,12 @@ def evaluateExp(input, wl):
 
 	proc = Popen("sollya input.sollya", stdout=PIPE, shell=True)
 	out, err = proc.communicate()
-	type(out.decode())
-	outs = out.decode().split("\n")
-
-	return outs[len(outs)-2]
+	# print(err.decode())
+	print("out:"+out.decode())
+	if len(out.decode()):
+		outs = out.decode().split("\n")
+		return outs[len(outs)-2]
+	return "NaN"
 
 def getIntervalInf(interval, wl):
 	n = len(interval)

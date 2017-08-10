@@ -307,7 +307,7 @@ def Constant_service(constantsInter):
                     returningJson[counter] = dico
             else:
                 dico = {}
-                if constInter != "NaN":
+                if expression["val"] != "NaN":
                     returningJson[counter] = {
                         'value': expression['exp'],
                         'error': "The url should contain the constant or the interval (ex '/Constant/12.44' or '/Constant/[-120;10])'"} # General Error

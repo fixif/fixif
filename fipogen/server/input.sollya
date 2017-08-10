@@ -1,1 +1,1 @@
-verbosity=0;display=decimal;prec = 320;x=log2(sin(pi));x ;
+verbosity=0;display=decimal;prec = 320;x=cos(pi);x ;
