@@ -25,7 +25,6 @@ from operator import attrgetter
 from functools import wraps  # use to wrap a logger for bottle
 import os
 import re
-import json
 from logging import getLogger
 
 import hashlib
@@ -40,9 +39,10 @@ weblogger = getLogger('bottle')
 TEMPLATE_PATH[:] = ['templates/']
 
 # regexs
-lit = "[+-]?\\d+(?:\\.\\d+)?"  # literal
+# lit = "[+-]?\\d+(?:\\.\\d+)?"  # literal
+lit = "[+-]?\\d+[.]?\\d+[[e][-]?\\d+]?"
 reobj_constant = re.compile("^" + lit + "$")  # regex defining a constant
-reobj_interval = re.compile("^\\[(" + lit + ");(" + lit + ")\\]$")  # regex defining an interval
+# reobj_interval = re.compile("^\\[(" + "\w" + ");(" + "\w" + ")\\]$" | "^\\[(" + "\w" + ")(" + "\w" + ")\\]$")  # regex defining an interval
 
 
 # --- Specific pages ---

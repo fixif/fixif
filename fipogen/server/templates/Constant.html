@@ -38,7 +38,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 <label class="FPF-label-constants-form"> the FPF:</label>
 <input class="yesno FPF-input-constants-form" id="FPF" type="input" required onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
 <button id="file-reset"  type="button" onclick="clearUpload()" class="reset-button-constants-form">Reset</button>
-<input type="submit" class="submit-button-constants-form"/>
+<input type="submit" id = "submit" class="submit-button-constants-form"/>
 </form>
 <h2 class="headings"> Result</h2>
 <!--  result -->
@@ -122,6 +122,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         editor.on("change", function(cm, e) {
             var str = cm.getValue();
             var lines= str.split("\n");
+            var hasWrong = false; //Checks if there exists a wrong phrase in editor or not
             for(var i =0; i < lines.length; i++)
             {
                 if(lines[i].trim().length >0)
@@ -134,15 +135,26 @@ Blablabla... This page allows to convert a real constant (literal constant or an
                     catch (e)
                     {
                         cm.setGutterMarker(i, "CodeMirror-lint-markers", returnWrongElement(e));
+
+						hasWrong = true;
                     }
                 }
                 else
                     cm.setGutterMarker(i, "CodeMirror-lint-markers", null);
             }
+            if(hasWrong)
+                document.getElementById("submit").disabled= true;
+            else
+                document.getElementById("submit").disabled= false;
+
         });
 
     });
-
+//
+//	function checkSubmitValidity()
+//	{
+//
+//    }
     function returnWrongElement(e) {
         var marker = document.createElement("div");
 
@@ -160,6 +172,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
         marker.classList.add("tooltip");
         marker.innerHTML += msg.outerHTML + "<br>";
+        marker.id = "w"+e.location.start.line;
         return marker;
     }
 
