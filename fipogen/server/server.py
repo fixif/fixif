@@ -238,18 +238,18 @@ def Constant_service(constantsInter):
         if len(line) > 0:
             try:
                 Constant(value=line, wl=100, signed=signed)
-                exps.append({'exp' : line, 'val' : line})
+                exps.append({'exp': line, 'val': line, 'const': True})
             except:
                 if line[0] == '[':
                     if WL:
-                        exps.append( {'exp' : line, 'val' : getIntervalInf(line, WL)})
+                        exps.append({'exp': line, 'val': getIntervalInf(line, WL), 'const': False})
                     else:
-                        exps.append({'exp' : line, 'val' : getIntervalInf(line, F.wl)})
+                        exps.append({'exp': line, 'val': getIntervalInf(line, F.wl), 'const': False})
                 else:
                     if WL:
-                        exps.append({'exp' : line, 'val' : evaluateExp(line, WL)})
+                        exps.append({'exp': line, 'val': evaluateExp(line, WL), 'const': True})
                     else:
-                        exps.append({'exp' : line, 'val' : evaluateExp(line, F.wl)})
+                        exps.append({'exp': line, 'val': evaluateExp(line, F.wl), 'const': True})
 
     counter = 0
     for expression in exps:
@@ -259,15 +259,15 @@ def Constant_service(constantsInter):
             inter = reobj_interval.match(constInter)
 
             # get the constant
-            if const:
+            if expression['const'] and expression['val'] != "NaN":
                 try:
-                    C = Constant(value=const.string, wl=WL, signed=signed, fpf=F)
+                    C = Constant(value=expression['val'], wl=WL, signed=signed, fpf=F)
                     dico = {}
                     dico = returnDictionaryConstant(C)
                     dico['value'] = expression['exp']
                     returningJson[counter] = dico
                 except ValueError as e:
-                    Cs = Constant(value=const.string, wl=F.wl, signed=signed)
+                    Cs = Constant(value=expression['val'], wl=F.wl, signed=signed)
                     dico= {}
                     dico = returnDictionaryConstant(Cs)
                     dico['value'] = expression['exp']
