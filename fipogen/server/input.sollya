@@ -1,1 +1,1 @@
-verbosity=0;display=decimal;prec = 980;x=9e4;x ;
+verbosity=0;display=decimal;prec = 320;x=log2(-1);x ;

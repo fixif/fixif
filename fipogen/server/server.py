@@ -19,7 +19,7 @@ from fipogen.FxP import Constant
 # utilities and path definition
 from fipogen.server.utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats
 from fipogen.server.path import Config  # paths
-from fipogen.server.utilities import returnDictionaryConstant , evaluateExp
+from fipogen.server.utilities import returnDictionaryConstant, evaluateExp, getIntervalInf
 
 from operator import attrgetter
 from functools import wraps  # use to wrap a logger for bottle
@@ -38,11 +38,12 @@ weblogger = getLogger('bottle')
 # Path to the template
 TEMPLATE_PATH[:] = ['templates/']
 
+# todo: delete the following lines
 # regexs
-# lit = "[+-]?\\d+(?:\\.\\d+)?"  # literal
-lit = "[+-]?\\d+[.]?\\d+[[e][-]?\\d+]?"
+lit = "[+-]?\\d+(?:\\.\\d+)?"  # literal
+# lit = "[+-]?\\d+[.]?\\d+[[e][-]?\\d+]?"
 reobj_constant = re.compile("^" + lit + "$")  # regex defining a constant
-# reobj_interval = re.compile("^\\[(" + "\w" + ");(" + "\w" + ")\\]$" | "^\\[(" + "\w" + ")(" + "\w" + ")\\]$")  # regex defining an interval
+reobj_interval = re.compile("^\\[(" + lit + ");(" + lit + ")\\]$")  # regex defining an interval
 
 
 # --- Specific pages ---
@@ -231,19 +232,28 @@ def Constant_service(constantsInter):
     exps = []   # List containing input constants or intervals or their evaluation.
     for i in range(0, len(constantsInter.split("@"))):
         line = constantsInter.split("@")[i]
+        line = line.strip()
         const = reobj_constant.match(line)
         inter = reobj_interval.match(line)
-        if const or inter:
-            exps.append(line)
-        else:
-            if WL:
-                exps.append(evaluateExp(line, WL))
-            else:
-                exps.append(evaluateExp(line, F.wl))
+        if len(line) > 0:
+            try:
+                Constant(value=line, wl=100, signed=signed)
+                exps.append({'exp' : line, 'val' : line})
+            except:
+                if line[0] == '[':
+                    if WL:
+                        exps.append( {'exp' : line, 'val' : getIntervalInf(line, WL)})
+                    else:
+                        exps.append({'exp' : line, 'val' : getIntervalInf(line, F.wl)})
+                else:
+                    if WL:
+                        exps.append({'exp' : line, 'val' : evaluateExp(line, WL)})
+                    else:
+                        exps.append({'exp' : line, 'val' : evaluateExp(line, F.wl)})
 
     counter = 0
-    for constInter in exps:
-
+    for expression in exps:
+        constInter = expression['val']
         if len(constInter) != 0:
             const = reobj_constant.match(constInter)
             inter = reobj_interval.match(constInter)
@@ -254,11 +264,13 @@ def Constant_service(constantsInter):
                     C = Constant(value=const.string, wl=WL, signed=signed, fpf=F)
                     dico = {}
                     dico = returnDictionaryConstant(C)
+                    dico['value'] = expression['exp']
                     returningJson[counter] = dico
                 except ValueError as e:
                     Cs = Constant(value=const.string, wl=F.wl, signed=signed)
                     dico= {}
                     dico = returnDictionaryConstant(Cs)
+                    dico['value'] = expression['exp']
                     errStr = "Not possible with the asked FPF; suggestion: " + str(Cs.FPF)
                     dico["error"] = errStr;
                     returningJson[counter] = dico
@@ -268,7 +280,8 @@ def Constant_service(constantsInter):
                     val_sup = float(inter.group(2))
                 # TODO: conversion str->float... faire avec GMP?
                 except:
-                    returningJson[counter] = {'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
+                    returningJson[counter] = {'value': expression['exp'],
+                        'error': 'The interval must be of the form [xxx;yyy] where xxx and yyy are litteral'}
                 try:
                     if WL:
                         C = Constant(value=val_sup, wl=WL)
@@ -278,10 +291,9 @@ def Constant_service(constantsInter):
                         C = Constant(value=val_sup, fpf=F)
                         if (float(Constant(value=val_inf, fpf=F).FPF.msb) > float(C.FPF.msb)):
                             C = Constant(value=val_inf, fpf=F)
-
-
                     dico = {}
                     dico = returnDictionaryConstant(C)
+                    dico["value"] = expression['exp']
                     returningJson[counter] = dico
                 except ValueError as e:  # None of the interval values could be represented with the given format
                     Cs = Constant(value=val_sup, wl=F.wl, signed=signed)
@@ -289,12 +301,21 @@ def Constant_service(constantsInter):
                         Cs = Constant(value=val_inf, wl=F.wl)
                     dico = {}
                     dico = returnDictionaryConstant(Cs)
+                    dico["value"] = expression['exp']
                     errStr = "Not possible with the asked FPF; suggestion: " + str(Cs.FPF)
-                    dico["error"] = errStr;
+                    dico["error"] = errStr
                     returningJson[counter] = dico
             else:
                 dico = {}
-                returningJson[counter] ={ 'error': "The url should contain the constant or the interval (ex '/Constant/12.44' or '/Constant/[-120;10])'"}
+                if constInter != "NaN":
+                    returningJson[counter] = {
+                        'value': expression['exp'],
+                        'error': "The url should contain the constant or the interval (ex '/Constant/12.44' or '/Constant/[-120;10])'"} # General Error
+                else:
+                    returningJson[counter] = {
+                        'value': expression['exp'],
+                        'error': "Arithmetic problem"
+                    }
             counter += 1
     return returningJson
 

@@ -122,8 +122,10 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         editor.on("change", function(cm, e) {
             var str = cm.getValue();
             var lines= str.split("\n");
+
             var hasWrong = false; //Checks if there exists a wrong phrase in editor or not
-            for(var i =0; i < lines.length; i++)
+
+			for(var i =0; i < lines.length; i++)
             {
                 if(lines[i].trim().length >0)
                 {
@@ -142,7 +144,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
                 else
                     cm.setGutterMarker(i, "CodeMirror-lint-markers", null);
             }
-            if(hasWrong)
+            if(hasWrong) //if there is a wrong phrase then the user should not be able to submit
                 document.getElementById("submit").disabled= true;
             else
                 document.getElementById("submit").disabled= false;
@@ -306,7 +308,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
             for(var i=0; i < Object.keys(data).length ; i++)
             {
                 html += "<tr>"
-                html += "<td>" + ci_s[i]+ "</td>";
+                html += "<td>" + data[i]["value"] + "</td>";
 
                 var startStr = "<td>"
                 if(data[i]['error'])
@@ -339,7 +341,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
             for(var i=0; i < Object.keys(data).length  ; i++)
             {
                 html += "<tr>"
-                html += "<td  align = left >" + ci_s[i]+ "</td>";
+                html += "<td  align = left >" + data[i]["value"] + "</td>";
                 if(!data[i]['error'])
                 {
                     html += "<td  align = left >" + "<a href=\"" + data[i]["FPF_image"] + "\">" + "<img class = \"loading\" src=" + data[i]["FPF_image"] + " alt=" + "Loading..." + "style=\"width:128px;height:128px;\"	"+"/>" + "</td>\n";

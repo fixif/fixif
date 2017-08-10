@@ -153,17 +153,19 @@ def returnDictionaryConstant(C):
 	""" Takes a constant c and builds a dictionary containing its attributes
 	Returns a dictionary"""
 	dico = {}
-	dico = {'error': '',
-			'FPF': str(C.FPF),
-			'integer': nstr(C.mantissa),
-			'lsb': str(C.FPF.lsb),
-			'bits': tobin(C.mantissa, C.FPF.wl),
-			'FPF_image': Config.baseURL + 'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
-			'approx': nstr(C.approx),
-			'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
-			'error_abs': nstr(C.absError),
-			'error_rel': nstr(C.realError),
-			}
+	dico = {
+		'value': '',
+		'error': '',
+		'FPF': str(C.FPF),
+		'integer': nstr(C.mantissa),
+		'lsb': str(C.FPF.lsb),
+		'bits': tobin(C.mantissa, C.FPF.wl),
+		'FPF_image': Config.baseURL + 'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
+		'approx': nstr(C.approx),
+		'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
+		'error_abs': nstr(C.absError),
+		'error_rel': nstr(C.realError),
+		}
 	return dico
 
 
@@ -173,7 +175,7 @@ def evaluateExp(input, wl):
 
 	inputFile.writelines(["verbosity=0;"])
 	inputFile.writelines(["display=decimal;"])
-	inputFile.writelines(["prec = " + str(wl * 10) + ";"])
+	inputFile.writelines(["prec = " + str(min(wl * 10, 1215752192)) + ";"])
 
 	inputFile.writelines(["x=" + input + ";"])
 
@@ -186,7 +188,31 @@ def evaluateExp(input, wl):
 	type(out.decode())
 	outs = out.decode().split("\n")
 
-	return outs[len(outs)-1]
+	return outs[len(outs)-2]
+
+def getIntervalInf(interval, wl):
+	n = len(interval)
+	if interval[0] != '[' or interval[n-1] != ']':
+		return None
+	if interval.find(',') != -1:
+		splitter = ','
+	elif interval.find(';') != -1:
+		splitter = ';'
+	else:
+		return None
+
+	ind_splitter = interval.index(splitter)
+	firstExp = interval[1:ind_splitter]
+	secExp = interval[ind_splitter+1:len(interval)-1]
+
+	firstExp = evaluateExp(firstExp, min(wl*100, 1215752192))
+	secExp = evaluateExp(secExp, min(1215752192, wl*100))
+
+	if firstExp == "NaN" or secExp == "NaN":
+		return None
+	return '[' + firstExp + ';' + secExp + ']'
+
+
 
 
 
