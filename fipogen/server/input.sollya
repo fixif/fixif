@@ -1,1 +1,1 @@
-verbosity=0;display=decimal;prec = 4000;x=56;x ;
+verbosity=0;display=decimal;prec = 43000;x=sin(3*pi/4);x ;

@@ -241,9 +241,11 @@ Blablabla... This page allows to convert a real constant (literal constant or an
     function clickSubmit()
     {
         var ci_s =processDiv(editor.getValue());
+
+        for(var i = 0; i < ci_s.length; i++) /* This for is to handle division in mathematical expressions, having / in path would be problematic*/
+            ci_s[i] = ci_s[i].replace("/", "div");
+
         var ci = ci_s.join("@");
-
-
 
 		/*Making of ci_s*/
         var wl = $('#wl').val();		// gets the wordlength/FPF

@@ -233,7 +233,7 @@ def Constant_service(constantsInter):
 
     exps = []   # List containing input constants or intervals or their evaluation.
     for i in range(0, len(constantsInter.split("@"))):
-        line = constantsInter.split("@")[i]
+        line = constantsInter.split("@")[i].replace("div", "/")  # replacing div with the real division sign
         line = line.strip()
         const = reobj_constant.match(line)
         inter = reobj_interval.match(line)
