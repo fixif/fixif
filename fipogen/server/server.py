@@ -231,23 +231,23 @@ def Constant_service(constantsInter):
     returningJson = {}
 
 
-    exps = []   # List containing input constants or intervals or their evaluation.
+    exps = []   # List containing input constants / intervals / their evaluation.
+
+    # Treating the raw input from client:
     for i in range(0, len(constantsInter.split("@"))):
         line = constantsInter.split("@")[i].replace("div", "/")  # replacing div with the real division sign
         line = line.strip()
-        const = reobj_constant.match(line)
-        inter = reobj_interval.match(line)
-        if len(line) > 0:
-            try:
+        if len(line) > 0:  # empty strings shouldn't be treated
+            try:    # if it's a normal constant then it should simply be added to exps
                 Constant(value=line, wl=100, signed=signed)
                 exps.append({'exp': line, 'val': line, 'const': True})
-            except:
-                if line[0] == '[':
+            except:     # it's either an interval or a mathematical expression that needs to be evaluated
+                if line[0] == '[':  # Since the input format is once validated in client side, we can simply use this condition to determine whether it's an interval or not
                     if WL:
                         exps.append({'exp': line, 'val': get_interval_inf(line, WL), 'const': False})
                     else:
                         exps.append({'exp': line, 'val': get_interval_inf(line, F.wl), 'const': False})
-                else:
+                else:   # Not an interval but a mathematical expression that needs to be evaluated
                     if WL:
                         exps.append({'exp': line, 'val': evaluate_exp(line, WL), 'const': True})
                     else:
@@ -257,8 +257,7 @@ def Constant_service(constantsInter):
     for expression in exps:
         constInter = expression['val']
         if len(constInter) != 0:
-            const = reobj_constant.match(constInter)
-            inter = reobj_interval.match(constInter)
+            inter = reobj_interval.match(constInter)  # is it an interval ?
 
             # get the constant
             if expression['const'] and expression['val'] != "NaN":
@@ -274,7 +273,7 @@ def Constant_service(constantsInter):
                     dico = return_dictionary_constant(Cs)
                     dico['value'] = expression['exp']
                     errStr = "Not possible with the asked FPF; suggestion: " + str(Cs.FPF)
-                    dico["error"] = errStr;
+                    dico["error"] = errStr
                     returningJson[counter] = dico
             elif inter:
                 try:
