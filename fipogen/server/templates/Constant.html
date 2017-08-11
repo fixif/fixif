@@ -88,14 +88,18 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pegjs/0.7.0/peg.min.js"></script>
 <script src="{{base_url}}require.js"></script>
 <script src="{{base_url}}parser.js"></script>
-
-
-
+<script src="{{base_url}}simple_parser.js"></script>
 
 
 <script>
     var resultJson;
     var editor;
+
+	var parser_m = parser;
+	{% if mode =='simple' %}
+		console.log("tada");
+		parser_m = simpleParser;
+	{% endif %}
 
     CodeMirror.defineSimpleMode("simplemode", {
         // The start state contains the rules that are initially used
@@ -131,7 +135,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
                 {
                     try
                     {
-                        parser.parse(lines[i]);
+                        parser_m.parse(lines[i]);
                         cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
                     }
                     catch (e)
@@ -152,11 +156,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         });
 
     });
-//
-//	function checkSubmitValidity()
-//	{
-//
-//    }
+
     function returnWrongElement(e) {
         var marker = document.createElement("div");
 
@@ -363,12 +363,11 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	 Code taken from : https://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server/18197341?noredirect=1#answer-3665147 */
     function dlResFile()
     {
-        var ci_s =processDiv(editor.getValue()); /* The constants or intervals given as input */
         var strFile = "Const/Int\t\t\t\tlsb\t\t\t\tFPF\n"; /* The string to put in downloadable file */
 
-        for(var i = 0; i < ci_s.length; i++)
+        for(var i = 0; i < resultJson.length; i++)
         {
-            strFile += ci_s[i] + "\t\t\t\t" + resultJson[i]["lsb"] + "\t\t\t\t" + resultJson[i]["FPF"] + "\n";
+            strFile += resultJson[i]["value"] + "\t\t\t\t" + resultJson[i]["lsb"] + "\t\t\t\t" + resultJson[i]["FPF"] + "\n";
         }
 
         var a = window.document.createElement('a');

@@ -19,7 +19,7 @@ from fipogen.FxP import Constant
 # utilities and path definition
 from fipogen.server.utilities import createImageFromLaTeX, optionManager, colorThemes, clean_caches, imageFormats
 from fipogen.server.path import Config  # paths
-from fipogen.server.utilities import returnDictionaryConstant, evaluateExp, getIntervalInf
+from fipogen.server.utilities import return_dictionary_constant, evaluate_exp, get_interval_inf, is_sollya_installed
 
 from operator import attrgetter
 from functools import wraps  # use to wrap a logger for bottle
@@ -77,8 +77,10 @@ def input_FPF():
 @route('/Constant.html')
 def input_Constant():
     """Returns the /Constant page that helps to transform/approach real constant into fixed-point constant"""
-    return template('Constant.html', {'imageFormats': imageFormats})
-
+    if is_sollya_installed():
+        return template('Constant.html', {'imageFormats': imageFormats, 'mode': 'sollya'})
+    else:
+        return template('Constant.html', {'imageFormats': imageFormats, 'mode': 'simple'})
 
 # /Sum of FPFs
 @route('/Sum')
@@ -242,14 +244,14 @@ def Constant_service(constantsInter):
             except:
                 if line[0] == '[':
                     if WL:
-                        exps.append({'exp': line, 'val': getIntervalInf(line, WL), 'const': False})
+                        exps.append({'exp': line, 'val': get_interval_inf(line, WL), 'const': False})
                     else:
-                        exps.append({'exp': line, 'val': getIntervalInf(line, F.wl), 'const': False})
+                        exps.append({'exp': line, 'val': get_interval_inf(line, F.wl), 'const': False})
                 else:
                     if WL:
-                        exps.append({'exp': line, 'val': evaluateExp(line, WL), 'const': True})
+                        exps.append({'exp': line, 'val': evaluate_exp(line, WL), 'const': True})
                     else:
-                        exps.append({'exp': line, 'val': evaluateExp(line, F.wl), 'const': True})
+                        exps.append({'exp': line, 'val': evaluate_exp(line, F.wl), 'const': True})
 
     counter = 0
     for expression in exps:
@@ -263,13 +265,13 @@ def Constant_service(constantsInter):
                 try:
                     C = Constant(value=expression['val'], wl=WL, signed=signed, fpf=F)
                     dico = {}
-                    dico = returnDictionaryConstant(C)
+                    dico = return_dictionary_constant(C)
                     dico['value'] = expression['exp']
                     returningJson[counter] = dico
                 except ValueError as e:
                     Cs = Constant(value=expression['val'], wl=F.wl, signed=signed)
                     dico= {}
-                    dico = returnDictionaryConstant(Cs)
+                    dico = return_dictionary_constant(Cs)
                     dico['value'] = expression['exp']
                     errStr = "Not possible with the asked FPF; suggestion: " + str(Cs.FPF)
                     dico["error"] = errStr;
@@ -292,7 +294,7 @@ def Constant_service(constantsInter):
                         if (float(Constant(value=val_inf, fpf=F).FPF.msb) > float(C.FPF.msb)):
                             C = Constant(value=val_inf, fpf=F)
                     dico = {}
-                    dico = returnDictionaryConstant(C)
+                    dico = return_dictionary_constant(C)
                     dico["value"] = expression['exp']
                     returningJson[counter] = dico
                 except ValueError as e:  # None of the interval values could be represented with the given format
@@ -300,7 +302,7 @@ def Constant_service(constantsInter):
                     if float(Constant(value=val_inf, wl=F.wl).FPF.msb) > float(Cs.FPF.msb):
                         Cs = Constant(value=val_inf, wl=F.wl)
                     dico = {}
-                    dico = returnDictionaryConstant(Cs)
+                    dico = return_dictionary_constant(Cs)
                     dico["value"] = expression['exp']
                     errStr = "Not possible with the asked FPF; suggestion: " + str(Cs.FPF)
                     dico["error"] = errStr

@@ -149,7 +149,7 @@ def tobin(x, wl=8):
 	x = int(x)
 	return "".join(map(lambda y: str((x >> y) & 1), range(wl-1, -1, -1)))
 
-def returnDictionaryConstant(C):
+def return_dictionary_constant(C):
 	""" Takes a constant c and builds a dictionary containing its attributes
 	Returns a dictionary"""
 	dico = {}
@@ -169,7 +169,7 @@ def returnDictionaryConstant(C):
 	return dico
 
 
-def evaluateExp(input, wl):
+def evaluate_exp(input, wl):
 	""" Takes a mathematical expression and evaluates its value with Sollya from bash """
 	inputFile = open("input.sollya", "w")
 
@@ -185,14 +185,12 @@ def evaluateExp(input, wl):
 
 	proc = Popen("sollya input.sollya", stdout=PIPE, shell=True)
 	out, err = proc.communicate()
-	# print(err.decode())
-	print("out:"+out.decode())
 	if len(out.decode()):
 		outs = out.decode().split("\n")
 		return outs[len(outs)-2]
 	return "NaN"
 
-def getIntervalInf(interval, wl):
+def get_interval_inf(interval, wl):
 	n = len(interval)
 	if interval[0] != '[' or interval[n-1] != ']':
 		return None
@@ -207,15 +205,20 @@ def getIntervalInf(interval, wl):
 	firstExp = interval[1:ind_splitter]
 	secExp = interval[ind_splitter+1:len(interval)-1]
 
-	firstExp = evaluateExp(firstExp, min(wl*100, 1215752192))
-	secExp = evaluateExp(secExp, min(1215752192, wl*100))
+	firstExp = evaluate_exp(firstExp, min(wl * 100, 1215752192))
+	secExp = evaluate_exp(secExp, min(1215752192, wl * 100))
 
 	if firstExp == "NaN" or secExp == "NaN":
 		return None
 	return '[' + firstExp + ';' + secExp + ']'
 
-
-
-
-
-
+def is_sollya_installed():
+	inputFile = open("test.sollya", "w")
+	inputFile.writelines(["x=" + "cos(pi)" + ";"])
+	inputFile.writelines(["x ;"])
+	inputFile.close()
+	proc = Popen("sollya input.sollya", stdout=PIPE, shell=True)
+	out, err = proc.communicate()
+	if len(out.decode()):
+		return True
+	return False
