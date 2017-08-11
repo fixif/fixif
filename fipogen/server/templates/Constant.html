@@ -54,25 +54,6 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 </div>
 </div>
 
-<!--
-	Fixed-Point Representation: <br/>
-	The constant is approximated by: <br/>
-	Absolute error: <br/>
-	Relative error:<br/>
-	<div class="r-container">
-	<div id="result">
-		<img id='FPF_image'><br/>
-		{% for img in imageFormats %}
-			<a id='a_{{img}}' href=''>{{img}}</a>&nbsp;&nbsp;
-		{% endfor %}
-		<br/>
-		<table border=1><div id='str_latex'></div></table>
-	</div>
- -->
-
-
-
-
 
 {% endblock %}
 
@@ -96,12 +77,13 @@ Blablabla... This page allows to convert a real constant (literal constant or an
     var editor;
 
 	var parser_m = parser;
-	{% if mode =='simple' %}
+
+	{% if mode =='simple' %} /* Checking if server supports mathematical expressions or not to determine the parser */
 		console.log("tada");
 		parser_m = simpleParser;
 	{% endif %}
 
-    CodeMirror.defineSimpleMode("simplemode", {
+    CodeMirror.defineSimpleMode("simplemode", {	 /* Simple code mirror editor with no language and syntax highlighting attributed */
         // The start state contains the rules that are initially used
         start: [
         ],
@@ -110,9 +92,8 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         ],
     });
 
-	/* ------------------------------------------------------- */
-    $(document).ready(function(){
-        //code here...
+    $(document).ready(function() /* Initialization of Code Mirror editor */
+	{
         var code = document.getElementById("text");
         editor = CodeMirror.fromTextArea(code, {
             lineNumbers : true,
@@ -123,17 +104,18 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         editor.scrollbarStyle = "simple";
         editor.mode ="simplemode";
         editor.smartIndent = true;
+        /* On each change we look up all lines of editor for text validation */
         editor.on("change", function(cm, e) {
             var str = cm.getValue();
             var lines= str.split("\n");
 
-            var hasWrong = false; //Checks if there exists a wrong phrase in editor or not
+            var hasWrong = false; 	// Checks if there exists a wrong phrase in the editor or not, is kept to enable/disable the submit button
 
 			for(var i =0; i < lines.length; i++)
             {
                 if(lines[i].trim().length >0)
                 {
-                    try
+                    try	// If the parser could successfully parse this line then it's validated
                     {
                         parser_m.parse(lines[i]);
                         cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
@@ -148,7 +130,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
                 else
                     cm.setGutterMarker(i, "CodeMirror-lint-markers", null);
             }
-            if(hasWrong) //if there is a wrong phrase then the user should not be able to submit
+            if(hasWrong) // if there is a wrong phrase then the user should not be able to submit
                 document.getElementById("submit").disabled= true;
             else
                 document.getElementById("submit").disabled= false;
@@ -157,7 +139,9 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
     });
 
-    function returnWrongElement(e) {
+    /* Creates an HTML element containing a red cross having an error msg which is shown when being hovered upon */
+    function returnWrongElement(e)
+	{
         var marker = document.createElement("div");
 
         var msgStr = e.message;
@@ -178,7 +162,9 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         return marker;
     }
 
-    function returnCorrectElement() {
+    /* Creates an HTML element containing a green tick */
+    function returnCorrectElement()
+	{
         var marker = document.createElement("div");
         marker.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAOpQTFRFAAAAGm0SZKdXLJ4PMo8ZFF4AETkCMnUKMW8RIk4GSXsmN6IALogAGW0SFm0SBTkKImkbir2DksSPN3wzChwIIG8NH3ALIGwLebppxei9PpA3Knwcb75bZ7lOJHMNIm8GbLxOo+COU65BDWAHK5MOftZcWb0vXL8vh95fVrwuGnIEABwAIXYAOrIGW9cebd4wVcgYLIMGBCkADS4ANYkGT8cNh91NR5YbCC0AFTkBTJoYj+BVs+2Cb6hGFUABHEgAaqk3dK9EJFANDioAETMAuOKxo96RZslHhtxgTMwTbt8wa98olOtY////X+LKJAAAAEV0Uk5TAAAAAAAAAAAAAAAAACQ1ASCvzkcBMSMcqv7ISNC2JRun+/ebxv64r/z6mBeU9v7++ZcVFJH4+psWFJf5/J8XFpadGxMUq3HNRwAAAAFiS0dETYBoIGUAAABmSURBVAjXY2AAA0ZePn4Ii0lAUEiYQURUjJlFXELSVYpBWkZWTl5B0U1JmUHFXVVNXcNDU0ubQUfXU0/fy8DQiJXB2MTU28fM3IKNgYHd0sraxtaOA2QQp72DoxMXxFBuZxceEA0AK08Lb2nEcnIAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTMtMTItMzBUMjM6Mjc6MTcrMDE6MDBW7ccSAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDEzLTEyLTMwVDIzOjI3OjE3KzAxOjAwJ7B/rgAAAABJRU5ErkJggg==')" ;
         marker.style.backgroundPosition="center";
@@ -186,21 +172,6 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         marker.innerHTML = "<br>";
 
         return marker;
-    }
-
-    function buildErrorMessage(s)
-    {
-        var numberOfSeperators = 0;
-        for(var i =0 ; i < s.length; i++)
-        {
-            if(s.charAt(i) == ';' || s.charAt(i) == ';')
-                numberOfSeperators ++;
-        }
-        if(s.trim().charAt(0) == '[' && s.trim().charAt(s.length -1) == ']' && numberOfSeperators == 1)
-            return "Enter a correct mathematical expression inside the interval";
-        if(s.trim().charAt(0) == '[' || s.trim().charAt(s.length -1) == ']' || numberOfSeperators > 1)
-            return "Correct interval format: [exp;exp] or [exp,exp]";
-        return "Enter a correct mathematical expression";
     }
 
 	/* Clears the uploaded file */
@@ -245,7 +216,6 @@ Blablabla... This page allows to convert a real constant (literal constant or an
             editor.focus();
             editor.setCursor({line: results.length, ch: 0});
 
-//            validateTextArea(editor); todo: :|
         }
     }
 
@@ -270,14 +240,6 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 	/* called when the form is submitted; call the image */
     function clickSubmit()
     {
-        var dlButt = document.createElement("button");	// The button corresponding to download the results file
-        dlButt.id= "dl-res";
-        dlButt.innerHTML = "Download the results";
-        dlButt.style.minHeight= '30px';
-        dlButt.setAttribute('onclick', 'dlResFile();');
-        document.getElementById("result").innerHTML = dlButt.outerHTML;
-
-//        var div = document.getElementById("text");
         var ci_s =processDiv(editor.getValue());
         var ci = ci_s.join("@");
 
@@ -302,6 +264,14 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         $.ajax({ url: q}).done( function( data)
         {
             resultJson= data;
+
+            var dlButt = document.createElement("button");	// The button corresponding to download the results file
+        	dlButt.id= "dl-res";
+        	dlButt.innerHTML = "Download the results";
+        	dlButt.style.minHeight= '30px';
+        	dlButt.setAttribute('onclick', 'dlResFile();');
+        	document.getElementById("result").innerHTML = dlButt.outerHTML;
+
             html = "";
             html = "<table style=\"width:100%\">\n";
             html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mantissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n <th align = left>Status</th>\n </tr>";
@@ -353,8 +323,6 @@ Blablabla... This page allows to convert a real constant (literal constant or an
                 html += "</tr>";
             }
             html += "</table>";
-
-//            $("#result").html(dlButt.outerHTML +"<br>"+ html);
             document.getElementById("result").innerHTML += html;
         });
     }
@@ -365,7 +333,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
     {
         var strFile = "Const/Int\t\t\t\tlsb\t\t\t\tFPF\n"; /* The string to put in downloadable file */
 
-        for(var i = 0; i < resultJson.length; i++)
+        for(var i = 0; i < Object.keys(resultJson).length; i++)
         {
             strFile += resultJson[i]["value"] + "\t\t\t\t" + resultJson[i]["lsb"] + "\t\t\t\t" + resultJson[i]["FPF"] + "\n";
         }
@@ -380,7 +348,7 @@ Blablabla... This page allows to convert a real constant (literal constant or an
         document.getElementById("result").removeChild(a); // Remove anchor from body
     }
 
-	/* To set one of wl or FPF required for submit */
+	/* To set one  (wl OR FPF) input required for submit */
     jQuery(function ($) {
         var $inputs = $('input[name=wl],input[name=FPF]');
         $inputs.on('input', function () {

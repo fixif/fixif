@@ -170,7 +170,8 @@ def return_dictionary_constant(C):
 
 
 def evaluate_exp(input, wl):
-	""" Takes a mathematical expression and evaluates its value with Sollya from bash """
+	""" Takes a mathematical expression and evaluates its value with Sollya from bash
+	returns the evaluated value or NaN if an error has occurred. """
 	inputFile = open("input.sollya", "w")
 
 	inputFile.writelines(["verbosity=0;"])
@@ -191,6 +192,8 @@ def evaluate_exp(input, wl):
 	return "NaN"
 
 def get_interval_inf(interval, wl):
+	""" Takes an interval evaluates it's lower bound and upper bound
+	returns a string in form [constant;constant] for further exploitation """
 	n = len(interval)
 	if interval[0] != '[' or interval[n-1] != ']':
 		return None
@@ -213,6 +216,9 @@ def get_interval_inf(interval, wl):
 	return '[' + firstExp + ';' + secExp + ']'
 
 def is_sollya_installed():
+	""" Checks if Sollya is installed on the machine
+	if yes returns True
+	if no returns False """
 	inputFile = open("test.sollya", "w")
 	inputFile.writelines(["x=" + "cos(pi)" + ";"])
 	inputFile.writelines(["x ;"])

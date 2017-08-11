@@ -110,55 +110,12 @@ function verifyFPF(FPF)
 {
 	FPF.setCustomValidity(msgValidFPF( FPF.value))
 }
-function verifyConstIntLines(inputStr)
-{
-	/*Contains each lines of the text entered*/
-	var arrStrs = inputStr.value.split('\n');
-	/*Returning error is the problem with the last entered value*/
-	var ret = "" ;
-	for(var i =0; i < arrStrs.length; i++)
-	{
-		if(arrStrs[i]!= "")
-		{
-			var result= msgValidConstInterval(arrStrs[i]);
-			if(result.length > 0)
-				ret = result;
-		}
-	}
-	inputStr.setCustomValidity(ret);
-}
-function verifyEachChar(inputStr)
-{
-    var lastChar = inputStr.value.charAt(inputStr.value.length-1);
-	if((lastChar < '0' || lastChar > '9') && (lastChar!= '\n' && lastChar != '.'))
-	{
-        inputStr.setCustomValidity('Entered character is not a number');
-    }
-    else
-	{
-		verifyConstIntLines(inputStr);
-	}
-
-}
 
 function processDiv(text)
 {
 	var ci_s = [];
 	var str = "";
 	ci_s= text.split("\n");
-	// for(var i =0; i < text.length; i++)
-	// {
-	// 	if(!separators.has(text.charAt(i)))
-	// 	{
-	// 		str += text.charAt(i);
-	// 	}
-	// 	else if(str)
-	// 	{
-	// 		ci_s[ci_s.length] = str;
-	// 		str = "";
-	// 	}
-	// }
-
 	return ci_s;
 
 }
