@@ -8,10 +8,10 @@ function queryString(form, except_name)
 	var s = [];
 	for(var i=0;i<e.length;i++)
 	{
-		if (e[i].name.substring(0,except_name.length)!= except_name)
+		if (e[i].name.substring(0,except_name.length)!== except_name)
 		{
-			if (e[i].name!="")
-				if (e[i].type=="checkbox")
+			if (e[i].name!=="")
+				if (e[i].type==="checkbox")
 					s.push( e[i].name +"="+(e[i].checked?"yes":"no") );
 				else
 					s.push( e[i].name+"="+e[i].value );
@@ -39,7 +39,7 @@ function msgValidFPF( fpf)
 	if ( resQ )
 	{
 		var wl = parseInt(resQ[2]) + parseInt(resQ[3]);
-		if ( (wl>1 && resQ[1]=='u') || (wl>2 && resQ[1]!='u') )
+		if ( (wl>1 && resQ[1]==='u') || (wl>2 && resQ[1]!=='u') )
 			return '';
 		else
 			return 'With the Q-notation, the integer part and the fractional part should (like Q3.5 or Q10.-2)'; 
@@ -49,7 +49,7 @@ function msgValidFPF( fpf)
 	if ( resP )
 	{
 		var wl = parseInt(resP[2]) - parseInt(resP[3]) + 1;
-		if ( (wl>1 && resP[1]=='u') || (wl>2 && resP[1]!='u') )
+		if ( (wl>1 && resP[1]==='u') || (wl>2 && resP[1]!=='u') )
 			return '';
 		else
 			return 'With MSB/LSB notation, the MSB should be greater than the LSB (like (5,-3) or (10,-3) )';
@@ -99,7 +99,7 @@ function verifyWL(fpfORwl)
 	var msgWL = '';
 	if ( isNaN(+fpfORwl.value) )
 		msgWL = 'This should be an integer greater than 1, or a Fixed-Point Format (Q-notation or MSB/LSB notation)';
-	else if (parseInt(fpfORwl.value) != +fpfORwl.value)
+	else if (parseInt(fpfORwl.value) !== +fpfORwl.value)
 		msgWL = 'A wordlength should be an integer';
 	else if (+fpfORwl.value<2)
 		msgWL = 'A wordlength should be greater than 1';
