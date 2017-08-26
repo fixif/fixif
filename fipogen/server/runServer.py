@@ -9,7 +9,7 @@ See the usage with the --help option
 from docopt import docopt
 import logging
 from logging.handlers import RotatingFileHandler
-from fipogen.server.server import runServer
+from fipogen.server.server import start
 
 
 usage = """
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 	logger.info("# running FiPoGen web server #")
 	logger.info("#============================#")
 	logger.info("")
-	runServer(args['--host'], args['--port'], debug, args['--cache'], args['--generated'])
+	start(args['--host'], args['--port'], debug, args['--cache'], args['--generated'])
 
 
 

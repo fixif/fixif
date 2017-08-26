@@ -518,7 +518,7 @@ def log_to_logger(fn):
 	return _log_to_logger
 
 
-def runServer(host, port, debug, cache, generated):
+def start(host, port, debug, cache, generated):
 	"""Run the webserver
 	Parameters:
 	- host: (string) name of the host (usually 'localhost')
