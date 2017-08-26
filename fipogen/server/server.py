@@ -36,7 +36,7 @@ weblogger = getLogger('bottle')
 # Path to the template
 TEMPLATE_PATH[:] = ['templates/']
 
-# todo: delete the following lines
+# TODO: delete the following lines
 # regexs
 lit = "[+-]?\\d+(?:\\.\\d+)?"  # literal
 # lit = "[+-]?\\d+[.]?\\d+[[e][-]?\\d+]?"
@@ -309,119 +309,118 @@ def Constant_service(constantsInter):
 			counter += 1
 	return returningJson
 
-
-# Generate Sum of FPF image (or LaTeX)
-@route('/Sum.<outputFormat:re:%s>' % '|'.join(imageFormats + ('tex',)))
-def Sum_service(outputFormat):
-	"""Generate Sum of FPF image (or LaTeX)"""
-	# TODO: add docstring
-	try:
-		# get data
-		formats = request.query.sum.split(":")
-		# build each FPF
-		F = [FPF(formatStr=f.replace('_', '.')) for f in formats]
-		resultFPF = FPF(formatStr=request.query.result.replace('_', '.'))
-	except ValueError:
-		return "Invalid Fixed-Point Formats"  # TODO: message d'erreur plus explicite ?
-	# process the options
-	options = optionManager(request.query)
-	options.addOptionalOption("colors", colorThemes, "YG")  # color theme
-	options.addOptionalOption("width", lambda x: int(x), '500')  # used for jpg, png, tiff only
-	options.addOptionalOption("height", lambda x: int(x), '1300')  # used for jpg, png, tiff only (default value is very large, to let the user specify width=2000 without being blocked by the height:300)
-	options.addOptionalOption("axis", {"yes": True, "no": False}, "no")  # display a vertical axis on bit=0
-	options.addOptionalOption("sort", ("no", "lsb", "msb"), "no")
-	options.addOptionalOption("hatches", {"yes": True, "no": False}, "no")  # display hatches for the bits outside the FPF of the result
-	options.addOptionalOption("xshift", lambda x: float(x), '0')
-	options.addOptionalOption("yshift", lambda x: float(x), '0')
-	# sorting the FPF
-	if options["sort"] == 'msb':
-		F.sort(key=attrgetter('msb'), reverse=True)
-	elif options["sort"] == 'lsb':
-		F.sort(key=attrgetter('lsb'))
-	# generate LaTeX code for the FPFs
-	latexFPF = "\n".join([f.LaTeX(x_shift=options["xshift"], y_origin=-i * 1.3 + options["yshift"], colors=options["colors"], hatches=((resultFPF.msb, resultFPF.lsb) if options["hatches"] else None)) for i, f in enumerate(F)])
-	latexFPF += "\n\t%result\n" + resultFPF.LaTeX(x_shift=options["xshift"],
-	                                              y_origin=-len(F) * 1.3 - 0.3 + options["yshift"],
-	                                              colors=options["colors"]
-	                                              )
-	minlsb = min(f.lsb for f in F + [resultFPF])
-	maxmsb = max(f.msb for f in F + [resultFPF])
-	latexFPF += "\n\t\\draw (%f,%f) -- (%f,%f) [color=black,line width=1pt];" % (
-		-maxmsb - 1.2 + options["xshift"], -len(F) * 1.3 + 1 + options["yshift"], -minlsb + 0.2 + options["xshift"],
-		-len(F) * 1.3 + 1 + options["yshift"])
-	if options["axis"]:
-		latexFPF += "\n\n\t\\draw (%f,%f) -- (%f,%f) [color=red];" % (
-			options["xshift"], 1.2 + options["yshift"], options["xshift"], -len(F) * 1.3 - 0.5 + options["yshift"])
-
-	sumName = "-".join([f.Qnotation() for f in F + [resultFPF]])
-	if outputFormat != 'tex':
-		# prepare the conversion argument (in the LaTeX class 'standalone')
-		if outputFormat != "pdf":
-			convert = "convert={size=%dx%d,outext=.%s}," % (options['width'], options['height'], outputFormat)
-		else:
-			convert = ""
-		# encompass it into a complete latex file
-		latexStr = template("latex-FPF.tex",
-		                    options.getValues({"FPF": latexFPF, "format": outputFormat, "convert": convert}))
-		# create the image from the latex
-		return createImageFromLaTeX(sumName + "?" + str(options), latexStr, outputFormat)
-	else:
-		return "\t%Generated from " + Config.baseURL + "Sum.tex?" + request.query_string + "\n" + latexFPF
-
-
-# /aSoP
-@route('/aSoP')
-def input_SoP():
-	"""Generate the aSoP HTML file"""
-	return static_file('aSoP.html', root=Config.views)
-
-
-# /aSoP when data are posted
-@post('/aSoP')
-def aSoP_submit():
-	"""Manage the aSoP data"""
-	# get data
-	constants = request.forms.get('constants').split("\r\n")
-	var_FPF = request.forms.get('var_FPF').split("\r\n")
-	var_wi = request.forms.get('var_wi').split("\r\n")
-	beta_final = request.forms.get('beta_final')
-	# conversion
-	try:
-		beta_final = float(beta_final)
-	except ValueError:
-		return "the beta final is not valid"
-
-	cons = []
-	for c in constants:
-		try:
-			c_v, c_w = c.split(',')
-			cons.append(Constant(float(c_v), int(c_w)))
-		except ValueError:
-			return "The constants cannot be converted to float"
-
-	try:
-		_ = [FPF(formatStr=f) for f in var_FPF]
-	except ValueError:
-		return "Invalid FPF format"
-
-	var_w = []  # variable wordlength
-	var_i = []  # variable interval
-	for wi in var_wi:
-		try:
-			w, i1, i2 = wi.split(',')
-			var_w.append(int(w))
-			var_i.append((float(i1), float(i2)))
-		except ValueError:
-			return "Invalid wordlength,inteval format"
-	# now call Benoit's function to do the aSoP...
-	interval_var = []
-	for w, i in zip(var_w, var_i):
-		interval_var.append(Variable(value_inf=i[0], value_sup=i[1], wl=w))  # beta=w changed in wl=w
-	return simple_cleaned_SoP(cons, interval_var, beta_final)
-
-
-# or return dummy string
-# return 'constants=%s\n var_FPF=%s\n var_w=%s\n var_i=%s'%(constants,var_FPF,var_w, var_i)
+# TODO: make `Sum` works
+# # Generate Sum of FPF image (or LaTeX)
+# @route('/Sum.<outputFormat:re:%s>' % '|'.join(imageFormats + ('tex',)))
+# def Sum_service(outputFormat):
+# 	"""Generate Sum of FPF image (or LaTeX)"""
+# 	try:
+# 		# get data
+# 		formats = request.query.sum.split(":")
+# 		# build each FPF
+# 		F = [FPF(formatStr=f.replace('_', '.')) for f in formats]
+# 		resultFPF = FPF(formatStr=request.query.result.replace('_', '.'))
+# 	except ValueError:
+# 		return "Invalid Fixed-Point Formats"  # TODO: message d'erreur plus explicite ?
+# 	# process the options
+# 	options = optionManager(request.query)
+# 	options.addOptionalOption("colors", colorThemes, "YG")  # color theme
+# 	options.addOptionalOption("width", lambda x: int(x), '500')  # used for jpg, png, tiff only
+# 	options.addOptionalOption("height", lambda x: int(x), '1300')  # used for jpg, png, tiff only (default value is very large, to let the user specify width=2000 without being blocked by the height:300)
+# 	options.addOptionalOption("axis", {"yes": True, "no": False}, "no")  # display a vertical axis on bit=0
+# 	options.addOptionalOption("sort", ("no", "lsb", "msb"), "no")
+# 	options.addOptionalOption("hatches", {"yes": True, "no": False}, "no")  # display hatches for the bits outside the FPF of the result
+# 	options.addOptionalOption("xshift", lambda x: float(x), '0')
+# 	options.addOptionalOption("yshift", lambda x: float(x), '0')
+# 	# sorting the FPF
+# 	if options["sort"] == 'msb':
+# 		F.sort(key=attrgetter('msb'), reverse=True)
+# 	elif options["sort"] == 'lsb':
+# 		F.sort(key=attrgetter('lsb'))
+# 	# generate LaTeX code for the FPFs
+# 	latexFPF = "\n".join([f.LaTeX(x_shift=options["xshift"], y_origin=-i * 1.3 + options["yshift"], colors=options["colors"], hatches=((resultFPF.msb, resultFPF.lsb) if options["hatches"] else None)) for i, f in enumerate(F)])
+# 	latexFPF += "\n\t%result\n" + resultFPF.LaTeX(x_shift=options["xshift"],
+# 	                                              y_origin=-len(F) * 1.3 - 0.3 + options["yshift"],
+# 	                                              colors=options["colors"]
+# 	                                              )
+# 	minlsb = min(f.lsb for f in F + [resultFPF])
+# 	maxmsb = max(f.msb for f in F + [resultFPF])
+# 	latexFPF += "\n\t\\draw (%f,%f) -- (%f,%f) [color=black,line width=1pt];" % (
+# 		-maxmsb - 1.2 + options["xshift"], -len(F) * 1.3 + 1 + options["yshift"], -minlsb + 0.2 + options["xshift"],
+# 		-len(F) * 1.3 + 1 + options["yshift"])
+# 	if options["axis"]:
+# 		latexFPF += "\n\n\t\\draw (%f,%f) -- (%f,%f) [color=red];" % (
+# 			options["xshift"], 1.2 + options["yshift"], options["xshift"], -len(F) * 1.3 - 0.5 + options["yshift"])
+#
+# 	sumName = "-".join([f.Qnotation() for f in F + [resultFPF]])
+# 	if outputFormat != 'tex':
+# 		# prepare the conversion argument (in the LaTeX class 'standalone')
+# 		if outputFormat != "pdf":
+# 			convert = "convert={size=%dx%d,outext=.%s}," % (options['width'], options['height'], outputFormat)
+# 		else:
+# 			convert = ""
+# 		# encompass it into a complete latex file
+# 		latexStr = template("latex-FPF.tex",
+# 		                    options.getValues({"FPF": latexFPF, "format": outputFormat, "convert": convert}))
+# 		# create the image from the latex
+# 		return createImageFromLaTeX(sumName + "?" + str(options), latexStr, outputFormat)
+# 	else:
+# 		return "\t%Generated from " + Config.baseURL + "Sum.tex?" + request.query_string + "\n" + latexFPF
+#
+#
+# # /aSoP
+# @route('/aSoP')
+# def input_SoP():
+# 	"""Generate the aSoP HTML file"""
+# 	return static_file('aSoP.html', root=Config.views)
+#
+#
+# # /aSoP when data are posted
+# @post('/aSoP')
+# def aSoP_submit():
+# 	"""Manage the aSoP data"""
+# 	# get data
+# 	constants = request.forms.get('constants').split("\r\n")
+# 	var_FPF = request.forms.get('var_FPF').split("\r\n")
+# 	var_wi = request.forms.get('var_wi').split("\r\n")
+# 	beta_final = request.forms.get('beta_final')
+# 	# conversion
+# 	try:
+# 		beta_final = float(beta_final)
+# 	except ValueError:
+# 		return "the beta final is not valid"
+#
+# 	cons = []
+# 	for c in constants:
+# 		try:
+# 			c_v, c_w = c.split(',')
+# 			cons.append(Constant(float(c_v), int(c_w)))
+# 		except ValueError:
+# 			return "The constants cannot be converted to float"
+#
+# 	try:
+# 		_ = [FPF(formatStr=f) for f in var_FPF]
+# 	except ValueError:
+# 		return "Invalid FPF format"
+#
+# 	var_w = []  # variable wordlength
+# 	var_i = []  # variable interval
+# 	for wi in var_wi:
+# 		try:
+# 			w, i1, i2 = wi.split(',')
+# 			var_w.append(int(w))
+# 			var_i.append((float(i1), float(i2)))
+# 		except ValueError:
+# 			return "Invalid wordlength,inteval format"
+# 	# now call Benoit's function to do the aSoP...
+# 	interval_var = []
+# 	for w, i in zip(var_w, var_i):
+# 		interval_var.append(Variable(value_inf=i[0], value_sup=i[1], wl=w))  # beta=w changed in wl=w
+# 	return simple_cleaned_SoP(cons, interval_var, beta_final)
+#
+#
+# # or return dummy string
+# # return 'constants=%s\n var_FPF=%s\n var_w=%s\n var_i=%s'%(constants,var_FPF,var_w, var_i)
 
 
 # /clean-caches
