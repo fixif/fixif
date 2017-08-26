@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+"""
+Main entry to run the web server
+See the usage with the --help option
+"""
+
+
 from docopt import docopt
 import logging
 from logging.handlers import RotatingFileHandler

@@ -5,7 +5,7 @@
 """
 
 from os.path import exists
-from subprocess import call, Popen, PIPE
+from subprocess import Popen, PIPE
 from bottle import static_file
 
 from fipogen.server.path import Config
@@ -24,6 +24,7 @@ imageFormats = ('pdf', 'jpg', 'png', 'tiff', 'eps')
 
 # Corresponds to log of latex compilation
 latexLogger = logging.getLogger('Latex')
+
 
 class optionManager:
 	"""class to mangage and process the parameters (here coming from an html form)
@@ -48,10 +49,11 @@ class optionManager:
 		self._finalValues = {}      # dictionary parameter/final returned value
 
 	def addOptionalOption(self, parameterName, method, defaultValue):
+		"""Add an option (that can be optional)"""
 		# get the value associated with the parameterName, if exits (otherwise, use the defaultValue)
 		value = self._query.get(parameterName, defaultValue)
 
-		# transform this value to a final value via the method (can be a disctionary, a list or a function)
+		# transform this value to a final value via the method (can be a dictionary, a list or a function)
 		if isinstance(method, dict):
 			if value not in method:
 				value = defaultValue
@@ -63,7 +65,7 @@ class optionManager:
 		else:
 			try:
 				finalValue = method(value)
-			except:
+			except ValueError:
 				finalValue = method(defaultValue)
 				value = defaultValue
 	
@@ -75,7 +77,7 @@ class optionManager:
 		return "&".join(k+"="+v for k, v in self._options.items())
 	
 	def getValues(self, d=None):
-		# TODO: si d est None, alors on renvoie le dico de finalValues...
+		"""Returns the final values from the dictionary d and the declared options"""
 		# when d is not given
 		if d is None:
 			d = {}
@@ -112,13 +114,13 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 
 		# TODO: check if pdflatex has compiled without errors (call returns the output code)
 
-		proc =Popen(command1, stdout= PIPE, shell=True)
-		out, err = proc.communicate()
+		proc = Popen(command1, stdout=PIPE, shell=True)
+		_ = proc.communicate()
 
 		latexLogger.info(command1 + "\n")
 
 		proc = Popen(command2, stdout=PIPE, shell=True)
-		out, err = proc.communicate()
+		_ = proc.communicate()
 		latexLogger.info(command2 + "\n")
 
 		latexLogger.info("##\tDone\t##")
@@ -132,13 +134,11 @@ def createImageFromLaTeX(baseName, latexStr, outputFormat):
 
 def clean_caches():
 	"""Clean caches (remove all files in the cache directory)"""
-	# TODO: potentially very dangerous !!!
+	# FIXME: potentially very dangerous !!!
 	# TODO: check if Config.cache is not empty !
-	try:
-		call("rm -r " + Config.cache)
-		call("mkdir " + Config.cache)
-	except:
-		pass
+	pass
+	# call("rm -r " + Config.cache)
+	# call("mkdir " + Config.cache)
 
 
 def tobin(x, wl=8):
@@ -149,10 +149,10 @@ def tobin(x, wl=8):
 	x = int(x)
 	return "".join(map(lambda y: str((x >> y) & 1), range(wl-1, -1, -1)))
 
+
 def return_dictionary_constant(C):
 	""" Takes a constant c and builds a dictionary containing its attributes
 	Returns a dictionary"""
-	dico = {}
 	dico = {
 		'value': '',
 		'error': '',
@@ -162,14 +162,14 @@ def return_dictionary_constant(C):
 		'bits': tobin(C.mantissa, C.FPF.wl),
 		'FPF_image': Config.baseURL + 'FPF/' + str(C.FPF) + '.jpg?notation=mlsb&numeric=no&colors=RB&binary_point=yes&label=no&intfrac=no&power2=no&bits=' + tobin(C.mantissa, C.FPF.wl),
 		'approx': nstr(C.approx),
-		'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True,label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
+		'latex': C.FPF.LaTeX(notation="mlsb", numeric=False, colors=colorThemes["RB"], binary_point=True, label="no", intfrac=False, power2=False, bits=tobin(C.mantissa, C.FPF.wl)),
 		'error_abs': nstr(C.absError),
 		'error_rel': nstr(C.realError),
 		}
 	return dico
 
 
-def evaluate_exp(input, wl):
+def evaluate_exp(inputStr, wl):
 	""" Takes a mathematical expression and evaluates its value with Sollya from bash
 	returns the evaluated value or NaN if an error has occurred. """
 	inputFile = open("input.sollya", "w")
@@ -178,7 +178,7 @@ def evaluate_exp(input, wl):
 	inputFile.writelines(["display=decimal;"])
 	inputFile.writelines(["prec = " + str(min(wl * 10, 1215752192)) + ";"])
 
-	inputFile.writelines(["x=" + input + ";"])
+	inputFile.writelines(["x=" + inputStr + ";"])
 
 	inputFile.writelines(["x ;"])
 
@@ -190,6 +190,7 @@ def evaluate_exp(input, wl):
 		outs = out.decode().split("\n")
 		return outs[len(outs)-2]
 	return "NaN"
+
 
 def get_interval_inf(interval, wl):
 	""" Takes an interval evaluates it's lower bound and upper bound
@@ -214,6 +215,7 @@ def get_interval_inf(interval, wl):
 	if firstExp == "NaN" or secExp == "NaN":
 		return None
 	return '[' + firstExp + ';' + secExp + ']'
+
 
 def is_sollya_installed():
 	""" Checks if Sollya is installed on the machine
