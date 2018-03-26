@@ -7,8 +7,8 @@
 		width: 16px;
 	}
 </style>
-<link rel="stylesheet" type="text/css" href="../plugins/codemirror/codemirror-5.28.0/lib/codemirror.css">
-<link rel="stylesheet" href="../plugins/codemirror/codemirror-5.28.0/addon/scroll/simplescrollbars.css">
+<link rel="stylesheet" type="text/css" href="../plugins/codemirror-5.28.0/lib/codemirror.css">
+<link rel="stylesheet" href="../plugins/codemirror-5.28.0/addon/scroll/simplescrollbars.css">
 Blablabla... This page allows to convert a real constant (literal constant or an interval, e.g. <i>0.124</i> or <i>[-100;100]</i>) into a fixed-point representation.
 
 <p>
@@ -58,15 +58,15 @@ Blablabla... This page allows to convert a real constant (literal constant or an
 
 {% block script %}
 
-<script type="text/javascript" src="{{base_url}}plugins/codemirror/codemirror-5.28.0/lib/codemirror.js"></script>
-<script src="{{base_url}}plugins/codemirror/codemirror-5.28.0/addon/mode/simple.js"></script>
-<script src="{{base_url}}plugins/codemirror/codemirror-5.28.0/addon/scroll/simplescrollbars.js"></script>
+<script type="text/javascript" src="{{base_url}}plugins/codemirror-5.28.0/lib/codemirror.js"></script>
+<script src="{{base_url}}plugins/codemirror-5.28.0/addon/mode/simple.js"></script>
+<script src="{{base_url}}plugins/codemirror-5.28.0/addon/scroll/simplescrollbars.js"></script>
 <!--<script type="text/javascript" src = "https://codemirror.net/addon/scroll/simplescrollbars.js"></script>-->
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="{{base_url}}useful.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pegjs/0.7.0/peg.min.js"></script>
-<script src="{{base_url}}require.js"></script>
+<script src="{{base_url}}../plugins/require.js"></script>
 <script src="{{base_url}}parser.js"></script>
 <script src="{{base_url}}simple_parser.js"></script>
 

@@ -446,39 +446,14 @@ def js(filename):
 	"""Returns the '/*.js' files"""
 	return static_file(filename + '.js', root=Config.views)
 
-# # ACE files
-# @route('/ace-builds-master/src/<filename>.js')
-# def ACE(filename):
-#     """Returns the ace files"""
-#     return static_file(filename + '.js', root=Config.views + 'ace-builds-master/src/')
 
 
-# Code Mirror, mostly files in lib directory
-@route('/plugins/codemirror/codemirror-5.28.0/<path>/<filename>.js')
-def plugins(filename, path):
-	"""Returns the ace files"""
-	return static_file(filename + '.js', root='plugins/codemirror/codemirror-5.28.0/' + path + '/')
+# Code Mirror files
+@route('/plugins/codemirror-5.28.0/<path:re:.*/>/<filename>.<ext:re:js|css>')
+def plugins(path, filename, ext):
+	"""Returns the code mirror files"""
+	return static_file(filename+'.'+ext, root='plugins/codemirror-5.28.0/' + path + '/')
 
-
-# Code Mirror style file
-@route('/plugins/codemirror/codemirror-5.28.0/<path>/<filename>.css')
-def plugins(filename, path):
-	"""Returns the ace files"""
-	return static_file(filename + '.css', root='plugins/codemirror/codemirror-5.28.0/' + path + '/')
-
-
-# Code Mirror 2 layers: js
-@route('/plugins/codemirror/codemirror-5.28.0/<path1>/<path2>/<filename>.js')
-def plugins(filename, path1, path2):
-	"""Returns the ace files"""
-	return static_file(filename + '.js', root='plugins/codemirror/codemirror-5.28.0/' + path1 + '/' + path2 + '/')
-
-
-# Code Mirror 2 layers: css
-@route('/plugins/codemirror/codemirror-5.28.0/<path1>/<path2>/<filename>.css')
-def plugins(filename, path1, path2):
-	"""Returns the ace files"""
-	return static_file(filename + '.css', root='plugins/codemirror/codemirror-5.28.0/' + path1 + '/' + path2 + '/')
 
 
 # logos and basic image
@@ -493,14 +468,6 @@ def getImage(image_name, outputFormat):
 def get_favicon():
 	"""Returns the favicon"""
 	return static_file('favicon.ico', root=Config.views)
-
-
-# a test page
-@get('/test')
-def test():
-	"""Returns the test page"""
-	# TODO: to be removed...
-	return template('test.html')
 
 
 # add a logger wrapper for bottle (in order to log its activity)
@@ -551,4 +518,4 @@ def start(host, port, debug, cache, generated):
 	weblogger.info("Run the web server on port %d...", port)
 	default_app().catchall = True  # all the exceptions/errors are catched, and re-routed to error500
 	# run the server
-	run(host='localhost', port=8080, debug=debug, quiet=not debug, reloader=False)
+	run(host=host, port=port, debug=debug, quiet=not debug, reloader=False)
