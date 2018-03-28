@@ -463,7 +463,6 @@ procedure wrappednumberroots(p, dom) {
 
 procedure provePolynomialPositiveBasic(p, dom) {
 	  var res, a, b, v, h, t, tt;
-	  
 	  a = inf(dom);
 	  b = sup(dom);
 
@@ -665,6 +664,9 @@ procedure functionNegativeAbscissa(q, dom) {
 */
 procedure provePolynomialPositive(poly, dom) {
           var q, r, delta, pr, oldPrec, c, cc, t, p;
+
+print(canonical(poly));
+print(dom);
 
           p = horner(poly);
 
