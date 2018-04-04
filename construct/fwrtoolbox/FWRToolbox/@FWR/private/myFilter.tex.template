@@ -1,8 +1,0 @@
-\begin{algorithm}[h]
-	\caption{<}
-##VARIABLES##
-	\SetAlgoLined
-	\Begin{
-##COMPUTATIONS##	
-}
-\end{algorithm}

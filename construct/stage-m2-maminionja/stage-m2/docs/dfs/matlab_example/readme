@@ -1,3 +1,0 @@
-Matlab example file, which generates a LWDF filter structure for a 5th order butterworth filter.
--------------
-In order to run the file you’ll need LWDF2SIF, which I had sent you earlier, and wdf_toolbox (which generates LWDFs), info about which you can find here http://ens.ewi.tudelft.nl/~huib/mtbx/get_files_ga_ens.php

@@ -1,2 +1,0 @@
-UTILISATION:
-executer "make" lance "slxparser.py" qui analysera le fichier "blockdiagram.xml"
