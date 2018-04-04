@@ -35,14 +35,14 @@ setup(
 	keywords='fixed-point arithmetic',
 	packages=find_packages(exclude=['tests']),
 	install_requires=[
-		"numpy >= 1.10.4",
-		"scipy >= 0.17.0",
+		"numpy", "scipy",
 		# "slycot >= 0.2.0",
-		"pytest >= 2.8.7",
+		"colorama",
 		# "matlabengineforpython",
 		# "sollya",
 		# "cython",
-		"mpmath"],
+		"mpmath",
+		'pytest', 'pytest-cov', 'coveralls'],
 	project_urls={
 		'Bug Reports': 'https://github.com/FiXiF/fixif/issues',
 		'Source': 'https://github.com/FiXiF/fixif/',
