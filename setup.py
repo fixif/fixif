@@ -1,29 +1,50 @@
+# -*- coding: utf-8 -*-
+
+# Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 
+# Get the long description from the README file
+import os
+import codecs
+here = os.path.abspath(os.path.dirname(__file__))
+with codecs.open('README.rst', encoding='utf-8') as f:
+	long_description = f.read()
+
+
+
+# setup arguments
 setup(
-	name= 'fixif',
-	version= '0.4',
-	author= 'Thibault Hilaire, Joachim Kruithof, Benoit Lopez, Anastasia Volkova',
-	author_email= 'thibault.hilaire@lip6.fr',
-	packages= find_packages(),  #TODO: list manually the packages we want (FxP, LTI, etc.)
-	scripts= [],
-#    url='http://pypi.python.org/pypi/fipogen/',
-	license= 'GPLv3',
-	description= 'Finite Word-length Realization toolbox.',
-	long_description= open('README.rst').read(),
-	install_requires= [
+	name='fixif',
+	#namespace='fixif',
+	version='0.4',
+	description='Fixed-Point filters',
+	long_description=long_description,
+	url='https://github.com/FiXiF/fixif',
+	author='Thibault Hilaire, Anastasia Volkova, Joachim Kruithof, Benoit Lopez',
+	author_email='thibault.hilaire@lip6.fr',
+	classifiers=[
+		'Development Status :: 4 - Beta',
+		'Intended Audience :: Science/Research',
+		'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+		'Topic :: Scientific/Engineering',
+		'Topic :: Software Development :: Embedded Systems',
+		'Topic :: Software Development :: Code Generators',
+		'Programming Language :: Python :: 2',
+		'Programming Language :: Python :: 3',
+	],
+	keywords='fixed-point arithmetic',
+	packages=find_packages(exclude=['tests']),
+	install_requires=[
 		"numpy >= 1.10.4",
 		"scipy >= 0.17.0",
-#		"slycot >= 0.2.0",
+		# "slycot >= 0.2.0",
 		"pytest >= 2.8.7",
-#		"jinja2 >= 2.8",
-#		"matlabengineforpython",
-#		"sollya",
-#		"cython",
-#		"bottle",
-#		"jinja2",
-#		"docopt",
-		"mpmath"
-	],
-	include_package_data=True
-) 
+		# "matlabengineforpython",
+		# "sollya",
+		# "cython",
+		"mpmath"],
+	project_urls={
+		'Bug Reports': 'https://github.com/FiXiF/fixif/issues',
+		'Source': 'https://github.com/FiXiF/fixif/',
+	},
+)
