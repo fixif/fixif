@@ -12,11 +12,11 @@ __status__ = "Beta"
 
 
 
-from fipogen.Structures import iterAllRealizations, LWDF
-from fipogen.LTI import Filter, iter_random_Filter, random_Filter
-from fipogen.LTI import iter_random_Butter
-from fipogen.LTI import iter_random_dTF
-from fipogen.Structures import DFI
+from fixif.Structures import iterAllRealizations, LWDF
+from fixif.LTI import Filter, iter_random_Filter, random_Filter
+from fixif.LTI import iter_random_Butter
+from fixif.LTI import iter_random_dTF
+from fixif.Structures import DFI
 
 import pytest
 import numpy

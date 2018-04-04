@@ -17,16 +17,16 @@ __status__ = "Beta"
 import pytest
 import numpy
 
-from fipogen.SIF import SIF
+from fixif.SIF import SIF
 from numpy import matrix as mat
-from fipogen.Structures import iterAllRealizations
-from fipogen.LTI import Filter, iter_random_dTF, iter_random_dSS
+from fixif.Structures import iterAllRealizations
+from fixif.LTI import Filter, iter_random_dTF, iter_random_dSS
 
 
 #from func_aux.get_data import get_data
 #from func_aux.MtlbHelper import MtlbHelper
 
-from fipogen.func_aux import mpf_to_numpy
+from fixif.func_aux import mpf_to_numpy
 
 
 from numpy.random import seed, rand, randint, shuffle

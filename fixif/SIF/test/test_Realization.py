@@ -18,12 +18,12 @@ __status__ = "Beta"
 import pytest
 from colorama import Fore
 
-from fipogen.SIF import Realization
+from fixif.SIF import Realization
 from numpy import matrix as mat, zeros,eye, empty, float64
 
-from fipogen.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
-from fipogen.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
-from fipogen.Structures import State_Space
+from fixif.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
+from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
+from fixif.Structures import State_Space
 from scipy.weave import inline
 
 #from func_aux.get_data import get_data

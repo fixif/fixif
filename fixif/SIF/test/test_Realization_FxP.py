@@ -13,8 +13,8 @@ __status__ = "Beta"
 import pytest
 
 
-from fipogen.LTI import dSS, Butter, dTF
-from fipogen.SIF import Realization, Realization_FxP
+from fixif.LTI import dSS, Butter, dTF
+from fixif.SIF import Realization, Realization_FxP
 from numpy import matrix as mat, zeros, eye, empty, float64
 import numpy as np
 from numpy import all
@@ -22,13 +22,13 @@ import time
 
 import mpmath as mp
 
-from fipogen.func_aux import write_matrix_mpf, write_matrix_hex, mpf_matrix_to_sollya, mpf_get_representation, \
+from fixif.func_aux import write_matrix_mpf, write_matrix_hex, mpf_matrix_to_sollya, mpf_get_representation, \
 	python2mpf_matrix, sollya_matrix_to_numpy
 
-from fipogen.Structures import LWDF, DFII, State_Space, DFI
+from fixif.Structures import LWDF, DFII, State_Space, DFI
 
-from fipogen.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
-from fipogen.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter, random_dSS, dSS
+from fixif.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
+from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter, random_dSS, dSS
 from scipy.weave import inline
 
 # from func_aux.get_data import get_data
@@ -36,7 +36,7 @@ from scipy.weave import inline
 
 import mpmath
 from mpmath import *
-from fipogen.func_aux import mpf_poly_mult
+from fixif.func_aux import mpf_poly_mult
 from numpy.random import seed, rand, randint, shuffle
 from numpy.testing import assert_allclose
 
