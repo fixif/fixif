@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block script %}
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="{{base_url}}useful.js"></script>
+<script>
+
+/* called when the form is submitted; call the image */
+function validate()
+{
+	var ci = $('#ci').val();		// get the constant/interval
+	var wl = $('#wl').val();		// get the wordlength/FPF
+	/* build the query */
+	var q = '{{base_url}}Constant/' + ci + '?';
+	if (msgValidFPF(wl)=='')
+		q = q + 'FPF='+wl;
+	else
+		q = q + 'WL='+wl;
+	/* get the json */
+	$.ajax({ url: q}).done( function( data)
+	{
+		if (data["error"])
+		{
+			$("#result").html("<span style='color:#FF0000'>Error: "+data["error"]+"</span>")	
+		}
+		else
+		{
+			/* FPF */
+			html = "Fixed-Point Representation: " + data["FPF"] + "<br/>\n";
+			html += "<a href=''><img id='FPF_image'></a><br/>\n";
+			{% for img in imageFormats %}
+				html += "<a id='a_{{img}}' href='" + data["FPF_image"].replace("jpg","{{img}}") + "'>{{img}}</a>&nbsp;&nbsp;\n";
+			{% endfor %}
+			html += "<br/>\n";
+			/* constant */
+			if (data["integer"])
+			{
+				html += "The constant is approximated by " + data["integer"] + "*2^" + data["lsb"] + " (ie " + data["approx"] + ")<br/>\n";
+				html += "Absolute error: " + data["error_abs"] + "<br/>\n";
+				html += "Relative error: " + data["error_rel"] + "<br/>\n";
+			}
+			/* display the result */
+			$("#result").html(html);
+			/* load the image */
+			$("#FPF_image").attr('src', '{{base_url}}spinner.gif');	/* first load the spinner */
+			$("#FPF_image").attr('src', data["FPF_image"]);		/* and then load the image */
+
+			
+		}
+	});
+}
+
+
+</script>
+{% endblock%}
+
+
+{% block content %}
+Blablabla... This page allows to convert a real constant (literal constant or an interval, e.g. <i>0.124</i> or <i>[-100;100]</i>) into a fixed-point representation.
+
+<p>
+
+<div class="container">
+	<div>
+	<!-- form -->
+	<form method="POST" action="javascript:validate();" id="form">
+		<label for="ci">Constant or interval</label><input class="yesno" id="ci" type="text" size="30" required onkeyup="verifyConstInterval(this);"/></br>
+		<label for="wl">wordlength or Fixed-Point Format: </label><input class="yesno" id="wl" type="text" required onkeyup="verifyWL(this);" size="8"/>
+		<input type="submit"/>
+	</form>
+	</div>
+	<!--  result -->
+	<div id="result">
+	</div>
+</div>
+	
+	</div>
+</div>
+	
+<!-- 
+	Fixed-Point Representation: <br/>
+	The constant is approximated by: <br/>
+	Absolute error: <br/> 
+	Relative error:<br/>
+	<div class="r-container">
+	<div id="result">
+		<img id='FPF_image'><br/>
+		{% for img in imageFormats %}
+			<a id='a_{{img}}' href=''>{{img}}</a>&nbsp;&nbsp;
+		{% endfor %}
+		<br/>
+		<table border=1><div id='str_latex'></div></table>
+	</div>
+ -->
+
+
+	
+	
+
+{% endblock %}

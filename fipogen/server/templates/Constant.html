@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<style>
+	.CodeMirror-lint-markers {
+		width: 16px;
+	}
+</style>
+<link rel="stylesheet" type="text/css" href="../plugins/codemirror-5.28.0/lib/codemirror.css">
+<link rel="stylesheet" href="../plugins/codemirror-5.28.0/addon/scroll/simplescrollbars.css">
+Blablabla... This page allows to convert a real constant (literal constant or an interval, e.g. <i>0.124</i> or <i>[-100;100]</i>) into a fixed-point representation.
+
+<p>
+
+	<div class="container" >
+		<div style="display: inline-block">
+			<!-- form -->
+			<h2 class="headings"> Form</h2>
+			<form method="POST" action="javascript:clickSubmit();" id="form" class="wrapper-constants-form">
+				<p  class="first-label-constants-form tooltip" style="display: inline-block" >Constants:
+					<span class="tooltiptext">Enter your constants or intervals here</span>
+				</p>
+				<div  id="text-container" class = "div-text-constants-from"  >
+					<textarea id="text" position="absolute" ></textarea>
+				</div>
+				<label class="upload-label-constants-form">Import a file:</label>
+				<span  class="upload-span-constants-form">
+					<input type="file" accept = ".txt" name="fileupload" style="background-color: lightgrey" value="fileupload" id="fileupload" onchange='loadTxt(this.files)'/>
+				</span>
+				<label class="explanation-constants-form">(It will be displayed in the upper text area.)</label>
+				<label for="wl" class="wl-label-constants-form">Word Length: </label>
+				<input class="yesno wl-input-constants-form" id="wl" type="input" required onkeyup="verifyWL(this);" oninput="disableFPF();" size="8"/>
+
+				<label class="or-label-constants-form">or</label>
+
+				<label class="FPF-label-constants-form"> the FPF:</label>
+				<input class="yesno FPF-input-constants-form" id="FPF" type="input" required onkeyup="verifyFPF(this);" oninput="disableWL();" size="8"/>
+				<button id="file-reset"  type="button" onclick="clearUpload()" class="reset-button-constants-form">Reset</button>
+				<input type="submit" id = "submit" class="submit-button-constants-form"/>
+			</form>
+			<h2 class="headings"> Result</h2>
+<!--  result -->
+		</div>
+<div id="result" >
+
+
+</div>
+
+
+</div>
+
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+
+<script type="text/javascript" src="{{base_url}}plugins/codemirror-5.28.0/lib/codemirror.js"></script>
+<script src="{{base_url}}plugins/codemirror-5.28.0/addon/mode/simple.js"></script>
+<script src="{{base_url}}plugins/codemirror-5.28.0/addon/scroll/simplescrollbars.js"></script>
+<!--<script type="text/javascript" src = "https://codemirror.net/addon/scroll/simplescrollbars.js"></script>-->
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="{{base_url}}useful.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pegjs/0.7.0/peg.min.js"></script>
+<script src="{{base_url}}../plugins/require.js"></script>
+<script src="{{base_url}}parser.js"></script>
+<script src="{{base_url}}simple_parser.js"></script>
+
+
+<script>
+    var resultJson;
+    var editor;
+
+    var parser_m = parser;
+
+    {% if mode =='simple' %} /* Checking if server supports mathematical expressions or not to determine the parser */
+    parser_m = simpleParser;
+    {% endif %}
+
+    CodeMirror.defineSimpleMode("simplemode", {	 /* Simple code mirror editor with no language and syntax highlighting attributed */
+        // The start state contains the rules that are initially used
+        start: [
+        ],
+        // The multi-line comment state.
+        comment: [
+        ],
+    });
+
+    $(document).ready(function() /* Initialization of Code Mirror editor */
+    {
+        var code = document.getElementById("text");
+        editor = CodeMirror.fromTextArea(code, {
+            lineNumbers : true,
+            gutters: ["CodeMirror-lint-markers"],
+        });
+
+        editor.lineWrapping = true;
+        editor.scrollbarStyle = "simple";
+        editor.mode ="simplemode";
+        editor.smartIndent = true;
+		/* On each change we look up all lines of editor for text validation */
+        editor.on("change", function(cm, e) {
+            var str = cm.getValue();
+            var lines= str.split("\n");
+
+            var hasWrong = false; 	// Checks if there exists a wrong phrase in the editor or not, is kept to enable/disable the submit button
+
+            for(var i =0; i < lines.length; i++)
+            {
+                if(lines[i].trim().length >0)
+                {
+                    try	// If the parser could successfully parse this line then it's validated
+                    {
+                        parser_m.parse(lines[i]);
+                        cm.setGutterMarker(i, "CodeMirror-lint-markers", returnCorrectElement());
+                    }
+                    catch (e)
+                    {
+                        cm.setGutterMarker(i, "CodeMirror-lint-markers", returnWrongElement(e));
+
+                        hasWrong = true;
+                    }
+                }
+                else
+                    cm.setGutterMarker(i, "CodeMirror-lint-markers", null);
+            }
+            if(hasWrong) // if there is a wrong phrase then the user should not be able to submit
+                document.getElementById("submit").disabled= true;
+            else
+                document.getElementById("submit").disabled= false;
+
+        });
+
+    });
+
+	/* Creates an HTML element containing a red cross having an error msg which is shown when being hovered upon */
+    function returnWrongElement(e)
+    {
+        var marker = document.createElement("div");
+
+        var msgStr = e.message;
+        var msg = document.createElement("span");
+        msg.classList.add("tooltiptext");
+        msg.style.paddingLeft = "50px";
+        msg.style.width = "400px";
+        msg.style.minHeight = "70px";
+        msg.innerText = "character " + e.location.start.column + ": "+ msgStr;
+
+        marker.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAASlQTFRFvEJC4WtrUgAAMgAA/hsb/ysrPgAAqEFB23p61XFxiSEhhjIy3Xt70nV1iSMjsTIy94uL95+f0mVlhhERkioq3nFx/KWl7X5+qSIiZwICvCoq94eH1FJS3Fxc+4qKriIiXQEBIAAAawEBwCIi+nBw+3FxsxsbXwAAEQAAGQAAigcH6T8/4Tk5eQUFBQAAmwsL3ykp+05O+kpK2ygokRQUpQ8P5x4ezB0d0CEh/UJC5S8vnRwcxhMTzyYmfQIChAQE0i8vwCIipQcH6zIy0yoqhQQEAAAAIgAAigUF1DMz6D09nQsLYQICoxoahAoKAAAAEwAAhgsLnxgYWwIC+n199nR0+WRk9V5e/2dn+lNT+1RU/zEx+EBA+UlJ/zAw+klJ+l5e/khI////+j8McAAAAFR0Uk5TAAAAAAAAACWujw4bp5gWhPv0gwwWnPv1ZH759I6f+vFeG5v5+vzzgg8Wo/76jQwpt/78qCE4v/b3/rUwuu16g/CtsP3naAcKcev8ozqtZwYHb6syI9ODJAAAAAFiS0dEYiu5HTwAAAB2SURBVAjXY2Dn4ORiYOTm4eVj4BcQFBIWERUTl2CQlAqRlpGVC5VXYFBUUg5TUQ1XU9dgYNLU0o6I0NHVY2Zg0TcwjIwyMjZhZTA1i44xt4i1tLJmsImLt7Wzd0hIdGRwcnZxdXP38PTyZvDx9fNnZgsIDAoGACHbEu2OSfg/AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDEzLTEyLTMwVDIzOjI3OjEwKzAxOjAwk0r5nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxMy0xMi0zMFQyMzoyNzoxMCswMTowMOIXQSAAAAAASUVORK5CYII=')";
+        marker.style.backgroundPosition="center";
+        marker.style.backgroundRepeat= "no-repeat";
+
+        marker.classList.add("tooltip");
+        marker.innerHTML += msg.outerHTML + "<br>";
+        marker.id = "w"+e.location.start.line;
+        return marker;
+    }
+
+	/* Creates an HTML element containing a green tick */
+    function returnCorrectElement()
+    {
+        var marker = document.createElement("div");
+        marker.style.backgroundImage = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAMAAAC67D+PAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAOpQTFRFAAAAGm0SZKdXLJ4PMo8ZFF4AETkCMnUKMW8RIk4GSXsmN6IALogAGW0SFm0SBTkKImkbir2DksSPN3wzChwIIG8NH3ALIGwLebppxei9PpA3Knwcb75bZ7lOJHMNIm8GbLxOo+COU65BDWAHK5MOftZcWb0vXL8vh95fVrwuGnIEABwAIXYAOrIGW9cebd4wVcgYLIMGBCkADS4ANYkGT8cNh91NR5YbCC0AFTkBTJoYj+BVs+2Cb6hGFUABHEgAaqk3dK9EJFANDioAETMAuOKxo96RZslHhtxgTMwTbt8wa98olOtY////X+LKJAAAAEV0Uk5TAAAAAAAAAAAAAAAAACQ1ASCvzkcBMSMcqv7ISNC2JRun+/ebxv64r/z6mBeU9v7++ZcVFJH4+psWFJf5/J8XFpadGxMUq3HNRwAAAAFiS0dETYBoIGUAAABmSURBVAjXY2AAA0ZePn4Ii0lAUEiYQURUjJlFXELSVYpBWkZWTl5B0U1JmUHFXVVNXcNDU0ubQUfXU0/fy8DQiJXB2MTU28fM3IKNgYHd0sraxtaOA2QQp72DoxMXxFBuZxceEA0AK08Lb2nEcnIAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTMtMTItMzBUMjM6Mjc6MTcrMDE6MDBW7ccSAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDEzLTEyLTMwVDIzOjI3OjE3KzAxOjAwJ7B/rgAAAABJRU5ErkJggg==')" ;
+        marker.style.backgroundPosition="center";
+        marker.style.backgroundRepeat= "no-repeat";
+        marker.innerHTML = "<br>";
+
+        return marker;
+    }
+
+	/* Clears the uploaded file */
+    function clearUpload()
+    {
+        $("#fileupload").val('');
+        $("#fileupload").disabled = false;
+        editor.setValue("");
+    }
+
+	/* Loads and processes the text in the .txt uploaded file. */
+    function loadTxt()
+    {
+        var doc = document.getElementById("fileupload");
+        var reader = new FileReader();
+        var file = doc.files[0];
+
+        reader.readAsText(file);
+        $(reader).on('load', fillUpTxtArea);
+
+    }
+	/* Disables upload option when some text is entered in text area. */
+    function disableUpload()
+    {
+        if( $('#text').text().toString().length != 0)
+            document.getElementById("fileupload").disabled = true;
+        else
+            document.getElementById("fileupload").disabled = false;
+
+    }
+
+
+	/* Loads the text in the uploaded text file and fills up the text area with its content. */
+    function fillUpTxtArea(e)
+    {
+        var file = e.target.result,
+            results;
+        if (file && file.length) {
+            results = file.split("\n");
+            var ci = "";
+            editor.setValue(editor.getValue() + "\n" + results.join('\n'));
+            editor.focus();
+            editor.setCursor({line: results.length, ch: 0});
+
+        }
+    }
+
+	/* When an input is given to wl, FPF must be disabled */
+    function disableFPF()
+    {
+        if($('#wl').val().length > 0)
+            document.getElementById("FPF").disabled= true;
+        else
+            document.getElementById("FPF").disabled= false;
+    }
+
+	/* When an input is given to FPF, wl must be disabled */
+    function disableWL()
+    {
+        if($('#FPF').val().length > 0)
+            document.getElementById("wl").disabled=true;
+        else
+            document.getElementById("wl").disabled=false;
+    }
+
+	/* called when the form is submitted; call the image */
+    function clickSubmit()
+    {
+        var ci_s =processDiv(editor.getValue());
+
+        for(var i = 0; i < ci_s.length; i++) /* This for is to handle division in mathematical expressions, having / in path would be problematic*/
+            ci_s[i] = ci_s[i].replace("/", "div");
+
+        var ci = ci_s.join("@");
+
+		/*Making of ci_s*/
+        var wl = $('#wl').val();		// gets the wordlength/FPF
+
+        if(wl.length == 0)
+        {
+            wl = $('#FPF').val();
+        }
+
+		/* build the query */
+        var q = '{{base_url}}Constant/' + ci + '?';
+        if (msgValidFPF(wl)=='')
+            q = q + 'FPF='+wl;
+        else
+            q = q + 'WL='+wl;
+
+		/* get the json */
+        $.ajax({ url: q}).done( function( data)
+        {
+            resultJson= data;
+
+            var dlButt = document.createElement("button");	// The button corresponding to download the results file
+            dlButt.id= "dl-res";
+            dlButt.innerHTML = "Download the results";
+            dlButt.style.minHeight= '30px';
+            dlButt.setAttribute('onclick', 'dlResFile();');
+            document.getElementById("result").innerHTML = dlButt.outerHTML;
+
+            html = "";
+            html = "<table style=\"width:100%\">\n";
+            html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Mantissa</th> \n<th aligne = left>LSB</th>>\n <th align = left>FPF</th>\n<th align = left>Absolute Error</th>\n<th align = left>Real Error</th>\n <th align = left>Status</th>\n </tr>";
+            for(var i=0; i < Object.keys(data).length ; i++)
+            {
+                html += "<tr>"
+                html += "<td>" + data[i]["value"] + "</td>";
+
+                var startStr = "<td>"
+                if(data[i]['error'])
+                {
+                    startStr = "<td style=\"color:darkred\">";
+                }
+                else
+                {
+                    startStr = "<td>";
+                }
+                html += startStr + data[i]["integer"] + "</td>\n";
+                html += startStr + data[i]["lsb"] + "</td>\n";
+                html += startStr + data[i]["FPF"] + "</td>\n";
+                html += startStr + data[i]["error_abs"] + "</td>\n";
+                html += startStr + data[i]["error_rel"] + "</td>\n";
+                if(data[i]['error'])
+                {
+                    html += startStr + data[i]["error"] + "</td>\n";
+                }
+                else
+                {
+                    html += startStr + "No error" + "</td>\n";
+                }
+                html += "</tr>";
+            }
+            html += "</table>";
+
+			/*Table for images: */
+            html += "<table style=\"width:100%\">\n";
+            html += "<tr>\n<th align = left>Const/Interval</th>\n <th align = left>Image</th></tr>";
+            for(var i=0; i < Object.keys(data).length  ; i++)
+            {
+                html += "<tr>"
+                html += "<td  align = left >" + data[i]["value"] + "</td>";
+                if(!data[i]['error'])
+                {
+                    html += "<td  align = left >" + "<a href=\"" + data[i]["FPF_image"] + "\">" + "<img class = \"loading\" src=" + data[i]["FPF_image"] + "style=\"width:128px;height:128px;\"	"+"/>" + "</td>\n";
+                }
+                else
+                {
+                    html += "<td>" + "<p style=\"color:darkred\" >" + data[i]['error'] + "</p>" +"</td>\n";
+                }
+                html += "</tr>";
+            }
+            html += "</table>";
+            document.getElementById("result").innerHTML += html;
+        });
+    }
+
+	/* Called when "Download the results" button is clicked.
+	 Code taken from : https://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server/18197341?noredirect=1#answer-3665147 */
+    function dlResFile()
+    {
+        var strFile = "Const/Int\t\t\t\tlsb\t\t\t\tFPF\n"; /* The string to put in downloadable file */
+
+        for(var i = 0; i < Object.keys(resultJson).length; i++)
+        {
+            strFile += resultJson[i]["value"] + "\t\t\t\t" + resultJson[i]["lsb"] + "\t\t\t\t" + resultJson[i]["FPF"] + "\n";
+        }
+
+        var a = window.document.createElement('a');
+        a.href = window.URL.createObjectURL(new Blob([strFile], {type: 'text'}));
+        a.download = 'result.txt';
+
+        document.getElementById("result").appendChild(a); // Append anchor to body.
+        a.click();
+
+        document.getElementById("result").removeChild(a); // Remove anchor from body
+    }
+
+	/* To set one  (wl OR FPF) input required for submit */
+    jQuery(function ($) {
+        var $inputs = $('input[name=wl],input[name=FPF]');
+        $inputs.on('input', function () {
+            $inputs.not(this).prop('required', !$(this).val().length);	// Set the required property of the other input to false if this input is not empty.
+        });
+    });
+
+</script>
+{% endblock%}

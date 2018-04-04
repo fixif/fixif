@@ -1,0 +1,127 @@
+\BOOKMARK [1][-]{section.1}{Installation}{}
+\BOOKMARK [1][-]{section.2}{Introduction to FWL problem}{}
+\BOOKMARK [1][-]{section.3}{A unifying framework}{}
+\BOOKMARK [2][-]{subsection.3.1}{The Specialized Implicit Framework \(SIF\)}{section.3}
+\BOOKMARK [2][-]{subsection.3.2}{definitions}{section.3}
+\BOOKMARK [2][-]{subsection.3.3}{Examples}{section.3}
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Classical state-space}{subsection.3.3}
+\BOOKMARK [3][-]{subsubsection.3.3.2}{State-space with \040operator}{subsection.3.3}
+\BOOKMARK [3][-]{subsubsection.3.3.3}{Cascade decomposition}{subsection.3.3}
+\BOOKMARK [3][-]{subsubsection.3.3.4}{Others forms}{subsection.3.3}
+\BOOKMARK [2][-]{subsection.3.4}{Equivalent classes}{section.3}
+\BOOKMARK [2][-]{subsection.3.5}{Finite Wordlength measures}{section.3}
+\BOOKMARK [3][-]{subsubsection.3.5.1}{Coefficient's quantization}{subsection.3.5}
+\BOOKMARK [3][-]{subsubsection.3.5.2}{Input-Output sensitivity}{subsection.3.5}
+\BOOKMARK [3][-]{subsubsection.3.5.3}{Pole sensitivity}{subsection.3.5}
+\BOOKMARK [3][-]{subsubsection.3.5.4}{Output roundoff noise}{subsection.3.5}
+\BOOKMARK [3][-]{subsubsection.3.5.5}{Closed-loop measures}{subsection.3.5}
+\BOOKMARK [1][-]{section.4}{The optimal realization problem}{}
+\BOOKMARK [1][-]{section.5}{Tutorial}{}
+\BOOKMARK [2][-]{subsection.5.1}{First example}{section.5}
+\BOOKMARK [1][-]{section.6}{The classes}{}
+\BOOKMARK [2][-]{subsection.6.1}{The FWR class}{section.6}
+\BOOKMARK [3][-]{subsubsection.6.1.1}{Fixed-Point Implementation Scheme}{subsection.6.1}
+\BOOKMARK [3][-]{subsubsection.6.1.2}{Methods}{subsection.6.1}
+\BOOKMARK [2][-]{subsection.6.2}{The FWS class}{section.6}
+\BOOKMARK [3][-]{subsubsection.6.2.1}{UYWfun function}{subsection.6.2}
+\BOOKMARK [3][-]{subsubsection.6.2.2}{Rfun function}{subsection.6.2}
+\BOOKMARK [3][-]{subsubsection.6.2.3}{Methods}{subsection.6.2}
+\BOOKMARK [1][-]{section.7}{FWR Toolbox reference}{}
+\BOOKMARK [2][-]{subsection.7.1}{create realizations and structurations}{section.7}
+\BOOKMARK [3][-]{subsubsection.7.1.1}{DFIq2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.2}{FFT2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.3}{implicitSS2FWS}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.4}{Modaldelta2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.5}{Modalrho2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.6}{Modalrho2FWS}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.7}{Observer2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.8}{OpModalrho2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.9}{OpModalrho2FWS}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.10}{rhoDFIIt2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.11}{rhoDFIIt2FWS}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.12}{SS2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.13}{SS2FWS}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.14}{SSdelta2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.15}{SSdelta2FWS}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.16}{SSrho2FWR}{subsection.7.1}
+\BOOKMARK [3][-]{subsubsection.7.1.17}{SSrho2FWS}{subsection.7.1}
+\BOOKMARK [2][-]{subsection.7.2}{Private functions}{section.7}
+\BOOKMARK [3][-]{subsubsection.7.2.1}{canon\137modal}{subsection.7.2}
+\BOOKMARK [3][-]{subsubsection.7.2.2}{complexFFT}{subsection.7.2}
+\BOOKMARK [3][-]{subsubsection.7.2.3}{strideM}{subsection.7.2}
+\BOOKMARK [3][-]{subsubsection.7.2.4}{twiddleM}{subsection.7.2}
+\BOOKMARK [2][-]{subsection.7.3}{FWR class methods }{section.7}
+\BOOKMARK [3][-]{subsubsection.7.3.1}{algorithmCfloat}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.2}{algorithmLaTeX}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.3}{computationalCost}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.4}{computeW}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.5}{display}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.6}{double}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.7}{FWR}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.8}{FWRmat2LaTeX}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.9}{get}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.10}{implementLaTeX}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.11}{implementMATLAB}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.12}{implementVHDL}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.13}{l2scaling}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.14}{MsensH}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.15}{MsensH\137cl}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.16}{MsensPole}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.17}{MsensPole\137cl}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.18}{Mstability}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.19}{mtimes}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.20}{ONP}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.21}{plus}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.22}{quantized}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.23}{realize}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.24}{relaxedl2scaling}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.25}{RNG}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.26}{RNG\137cl}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.27}{set}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.28}{setFPIS}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.29}{sigma\137tf}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.30}{simplify}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.31}{size}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.32}{ss}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.33}{subsasgn}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.34}{subsref}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.35}{tf}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.36}{TradeOffMeasure\137cl}{subsection.7.3}
+\BOOKMARK [3][-]{subsubsection.7.3.37}{transform}{subsection.7.3}
+\BOOKMARK [2][-]{subsection.7.4}{FWR private functions}{section.7}
+\BOOKMARK [3][-]{subsubsection.7.4.1}{compute\137rZ}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.2}{computeAZBZCZDZWcWo}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.3}{computeJtoS}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.4}{computelmnp}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.5}{computeZ}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.6}{deigdZ}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.7}{mylyap}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.8}{scalprodCfloat}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.9}{scalprodMATLAB}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.10}{scalprodVHDL}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.11}{w\137prod\137norm}{subsection.7.4}
+\BOOKMARK [3][-]{subsubsection.7.4.12}{w\137prod\137norm\137SISO}{subsection.7.4}
+\BOOKMARK [2][-]{subsection.7.5}{FWS class methods }{section.7}
+\BOOKMARK [3][-]{subsubsection.7.5.1}{display}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.2}{FWS}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.3}{genCostFunction}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.4}{get}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.5}{getValues}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.6}{MsensPole}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.7}{MsensPole\137cl}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.8}{Mstability}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.9}{optim}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.10}{RNG}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.11}{RNG\137cl}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.12}{set}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.13}{setFPIS}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.14}{ss}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.15}{subsasgn}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.16}{subsref}{subsection.7.5}
+\BOOKMARK [3][-]{subsubsection.7.5.17}{tf}{subsection.7.5}
+\BOOKMARK [2][-]{subsection.7.6}{FWS private functions}{section.7}
+\BOOKMARK [3][-]{subsubsection.7.6.1}{genCostFunctionR}{subsection.7.6}
+\BOOKMARK [3][-]{subsubsection.7.6.2}{genCostFunctionS}{subsection.7.6}
+\BOOKMARK [3][-]{subsubsection.7.6.3}{myoptions\137asamin}{subsection.7.6}
+\BOOKMARK [3][-]{subsubsection.7.6.4}{updateR}{subsection.7.6}
+\BOOKMARK [1][-]{section.8}{Bibliography}{}

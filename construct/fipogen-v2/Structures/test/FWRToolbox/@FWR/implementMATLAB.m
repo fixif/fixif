@@ -1,0 +1,233 @@
+%Purpose:
+% Create the associated fixed-point algorithm in Matlab language
+% (it uses integer to simulate fixed-point). The algorithm is written in a file (by default, in "myFilter.m" file)
+%
+%Syntax:
+% implementMATLAB( R,fileName)
+%
+%Parameters:
+% R: FWR object
+% fileName: filename of the created function (default="myFilter")
+%
+% $Id$
+
+
+function implementMATLAB( R, fileName)
+
+% args
+if nargin<2
+    fileName='myFilter';
+end
+
+% FPIS?
+if isempty(R.FPIS)
+    error( 'The realization must have a valid FPIS');
+end
+
+% parameters
+tabu = '    ';
+isPnut = any(any( tril(R.P,-1)) ); % is the lower triangular part of R.P non null ???
+endl = 13; % end of line
+
+% files
+FP_file = fopen('private/myFilter.m.template','r');
+myFP_file = fopen([ fileName '.m'],'w');
+
+%===================================
+% input(s)/states/output(s) strings
+% output(s)
+if (R.p==1)
+    strY = 'y(i)';
+else
+    strY = [ setstr( ones(R.p,1)*'y' ) setstr( ones(R.p,1)*'(i,' ) num2str((1:R.p)') setstr( ones(R.p,1)*')' ) ];
+end
+% states
+strXn = [ setstr( ones(R.n,1)*'xn' ) setstr( ones(R.n,1)*'(' ) num2str((1:R.n)') setstr( ones(R.n,1)*')' ) ];
+strXnp = [ setstr( ones(R.n,1)*'xnp' ) setstr( ones(R.n,1)*'(' ) num2str((1:R.n)') setstr( ones(R.n,1)*')' ) ];
+% input(s)
+if (R.m==1)
+    strU = 'u(i)';
+else
+    strU = [ setstr( ones(R.m,1)*'u' ) setstr( ones(R.m,1)*'(i,' ) num2str((1:R.m)') setstr( ones(R.m,1)*')' ) ];
+end
+% intermediate variables
+    strT = [ setstr( ones(R.l,1)*'T' ) num2str((0:R.l-1)','%.2d') ];
+% accumulator
+strAcc = [ setstr( ones(R.l+R.n+R.p,1)*'Acc') num2str((0:R.l+R.n+R.p-1)','%.2d') ];
+%
+strTXU = strvcat( strT, strXn, strU  );
+if (isPnut)
+    strTXY = strvcat( strT, strXnp, strY  );
+else
+    strTXY = strvcat( strT, strXn, strY  );
+end
+    
+
+%===================================
+% prototype, initialization and loop
+
+% funcname
+copyUntilSharps( FP_file, myFP_file); % ##FUNCNAME##
+fwrite( myFP_file, fileName);
+
+% date
+copyUntilSharps( FP_file, myFP_file); % ##DATE##
+fwrite( myFP_file, datestr(now));
+
+% fileName
+copyUntilSharps( FP_file, myFP_file); % ##FUNCNAME##
+fwrite( myFP_file, fileName);
+
+% initialize
+copyUntilSharps( FP_file, myFP_file); % ##INITIALIZE##
+fwrite( myFP_file, [ 'u = round(2.^' mat2str(R.FPIS.gammaU') '.*u);' endl ]);
+fwrite( myFP_file, [ 'y = zeros( size(u,1), ' num2str(R.p) ' );' endl ]);
+fwrite( myFP_file, [ 'xn = zeros(' num2str(R.n) ',1);' endl ]);
+if (isPnut)
+    fwrite( myFP_file, [ 'xnp = zeros(' num2str(R.n) ',1);' endl ]);
+end
+
+
+%=============
+% computations
+copyUntilSharps( FP_file, myFP_file); % ##COMPUTATIONS##
+Zbis = R.Z + [ eye(R.l) zeros(R.l, R.n+R.m); zeros(R.n+R.p,R.l+R.n+R.m) ]; 
+for i=1:R.l+R.n+R.p
+    if i==1
+        fwrite( myFP_file, [ endl tabu '% intermediate variables' endl] );
+    elseif i==(R.l+1)
+        fwrite( myFP_file, [ endl tabu '% states' endl] );
+    elseif i==(R.l+R.n+1)
+        fwrite( myFP_file, [ endl tabu '% output(s)' endl] );
+    end        
+    scalprodMATLAB( myFP_file, Zbis(i,:), strTXU, R.FPIS.gammaZ(i,:), R.FPIS.shiftZ(i,:), strAcc(i,:) );
+    fwrite( myFP_file, [ tabu strTXY(i,:) ' = ' shiftcode( strAcc(i,:), R.FPIS.shiftADD(i) ) ';' endl ]);
+end
+
+% permutations
+if (isPnut)
+    fwrite( myFP_file, [ endl tabu '%permutations' endl] );
+    fwrite( myFP_file, [ tabu 'xn = xnp;' ]);
+end
+
+
+%====
+% end
+% close files
+copyUntilSharps( FP_file, myFP_file);
+fwrite( myFP_file, [ 'y = 2.^-' mat2str(R.FPIS.gammaY') '.*y;' endl ]);
+fclose(FP_file); fclose(myFP_file);
+
+        
+        
+
+%===================
+% code for the shift
+function S = shiftcode( str, shift)
+
+if shift<0
+    S = [ str '* 2^' num2str(-shift) ];
+elseif shift==0
+    S = str;
+else
+    S = [ 'floor( ' str '/2^' num2str(shift) ' )'];
+end
+
+
+%=================================================
+% copy from src to dest until double shaprs appears
+function copyUntilSharps( src, dest)
+
+while ~feof(src)
+    c=fread(src,1);
+    if c=='#'
+        c=fread(src,1);
+        if c=='#'
+            while fread(src,1)~='#'; end;
+            fread(src,1);
+            break;
+        else
+            fwrite(dest,c);
+        end
+    end
+    fwrite(dest,c);
+end
+
+%Description:
+% 	Generate a Matlab file (named \matlab{'myFilter.m'} by default) that emulates the fixed-point algorithm
+% 	corresponding to the realization. The rounding operations are realized by the \texttt{floor} function.
+% 	All the wordlengths and the fixed-point positions should be first computed by adjusting the FPIS with
+% 	\funcName{@FWR/setFPIS}.\\
+%	The file \matlab{@FWR/private/myFilter.m.template} is used as a
+%	template.
+
+%Example:
+% 	It creates a matlab file like
+% 	\begin{lstlisting}%[language=matlab]
+% 	% Fixed-point algorithm in Matlab language
+% 	% (it uses integer to simulate fixed-point)
+% 	%
+% 	% y = myFilter(u)
+% 	%
+% 	% y: filtered output(s)
+% 	% u: intput(s)
+% 	%
+% 	% date: 08-Dec-2008 18:12:26
+% 	% Automatically generated by implementMATLAB / FWRToolbox
+% 
+% 
+% 	function y = myFilter(u)
+% 
+% 	% initialize                   
+% 	u = round(2.^11.*u);
+% 	y = zeros( size(u,1), 1 );
+% 	xn = zeros(3,1);
+% 	xnp = zeros(3,1);
+% 
+% 
+% 	for i=1:size(u,1)
+% 
+% 
+% 		% intermediate variables
+% 		Acc0 = xn(1) * 18120;
+% 		Acc0 = Acc0 + xn(2) * -8813;
+% 		Acc0 = Acc0 + xn(3) * 239;
+% 		Acc0 = Acc0 + u(i)  * 11003;
+% 		xnp(1) = floor( Acc0/2^15 );
+% 		Acc1 = xn(1) * 17627;
+% 		Acc1 = Acc1 + xn(2) * 1591;
+% 		Acc1 = Acc1 + xn(3) * -2919;
+% 		Acc1 = Acc1 + u(i)  * -5304;
+% 		xnp(2) = floor( Acc1/2^14 );
+% 		Acc2 = xn(1) * 3824;
+% 		Acc2 = Acc2 + xn(2) * 23349;
+% 		Acc2 = Acc2 + xn(3) * -2387;
+% 		Acc2 = Acc2 + u(i)  * 5196;
+% 		xnp(3) = floor( Acc2/2^15 );
+% 
+% 		% output(s)
+% 		Acc3 = xn(1) * 22006;
+% 		Acc3 = Acc3 + xn(2) * 5304;
+% 		Acc3 = Acc3 + xn(3) * 650;
+% 		Acc3 = Acc3 + u(i)  * 1614;
+% 		y(i)   = floor( Acc3/2^14 );
+% 
+% 		%permutations
+% 		xn = xnp;
+% 
+% 	end
+% 
+% 	y = 2.^-11.*y;
+% 	\end{lstlisting}
+% 	It could be used to compute the fixed-point output of the associated realization, with the fixed-point
+% 	algorithm.
+% 	\begin{verbatim}
+% 	>> u=10*rand(1000,1);
+% 	>> y=myFilter(u);
+% 	\end{verbatim}
+
+%See also: <@FWR/implementLaTeX>, <@FWR/implementVHDL>
+
+
+        
+        

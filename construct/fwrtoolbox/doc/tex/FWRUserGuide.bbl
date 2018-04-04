@@ -1,0 +1,336 @@
+\begin{thebibliography}{10}
+
+\bibitem{AgarwalBurrusTCAS75}
+R.C. Agarwal and C.S. Burrus.
+\newblock New recursive digital filter structures having very low sensitivity
+  and roundoff noise.
+\newblock {\em IEEE Trans.\ Circuits \& Syst.}, 22(12):921--927, December 1975.
+
+\bibitem{Alaz99a}
+D.~Alazard, C.~Curres, P.~Apkarian, M.~Gauvrit, and G.~Ferreses.
+\newblock {\em Robustesse et Commande Optimale}.
+\newblock Cepadues Edition, 1999.
+
+\bibitem{Bert58}
+J.E Bertram.
+\newblock The effects of quantization in sampled-feedback systems.
+\newblock {\em Trans. of the American Institute of Electrical Engineers},
+  77:177--182, 1958.
+
+\bibitem{ChanICASSP79}
+D.S.K. Chan.
+\newblock Constrained minimization of roundoff noise in fixed-point digital
+  filters.
+\newblock In {\em Proc.\ IEEE Int.\ Conf.\ On Acoust., Speech, and Signal
+  Processing (ICASSP '79)}, pages 335--339, Washington, DC, April 1979.
+
+\bibitem{ChanTAC80}
+D.S.K. Chan.
+\newblock The structure of recursible multidimensional discrete systems.
+\newblock {\em IEEE Trans.\ Autom.\ Control}, 25(4):663--673, August 1980.
+
+\bibitem{Cool65}
+J.~Cooley and J.~Tukey.
+\newblock An algorithm for the machine calculation of complex fourier series.
+\newblock {\em Math. of Computation}, 19:297--301, 1965.
+
+\bibitem{Egne01}
+Sebastian Egner, Jeremy Johnson, David Padua, Jianxin Xiong, and Markus
+  P{\"u}schel.
+\newblock Automatic derivation and implementation of signal processing
+  algorithms.
+\newblock {\em ACM SIGSAM Bull. Communications in Computer Algebra},
+  35(2):1--19, 2001.
+
+\bibitem{Feng09a}
+Y.~Feng, P.~Chevrel, and T.~Hilaire.
+\newblock A practival strategy of an efficient and sparse fwl implementation of
+  lti filters.
+\newblock In {\em submitted to ECC'09}, 2009.
+
+\bibitem{Geve93}
+M.~Gevers and G.~Li.
+\newblock {\em Parametrizations in Control, Estimation and Filtering Probems}.
+\newblock Springer-Verlag, 1993.
+
+\bibitem{GoodallRIC2001}
+R.~Goodall.
+\newblock Perspectives on processing for real-time control.
+\newblock {\em Annual Reviews in Control}, 25:123--131, 2001.
+
+\bibitem{Hila09a}
+T.~Hilaire.
+\newblock Low parametric sensitivity realizations with relaxed
+  l2-dynamic-range-scaling constraints.
+\newblock {\em submitted to IEEE Trans. on Circuits \& Systems II}, 2009.
+
+\bibitem{Hila07d}
+T.~Hilaire and P.~Chevrel.
+\newblock On the compact formulation of the derivation of a transfer matrix
+  with respect to another matrix.
+\newblock Technical Report RR-6760, INRIA, 2008.
+
+\bibitem{Hila06a}
+T.~Hilaire, P.~Chevrel, and J-P. Clauzel.
+\newblock Low parametric sensitivity realization design for {FWL}
+  implementation of {MIMO} controllers : Theory and application to the active
+  control of vehicle longitudinal oscillations.
+\newblock In {\em Proc. of Control Applications of Optimisation CAO'O6}, April
+  2006.
+
+\bibitem{Hila06b}
+T.~Hilaire, P.~Chevrel, and J-P. Clauzel.
+\newblock Pole sensitivity stability related measure of {FWL} realization with
+  the implicit state-space formalism.
+\newblock In {\em 5th IFAC Symposium on Robust Control Design (ROCOND'06)},
+  July 2006.
+
+\bibitem{Hila05a}
+T.~Hilaire, P.~Chevrel, and Y.~Trinquet.
+\newblock Implicit state-space representation : a unifying framework for {FWL}
+  implementation of {LTI} systems.
+\newblock In P.~Piztek, editor, {\em Proc. of the 16th IFAC World Congress}.
+  Elsevier, July 2005.
+
+\bibitem{Hila07e}
+T.~Hilaire, P.~Chevrel, and J.~Whidborne.
+\newblock Low parametric closed-loop sensitivity realizations using fixed-point
+  and floating-point arithmetic.
+\newblock In {\em Proc. European Control Conference (ECC'07)}, July 2007.
+
+\bibitem{Hila07b}
+T.~Hilaire, P.~Chevrel, and J.F. Whidborne.
+\newblock A unifying framework for finite wordlength realizations.
+\newblock {\em IEEE Trans. on Circuits and Systems}, 8(54), August 2007.
+
+\bibitem{Hila08b}
+T.~Hilaire, P.~Chevrel, and J.F. Whidborne.
+\newblock Finite wordlength controller realizations using the specialized
+  implicit form.
+\newblock Technical Report RR-6759, INRIA, 2008.
+
+\bibitem{Hila07c}
+T.~Hilaire, D.~M{\'e}nard, and O.~Sentieys.
+\newblock Roundoff noise analysis of finite wordlength realizations with the
+  implicit state-space framework.
+\newblock In {\em 15th European Signal Processing Conference (EUSIPOC'07)},
+  September 2007.
+
+\bibitem{Hila08c}
+T.~Hilaire, D.~M{\'e}nard, and O.~Sentieys.
+\newblock Bit accurate roundoff noise analysis of fixed-point linear
+  controllers.
+\newblock In {\em Proc. \emph{IEEE International Symposium on Computer-Aided
+  Control System Design} (CACSD'08)}, September 2008.
+
+\bibitem{HinamotoTCASII2005}
+T.~Hinamoto, H.~Ohnishi, and W.-S. Lu.
+\newblock Minimization of {$L_2$} sensitivity for state-space digital filters
+  subject to {$L_2$}-dynamic-range scaling constraints.
+\newblock {\em IEEE Trans.\ Circuits \& Syst.\ II}, 52(10):641--645, 2005.
+
+\bibitem{Hina02a}
+T.~Hinamoto, S.~Yokoyama, T.~Inoue, W.~Zeng, and W.~Lu.
+\newblock Analysis and minimization of {$L_2$}-sensitivity for linear systems
+  and two-dimensional state-space filters using general controllability and
+  observability gramians.
+\newblock In {\em IEEE Transactions on Circuits and Systems, Fundamental Theory
+  and Applications}, volume~49, september 2002.
+
+\bibitem{Hwan77}
+S.Y. Hwang.
+\newblock Minimum uncorrelated unit noise in state-space digital filtering.
+\newblock {\em IEEE Trans. on Acoust., Speech, and Signal Processing},
+  25(4):273--281, August 1977.
+
+\bibitem{Iked84}
+M.~Ikeda, D.~\v{S}iljak, and D.~White.
+\newblock An inclusion principle for dynamic systems.
+\newblock {\em IEEE Trans. Automatic Control}, 29(3):244--249, March 1984.
+
+\bibitem{Ingb96}
+L.~Ingber.
+\newblock Adaptive simulated annealing ({ASA}): Lessons learned.
+\newblock {\em Control and Cybernetics}, 25(1):33--54, 1996.
+
+\bibitem{IstepanianDCIF}
+R.S.H. Istepanian and J.F. Whidborne.
+\newblock Finite-precision computing for digital control systems: Current
+  status and future paradigms.
+\newblock In R.S.H. Istepanian and J.F. Whidborne, editors, {\em Digital
+  Controller Implementation and Fragility: A Modern Perspective}, chapter~1,
+  pages 1--12. Springer-Verlag, London, UK, 2001.
+
+\bibitem{IwatsukiTCAS90}
+M.~Iwatsuki, M.~Kawamata, and T.~Higuchi.
+\newblock Statistical sensitivity and minimum sensitivity structures with fewer
+  coefficients in discrete time linear systems.
+\newblock {\em IEEE Trans.\ Circuits \& Syst.}, 37(1):72--80, January 1989.
+
+\bibitem{Kaiser66}
+J.F. Kaiser.
+\newblock Digital filters.
+\newblock In F.F. Kuo and J.F. Kaiser, editors, {\em System Analysis by Digital
+  Computer}, pages 218--285. Wiley, New York, 1966.
+
+\bibitem{KnowlesOlcaytoTCAS68}
+J.~Knowles and E.~Olcayto.
+\newblock Coefficient accuracy and digital filter response.
+\newblock {\em IEEE Trans.\ Circuits \& Syst.}, 15(1):31--41, mar 1968.
+
+\bibitem{Ko04a}
+H-J. Ko and WS~Yu.
+\newblock Guaranteed robust stability of the closed-loop systems for digital
+  controller implementations via orthogonal hermitian transform.
+\newblock {\em IEEE Trans. on Systems, Man, and Cybernetics}, 34(4):1923--1932,
+  August 2004.
+
+\bibitem{Laps96}
+P.~Lapsley, J.~Bier, A.~Shoham, and E.~A. Lee.
+\newblock {\em {DSP Processor Fundamentals: Architectures and Features}}.
+\newblock Berkeley Design Technology, Inc, Fremont, CA, 1996.
+
+\bibitem{Li98}
+G.~Li.
+\newblock On the structure of digital controllers with finite word length
+  consideration.
+\newblock {\em IEEE Trans. on Autom. Control}, 43(5):689--693, May 1998.
+
+\bibitem{LiAndersonGeversPerkins92}
+G.~Li, B.D.O. Anderson, M.~Gevers, and J.E. Perkins.
+\newblock Optimal {FWL} design of state space digital systems with weighted
+  sensitivity minimization and sparseness consideration.
+\newblock {\em IEEE Trans.\ Circuits \& Syst.\ II}, 39(5):365--377, May 1992.
+
+\bibitem{Li04b}
+G.~Li and Z.~Zhao.
+\newblock On the generalized {DFII}t structure and its state-space realization
+  in digital filter implementation.
+\newblock {\em IEEE Trans. on Circuits and Systems}, 51(4):769--778, April
+  2004.
+
+\bibitem{LiuTCT71}
+B.~Liu.
+\newblock Effects of finite word-length on the accuracy of digital filters ---
+  a review.
+\newblock {\em IEEE Trans. Circuit Theory}, 18(6):670--677, 1971.
+
+\bibitem{LuHinamotoTSP2005}
+W.-S. Lu and T.~Hinamoto.
+\newblock Jointly optimized error-feedback and realization for roundoff noise
+  minimization in state-space digital filters.
+\newblock {\em IEEE Trans.\ Sig.\ Proc.}, 53(6):2135--2145, June 2005.
+
+\bibitem{LutzHakimiTCAS88}
+W.J. Lutz and S.L. Hakimi.
+\newblock Design of multi-input multi-output systems with minimum sensitivity.
+\newblock {\em IEEE Trans.\ Circuits \& Syst.}, 35(9):1114--1122, September
+  1988.
+
+\bibitem{MadievskiAndersonGeversAUTO95}
+A.G. Madievski, B.D.O. Anderson, and M.~Gevers.
+\newblock Optimum realizations of sampled-data controllers for {FWL}
+  sensitivity minimization.
+\newblock {\em Automatica}, 31(3):367--379, 1995.
+
+\bibitem{ManteyTAC68}
+P.E. Mantey.
+\newblock Eigenvalue sensitivity and state-variable selection.
+\newblock {\em IEEE Trans.\ Autom.\ Control}, 13(3):263--269, 1968.
+
+\bibitem{Midd90a}
+R.~Middleton and G.~Goodwin.
+\newblock {\em Digital Control and Estimation, a unified approach}.
+\newblock Prentice-Hall International Editions, 1990.
+
+\bibitem{MoroneyWillskyHouptTAC80}
+P.~Moroney, A.S. Willsky, and P.K. Houpt.
+\newblock The digital implementation of control compensators: the coefficient
+  wordlength issue.
+\newblock {\em IEEE Trans.\ Autom.\ Control}, 25(4):621--630, August 1980.
+
+\bibitem{Mull76}
+C.~Mullis and R.~Roberts.
+\newblock Synthesis of minimum roundoff noise fixed point digital filters.
+\newblock In {\em IEEE Transactions on Circuits and Systems}, volume CAS-23,
+  September 1976.
+
+\bibitem{SandbergBSTJ67}
+I.W. Sandberg.
+\newblock Floating-point-roundoff accumulation in digital-filter realizations.
+\newblock {\em Bell Syst. Tech. J.}, 46(8):1775--1791, 1967.
+
+\bibitem{Skel84}
+R.~Skelton and D.~Wagie.
+\newblock Minimal root sensitivity in linear systems.
+\newblock {\em Journal of Guidance, Control and Dynamics}, 7(5):570--574, 1984.
+
+\bibitem{SlaughterTAC64}
+J.B. Slaughter.
+\newblock Quantization errors in digital control systems.
+\newblock {\em IEEE Trans.\ Autom.\ Control}, 9:70--74, 1964.
+
+\bibitem{Tavs84}
+V.~Tav\c{s}ano\u{g}lu and L.~Thiele.
+\newblock Optimal design of state-space digital filters by simultaneous
+  minimization of sensibility and roundoff noise.
+\newblock In {\em IEEE Trans. on Acoustics, Speech and Signal Processing},
+  volume CAS-31, October 1984.
+
+\bibitem{Thiele84}
+L.~Thiele.
+\newblock Design of sensitivity and round-off noise optimal state-space
+  discrete systems.
+\newblock {\em Int. J. Circuit Theory Appl.}, 12:39--46, 1984.
+
+\bibitem{Thiele86}
+L.~Thiele.
+\newblock On the sensitivity of linear state space systems.
+\newblock {\em IEEE Trans.\ Circuits \& Syst.}, 33(5):502--510, 1986.
+
+\bibitem{Silj91}
+D.~\v{S}iljak.
+\newblock {\em Decentralized Control of Complex Systems}.
+\newblock Academic Press, 1991.
+
+\bibitem{Whid01b}
+J.F. Whidborne, R.~Istepanian, and J.~Wu.
+\newblock Reduction of controller fragility by pole sensitivity minimization.
+\newblock {\em IEEE Trans. Automatic Control}, 46:320--325, 2001.
+
+\bibitem{Will86}
+D.~Williamson.
+\newblock Roundoff noise minimization and pole-zero sensibivity in fixed-point
+  digital filters using residue feedback.
+\newblock In {\em IEEE Trans. on Acoustics, Speech and Signal Processing},
+  volume ASSP-43, October 1986.
+
+\bibitem{Will92}
+D.~Williamson.
+\newblock {\em Digital Control and Implementation, Finite Wordlength
+  Considerations}.
+\newblock Prentice-Hall International Editions, 1992.
+
+\bibitem{Wu01}
+J.~Wu, S.~Chen, G.~Li, R.~Istepanian, and J.~Chu.
+\newblock An improved closed-loop stability related measure for
+  finite-precision digital controller realizations.
+\newblock {\em IEEE Trans. Automatic Control}, 46(7):1162--1166, 2001.
+
+\bibitem{XiaoTSP97}
+C.~Xiao.
+\newblock Improved {$L_2$}-sensitivity for state-space digital system.
+\newblock {\em IEEE Trans.\ Sig.\ Proc.}, 45(4):837--840, April 1997.
+
+\bibitem{YanMooreCAS92}
+W.-Y. Yan and J.B. Moore.
+\newblock On {$L^2$}-sensitivity minimization of linear state-space systems.
+\newblock {\em IEEE Trans.\ Circuits \& Syst.\ I-Fundamental Theory \& Appl.},
+  39(8):641--648, August 1992.
+
+\bibitem{Zhou96}
+K.~Zhou, J.~Doyle, and K.~Glover.
+\newblock {\em Robust and Optimal Control}.
+\newblock Prentice-Hall, 1996.
+
+\end{thebibliography}

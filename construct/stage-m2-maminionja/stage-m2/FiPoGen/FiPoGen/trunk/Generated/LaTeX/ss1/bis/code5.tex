@@ -1,0 +1,234 @@
+\documentclass{minimal}
+\usepackage[a4paper,margin=1cm,landscape]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows,arrows}
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[
+	every node/.style={scale = 0.7},
+	TreeNode/.style={rectangle,rounded corners=0.7mm, draw,
+		text centered, font=\boldmath,anchor=north},
+     form/.style={TreeNode,
+		color=red!80, 
+		fill=white, 
+		text=red!80},
+    form2/.style={TreeNode,
+		color=blue!80, 
+		fill=white, 
+		text=blue!80},
+    decM/.style={TreeNode,
+		color=green!80!black,
+		top color=green!80!black,
+		bottom color=green!10,
+		shading angle={45},
+		text=black},
+    adder/.style={TreeNode,
+		color=red,
+		top color=red,
+		bottom color=red!30,
+		shading angle={45},
+        text=white},
+    mult/.style={TreeNode,
+		color=green!80!black,
+		top color=green!80!black,
+		bottom color=green!10,
+		shading angle={45},
+		text=black},
+     cst/.style={TreeNode,
+		color=orange!80, 
+		top color=orange!80,
+		bottom color=yellow!70!black!20,
+		shading angle={45},
+		text=black},
+     var/.style={TreeNode,
+		color=yellow!95!black,
+		top color=yellow!95!black,
+		bottom color=yellow!10,
+		shading angle={45},
+		text=black},
+	 op/.style={TreeNode,
+		color=green!30,
+		top color=red!60,
+		bottom color=green!30,
+		shading angle={45},
+		text=black},
+    level distance=0.4cm, growth parent anchor=south, thick
+]
+\node (Sortie) [adder] {$S$}
+child{[sibling distance=10.000000cm]
+	node(DAdd_321163) [form] {$F$}
+	child{
+		node(Add_321163) [adder] {$+$}
+	child{[sibling distance=6.000000cm]
+		node(Add_321162) [adder] {$+$}
+		child{[sibling distance=4.000000cm]
+			node(Add_321160) [adder] {$+$}
+			child{[sibling distance=3.000000cm]
+				node(Add_321157) [adder] {$+$}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultx6k lsb  6_M) [decM] {$\gg 11 $}
+					child{[level distance=0.4cm]
+						node(Multx6k lsb  6) [mult] {$\times$}
+						child{
+							node(Cst5) [cst] {-6415}
+						edge from parent node[left] {(-2,-15)}
+						}
+						child{
+							node(Var5) [var] {$x6[k]$}
+						edge from parent node[right] {(8,-2)}
+						}
+					}
+					edge from parent node[left,sloped,above] {(6,-6)}
+				}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultx7k lsb  6_M) [decM] {$\gg 5 $}
+					child{[level distance=0.4cm]
+						node(Multx7k lsb  6) [mult] {$\times$}
+						child{
+							node(Cst6) [cst] {-404}
+						edge from parent node[left] {(-3,-12)}
+						}
+						child{
+							node(Var6) [var] {$x7[k]$}
+						edge from parent node[right] {(5,1)}
+						}
+					}
+					edge from parent node[right,sloped,above] {(6,-6)}
+				}
+				edge from parent node[left,sloped,above] {(6,-6)}
+			}
+			child{[sibling distance=1cm, level distance=0cm]
+				node(DMultx1k lsb  6_M) [decM] {$\gg 19 $}
+				child{[level distance=0.4cm]
+					node(Multx1k lsb  6) [mult] {$\times$}
+					child{
+						node(Cst0) [cst] {-4172}
+					edge from parent node[left] {(-6,-19)}
+					}
+					child{
+						node(Var0) [var] {$x1[k]$}
+					edge from parent node[right] {(12,-6)}
+					}
+				}
+				edge from parent node[right,sloped,above] {(6,-6)}
+			}
+			edge from parent node[left,sloped,above] {(7,-6)}
+		}
+		child{[sibling distance=3.000000cm]
+			node(Add_234499) [adder] {$+$}
+			child{[sibling distance=1cm, level distance=0cm]
+				node(DMultx4k lsb  6_M) [decM] {$\gg 13 $}
+				child{[level distance=0.4cm]
+					node(Multx4k lsb  6) [mult] {$\times$}
+					child{
+						node(Cst3) [cst] {-19819}
+					edge from parent node[left] {(-1,-16)}
+					}
+					child{
+						node(Var3) [var] {$x4[k]$}
+					edge from parent node[right] {(9,-3)}
+					}
+				}
+				edge from parent node[left,sloped,above] {(7,-6)}
+			}
+			child{[sibling distance=1cm, level distance=0cm]
+				node(DMultu1k lsb  6_M) [decM] {$\gg 15 $}
+				child{[level distance=0.4cm]
+					node(Multu1k lsb  6) [mult] {$\times$}
+					child{
+						node(Cst8) [cst] {-1412}
+					edge from parent node[left] {(-4,-15)}
+					}
+					child{
+						node(Var8) [var] {$u1[k]$}
+					edge from parent node[right] {(8,-6)}
+					}
+				}
+				edge from parent node[right,sloped,above] {(7,-6)}
+			}
+			edge from parent node[right,sloped,above] {(7,-6)}
+		}
+		edge from parent node[left,sloped,above] {(8,-6)}
+	}
+	child{[sibling distance=5.000000cm]
+		node(Add_320957) [adder] {$+$}
+		child{[sibling distance=4.000000cm]
+			node(Add_319976) [adder] {$+$}
+			child{[sibling distance=3.000000cm]
+				node(Add_316058) [adder] {$+$}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultx5k lsb  6_M) [decM] {$\gg 12 $}
+					child{[level distance=0.4cm]
+						node(Multx5k lsb  6) [mult] {$\times$}
+						child{
+							node(Cst4) [cst] {-18736}
+						edge from parent node[left] {(0,-15)}
+						}
+						child{
+							node(Var4) [var] {$x5[k]$}
+						edge from parent node[right] {(8,-3)}
+						}
+					}
+					edge from parent node[left,sloped,above] {(8,-6)}
+				}
+				child{[sibling distance=1cm, level distance=0cm]
+					node(DMultx8k lsb  6_M) [decM] {$\gg 3 $}
+					child{[level distance=0.4cm]
+						node(Multx8k lsb  6) [mult] {$\times$}
+						child{
+							node(Cst7) [cst] {12}
+						edge from parent node[left] {(-7,-11)}
+						}
+						child{
+							node(Var7) [var] {$x8[k]$}
+						edge from parent node[right] {(4,2)}
+						}
+					}
+					edge from parent node[right,sloped,above] {(8,-6)}
+				}
+				edge from parent node[left,sloped,above] {(8,-6)}
+			}
+			child{[sibling distance=1cm, level distance=0cm]
+				node(DMultx3k lsb  6_M) [decM] {$\gg 16 $}
+				child{[level distance=0.4cm]
+					node(Multx3k lsb  6) [mult] {$\times$}
+					child{
+						node(Cst2) [cst] {-3315}
+					edge from parent node[left] {(-5,-17)}
+					}
+					child{
+						node(Var2) [var] {$x3[k]$}
+					edge from parent node[right] {(10,-5)}
+					}
+				}
+				edge from parent node[right,sloped,above] {(8,-6)}
+			}
+			edge from parent node[left,sloped,above] {(8,-6)}
+		}
+		child{[sibling distance=1cm, level distance=0cm]
+			node(DMultx2k lsb  6_M) [decM] {$\gg 13 $}
+			child{[level distance=0.4cm]
+				node(Multx2k lsb  6) [mult] {$\times$}
+				child{
+					node(Cst1) [cst] {-1342}
+				edge from parent node[left] {(-5,-16)}
+				}
+				child{
+					node(Var1) [var] {$x2[k]$}
+				edge from parent node[right] {(9,-3)}
+				}
+			}
+			edge from parent node[right,sloped,above] {(8,-6)}
+		}
+		edge from parent node[right,sloped,above] {(8,-6)}
+	}
+		edge from parent node[right] {(8,-6)}	}
+	edge from parent node[right] {(8,-2)}
+}
+
+;
+        
+\end{tikzpicture}
+\end{center}
+\end{document}

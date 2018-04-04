@@ -1,0 +1,94 @@
+// Z1
+float filter_Z1( float u)                                                                                                                                       
+{                                                                                                                                                               
+    // states                                                                                                                                                   
+    static float* xn = (float*) calloc( 6*sizeof(float));                                                                                                       
+                                                                                                                                                                
+    // intermediate variables                                                                                                                                   
+    float T = 0.4538000000*xn[0] + -1.5562000000*xn[1] + 1.9749000000*xn[2] + 0.0159400000*xn[3] + 0.0478200000*xn[4] + 0.0478200000*xn[5] + 0.0159400000*u    ;
+                                                                                                                                                                
+    // output(s)                                                                                                                                                
+    y = T    ;                                                                                                                                                  
+                                                                                                                                                                
+    // states                                                                                                                                                   
+    xn[0] = xn[1];                                                                                                                                              
+    xn[1] = xn[2];                                                                                                                                              
+    xn[2] = T    ;                                                                                                                                              
+    xn[3] = xn[4];                                                                                                                                              
+    xn[4] = xn[5];                                                                                                                                              
+    xn[5] = u    ;                                                                                                                                              
+}
+
+
+// Z2
+float filter_Z2( float u)                                                                                
+{                                                                                                        
+    // states                                                                                            
+    static float* xn = (float*) calloc( 3*sizeof(float));                                                
+    static float* xnp = (float*) calloc( 3*sizeof(float));                                               
+                                                                                                         
+    // output(s)                                                                                         
+    y = -162206.2655556430*xn[0] + 91809.0295201326*xn[1] + 190695.3666706911*xn[2] + 0.0159400000*u    ;
+                                                                                                         
+    // states                                                                                            
+    xnp[0] = 0.7035614116*xn[0] + -0.0890724905*xn[1] + 0.1731688389*xn[2] + -0.0000002169*u    ;        
+    xnp[1] = 0.1020146132*xn[0] + 0.6645391991*xn[1] + -0.0183835454*xn[2] + 0.0000016753*u    ;         
+    xnp[2] = -1.4333936667*xn[0] + 0.0645922952*xn[1] + 0.6067993893*xn[2] + -0.0000005752*u    ;        
+                                                                                                         
+    //permutations                                                                                       
+    float* ptemp = xn;                                                                                   
+    xn = xnp;                                                                                            
+    xnp = ptemp;                                                                                         
+}
+
+
+
+// Z3
+float filter_Z3( float u)                                                                                     
+{                                                                                                            
+    // states                                                                                                
+    static float* xn = (float*) calloc( 3*sizeof(float));                                                    
+    static float* xnp = (float*) calloc( 3*sizeof(float));                                                   
+                                                                                                             
+    // intermediate variables                                                                                
+    float T0 = -10.6743015936*xn[0] + -1.5250735244*xn[1] + -0.0106097057*xn[2] + -447.9171859375*u    ;     
+    float T1 = 0.9201330121*xn[0] + -9.4920071677*xn[1] + 0.4122625878*xn[2] + 1206.7422327784*u    ;        
+    float T2 = 120.9196781511*xn[0] + -635.7778206078*xn[1] + -12.6368912387*xn[2] + 160551.7589172209*u    ;
+                                                                                                             
+    // output(s)                                                                                             
+    y = -0.0116009718*xn[0] + 0.0009226556*xn[1] + -0.0000234945*xn[2] + 0.0159400000*u    ;                 
+                                                                                                             
+    // states                                                                                                
+    xnp[0] = xn[0] + 0.0312500000*T0   ;                                                                     
+    xnp[1] = xn[1] + 0.0312500000*T1   ;                                                                     
+    xnp[2] = xn[2] + 0.0312500000*T2   ;                                                                     
+                                                                                                             
+    //permutations                                                                                           
+    float* ptemp = xn;                                                                                       
+    xn = xnp;                                                                                                
+    xnp = ptemp;                                                                                             
+} 
+
+
+
+// Z4
+float filter_Z4( float u)                                                                                                                      
+{                                                                                                                                              
+    // states                                                                                                                                  
+    static float* xn = (float*) calloc( 3*sizeof(float));                                                                                      
+                                                                                                                                               
+    // intermediate variables                                                                                                                  
+    float T0 = -0.6063037957*xn[0] + -0.2352100131*xn[1] + -0.1687856067*xn[2] + 16.0963747673*u    ;                                          
+    float T1 = 0.9813319226*xn[0] + -0.6218581414*xn[1] + 0.2061127519*xn[2] + -30.9718664400*u     + -0.7427116275*T0   ;                     
+    float T2 = 1.3770122499*xn[0] + -0.0427701410*xn[1] + -0.4018233285*xn[2] + 31.9800749452*u     + -0.9834549509*T0    + 0.0523626936*T1   ;
+                                                                                                                                               
+    // output(s)                                                                                                                               
+    y = 0.0046634446*xn[0] + 0.0089084628*xn[1] + 0.0003083008*xn[2] + 0.0159400000*u    ;                                                     
+                                                                                                                                               
+    // states                                                                                                                                  
+    xn[0] = T0   ;                                                                                                                             
+    xn[1] = T1   ;                                                                                                                             
+    xn[2] = T2   ;                                                                                                                             
+}
+
+

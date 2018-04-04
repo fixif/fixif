@@ -1,0 +1,6 @@
+\beamer@endinputifotherversion {3.33pt}
+\beamer@sectionintoc {2}{Le Sujet}{3}{0}{1}
+\beamer@sectionintoc {3}{Mise en \oe {}uvre}{9}{0}{2}
+\beamer@sectionintoc {4}{Tests et Validations}{20}{0}{3}
+\beamer@sectionintoc {5}{Analyse des R\IeC {\'e}sultats}{26}{0}{4}
+\beamer@sectionintoc {6}{Conclusion et Perspectives}{29}{0}{5}
