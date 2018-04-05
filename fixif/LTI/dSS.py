@@ -35,7 +35,7 @@ from numpy.testing import assert_allclose
 try:
 	from slycot import sb03md, ab09ad
 except ImportError:
-	slycot = None
+	pass
 
 
 class dSS(object):
@@ -202,7 +202,7 @@ class dSS(object):
 		if method is None:
 			method = dSS._W_method
 
-		if method == 'linalg' or slycot is None:
+		if method == 'linalg':
 			try:
 				X = solve_discrete_lyapunov(self._A.transpose(), self._C.transpose() * self._C)
 				self._Wo = mat(X)
@@ -216,7 +216,7 @@ class dSS(object):
 					e.info = ve.info
 				raise e
 
-		elif self._W_method == 'slycot':
+		elif method == 'slycot':
 			# Solve the Lyapunov equation by calling the Slycot function sb03md
 			# If we don't use "copy" in the call, the result is plain false
 
@@ -235,6 +235,8 @@ class dSS(object):
 					               "(see LAPACK Library routine DGEES).")
 					e.info = ve.info
 				raise e
+			except NameError:
+				return self.calc_Wo('linalg')
 
 		else:
 			raise ValueError("dSS: Unknown method to calculate observers (method=%s)" % method)
@@ -276,7 +278,7 @@ class dSS(object):
 		if method is None:
 			method = dSS._W_method
 
-		if method == 'linalg' or slycot is None:
+		if method == 'linalg':
 			try:
 				X = solve_discrete_lyapunov(self._A, self._B * self._B.transpose())
 				self._Wc = mat(X)
@@ -290,7 +292,7 @@ class dSS(object):
 					e.info = ve.info
 				raise e
 
-		elif self._W_method == 'slycot':
+		elif method == 'slycot':
 			# Solve the Lyapunov equation by calling the Slycot function sb03md
 			# If we don't use "copy" in the call, the result is plain false
 
@@ -309,6 +311,8 @@ class dSS(object):
 					               "(see LAPACK Library routine DGEES).")
 					e.info = ve.info
 				raise e
+			except NameError:
+				return self.calc_Wc(method='linalg')
 
 		else:
 			raise ValueError("dSS: Unknown method to calculate observers (method=%s)" % method)
@@ -689,14 +693,15 @@ class dSS(object):
 		Returns
 		- a dSS object
 		"""
-		if slycot:
+		try:
 			Nr, Ar, Br, Cr, hsv = ab09ad('D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr=self.n, tol=1e-18)
-			if Nr == 0:
-				raise ValueError("dSS: balanced: Cannot compute the balanced system "
-				                 "(the selected order nr is greater than the order of a minimal realization of the given system)")
-			return dSS(Ar, Br, Cr, self.D)
-		else:
+		except NameError:
 			raise ValueError("dSS.balanced: slycot is not installed")
+		if Nr == 0:
+			raise ValueError("dSS: balanced: Cannot compute the balanced system "
+			                 "(the selected order nr is greater than the order of a minimal realization of the given system)")
+		return dSS(Ar, Br, Cr, self.D)
+
 
 
 	def __add__(self, S):
