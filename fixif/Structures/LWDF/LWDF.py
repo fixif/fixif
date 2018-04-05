@@ -35,22 +35,22 @@ def makeLWDF(filter):
 
 	"""
 	# connect to matlab if not already connected
-
-	MH = MatlabHelper()
-	eng = MH.engine
-
-	#we suppose that we start in the root of the git repository, i.e. at yourlocalpath/fipogen
-	p = os.getcwd() + '/construct/fwrtoolbox/FWRToolbox/'
-	eng.cd(p)
-
-	#eng.addpath('construct', 'fwrtoolbox')
-	#eng.eval('R=ButterLWDF2FWR( %d, %f);'%(filter.n, filter.Wn), nargout=0)
-
-
-	#eng.eval('R=TF2LWDF2SIF( %f, %f);' % (filter.dTF.num.tolist(), filter.dTF.den.tolist()), nargout=0)
-	#R = eng.eval('struct(R)')
-
 	try:
+		MH = MatlabHelper()
+		eng = MH.engine
+
+		#we suppose that we start in the root of the git repository, i.e. at yourlocalpath/fipogen
+		p = os.getcwd() + '/construct/fwrtoolbox/FWRToolbox/'
+		eng.cd(p)
+
+		#eng.addpath('construct', 'fwrtoolbox')
+		#eng.eval('R=ButterLWDF2FWR( %d, %f);'%(filter.n, filter.Wn), nargout=0)
+
+
+		#eng.eval('R=TF2LWDF2SIF( %f, %f);' % (filter.dTF.num.tolist(), filter.dTF.den.tolist()), nargout=0)
+		#R = eng.eval('struct(R)')
+
+
 		R = eng.TF2LWDF2SIF(matlab.double(filter.dTF.num.tolist()), matlab.double(filter.dTF.den.tolist()))
 	except:
 		raise ValueError('Could not create the LWDF structure using matlab.\n')

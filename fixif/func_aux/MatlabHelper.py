@@ -34,7 +34,10 @@ class MatlabHelper(object):
 
 	@property
 	def engine(self):
-		return self._engine[0]
+		if self._engine:
+			return self._engine[0]
+		else:
+			return None
 
 
 # TODO: ne pas crasher qd matlabengine n'est pas installé
