@@ -1,10 +1,10 @@
 import numpy
 import mpmath
-import sollya
+#import sollya
 
 from fixif.func_aux import MPFMatrix
 
-import pytest
+#import pytest
 
 
 

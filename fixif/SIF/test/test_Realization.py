@@ -24,7 +24,7 @@ from numpy import matrix as mat, zeros,eye, empty, float64
 from fixif.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
 from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
 from fixif.Structures import State_Space
-from scipy.weave import inline
+#from scipy.weave import inline
 
 #from func_aux.get_data import get_data
 #from func_aux.MtlbHelper import MtlbHelper

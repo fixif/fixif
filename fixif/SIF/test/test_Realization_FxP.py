@@ -1,4 +1,4 @@
-import sollya
+#import sollya
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -14,7 +14,7 @@ import pytest
 
 
 from fixif.LTI import dSS, Butter, dTF
-from fixif.SIF import Realization, Realization_FxP
+#from fixif.SIF import Realization, Realization_FxP
 from numpy import matrix as mat, zeros, eye, empty, float64
 import numpy as np
 from numpy import all
@@ -29,7 +29,7 @@ from fixif.Structures import LWDF, DFII, State_Space, DFI
 
 from fixif.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
 from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter, random_dSS, dSS
-from scipy.weave import inline
+#from scipy.weave import inline
 
 # from func_aux.get_data import get_data
 # from func_aux.MtlbHelper import MtlbHelper

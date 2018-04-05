@@ -3,8 +3,8 @@ import numpy
 import mpmath
 from mpmath import *
 from mpmath import matrix
-import sollya
-from sollya import *
+#import sollya
+#from sollya import *
 
 from fixif.func_aux import *
 from fixif.LTI import dSS, random_dSS
