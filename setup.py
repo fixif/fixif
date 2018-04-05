@@ -45,6 +45,7 @@ setup(
 		# "cython",
 		"lxml",
 		"mpmath",
+		'jinja2',
 		'pytest', 'pytest-cov', 'coveralls'],
 	extras_require={
         'slicot':  ['slycot'],
