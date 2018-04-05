@@ -186,10 +186,10 @@ class dSS(object):
 
 		..Example::
 
-			>>>mydSS = random_dSS() ## define a new state space from random data
-			>>>mydSS.calc_Wo('linalg') # use numpy
-			>>>mydSS.calc_Wo('slycot') # use slycot
-			>>>mydSS.calc_Wo() # use the default method defined in dSS
+			>>> mydSS = random_dSS() ## define a new state space from random data
+			>>> mydSS.calc_Wo('linalg') # use numpy
+			>>> mydSS.calc_Wo('slycot') # use slycot
+			>>> mydSS.calc_Wo() # use the default method defined in dSS
 
 		.. warning::
 
@@ -263,10 +263,10 @@ class dSS(object):
 
 		..Example::
 
-			>>>mydSS = random_dSS() ## define a new state space from random data
-			>>>mydSS.calc_Wc('linalg') # use numpy
-			>>>mydSS.calc_Wc('slycot') # use slycot
-			>>>mydSS.calc_Wo() # use the default method defined in dSS
+			>>> mydSS = random_dSS() ## define a new state space from random data
+			>>> mydSS.calc_Wc('linalg') # use numpy
+			>>> mydSS.calc_Wc('slycot') # use slycot
+			>>> mydSS.calc_Wo() # use the default method defined in dSS
 
 		.. warning::
 
