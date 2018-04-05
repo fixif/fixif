@@ -43,6 +43,7 @@ setup(
 		# "matlabengineforpython",
 		# "sollya",
 		# "cython",
+		"lxml",
 		"mpmath",
 		'pytest', 'pytest-cov', 'coveralls'],
 	project_urls={
