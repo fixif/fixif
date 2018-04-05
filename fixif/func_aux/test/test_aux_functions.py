@@ -1,5 +1,6 @@
 import unittest
 import numpy
+from numpy import long
 import mpmath
 from mpmath import *
 from mpmath import matrix
