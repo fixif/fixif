@@ -16,7 +16,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fixif.Structures import Structure
+from fixif.Structures.Structure import Structure
 from fixif.LTI import Filter
 
 import numpy as np
