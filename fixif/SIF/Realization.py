@@ -21,7 +21,7 @@ from fixif.SIF import SIF
 from fixif.func_aux import dynMethodAdder
 from fixif.LTI import Filter
 from fixif.LTI import dSS
-from fixif.FxP import Constant
+#from fixif.FxP import Constant
 import numpy as np
 from copy import copy
 

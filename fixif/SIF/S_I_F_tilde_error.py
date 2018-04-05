@@ -15,7 +15,7 @@ __status__ = "Beta"
 from fixif.LTI import dSS
 from fixif.SIF import SIF
 
-from fixif.FxP.Constant import Constant
+#from fixif.FxP.Constant import Constant
 import numpy as np
 
 def convertToFix(M,w):
