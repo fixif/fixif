@@ -36,8 +36,10 @@ setup(
 	packages=find_packages(exclude=['tests']),
 	install_requires=[
 		"numpy", "scipy",
-		# "slycot >= 0.2.0",
+		"slycot",
 		"colorama",
+		"matplotlib",
+		#"sollya",
 		# "matlabengineforpython",
 		# "sollya",
 		# "cython",
