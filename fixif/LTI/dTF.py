@@ -77,8 +77,8 @@ class dTF(object):
 		str_den = " + ".join( str(c)+"z^"+str(-j) if j>0 else str(c) for (i,j),c in ndenumerate(self.den) )
 
 		fraclen = max(len(str_num), len(str_den))
-		sp_num = " "*(( fraclen - len(str_num) ) / 2)
-		sp_den = " "*(( fraclen - len(str_den) ) / 2)
+		sp_num = " "*int(( fraclen - len(str_num) ) / 2)
+		sp_den = " "*int(( fraclen - len(str_den) ) / 2)
 
 		str_tf  = "\n"
 		str_tf += " "*7 + sp_num + str_num + "\n"

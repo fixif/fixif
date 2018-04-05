@@ -45,8 +45,8 @@ def my_assertAlmostEqual_matrix(A, B, rel_eps=None, abs_eps = None):
 def test_construction( ):
 	with pytest.raises(ValueError):
 		dTF( [1, 2, 3], [0, 6 ,7] )		# den[0] cannot be zero
-	with pytest.raises(ValueError):
-		dTF( [1, 2, 3], [1, 2] )		# num should not be longer than den
+	#with pytest.raises(ValueError):
+	#	dTF( [1, 2, 3], [1, 2] )		# num should not be longer than den
 
 
 @pytest.mark.parametrize("H", iter_random_dTFmp(15))

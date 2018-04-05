@@ -28,8 +28,8 @@ def test_construction( ):
 	# test non-consistency size
 	with pytest.raises(ValueError):
 		Filter(num=[1, 2, 3], den=[0, 6 , 7])		# den[0] cannot be zero
-	with pytest.raises(ValueError):
-		Filter(num=[1, 2, 3], den=[1, 2])		# num should not be longer than den
+	#with pytest.raises(ValueError):
+	#	Filter(num=[1, 2, 3], den=[1, 2])		# num should not be longer than den
 
 	# test non-consistency size
 	with pytest.raises(ValueError):

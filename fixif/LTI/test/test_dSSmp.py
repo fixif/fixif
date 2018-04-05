@@ -51,7 +51,7 @@ def my_assertAlmostEqual_matrix(A, B, rel_eps=None, abs_eps = None):
 
 def test_construction( ):
 	with pytest.raises(ValueError):
-		dSSmp(numpy.matrix([[1, 2], [3, 4], [5, 6]]), 1, 2, 3)
+		dSSmp(numpy.matrix([[1.0, 2], [3, 4], [5, 6]]), 1, 2, 3)
 	with pytest.raises(ValueError):
 		dSSmp([[1, 2], [3, 4]], 1, 2, 3)
 	with pytest.raises(ValueError):
