@@ -17,12 +17,12 @@ from datetime import datetime
 from fixif.func_aux import scalarProduct
 
 from numpy import matrix as mat, zeros,eye, empty, float64
-from scipy.weave import inline
+#from scipy.weave import inline
 
 #used to build the Cython module
 from distutils.core import setup
 from distutils.extension import Extension
-from Cython.Distutils import build_ext
+#from Cython.Distutils import build_ext
 
 from imp import load_dynamic, find_module, load_module
 
