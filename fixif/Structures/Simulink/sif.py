@@ -14,7 +14,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from diagram import Equation
+from fixif.Structures.Simulink.diagram import Equation
 
 class Sif(object):
 	def __init__(self, l, m, n, p):
@@ -210,7 +210,7 @@ class Sif(object):
 			#print node[0], node[1], node[2]
 			
 			if node[1] == 1:
-				print "\nerror - not a D.A.G !!!"
+				print("\nerror - not a D.A.G !!!")
 				sys.exit()
 			if node[1] == 0: # not yet visited	
 				node[1] = 1

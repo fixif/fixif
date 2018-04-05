@@ -20,8 +20,8 @@ __status__ = "Beta"
 
 
 
-import sif
-from diagram import System
+from fixif.Structures.Simulink import sif
+from fixif.Structures.Simulink.diagram import System
 from zipfile import is_zipfile, ZipFile
 from os.path import split
 

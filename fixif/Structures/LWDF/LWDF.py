@@ -20,12 +20,12 @@ __status__ = "Beta"
 
 
 import os
-from fixif.Structures import Structure
+from fixif.Structures.Structure import Structure
 from numpy import matrix as mat
-from matlab.engine import connect_matlab
+#from matlab.engine import connect_matlab
 from fixif.func_aux import MatlabHelper
 
-import matlab
+#import matlab
 
 
 

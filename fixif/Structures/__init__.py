@@ -1,11 +1,11 @@
-from fixif.LTI.Structure import Structure, iterAllRealizations, makeARealization, iterAllRealizationsRandomFilter, iterStructuresAndOptions
-
-from fixif.LTI.DirectForms.DFI import DFI
-from fixif.LTI.DirectForms.DFII import DFII
-from fixif.LTI.LWDF.LWDF import LWDF
-from fixif.LTI.State_Space.State_Space import State_Space
-from fixif.LTI.rhoDFIIt.rhoDFIIt import rhoDFII
-#fromfixif.LTI. LGS_LCW.LGS_LCW import LGS, LCW
+from fixif.Structures import Structure
+from fixif.Structures.Structure import iterAllRealizations, makeARealization, iterAllRealizationsRandomFilter, iterStructuresAndOptions
+from fixif.Structures.DirectForms.DFI import DFI
+from fixif.Structures.DirectForms.DFII import DFII
+from fixif.Structures.LWDF.LWDF import LWDF
+from fixif.Structures.State_Space.State_Space import State_Space
+from fixif.Structures.rhoDFIIt.rhoDFIIt import rhoDFII
+#from fixif.Structures.LGS_LCW.LGS_LCW import LGS, LCW
 
 
 

@@ -16,7 +16,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fixif.Structures import Structure
+from fixif.Structures.Structure import Structure
 
 from numpy import matrix as mat
 from numpy import diagflat, zeros, eye, rot90, ones, r_, c_, atleast_2d, fliplr

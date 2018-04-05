@@ -17,7 +17,7 @@ __status__ = "Beta"
 
 
 
-from fixif.Structures import Structure
+from fixif.Structures.Structure import Structure
 from fixif.LTI import dSS
 from numpy import mat, array_equal
 from numpy import zeros,  poly, sqrt, prod, transpose, diagflat, r_, c_, ones, atleast_2d, eye

@@ -1,1 +1,1 @@
-from Simulink import importSimulink
+from fixif.Structures.Simulink.Simulink import importSimulink

@@ -14,7 +14,7 @@ __status__ = "Beta"
 
 
 from lxml import etree
-from blocks import *
+from fixif.Structures.Simulink.blocks import *
 
 class System(object):
 
@@ -167,7 +167,7 @@ class System(object):
 						sblock = line.srcsid
 						sport = line.srcport
 						sline = line
-						print line
+						print(line)
 						break
 
 				try:		
@@ -291,7 +291,7 @@ class System(object):
 		# to be improved by using dico
 		inputs = [] 
 		for eq in self.equations:
-			print eq
+			print (eq)
 			for block in eq.termes.keys():
 				if block not in inputs:
 					inputs.append(block)	
