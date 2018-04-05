@@ -1,7 +1,7 @@
 import mpmath
 from mpmath import mp
 import numpy
-from fipogen.func_aux import python2mpf_matrix
+from fixif.func_aux import python2mpf_matrix
 
 def mpf_matrix_fsub(A, B):
 	"""

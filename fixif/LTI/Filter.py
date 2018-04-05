@@ -14,7 +14,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from fipogen.LTI import dSS,dTF, random_dSS
+from fixif.LTI import dSS,dTF, random_dSS
 from numpy.random import seed as numpy_seed, randint, choice
 from re import compile
 
@@ -132,7 +132,7 @@ class Filter(object):
 		"""
 		Returns True if the filter is known to be a Butterworth filter
 		"""
-		from fipogen.LTI import Butter
+		from fixif.LTI import Butter
 		return self.__class__ == Butter
 
 

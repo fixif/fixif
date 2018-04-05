@@ -14,7 +14,7 @@ __status__ = "Beta"
 
 
 import pytest
-from fipogen.Structures.Simulink import importSimulink
+from fixif.Structures.Simulink import importSimulink
 
 
 

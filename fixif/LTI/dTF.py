@@ -2,7 +2,7 @@
 
 # This class describes a SISO transfer function
 from numpy.random.mtrand import randint, rand
-from scipy.weave import inline
+#from scipy.weave import inline
 
 __author__ = "Thibault Hilaire"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -22,7 +22,7 @@ from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
 from scipy.linalg import norm
-import sollya
+#import sollya
 
 from numpy.testing import assert_allclose
 
@@ -89,7 +89,7 @@ class dTF(object):
 
 
 	def to_dTFmp(self):
-		from fipogen.LTI import dTFmp
+		from fixif.LTI import dTFmp
 		return dTFmp(self._num, self._den)
 
 	def to_dSS(self, form="ctrl"):
@@ -101,7 +101,7 @@ class dTF(object):
 		"""
 		#TODO: code it without scipy
 
-		from fipogen.LTI import dSS
+		from fixif.LTI import dSS
 		if form=='ctrl':
 			A = mat( diagflat(ones((1, self.order-1)), 1) )
 			A[self.order-1,:] = fliplr( -self.den[0,1:] )

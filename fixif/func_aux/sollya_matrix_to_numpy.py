@@ -1,5 +1,5 @@
-import sollya
-from sollya import *
+#import sollya
+#from sollya import *
 import numpy
 
 def sollya_matrix_to_numpy(A, m, n):

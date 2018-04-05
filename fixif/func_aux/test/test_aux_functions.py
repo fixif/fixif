@@ -6,8 +6,8 @@ from mpmath import matrix
 import sollya
 from sollya import *
 
-from fipogen.func_aux import *
-from fipogen.LTI import dSS, random_dSS
+from fixif.func_aux import *
+from fixif.LTI import dSS, random_dSS
 
 def my_assert_allclose_mp(A, AA, abs_tol):
 
@@ -89,14 +89,14 @@ class MyTestCase(unittest.TestCase):
 		(y,n) = mpf_get_representation(a)
 
 		self.assertTrue(isinstance(y, long))
-		self.assertEqual(y, 1L)
+		self.assertEqual(y, 1)
 		self.assertEqual(n, 1)
 
 		a = mpf('-0.125')
 		(y, n) = mpf_get_representation(a)
 
 		self.assertTrue(isinstance(y, long))
-		self.assertEqual(y, -1L)
+		self.assertEqual(y, -1)
 		self.assertEqual(n, -3)
 
 		a = mpf('inf')

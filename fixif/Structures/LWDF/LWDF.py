@@ -20,10 +20,10 @@ __status__ = "Beta"
 
 
 import os
-from fipogen.Structures import Structure
+from fixif.Structures import Structure
 from numpy import matrix as mat
 from matlab.engine import connect_matlab
-from fipogen.func_aux import MatlabHelper
+from fixif.func_aux import MatlabHelper
 
 import matlab
 

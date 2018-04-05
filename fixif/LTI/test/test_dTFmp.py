@@ -12,7 +12,7 @@ __status__ = "Beta"
 import mpmath
 import numpy
 import pytest
-from fipogen.LTI import dTFmp, iter_random_dTFmp, dTF, dSSmp
+from fixif.LTI import dTFmp, iter_random_dTFmp, dTF, dSSmp
 
 def my_assertEqual_matrix(A, B):
 	if not isinstance(A, mpmath.matrix) and not isinstance(B, mpmath.matrix):

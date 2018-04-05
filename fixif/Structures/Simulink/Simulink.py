@@ -25,10 +25,10 @@ from diagram import System
 from zipfile import is_zipfile, ZipFile
 from os.path import split
 
-from fipogen.SIF import Realization
+from fixif.SIF import Realization
 from numpy import mat
 
-from fipogen.LTI.Filter import random_Filter
+from fixif.LTI.Filter import random_Filter
 
 
 def importSimulink( fileName, constants=None):

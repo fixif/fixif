@@ -1,7 +1,7 @@
 import mpmath
 from mpmath import mp
 import numpy
-from fipogen.func_aux import *
+from fixif.func_aux import *
 
 def mpf_matrix_fmul(A, B):
 	"""

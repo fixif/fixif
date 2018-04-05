@@ -16,7 +16,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fipogen.Structures import Structure
+from fixif.Structures import Structure
 from numpy import eye, zeros
 
 

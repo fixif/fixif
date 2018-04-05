@@ -27,8 +27,8 @@ __status__ = "Beta"
 
 
 from itertools import izip, product
-from fipogen.SIF import Realization
-from fipogen.LTI.Filter import iter_random_Filter
+from fixif.SIF import Realization
+from fixif.LTI.Filter import iter_random_Filter
 
 class Structure(object):
 	"""

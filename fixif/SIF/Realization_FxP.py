@@ -12,17 +12,17 @@ __status__ = "Beta"
 from scipy import signal
 import numpy as np
 from numpy import all
-from fipogen.LTI import Filter
-from fipogen.LTI import dSS
+from fixif.LTI import Filter
+from fixif.LTI import dSS
 
-from fipogen.SIF import Realization
-from fipogen.SIF import SIF
-from fipogen.func_aux import dynMethodAdder
+from fixif.SIF import Realization
+from fixif.SIF import SIF
+from fixif.func_aux import dynMethodAdder
 
 import numpy as np
 
 # list of methods to be added to the Realization class
-__all__ = ['compute_LSB', '_compute_MSB', 'compute_MSB_allvar_extended', 'flopoco']
+__all__ = ['_compute_LSB', '_compute_MSB', 'compute_MSB_allvar_extended', 'flopoco']
 
 
 
@@ -75,7 +75,7 @@ def _compute_LSB(self, l_y_out):
 
 	for x in (g==np.inf):
 		if x.any():
-			print 'Divided by zero\n'
+			print('Divided by zero\n')
 
 
 	lsb = np.bmat([max(l_y_out) - g])
@@ -143,7 +143,7 @@ def compute_MSB_allvar_extended(self, u_bar, lsb_t, lsb_x, lsb_y):
 		msb = np.bmat([np.ceil(np.log2(y_bar[i] + delta_bar[i])) for i in range(0, delta_bar.size)])
 		return msb
 	else:
-		print 'Something went wrong, error with sizes :( \n'
+		print('Something went wrong, error with sizes :( \n')
 		return 0
 
 

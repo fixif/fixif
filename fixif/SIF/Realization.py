@@ -17,11 +17,11 @@ __status__ = "Beta"
 
 
 
-from fipogen.SIF import SIF
-from fipogen.func_aux import dynMethodAdder
-from fipogen.LTI import Filter
-from fipogen.LTI import dSS
-from fipogen.FxP import Constant
+from fixif.SIF import SIF
+from fixif.func_aux import dynMethodAdder
+from fixif.LTI import Filter
+from fixif.LTI import dSS
+#from fixif.FxP import Constant
 import numpy as np
 from copy import copy
 
@@ -69,8 +69,7 @@ class Realization(SIF):
 		"""
 
 		# call the parent class constructor
-		# see http://stackoverflow.com/questions/576169/understanding-python-super-with-init-methods for super() and some comments
-		SIF.__init__( self, JtoS, dJtodS)
+		super(Realization, self).__init__(JtoS, dJtodS)
 
 		# name of the variables t, x, u and y
 		if varNameTX is None:
@@ -193,7 +192,7 @@ class Realization(SIF):
 
 		for x in (g==np.inf):
 			if x.any():
-				print 'Divided by zero\n'
+				print( 'Divided by zero\n')
 
 
 		lsb = np.bmat(l_y_out - g - 1)
@@ -211,7 +210,7 @@ class Realization(SIF):
 		C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])	#R
 		C3 = np.bmat([ [np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])	#S
 
-		print self.J
+		print(self.J)
 		#building an extended SIF
 		S_ext = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
 
@@ -266,5 +265,5 @@ class Realization(SIF):
 			msb = np.bmat([np.ceil(np.log2(y_bar[i] + delta_bar[i])) for i in range(0, delta_bar.size)])
 			return msb
 		else:
-			print 'Something went wrong, error with sizes :( \n'
+			print('Something went wrong, error with sizes :( \n')
 			return 0

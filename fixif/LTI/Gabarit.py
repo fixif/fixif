@@ -15,8 +15,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fipogen.LTI import dTF, dTFmp
-from fipogen.func_aux import mpf_matrix_to_sollya, MatlabHelper
+from fixif.LTI import dTF, dTFmp
+from fixif.func_aux import mpf_matrix_to_sollya, MatlabHelper
 
 from scipy.signal import iirdesign, freqz
 from numpy import array, pi, log10, infty
@@ -26,12 +26,14 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 import mpmath
-import sollya
+#import sollya
 
 
 # load 'gabarit.sol'
-sollya.suppressmessage(57, 174, 130, 457)
-sollya.execute("fipogen/LTI/gabarit.sol")
+
+#-> TO uncomment when sollya is installed
+#sollya.suppressmessage(57, 174, 130, 457)
+#sollya.execute("fipogen/LTI/gabarit.sol")
 
 
 

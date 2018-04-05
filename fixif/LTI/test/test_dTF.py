@@ -16,8 +16,8 @@ __status__ = "Beta"
 
 
 
-from fipogen.LTI import dTF, iter_random_dTF
-from fipogen.func_aux import python2mpf_matrix
+from fixif.LTI import dTF, iter_random_dTF
+from fixif.func_aux import python2mpf_matrix
 import mpmath
 import pytest
 import numpy

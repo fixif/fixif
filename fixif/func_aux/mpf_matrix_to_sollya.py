@@ -1,7 +1,7 @@
 import mpmath
-import sollya
+#import sollya
 #from sollya import *
-from fipogen.func_aux import mpf_matrix_get_representation
+from fixif.func_aux import mpf_matrix_get_representation
 
 def mpf_matrix_to_sollya(A):
 	"""

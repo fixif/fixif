@@ -1,7 +1,7 @@
 import mpmath
 from mpmath import mp
 import numpy
-from fipogen.func_aux import python2mpf_matrix
+from fixif.func_aux import python2mpf_matrix
 
 def my_forward_subst(L, i):
 	"""
@@ -72,7 +72,7 @@ def mpf_matrix_lt_inverse(L):
 
 	#checking the size
 	if L.rows != L.cols:
-		raise ValueError('Cannot compute inverse: matrix must be square but istead is %s x %s') % L.rows, L.cols
+		raise ValueError('Cannot compute inverse: matrix must be square but istead is %s x %s' % L.rows, L.cols)
 	else:
 		n = L.rows
 

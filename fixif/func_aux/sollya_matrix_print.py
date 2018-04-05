@@ -1,5 +1,5 @@
-import sollya
-from sollya import *
+#import sollya
+#from sollya import *
 
 def sollya_matrix_print(A, m, n):
 	"""
@@ -19,7 +19,7 @@ def sollya_matrix_print(A, m, n):
 
 	for i in range(0,m):
 		for j in range(0,n):
-			print '%s\t' % A[i* n + j],
+			print( '%s\t' % A[i* n + j],)
 		print('\n')
 
 

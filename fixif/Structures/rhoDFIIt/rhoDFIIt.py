@@ -17,8 +17,8 @@ __status__ = "Beta"
 
 
 
-from fipogen.Structures import Structure
-from fipogen.LTI import dSS
+from fixif.Structures import Structure
+from fixif.LTI import dSS
 from numpy import mat, array_equal
 from numpy import zeros,  poly, sqrt, prod, transpose, diagflat, r_, c_, ones, atleast_2d, eye
 from numpy import matrix as mat

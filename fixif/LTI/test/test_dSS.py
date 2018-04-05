@@ -17,7 +17,7 @@ __status__ = "Beta"
 
 import numpy
 
-from fipogen.SIF import SIF
+#from fixif.SIF import SIF
 
 import pytest
 import mpmath
@@ -27,8 +27,8 @@ from numpy.linalg import eigvals
 from numpy.testing import assert_allclose
 from numpy.random import seed, randint
 
-from fipogen.LTI import dSS, random_dSS, iter_random_dSS, iter_random_dTF, random_dTF
-from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy
+from fixif.LTI import dSS, random_dSS, iter_random_dSS, iter_random_dTF, random_dTF
+from fixif.func_aux import python2mpf_matrix, mpf_to_numpy
 
 
 def my_assert_allclose_TFmp(H, b, a, tol):

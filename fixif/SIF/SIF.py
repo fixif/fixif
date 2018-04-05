@@ -17,15 +17,15 @@ __status__ = "Beta"
 
 
 
-from fipogen.LTI import dSS
-from fipogen.func_aux import dynMethodAdder
+from fixif.LTI import dSS
+from fixif.func_aux import dynMethodAdder
 import numpy as np
 
 from numpy import c_, r_, eye, zeros, matrix as mat
 from numpy.linalg import inv
 from math import log
 from copy import copy
-from fipogen.func_aux import mpf_matrix_lt_inverse, mpf_matrix_fadd, mpf_matrix_fmul
+from fixif.func_aux import mpf_matrix_lt_inverse, mpf_matrix_fadd, mpf_matrix_fmul
 
 
 def isTrivial(x, epsilon):
@@ -141,7 +141,7 @@ class SIF(object):
 		"""
 		# particular case when the SIF is already a state-space
 		if self.l == 0:
-			from fipogen.LTI import dSSmp
+			from fixif.LTI import dSSmp
 			return dSSmp(self.P, self.Q, self.R, self.S)
 
 		# otherwise
@@ -168,7 +168,7 @@ class SIF(object):
 		DZ = mpf_matrix_fmul(self.L, DZ)
 		DZ = mpf_matrix_fadd(DZ, self.S)
 
-		from fipogen.LTI import dSSmp
+		from fixif.LTI import dSSmp
 		return dSSmp(AZ, BZ, CZ, DZ)
 
 

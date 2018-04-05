@@ -12,8 +12,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fipogen.LTI import dSS
-from fipogen.SIF import SIF
+from fixif.LTI import dSS
+from fixif.SIF import SIF
 
 from FxP.Constant import Constant
 import numpy as np
@@ -81,17 +81,17 @@ def SIFH_to_SIFHstar(S,w, prints = False):
 	S_t = np.bmat([[S_tilde-S.S, np.zeros((S.p, S.l+S.n)), IdenY]])
 	
 	if prints:
-		print "\n### Z exact ###"
-		print "\nWCPG : \n - Wy :"
+		print("\n### Z exact ###")
+		print("\nWCPG : \n - Wy :")
 		print ( S.dSS.WCPG() )
-		print "\n - Wtxy :"
-		print WCPG_txy(S)
-		print "\n### Z degrade ###\n\nWCPG : \n - Wy :"
+		print("\n - Wtxy :")
+		print(WCPG_txy(S))
+		print("\n### Z degrade ###\n\nWCPG : \n - Wy :")
 	SIF_tilde = SIF((J_tilde,K_tilde,L_tilde,M_tilde,N_tilde,P_tilde,Q_tilde,R_tilde,S_tilde))
 	if prints:
 		print(SIF_tilde.dSS.WCPG())
-		print "\n - Wtxy :"
-		print WCPG_txy(SIF_tilde)
+		print("\n - Wtxy :")
+		print(WCPG_txy(SIF_tilde))
 	SIF_err = SIF((J,K,L,M,N,P,Q,R,S_t))
 	return SIF_tilde, SIF_err
 

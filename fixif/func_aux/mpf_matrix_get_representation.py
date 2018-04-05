@@ -1,6 +1,6 @@
 import mpmath
 import numpy
-from fipogen.func_aux import mpf_get_representation
+from fixif.func_aux import mpf_get_representation
 
 def mpf_matrix_get_representation(A):
 	"""

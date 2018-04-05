@@ -15,8 +15,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fipogen.LTI import Filter, random_Filter, iter_random_Filter
-from fipogen.LTI import iter_random_Butter
+from fixif.LTI import Filter, random_Filter, iter_random_Filter
+from fixif.LTI import iter_random_Butter
 
 import pytest
 

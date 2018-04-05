@@ -24,7 +24,7 @@ from numpy.linalg.linalg import LinAlgError
 from scipy.linalg import solve_discrete_lyapunov
 from slycot import sb03md, ab09ad
 from copy import copy
-from scipy.weave import inline
+#from scipy.weave import inline
 from scipy.signal import ss2tf
 from numpy.core.umath import pi, cos, sin
 from numpy.random.mtrand import randint, rand, randn
@@ -563,7 +563,7 @@ class dSS(object):
 
 	def to_dSSmp(self):
 		"""Transforms the dSS into a dSSmp (multiprecision dSS)"""
-		from fipogen.LTI import dSSmp
+		from fixif.LTI import dSSmp
 		return dSSmp(self._A, self._B, self._C, self._D)
 
 
@@ -573,7 +573,7 @@ class dSS(object):
 		"""
 		if self._p != 1 or self._q != 1:
 			raise ValueError('dSS: the state-space must be SISO to be converted in transfer function')
-		from fipogen.LTI import dTF
+		from fixif.LTI import dTF
 		num, den = ss2tf(self._A, self._B, self._C, self._D)
 		return dTF(num[0], den)
 

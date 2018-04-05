@@ -10,10 +10,10 @@ __email__ = "Anastasia.Volkova@lip6.fr"
 __status__ = "Beta"
 
 from numpy.random.mtrand import randint, rand
-from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mpf_matrix_to_sollya
+from fixif.func_aux import python2mpf_matrix, mpf_to_numpy, mpf_matrix_to_sollya
 import mpmath
 import numpy
-import sollya
+#import sollya
 
 class dTFmp(object):
 
@@ -75,7 +75,7 @@ class dTFmp(object):
 		return self._order
 
 	def to_dTF(self):
-		from fipogen.LTI import dTF
+		from fixif.LTI import dTF
 		return dTF(mpf_to_numpy(self._num.transpose()), mpf_to_numpy(self._den.transpose()))
 
 	def to_dSSmp(self):
@@ -118,7 +118,7 @@ class dTFmp(object):
 		S  - dSSmp object
 		"""
 
-		from fipogen.LTI import dSSmp
+		from fixif.LTI import dSSmp
 
 		N = self.order + 1
 

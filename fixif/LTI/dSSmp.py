@@ -1,4 +1,4 @@
-import sollya
+#import sollya
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
@@ -14,8 +14,8 @@ import mpmath
 import numpy
 
 from numpy.random.mtrand import randint, rand
-from fipogen.func_aux import python2mpf_matrix, mpf_to_numpy, mp_poly_product, mpf_matrix_fadd, mpf_matrix_fmul, mpf_matrix_to_sollya
-from fipogen.LTI import random_dSS
+from fixif.func_aux import python2mpf_matrix, mpf_to_numpy, mp_poly_product, mpf_matrix_fadd, mpf_matrix_fmul, mpf_matrix_to_sollya
+from fixif.LTI import random_dSS
 
 class dSSmp(object):
 
@@ -155,7 +155,7 @@ class dSSmp(object):
 		H - a filter which corresponds to the difference of systems self and S
 		"""
 
-		from fipogen.LTI import dSS
+		from fixif.LTI import dSS
 		if not isinstance(S, dSSmp):
 			if isinstance(S, dSS):
 				S = dSSmp(S.A, S.B, S.C, S.D)
@@ -221,7 +221,7 @@ class dSSmp(object):
 		"""
 
 
-		from fipogen.LTI import dSS
+		from fixif.LTI import dSS
 		if not isinstance(S, dSSmp):
 			if isinstance(S, dSS):
 				S = dSSmp(S.A, S.B, S.C, S.D)
@@ -270,7 +270,7 @@ class dSSmp(object):
 
 
 	def to_dSS(self):
-		from fipogen.LTI import dSS
+		from fixif.LTI import dSS
 		return dSS(mpf_to_numpy(self._A), mpf_to_numpy(self._B), mpf_to_numpy(self._C), mpf_to_numpy(self._D))
 
 
@@ -292,7 +292,7 @@ class dSSmp(object):
 		oldprec = mpmath.mp.prec
 		mpmath.mp.prec = prec
 
-		from fipogen.LTI import dTFmp
+		from fixif.LTI import dTFmp
 
 		if self.p != 1 or self.q != 1:
 			raise ValueError('dSS: cannot convert a dSSmp to dTFmp for not a SISO system')

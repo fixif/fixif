@@ -14,7 +14,7 @@ __status__ = "Beta"
 from jinja2 import Environment, PackageLoader
 from numpy import tril, all
 from datetime import datetime
-from fipogen.func_aux import scalarProduct
+from fixif.func_aux import scalarProduct
 
 from numpy import matrix as mat, zeros,eye, empty, float64
 from scipy.weave import inline

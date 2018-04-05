@@ -1,7 +1,7 @@
 import mpmath
 from mpmath import *
 
-from fipogen.func_aux import mpf_poly_mult
+from fixif.func_aux import mpf_poly_mult
 
 
 #polynomials are sto

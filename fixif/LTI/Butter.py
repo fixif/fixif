@@ -18,7 +18,7 @@ __status__ = "Beta"
 from numpy.random.mtrand import randint, seed as numpy_seed, choice, random_sample		# seed is renamed numpy_seed, so that I can use the variable seed
 from scipy.signal import butter
 
-from fipogen.LTI import Filter, dTF
+from fixif.LTI import Filter, dTF
 
 
 class Butter(Filter):

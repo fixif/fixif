@@ -2,7 +2,7 @@ import numpy
 import mpmath
 import sollya
 
-from fipogen.func_aux import MPFMatrix
+from fixif.func_aux import MPFMatrix
 
 import pytest
 

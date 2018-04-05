@@ -16,8 +16,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fipogen.Structures import Structure
-from fipogen.LTI import Filter
+from fixif.Structures import Structure
+from fixif.LTI import Filter
 
 import numpy as np
 import scipy as sp
@@ -44,7 +44,7 @@ def PhiKLD(s):
 	return (Phi, K, L, D)
 
 
-def PhiKLD_in(alpha, (Phi, K, L, D)):
+def PhiKLD_in(alpha, Phi, K, L, D):
 	"""Construit Phi_in et K_in à partir des alphas en utilisant la formule
 	et L_in en utilisant la transformation pour passer de (Phi,K,L,D)
 	à (Phi_in,K_in,L_in,D)"""
@@ -154,7 +154,7 @@ def A_decomposition_LCW(alpha, Phi_in):
 	return Ad
 
 
-def Matrice_JtoS_LGS(Ad, (A_in, B_in, C_in, d)):
+def Matrice_JtoS_LGS(Ad, A_in, B_in, C_in, d):
 	"""A partir de la décomposition de A_in et des matrices B_in,C_in,D,
 	construit les éléments (J,K,L,M,N,P,Q,R,S) qui forment Z."""
 	n = Ad[0].shape[0]
@@ -199,7 +199,7 @@ def Matrice_JtoS_LGS(Ad, (A_in, B_in, C_in, d)):
 	return J, K, L, M, N, P, Q, R, S
 
 
-def Matrice_JtoS_LCW(Ad, (As, Bs, Cs, d)):
+def Matrice_JtoS_LCW(Ad, As, Bs, Cs, d):
 	"""A partir de la décomposition de A_in et des matrices B_in,C_in,D,
 	construit les éléments (J,K,L,M,N,P,Q,R,S) qui forment Z."""
 	n = Ad[0].shape[0]
@@ -332,7 +332,7 @@ def makeLGS(filt, transposed=False):
 	alpha = JSS_trans(den)
 
 	# We compute the PhiKLD_in
-	(Phi_in, K_in, L_in, D) = PhiKLD_in(alpha, (Phi, K, L, D))
+	(Phi_in, K_in, L_in, D) = PhiKLD_in(alpha, Phi, K, L, D)
 
 	# We can compute the (A_in, B_in, C_in, d) abd tge A_in decomposition
 	(A_in, B_in, C_in, d) = ABCd_in(Phi_in, K_in, L_in, D)
@@ -340,7 +340,7 @@ def makeLGS(filt, transposed=False):
 	Ad = A_decomposition_LGS(alpha, Phi_in)
 
 	# Then, we deduce J to S matrices
-	JtoS = Matrice_JtoS_LGS(Ad, (A_in, B_in, C_in, d))
+	JtoS = Matrice_JtoS_LGS(Ad, A_in, B_in, C_in, d)
 
 	#TODO: use transposed ???
 
@@ -358,14 +358,14 @@ def makeLCW(filt, transposed=False):
 	# On calcule les alpha par la JSS-transformation
 	alpha = JSS_trans(den)
 	# On calcule les PhiKLD_in
-	(Phi_in, K_in, L_in, D) = PhiKLD_in(alpha, (Phi, K, L, D))
+	(Phi_in, K_in, L_in, D) = PhiKLD_in(alpha, Phi, K, L, D)
 	# On peut calculer les (A,B,C,d)_in et la
 	# décomposition de A_in en produit de matrice.
 	(A_ib, B_ib, C_ib, d) = ABCd_in(Phi_in, K_in, L_in, D)
 	(As, Bs, Cs, d) = ABCd_star(A_ib, B_ib, C_ib, d, Phi_in, K_in)
 	Ad = A_decomposition_LCW(alpha, Phi_in)
 	# On construit les matrices qui forment Z
-	JtoS = Matrice_JtoS_LCW(Ad, (As, Bs, Cs, d))
+	JtoS = Matrice_JtoS_LCW(Ad, As, Bs, Cs, d)
 	#TODO: use transposed ???
 
 	# return useful infos to build the Realization

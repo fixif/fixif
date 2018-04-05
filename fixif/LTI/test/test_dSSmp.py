@@ -12,11 +12,11 @@ import pytest
 import numpy
 import mpmath
 from numpy.testing import assert_allclose
-from fipogen.func_aux import *
+from fixif.func_aux import *
 
-from fipogen.LTI import dSS, dSSmp, dTFmp, iter_random_dSSmp, Filter, iter_random_dSS
-from fipogen.SIF import SIF
-from fipogen.Structures import State_Space
+from fixif.LTI import dSS, dSSmp, dTFmp, iter_random_dSSmp, Filter, iter_random_dSS
+from fixif.SIF import SIF
+from fixif.Structures import State_Space
 
 
 def my_assertEqual_matrix(A, B):
@@ -82,7 +82,7 @@ def test_to_dSS( S ):
 @pytest.mark.parametrize( "S", iter_random_dSS(25, True, (5, 10), (1, 2), (1, 2), pBCmask=0.1))
 def test_WCPGmp( S ):
 
-	from fipogen.Structures import State_Space
+	from fixif.Structures import State_Space
 	F = Filter(A=S.A, B=S.B, C=S.C, D=S.D)
 	R = State_Space(F)
 	Rq = R.quantize(16)

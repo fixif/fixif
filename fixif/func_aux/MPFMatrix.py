@@ -256,7 +256,7 @@ class MPFMatrix(object):
 
 		# checking the size
 		if self.rows != self.cols:
-			raise ValueError('Cannot compute inverse: matrix must be square but istead is %s x %s') % self.rows, self.cols
+			raise ValueError('Cannot compute inverse: matrix must be square but istead is %s x %s' % self.rows, self.cols)
 		else:
 			n = self.rows
 
@@ -313,7 +313,7 @@ class MPFMatrix(object):
 		N - p x q matrix of type int or long
 		"""
 
-		from fipogen.func_aux import mpf_get_representation
+		from fixif.func_aux import mpf_get_representation
 		Y = numpy.zeros([self.rows, self.cols], dtype=object)
 		N = numpy.zeros([self.rows, self.cols], dtype=object)
 
