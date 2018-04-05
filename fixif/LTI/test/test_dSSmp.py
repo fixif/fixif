@@ -11,12 +11,12 @@ __status__ = "Beta"
 import pytest
 import numpy
 import mpmath
-from numpy.testing import assert_allclose
-from fixif.func_aux import *
+#from numpy.testing import assert_allclose
+#from fixif.func_aux import *
 
 from fixif.LTI import dSS, dSSmp, dTFmp, iter_random_dSSmp, Filter, iter_random_dSS
-from fixif.SIF import SIF
-from fixif.Structures import State_Space
+#from fixif.SIF import SIF
+#from fixif.Structures import State_Space
 
 
 def my_assertEqual_matrix(A, B):
