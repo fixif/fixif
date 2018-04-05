@@ -5,7 +5,7 @@ from distutils.extension import Extension
 import numpy
 
 setup(
-	cmdclass = {'build_ext': build_ext},
+#	cmdclass = {'build_ext': build_ext},
 	ext_modules = [Extension("runC",
 					sources=["runCython.pyx", "runC.c"],
 					extra_compile_args=['-Wno-unused-function'],
