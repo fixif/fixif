@@ -26,7 +26,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from itertools import izip, product
+from itertools import product      #izip for Python 2.x
 from fixif.SIF import Realization
 from fixif.LTI.Filter import iter_random_Filter
 
@@ -129,7 +129,7 @@ def iterAllRealizations(filter):
 		if st._options:
 			# list of all the possible values for dictionnary
 			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
-			vl = ( dict(izip(st._options, x)) for x in product(*st._options.itervalues()) )
+			vl = ( dict(zip(st._options, x)) for x in product(*st._options.values()) )
 			for options in vl:
 				if st.canAcceptFilter(filter, **options):
 					yield st.makeRealization(filter, **options)
@@ -149,7 +149,7 @@ def iterStructuresAndOptions(fakeFilter):
 		if st._options:
 			# list of all the possible values for dictionnary
 			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
-			vl = ( dict(izip(st._options, x)) for x in product(*st._options.itervalues()) )
+			vl = ( dict(zip(st._options, x)) for x in product(*st._options.values()) )
 			for options in vl:
 				if st.canAcceptFilter(fakeFilter, **options):
 					yield st, options
