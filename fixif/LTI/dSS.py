@@ -22,7 +22,7 @@ from numpy import eye, zeros, r_, c_, sqrt
 from numpy.linalg import inv, solve
 from numpy.linalg.linalg import LinAlgError
 from scipy.linalg import solve_discrete_lyapunov
-from slycot import sb03md, ab09ad
+
 from copy import copy
 #from scipy.weave import inline
 from scipy.signal import ss2tf
@@ -32,7 +32,10 @@ import numpy
 from itertools import chain
 from numpy.testing import assert_allclose
 
-
+try:
+	from slycot import sb03md, ab09ad
+except ImportError:
+	slycot = None
 
 
 class dSS(object):
@@ -71,7 +74,7 @@ class dSS(object):
 
 	"""
 
-	_W_method = 'slycot1'  # linalg, slycot1
+	_W_method = 'slycot'  # linalg, slycot
 
 
 	def __init__(self, A, B, C, D):
@@ -176,7 +179,7 @@ class dSS(object):
 		1 digit precision with bilinear algorithm for big matrixes (really bad).
 		not good enough with usual python data types
 
-		- ``slycot1`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
+		- ``slycot`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
 		see http://slicot.org/objects/software/shared/libindex.html
 
 		- ``None`` (default) : use the default method defined in the dSS class (dSS._W_method)
@@ -185,7 +188,7 @@ class dSS(object):
 
 			>>>mydSS = random_dSS() ## define a new state space from random data
 			>>>mydSS.calc_Wo('linalg') # use numpy
-			>>>mydSS.calc_Wo('slycot1') # use slycot
+			>>>mydSS.calc_Wo('slycot') # use slycot
 			>>>mydSS.calc_Wo() # use the default method defined in dSS
 
 		.. warning::
@@ -199,7 +202,7 @@ class dSS(object):
 		if method is None:
 			method = dSS._W_method
 
-		if method == 'linalg':
+		if method == 'linalg' or slycot is None:
 			try:
 				X = solve_discrete_lyapunov(self._A.transpose(), self._C.transpose() * self._C)
 				self._Wo = mat(X)
@@ -213,7 +216,7 @@ class dSS(object):
 					e.info = ve.info
 				raise e
 
-		elif self._W_method == 'slycot1':
+		elif self._W_method == 'slycot':
 			# Solve the Lyapunov equation by calling the Slycot function sb03md
 			# If we don't use "copy" in the call, the result is plain false
 
@@ -251,7 +254,7 @@ class dSS(object):
 		1 digit precision with bilinear algorithm for big matrixes (really bad).
 		not good enough with usual python data types
 
-		- ``slycot1`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
+		- ``slycot`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
 		see http://slicot.org/objects/software/shared/libindex.html
 
 		- ``None`` (default) : use the default method defined in the dSS class (dSS._W_method)
@@ -260,7 +263,7 @@ class dSS(object):
 
 			>>>mydSS = random_dSS() ## define a new state space from random data
 			>>>mydSS.calc_Wc('linalg') # use numpy
-			>>>mydSS.calc_Wc('slycot1') # use slycot
+			>>>mydSS.calc_Wc('slycot') # use slycot
 			>>>mydSS.calc_Wo() # use the default method defined in dSS
 
 		.. warning::
@@ -273,7 +276,7 @@ class dSS(object):
 		if method is None:
 			method = dSS._W_method
 
-		if method == 'linalg':
+		if method == 'linalg' or slycot is None:
 			try:
 				X = solve_discrete_lyapunov(self._A, self._B * self._B.transpose())
 				self._Wc = mat(X)
@@ -287,7 +290,7 @@ class dSS(object):
 					e.info = ve.info
 				raise e
 
-		elif self._W_method == 'slycot1':
+		elif self._W_method == 'slycot':
 			# Solve the Lyapunov equation by calling the Slycot function sb03md
 			# If we don't use "copy" in the call, the result is plain false
 
@@ -686,12 +689,14 @@ class dSS(object):
 		Returns
 		- a dSS object
 		"""
-
-		Nr, Ar, Br, Cr, hsv = ab09ad('D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr=self.n, tol=1e-18)
-		if Nr == 0:
-			raise ValueError("dSS: balanced: Cannot compute the balanced system "
-			                 "(the selected order nr is greater than the order of a minimal realization of the given system)")
-		return dSS(Ar, Br, Cr, self.D)
+		if slycot:
+			Nr, Ar, Br, Cr, hsv = ab09ad('D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr=self.n, tol=1e-18)
+			if Nr == 0:
+				raise ValueError("dSS: balanced: Cannot compute the balanced system "
+				                 "(the selected order nr is greater than the order of a minimal realization of the given system)")
+			return dSS(Ar, Br, Cr, self.D)
+		else:
+			raise ValueError("dSS.balanced: slycot is not installed")
 
 
 	def __add__(self, S):

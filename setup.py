@@ -46,6 +46,10 @@ setup(
 		"lxml",
 		"mpmath",
 		'pytest', 'pytest-cov', 'coveralls'],
+	extras_require={
+        'slicot':  ['slycot'],
+        #'sollya': ['pythonsollya'],
+    },
 	project_urls={
 		'Bug Reports': 'https://github.com/FiXiF/fixif/issues',
 		'Source': 'https://github.com/FiXiF/fixif/',
