@@ -98,7 +98,7 @@ def test_Gramians ( S ):
 	"""
 
 	relative_tolerance_linalg = 1e-3
-	relative_tolerance_slycot1 = 1e-5
+	relative_tolerance_slycot = 1e-5
 
 
 	# test with 'linalg' method
@@ -110,10 +110,10 @@ def test_Gramians ( S ):
 	S._Wo = None
 	S._Wc = None
 
-	# test for 'slycot1' method (with slycot we expect a 8-digit accuracy)
-	dSS._W_method = 'slycot1'
-	assert_allclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()), array(S.Wc), rtol=relative_tolerance_slycot1)
-	assert_allclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C), array(S.Wo), rtol=relative_tolerance_slycot1)
+	# test for 'slycot' method (with slycot we expect a 8-digit accuracy)
+	dSS._W_method = 'slycot'
+	assert_allclose( array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()), array(S.Wc), rtol=relative_tolerance_slycot)
+	assert_allclose( array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C), array(S.Wo), rtol=relative_tolerance_slycot)
 
 	# test with non-existing method
 	dSS._W_method = 'toto'
@@ -124,7 +124,7 @@ def test_Gramians ( S ):
 	with pytest.raises(ValueError):
 		t = S.Wo
 
-	dSS._W_method = 'slycot1'
+	dSS._W_method = 'slycot'
 
 
 @pytest.mark.parametrize( "S", iter_random_dSS(1, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
