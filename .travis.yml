@@ -16,13 +16,14 @@ matrix:
       env: TOXENV=py37-dev
 
 before_install:
-# install Slycot
     - sudo apt-get -qq update
+# install Slycot
     - sudo apt-get build-dep python-scipy
 # install required python packages for build and coverage
     - pip install pytest pytest-cov
     - pip install coveralls
-
+# install fixif.FxP
+    - pip install https://github.com/fixif/fixif.FxP/archive/master.zip
 install: pip install tox
 
 script:
