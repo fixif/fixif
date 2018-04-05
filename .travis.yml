@@ -18,7 +18,7 @@ matrix:
 before_install:
 # install Slycot
     - sudo apt-get -qq update
-    - sudo apt-get install -y gfortran lapacke
+    - sudo apt-get install -y gfortran lapack
 # install required python packages for build and coverage
     - pip install pytest pytest-cov
     - pip install coveralls
