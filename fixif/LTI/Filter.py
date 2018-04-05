@@ -162,7 +162,7 @@ def iter_random_Filter( number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True
 
 	for s in seeds:
 		if type not in pq.keys():
-			type = choice( pq.keys() )
+			type = choice( list(pq.keys()) )
 		nn = randint(*n)
 		pp = randint(*pq[type][0])
 		qq = randint(*pq[type][1])
