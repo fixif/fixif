@@ -117,9 +117,9 @@ def iterAllRealizations(filter):
 	-------
 	a generator of
 
-	>>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
-	>>>> for R in Structure.iterAllRealizations(f):
-	>>>>    print(R)
+	>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
+	>>> for R in Structure.iterAllRealizations(f):
+	>>>    print(R)
 
 	print the realizations (filter f implemeted in all the existing structures wih all the possible options)
 	(ie Direct Form I (with nbSum=1 and also nbSum=2), State-Space (balanced, canonical observable form, canonical controlable, etc.), etc.)
