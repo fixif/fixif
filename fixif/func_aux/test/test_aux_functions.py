@@ -38,7 +38,7 @@ def my_assert_allclose_mp(A, AA, abs_tol):
 
 class MyTestCase(unittest.TestCase):
 	def test_python2mpf_matrix(self):
-		A = numpy.matrix([[1, 2, 3], [4, 5, 6]])
+		A = numpy.matrix([[1.0, 2, 3], [4, 5, 6]])
 		B = python2mpf_matrix(A)
 		self.assertEqual(B.rows, 2)
 		self.assertEqual(B.cols, 3)
