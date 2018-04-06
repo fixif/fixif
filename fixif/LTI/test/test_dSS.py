@@ -208,11 +208,17 @@ def test_to_dTF( S ):
 
 @pytest.mark.parametrize( "S", iter_random_dSS(20, stable=True, n=(1, 15), p=(1, 5), q=(1, 5)))
 def test_balanced( S ):
-	Sb = S.balanced()
-	# check if S and Sb represent the same systems
-	S.assert_close(Sb)
-	# check if Sb is really balanced
-	my_assert_allclose( Sb.Wo,'Wo', Sb.Wc, 'Wc', atol=1e-6 )
+	try:
+		import slycot   # ununsed, but just to know if slycot exists
+	except ImportError:
+		with pytest.raises(ImportError):
+			Sb = S.balanced()
+	else:
+		Sb = S.balanced()
+		# check if S and Sb represent the same systems
+		S.assert_close(Sb)
+		# check if Sb is really balanced
+		my_assert_allclose( Sb.Wo,'Wo', Sb.Wc, 'Wc', atol=1e-6 )
 
 
 #TODO: il reste à tester:

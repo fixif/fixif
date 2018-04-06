@@ -696,7 +696,7 @@ class dSS(object):
 		try:
 			Nr, Ar, Br, Cr, hsv = ab09ad('D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr=self.n, tol=1e-18)
 		except NameError:
-			raise ValueError("dSS.balanced: slycot is not installed")
+			raise ImportError("dSS.balanced: slycot is not installed")
 		if Nr == 0:
 			raise ValueError("dSS: balanced: Cannot compute the balanced system "
 			                 "(the selected order nr is greater than the order of a minimal realization of the given system)")
