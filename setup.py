@@ -38,7 +38,7 @@ setup(
 		"numpy", "scipy",
 		"colorama",
 		"matplotlib",
-		"fixif.FxP>=0.2",
+		"fixif.FxP>=0.1",
 		#"sollya",
 		# "matlabengineforpython",
 		# "sollya",
