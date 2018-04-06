@@ -22,7 +22,7 @@ before_install:
 # install required python packages for build and coverage
     - pip install pytest pytest-cov
     - pip install coveralls
-install: pip install tox --process-dependency-links
+install: pip install tox
 
 script:
     - tox
