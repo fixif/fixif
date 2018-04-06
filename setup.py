@@ -36,9 +36,9 @@ setup(
 	packages=find_packages(exclude=['tests']),
 	install_requires=[
 		"numpy", "scipy",
-		"slycot",
 		"colorama",
 		"matplotlib",
+		"fixif.FxP",
 		#"sollya",
 		# "matlabengineforpython",
 		# "sollya",
@@ -48,9 +48,10 @@ setup(
 		'jinja2',
 		'pytest', 'pytest-cov', 'coveralls'],
 	extras_require={
-        'slicot':  ['slycot'],
-        #'sollya': ['pythonsollya'],
-    },
+		'slicot':  ['slycot'],
+		#'sollya': ['pythonsollya'],
+	},
+	dependency_links = ["https://github.com/fixif/fixif.FxP/archive/master.zip"],
 	project_urls={
 		'Bug Reports': 'https://github.com/FiXiF/fixif/issues',
 		'Source': 'https://github.com/FiXiF/fixif/',
