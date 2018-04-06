@@ -38,7 +38,6 @@ setup(
 		"numpy", "scipy",
 		"colorama",
 		"matplotlib",
-		"fixif.FxP",
 		#"sollya",
 		# "matlabengineforpython",
 		# "sollya",
@@ -51,7 +50,7 @@ setup(
 		'slicot':  ['slycot'],
 		#'sollya': ['pythonsollya'],
 	},
-	dependency_links = ["https://github.com/fixif/fixif.FxP/archive/master.zip"],
+	dependency_links = ["https://github.com/fixif/fixif.FxP/archive/master#egg=fixif.FxP-0.2"], # install fixif.FxP from github
 	project_urls={
 		'Bug Reports': 'https://github.com/FiXiF/fixif/issues',
 		'Source': 'https://github.com/FiXiF/fixif/',
