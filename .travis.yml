@@ -5,13 +5,15 @@ python:
     - "3.4"
     - "3.5"
     - "3.6"
+
+os:
+  - linux
+  before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get build-dep python-scipy
+
 matrix:
   include:
-    - os: linux
-      before_install:
-        - sudo apt-get -qq update
-        - sudo apt-get build-dep python-scipy
-
     - os: osx
       language: generic
       python: "3.6"
