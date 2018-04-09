@@ -14,8 +14,8 @@ matrix:
       before_install:
         - brew update
         - brew upgrade python
-        - python --version
-        - pip --version
+        - python3 --version
+        - pip3 --version
 
 
     - os: osx
@@ -36,7 +36,7 @@ install:
     sudo apt-get build-dep python-scipy || travis_terminate 1;
     fi
   # install required python packages for build and coverage
-  - pip install pytest
+  - pip install -U pytest
   - pip install pytest-cov
   - pip install coveralls
   - python setup.py  install
