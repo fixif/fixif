@@ -5,24 +5,24 @@ python:
     - "3.4"
     - "3.5"
     - "3.6"
+matrix:
+  include:
+    - os: osx
+      language: generic
+      python: "3.6"
+      before_install:
+        - brew update
+        - brew install python3
+        - python3 -m venv venv
+        - source venv/bin/activate
+      install:
+        - python3 fixif/setup.py install --process-dependency-links
 
-include:
-  - os: osx
-    language: generic
-    python: "3.6"
-    before_install:
-      - brew update
-      - brew install python3
-      - python3 -m venv venv
-      - source venv/bin/activate
-    install:
-      - pip3 install --process-dependency-links
-
-  - os: osx
-    language: generic
-    python: "2.7"
-    install:
-      - pip install --process-dependency-links
+    - os: osx
+      language: generic
+      python: "2.7"
+      install:
+        - python fixif/setup.py install --process-dependency-links
 
 
 
@@ -34,7 +34,7 @@ before_install:
     - pip install pytest pytest-cov
     - pip install coveralls
 install:
-    - pip install --process-dependency-links
+    - python fixif/setup.py  install --process-dependency-links
 
 script:
     - pytest -k construct --cov=fixif
