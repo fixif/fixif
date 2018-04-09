@@ -14,16 +14,17 @@ matrix:
       before_install:
         - brew update
         - brew upgrade python
-        - virtualenv venv -p python3;
-        - source venv/bin/activate;
+        - virtualenv venv -p python3
+        - source venv/bin/activate
 
     - os: osx
       language: generic
       python: "2.7"
       before_install:
-        - brew install python;
-        - virtualenv venv -p python3;
-        - source venv/bin/activate;
+        - brew install python
+        - virtualenv venv -p python3
+        - source venv/bin/activate
+
 
 install:
     - if [[ $TRAVIS_OS_NAME == linux ]]; then
