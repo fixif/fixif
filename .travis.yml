@@ -23,7 +23,6 @@ install:
     - if [[ $TRAVIS_OS_NAME == linux ]]; then
         sudo apt-get -qq update || travis_terminate 1;
         sudo apt-get build-dep python-scipy || travis_terminate 1;  # deps for slycot
-
       else
         # install python requirements
         brew update;
@@ -37,7 +36,6 @@ install:
           source venv/bin/activate;
         fi
       fi
-    fi
 
 # install required python packages for build and coverage
     - pip install pytest pytest-cov
