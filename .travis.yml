@@ -28,10 +28,8 @@ matrix:
       language: generic
       python: "2.7"
       before_install:
-        #- brew update
-        # install python 3.6
-        #- brew upgrade python
-        #- PATH=/usr/local/opt/python/libexec/bin:$PATH
+        - virtualenv venv -p python
+        - source venv/bin/activate
         # install numpy and gfortran (via gcc)
         - pip install numpy
         - brew install gcc || brew link --overwrite gcc
