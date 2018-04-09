@@ -14,7 +14,7 @@ matrix:
       before_install:
         - brew update
         - brew upgrade python
-        - virtualenv venv -p python
+        - virtualenv venv -p python3
         - source venv/bin/activate
         - python --version
         - pip --version
@@ -36,7 +36,8 @@ install:
     sudo apt-get build-dep python-scipy || travis_terminate 1;
     fi
   # install required python packages for build and coverage
-  - pip install pytest pytest-cov
+  - pip install pytest
+  - pip install pytest-cov
   - pip install coveralls
   - python setup.py  install
 
