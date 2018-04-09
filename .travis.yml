@@ -23,8 +23,7 @@ matrix:
         - PATH=/usr/local/opt/python/libexec/bin:$PATH
         # install numpy and gfortran (via gcc)
         - pip install numpy
-        - brew link --overwrite gcc
-        - brew install gcc --overwrite
+        - brew install gcc || brew link --overwrite gcc
 
 install:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
