@@ -14,7 +14,7 @@ matrix:
       before_install:
         - brew update
         - brew upgrade python
-        - virtualenv venv -p python3
+        - virtualenv venv
         - source venv/bin/activate
         - python --version
         - pip --version
@@ -27,7 +27,9 @@ matrix:
         - virtualenv venv -p python
         - source venv/bin/activate
         - python --version
+        - pip --update
         - pip --version
+
 
 
 install:
