@@ -7,8 +7,8 @@ language: python
 #  - "3.6"
 
 env:
-- sollya = 'True'
-- sollya = 'False'
+- sollya = true
+- sollya = false
 
 
 matrix:
@@ -25,10 +25,13 @@ install:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
       sudo apt-get -qq update || travis_terminate 1;
       sudo apt-get build-dep python-scipy || travis_terminate 1;
-      if [[ $SOLLYA == 'yes' ]]; then
+      if [[ $SOLLYA ]]; then
         sudo apt-get sollya;
       fi
+    else
+      pip install numpy;
     fi
+
   # install required python packages for build and coverage
   - pip install -U pytest
   - pip install pytest-cov
