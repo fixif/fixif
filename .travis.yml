@@ -36,7 +36,6 @@ install:
           source venv/bin/activate;
         fi
       fi
-
 # install required python packages for build and coverage
     - pip install pytest pytest-cov
     - pip install coveralls
