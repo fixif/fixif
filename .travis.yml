@@ -20,6 +20,8 @@ matrix:
         - brew update
         - brew upgrade python
         - PATH=/usr/local/opt/python/libexec/bin:$PATH
+        - pip install numpy
+        - brew install gfortran
 
 install:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
@@ -28,12 +30,10 @@ install:
       if [[ $SOLLYA ]]; then
         sudo apt-get sollya;
       fi
-    else
-      pip install numpy;
     fi
 
   # install required python packages for build and coverage
-  - pip install -U pytest
+  - pip install pytest
   - pip install pytest-cov
   - pip install coveralls
   - python setup.py  install
