@@ -21,7 +21,7 @@ matrix:
 
 before_install:
     # install Slycot
-    - if [[ $TRAVIS_OS == LINUX ]]; then
+    - if [[ $TRAVIS_OS_NAME == linux ]]; then
       sudo apt-get -qq update;
       sudo apt-get build-dep python-scipy;
       fi
