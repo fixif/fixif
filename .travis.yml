@@ -20,9 +20,11 @@ matrix:
 
 
 before_install:
-    - sudo apt-get -qq update
-# install Slycot
-    - sudo apt-get build-dep python-scipy
+    # install Slycot
+    - if [[ $TRAVIS_OS == LINUX ]]; then
+      sudo apt-get -qq update;
+      sudo apt-get build-dep python-scipy;
+      fi
 # install required python packages for build and coverage
     - pip install pytest pytest-cov
     - pip install coveralls
