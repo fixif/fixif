@@ -27,7 +27,7 @@ before_install:
     - pip install pytest pytest-cov
     - pip install coveralls
 install:
-    - python setup.py  install --process-dependency-links
+    - python setup.py  install
 
 script:
     - pytest -k construct --cov=fixif
