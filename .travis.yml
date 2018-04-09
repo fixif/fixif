@@ -26,15 +26,6 @@ install:
       else
         # install python requirements
         brew update;
-        if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-          brew install python;
-          virtualenv venv -p python;
-          source venv/bin/activate;
-        else
-          brew install python3;
-          virtualenv venv -p python3;
-          source venv/bin/activate;
-        fi
       fi
 # install required python packages for build and coverage
     - pip install pytest pytest-cov
