@@ -20,21 +20,14 @@ matrix:
         - brew update
         - brew upgrade python
         - PATH=/usr/local/opt/python/libexec/bin:$PATH
-        - python3 --version
-        - python --version
-        - pip3 --version
-        - pip --version
-
-
-
-
 
 install:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
       sudo apt-get -qq update || travis_terminate 1;
       sudo apt-get build-dep python-scipy || travis_terminate 1;
-    if [[ $SOLLYA == 'yes' ]]; then
-      sudo apt-get sollya;
+      if [[ $SOLLYA == 'yes' ]]; then
+        sudo apt-get sollya;
+      fi
     fi
   # install required python packages for build and coverage
   - pip install -U pytest
