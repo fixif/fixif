@@ -31,7 +31,8 @@ matrix:
         - virtualenv venv -p python
         - source venv/bin/activate
         # install numpy and gfortran (via gcc)
-        - pip install numpy
+        - pip uninstall numpy -y
+        - pip install -I numpy==1.8.2
         - brew install gcc || brew link --overwrite gcc
 
 install:
