@@ -36,6 +36,7 @@ install:
   - if "$SOLLYA"; then
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then
           sudo apt-get install libmpfr-dev;
+          sudo apt-get install libmpfi-dev;
           wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
           tar xzf sollya-6.0.tar.gz;
           cd sollya-6.0/;
