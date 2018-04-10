@@ -64,5 +64,10 @@ def acceptSS(filter, form):
 	return True
 
 
-
-State_Space = Structure( shortName="SS", fullName="State-Space", options={ 'form': (None, 'balanced', 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
+# do not propose "balanced" form when slycot is not installed
+try:
+	import slycot
+except ImportError:
+	State_Space = Structure(shortName="SS", fullName="State-Space", options={ 'form': (None, 'ctrl', 'obs') }, make=makeSS, accept=acceptSS)
+else:
+	State_Space = Structure( shortName="SS", fullName="State-Space", options={ 'form': (None, 'balanced', 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
