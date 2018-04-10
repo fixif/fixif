@@ -16,6 +16,9 @@ matrix:
     - os: osx
       language: generic
       python: "3.6"
+      env:
+        - SOLLYA=true
+        - SLYCOT=true
       before_install:
         - brew update
         # install python 3.6
@@ -25,15 +28,19 @@ matrix:
 
 install:
   # install sollya (and prepare for slycot)
-  - if [[ $SOLLYA ]]; then
+  - if [[ $SOLLYA=true ]]; then
         if [[ $TRAVIS_OS_NAME = 'linux' ]]; then
-          sudo apt-get install sollya;
+          wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
+          tar xzf sollya-6.0.tar.gz;
+          cd sollya-6.0/;
+          ./configure && make -j4 && sudo make install;
+          cd ..;
         else
           echo "Sollya not installed yet";
         fi
     fi
   # install slycot (first install requirement like gfortran and/or numpy/scipy)
-  - if [[ $SLYCOT ]]; then
+  - if [[ $SLYCOT=true ]]; then
       if [[ $TRAVIS_OS_NAME = 'linux' ]]; then
         sudo apt-get -qq update || travis_terminate 1;
         sudo apt-get build-dep python-scipy;
