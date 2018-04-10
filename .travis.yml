@@ -25,11 +25,7 @@ matrix:
         - pip install numpy
         - brew install gcc || brew link --overwrite gcc
 
-  exclude:
-    - python: "3.4"
-      SOLLYA=true
-    - python: "3.5"
-      SOLLYA=false
+
 
 install:
   # install sollya (and prepare for slycot)
