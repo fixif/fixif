@@ -35,9 +35,6 @@ install:
       if [[ $SOLLYA ]]; then
         sudo apt-get sollya;
       fi
-      if [[ $SLYCOT ]]; then
-        sudo pip install slycot;
-      fi
     fi
   # install required python packages for build and coverage
   - pip install pytest
