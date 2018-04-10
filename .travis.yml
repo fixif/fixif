@@ -1,14 +1,14 @@
 language: python
 
-#python:
-#  - "2.7"
-#  - "3.4"
-#  - "3.5"
-#  - "3.6"
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
 
 env:
-- sollya = true
-- sollya = false
+- SOLLYA=true  SLYCOT=true
+- SOLLYA=false  SLYCOT=false
 
 
 matrix:
@@ -24,25 +24,25 @@ matrix:
         # install numpy and gfortran (via gcc)
         - pip install numpy
         - brew install gcc || brew link --overwrite gcc
-    - os: osx
-      language: generic
-      python: "2.7"
-      before_install:
-        - virtualenv venv -p python
-        - source venv/bin/activate
-        # install numpy and gfortran (via gcc)
-        - pip2 install -U --only-binary=numpy,scipy numpy scipy
-        - brew install gcc || brew link --overwrite gcc
+
+  exclude:
+    - python: "3.4"
+      SOLLYA=true
+    - python: "3.5"
+      SOLLYA=false
 
 install:
+  # install sollya (and prepare for slycot)
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
       sudo apt-get -qq update || travis_terminate 1;
       sudo apt-get build-dep python-scipy || travis_terminate 1;
       if [[ $SOLLYA ]]; then
         sudo apt-get sollya;
       fi
+      if [[ $SLYCOT ]]; then
+        sudo pip install slycot;
+      fi
     fi
-
   # install required python packages for build and coverage
   - pip install pytest
   - pip install pytest-cov
