@@ -41,7 +41,7 @@ install:
           sudo apt-get install libmpfr-dev;
           sudo apt-get install libmpfi-dev;
           wget https://github.com/fplll/fplll.git;
-          cd fplll;
+          cd fplll.git;
           ./configure && make && sudo make install;
           cd ..;
           wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
