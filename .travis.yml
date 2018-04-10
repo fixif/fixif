@@ -26,7 +26,11 @@ matrix:
 install:
   # install sollya (and prepare for slycot)
   - if [[ $SOLLYA ]]; then
-    echo "Sollya !!";
+        if [[ $TRAVIS_OS_NAME = 'linux' ]]; then
+          echo "sudo apt-get sollya";
+        else
+          echo "Sollya not installed yet";
+        fi
     fi
   # install slycot (first install requirement like gfortran and/or numpy/scipy)
   - if [[ $SLYCOT ]]; then
