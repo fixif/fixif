@@ -30,6 +30,15 @@ from numpy.random import seed, randint
 from fixif.LTI import dSS, random_dSS, iter_random_dSS, iter_random_dTF, random_dTF
 from fixif.func_aux import python2mpf_matrix, mpf_to_numpy
 
+try:
+	import Sollya
+except ImportError:
+	print("PythonSollya is not installed")
+try:
+	import Slycot
+except ImportError:
+	print("Slycot is not installed")
+
 
 def my_assert_allclose_TFmp(H, b, a, tol):
 
