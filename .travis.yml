@@ -44,7 +44,7 @@ install:
   # install sollya (and prepare for slycot)
   - if "$SOLLYA"; then
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-          sudo apt-get install sollya;
+          sudo apt-get install libsollya-dev;
         else
           echo "Sollya not installed yet";
         fi
