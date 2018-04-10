@@ -26,6 +26,15 @@ matrix:
 
 
 install:
+  # install sollya (and prepare for slycot)
+  - if [[ $SOLLYA ]]; then
+      if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+        sudo apt-get sollya;
+      else
+        echo "Sollya not installed yet";
+      fi
+    fi
+
   # install required python packages for build and coverage
   - pip install pytest
   - pip install pytest-cov
