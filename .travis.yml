@@ -28,7 +28,7 @@ matrix:
 
 before_install:
   # update apt-get or install python 3.6
-  - if [ $TRAVIS_OS_NAME == 'linux' ]; then
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       sudo apt-get -qq update;
     else
       brew update;
@@ -39,7 +39,7 @@ before_install:
 install:
   # install sollya (and prepare for slycot)
   - if "$SOLLYA"; then
-        if [ $TRAVIS_OS_NAME == 'linux' ]; then
+        if [ "$TRAVIS_OS_NAME" == "linux" ]; then
           sudo apt-get install sollya || travis_terminate 1;
         else
           echo "Sollya not installed yet";
@@ -47,7 +47,7 @@ install:
     fi
   # install slycot (first install requirement like gfortran and/or numpy/scipy)
   - if "$SLYCOT"; then
-      if [ $TRAVIS_OS_NAME == 'linux' ]; then
+      if [ "$TRAVIS_OS_NAME" == "linux" ]; then
         sudo apt-get build-dep python-scipy || travis_terminate 1;
       else
         pip install numpy || travis_terminate 1;
@@ -70,6 +70,6 @@ email: false
 
 after_success:
     # run coveralls for Python 3.6 under linux with Sollya and Slycot installed
-    - if [[ $TRAVIS_PYTHON_VERSION == '3.6' && $SOLLYA && $SLYCOT && $TRAVIS_OS_NAME == 'linux' ]]; then
+    - if [[ $TRAVIS_PYTHON_VERSION == '3.6' && $SOLLYA && $SLYCOT && "$TRAVIS_OS_NAME" == "linux" ]]; then
           coveralls;
       fi
