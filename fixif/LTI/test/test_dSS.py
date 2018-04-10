@@ -30,16 +30,18 @@ from numpy.random import seed, randint
 from fixif.LTI import dSS, random_dSS, iter_random_dSS, iter_random_dTF, random_dTF
 from fixif.func_aux import python2mpf_matrix, mpf_to_numpy
 
-# tell if sollya or slycot are disabled
-with pytest.capsys.disabled():
-	try:
-		import Sollya
-	except ImportError:
-		print("PythonSollya is not installed")
-	try:
-		import Slycot
-	except ImportError:
-		print("Slycot is not installed")
+
+def test_sollya_slycot(capsys):
+	# tell if sollya or slycot are disabled
+	with capsys.disabled():
+		try:
+			import Sollya
+		except ImportError:
+			print("PythonSollya is not installed")
+		try:
+			import Slycot
+		except ImportError:
+			print("Slycot is not installed")
 
 
 def my_assert_allclose_TFmp(H, b, a, tol):
