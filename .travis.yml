@@ -26,7 +26,7 @@ matrix:
 install:
   # install sollya (and prepare for slycot)
   - if [[ $SOLLYA ]]; then
-      if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      if [[ $TRAVIS_OS_NAME == linux ]]; then
         sudo apt-get sollya;
       else
         echo "Sollya not installed yet";
@@ -34,7 +34,7 @@ install:
     fi
   # install slycot (first install requirement like gfortran and/or numpy/scipy)
   - if [[ $SLYCOT ]]; then
-      if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      if [[ $TRAVIS_OS_NAME == linux ]]; then
         sudo apt-get -qq update || travis_terminate 1;
         sudo apt-get build-dep python-scipy;
       else
@@ -47,10 +47,6 @@ install:
   - pip install pytest
   - pip install pytest-cov
   - pip install coveralls
-  # install slycot if needed
-  - if [[ $SLYCOT ]]; then
-        pip install slycot;
-    fi
   # and then install fixif
   - python setup.py  install
 
