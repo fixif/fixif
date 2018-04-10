@@ -20,11 +20,7 @@ matrix:
         - SOLLYA=true
         - SLYCOT=true
 
-#wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
-#          tar xzf sollya-6.0.tar.gz;
-#          cd sollya-6.0/;
-#          ./configure && make -j4 && sudo make install;
-#          cd ..;
+#
 
 before_install:
   # update apt-get or install python 3.6
@@ -40,7 +36,11 @@ install:
   # install sollya (and prepare for slycot)
   - if "$SOLLYA"; then
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-          sudo apt-get install sollya || travis_terminate 1;
+          wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
+          tar xzf sollya-6.0.tar.gz;
+          cd sollya-6.0/;
+          ./configure && make -j4 && sudo make install;
+          cd ..;
         else
           echo "Sollya not installed yet";
         fi
