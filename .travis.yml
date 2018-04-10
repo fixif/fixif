@@ -33,7 +33,7 @@ before_install:
     else
       brew update;
       brew upgrade python;
-      PATH=/usr/local/opt/python/libexec/bin:$PATH
+      PATH=/usr/local/opt/python/libexec/bin:$PATH;
     fi
 
 install:
