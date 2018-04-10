@@ -34,7 +34,19 @@ install:
         echo "Sollya not installed yet";
       fi
     fi
-
+  # install slycot
+  - if [[ $SLYCOT ]]; then
+      # prepare with slicot, gfortran, etc.
+      if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+        sudo apt-get -qq update || travis_terminate 1;
+        sudo apt-get build-dep python-scipy;
+      else
+        # install numpy and gfortran (via gcc)
+        pip install numpy || travis_terminate 1;
+        brew install gcc || brew link --overwrite gcc;
+      fi;
+      pip install slycot || travis_terminate 1;
+    fi
   # install required python packages for build and coverage
   - pip install pytest
   - pip install pytest-cov
