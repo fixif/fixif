@@ -35,6 +35,7 @@ install:
   # install sollya (and prepare for slycot)
   - if "$SOLLYA"; then
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+          sudo apt-get install mpfr;
           wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
           tar xzf sollya-6.0.tar.gz;
           cd sollya-6.0/;
@@ -62,7 +63,7 @@ install:
   - python setup.py  install
 
 script:
-    - pytest -k construct --cov=fixif
+    - pytest -k construct --cov=fixif -s
 
 notifications:
 email: false
