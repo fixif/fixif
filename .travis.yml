@@ -7,10 +7,8 @@ python:
   - "3.6"
 
 env:
-  - SOLLYA=true
-  - SOLLYA=false
-  - SLYCOT=true
-  - SLYCOT=false
+  - SOLLYA=true SLYCOT=true
+  - SOLLYA=false  SLYCOT=false
 
 
 matrix:
@@ -34,7 +32,7 @@ install:
         echo "Sollya not installed yet";
       fi
     fi
-  # install slycot
+  # install slycot (first install requirement like gfortran and/or numpy/scipy)
   - if [[ $SLYCOT ]]; then
       if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
         sudo apt-get -qq update || travis_terminate 1;
