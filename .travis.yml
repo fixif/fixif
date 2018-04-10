@@ -7,8 +7,10 @@ python:
   - "3.6"
 
 env:
-- SOLLYA=true  SLYCOT=true
-- SOLLYA=false  SLYCOT=false
+- SOLLYA=true
+- SLYCOT=true
+- SOLLYA=false
+- SLYCOT=false
 
 
 matrix:
@@ -21,25 +23,43 @@ matrix:
         # install python 3.6
         - brew upgrade python
         - PATH=/usr/local/opt/python/libexec/bin:$PATH
-        # install numpy and gfortran (via gcc)
-        - pip install numpy
-        - brew install gcc || brew link --overwrite gcc
-
 
 
 install:
   # install sollya (and prepare for slycot)
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-      sudo apt-get -qq update || travis_terminate 1;
-      sudo apt-get build-dep python-scipy || travis_terminate 1;
-      if [[ $SOLLYA ]]; then
+  - if [[ $SOLLYA ]]; then
+      if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
         sudo apt-get sollya;
+      else
+        echo "Sollya not installed yet";
       fi
     fi
+
+  # install slycot
+  - if [[ $SLYCOT ]]; then
+      # prepare with slicot, gfortran, etc.
+      if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+        sudo apt-get -qq update || travis_terminate 1;
+        sudo apt-get build-dep python-scipy || travis_terminate 1;
+      else
+        # install numpy and gfortran (via gcc)
+        pip install numpy;
+        brew install gcc || brew link --overwrite gcc
+      fi
+      pip install slycot || travis_terminate 1;
+    fi
+
   # install required python packages for build and coverage
   - pip install pytest
   - pip install pytest-cov
   - pip install coveralls
+
+  # install slycot if needed
+  - if [[ $SLYCOT ]]; then
+        pip install slycot;
+    fi
+
+  # and then install fixif
   - python setup.py  install
 
 script:
@@ -49,6 +69,7 @@ notifications:
 email: false
 
 after_success:
-    - if [[ $TOXENV == py36 ]]; then
+    # run coveralls for Python 3.6 under linux with Sollya and Slycot installed
+    - if [[ $TRAVIS_PYTHON_VERSION == '3.6' && $SOLLYA && $SLYCOT && $TRAVIS_OS_NAME == 'linux' ]]; then
           coveralls;
       fi
