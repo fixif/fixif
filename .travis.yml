@@ -19,22 +19,28 @@ matrix:
       env:
         - SOLLYA=true
         - SLYCOT=true
-      before_install:
-        - brew update
-        # install python 3.6
-        - brew upgrade python
-        - PATH=/usr/local/opt/python/libexec/bin:$PATH
 
+#wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
+#          tar xzf sollya-6.0.tar.gz;
+#          cd sollya-6.0/;
+#          ./configure && make -j4 && sudo make install;
+#          cd ..;
+
+before_install:
+  # update apt-get or install python 3.6
+  - if [[ $TRAVIS_OS_NAME = 'linux' ]]; then
+      sudo apt-get -qq update;
+    else
+      brew update;
+      brew upgrade python;
+      PATH=/usr/local/opt/python/libexec/bin:$PATH
+    fi
 
 install:
   # install sollya (and prepare for slycot)
   - if [[ $SOLLYA=true ]]; then
         if [[ $TRAVIS_OS_NAME = 'linux' ]]; then
-          wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
-          tar xzf sollya-6.0.tar.gz;
-          cd sollya-6.0/;
-          ./configure && make -j4 && sudo make install;
-          cd ..;
+          sudo apt-get install sollya || travis_terminate 1;
         else
           echo "Sollya not installed yet";
         fi
@@ -42,8 +48,7 @@ install:
   # install slycot (first install requirement like gfortran and/or numpy/scipy)
   - if [[ $SLYCOT=true ]]; then
       if [[ $TRAVIS_OS_NAME = 'linux' ]]; then
-        sudo apt-get -qq update || travis_terminate 1;
-        sudo apt-get build-dep python-scipy;
+        sudo apt-get build-dep python-scipy || travis_terminate 1;
       else
         pip install numpy || travis_terminate 1;
         brew install gcc || brew link --overwrite gcc;
