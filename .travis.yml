@@ -55,7 +55,7 @@ install:
 
           export LD_LIBRARY_PATH=/usr/local/lib;
           git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b master sollya_git;
-          cd sollya_git && sh autogen.sh && ./configure && make && make install && cd ..;
+          cd sollya_git && sh autogen.sh && ./configure && make && sudo make install && cd ..;
 
           pip install git+https://gitlab.com/metalibm-dev/pythonsollya;
         else
