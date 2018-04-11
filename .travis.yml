@@ -1,13 +1,13 @@
 language: python
 
-#python:
-#  - "2.7"
-#  - "3.5"
-#  - "3.6"
+python:
+  - "2.7"
+  - "3.5"
+  - "3.6"
 
-#env:
-#  - SOLLYA=true SLYCOT=true
-#  - SOLLYA=false  SLYCOT=false
+env:
+  - SOLLYA=true SLYCOT=true
+  - SOLLYA=false  SLYCOT=false
 
 
 matrix:
@@ -27,60 +27,34 @@ before_install:
       sudo apt-get -qq update;
     else
       brew update;
+      brew install gcc || brew link --overwrite gcc;
       brew upgrade python;
-      brew install bison;
-      brew link bison --force;
       PATH=/usr/local/opt/python/libexec/bin:$PATH;
     fi
 
-
-
-#          wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
-#          tar xzf sollya-6.0.tar.gz;
-#          cd sollya-6.0/;
-#          ./configure && make -j && sudo make install;
-#          cd ..;
-#          git clone https://gitlab.com/metalibm-dev/pythonsollya.git;
-#          cd pythonsollya && make install && make test && cd ..;
-
-
 install:
-  # install sollya (and prepare for slycot)
+  # install sollya
   - if "$SOLLYA"; then
+
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then
           sudo apt-get install libmpfr-dev;
           sudo apt-get install libmpfi-dev;
-
-          git clone https://github.com/fplll/fplll.git;
-          cd fplll;
-          ./autogen.sh && ./configure && make -j&& sudo make install; cd ..;
-
-          export LD_LIBRARY_PATH=/usr/local/lib;
-          git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b master sollya_git;
-          cd sollya_git && sh autogen.sh && ./configure && make && sudo make install && cd ..;
-
-          pip install git+https://gitlab.com/metalibm-dev/pythonsollya;
         else
           brew install mpfi;
-          git clone https://github.com/fplll/fplll.git;
-          cd fplll;
-          ./autogen.sh && ./configure && make -j&& sudo make install; cd ..;
-
-          export LD_LIBRARY_PATH=/usr/local/lib;
-          git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b master sollya_git;
-          cd sollya_git && sh autogen.sh && ./configure && make && sudo make install && cd ..;
-
-          export PYTHON=python;
-          pip install git+https://gitlab.com/metalibm-dev/pythonsollya;
-
-
-
-
-
-
-
-
+          brew install bison || brew link bison --force;
         fi
+
+        git clone https://github.com/fplll/fplll.git;
+        cd fplll;
+        ./autogen.sh && ./configure && make -j&& sudo make install; cd ..;
+
+        export LD_LIBRARY_PATH=/usr/local/lib;
+        git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b master sollya_git;
+        cd sollya_git && sh autogen.sh && ./configure && make && sudo make install && cd ..;
+
+        export PYTHON=python;
+        pip install git+https://gitlab.com/metalibm-dev/pythonsollya;
+
     fi
   # install slycot (first install requirement like gfortran and/or numpy/scipy)
   - if "$SLYCOT"; then
@@ -88,7 +62,6 @@ install:
         sudo apt-get build-dep python-scipy || travis_terminate 1;
       else
         pip install numpy || travis_terminate 1;
-        brew install gcc || brew link --overwrite gcc;
       fi;
       pip install slycot || travis_terminate 1;
     fi
