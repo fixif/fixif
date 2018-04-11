@@ -40,15 +40,22 @@ install:
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then
           sudo apt-get install libmpfr-dev;
           sudo apt-get install libmpfi-dev;
+
           git clone https://github.com/fplll/fplll.git;
           cd fplll;
-          ./autogen.sh && ./configure && make && sudo make install;
+          ./autogen.sh && ./configure && make -j&& sudo make install;
           cd ..;
+
           wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
           tar xzf sollya-6.0.tar.gz;
           cd sollya-6.0/;
-          ./configure && make -j4 && sudo make install;
+          ./configure && make -j && sudo make install;
           cd ..;
+
+          git clone https://gitlab.com/metalibm-dev/pythonsollya.git;
+          cd pythonsollya;
+          make build && make install;
+          cd ..
         else
           echo "Sollya not installed yet";
         fi
