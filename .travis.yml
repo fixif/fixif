@@ -5,6 +5,8 @@ python:
   - "3.5"
   - "3.6"
 
+cache: pip
+
 env:
   - SOLLYA=true SLYCOT=true
   - SOLLYA=false  SLYCOT=false
