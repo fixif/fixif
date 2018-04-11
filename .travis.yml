@@ -69,6 +69,7 @@ install:
           git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b master sollya_git;
           cd sollya_git && sh autogen.sh && ./configure && make && sudo make install && cd ..;
 
+          export PYTHON=python;
           pip install git+https://gitlab.com/metalibm-dev/pythonsollya;
 
 
