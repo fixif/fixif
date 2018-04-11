@@ -33,6 +33,12 @@ before_install:
 
 
 
+#          wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
+#          tar xzf sollya-6.0.tar.gz;
+#          cd sollya-6.0/;
+#          ./configure && make -j && sudo make install;
+#          cd ..;
+
 
 install:
   # install sollya (and prepare for slycot)
@@ -43,19 +49,14 @@ install:
 
           git clone https://github.com/fplll/fplll.git;
           cd fplll;
-          ./autogen.sh && ./configure && make -j&& sudo make install;
-          cd ..;
+          ./autogen.sh && ./configure && make -j&& sudo make install; cd ..;
 
-          wget https://gforge.inria.fr/frs/download.php/file/36270/sollya-6.0.tar.gz;
-          tar xzf sollya-6.0.tar.gz;
-          cd sollya-6.0/;
-          ./configure && make -j && sudo make install;
-          cd ..;
+          export LD_LIBRARY_PATH=/usr/local/lib;
+          git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b master sollya_git;
+          cd sollya_git && sh autogen.sh && ./configure && make && make install && cd ..;
 
           git clone https://gitlab.com/metalibm-dev/pythonsollya.git;
-          cd pythonsollya;
-          make build && make install;
-          cd ..
+          cd pythonsollya && make install && make test && cd ..;
         else
           echo "Sollya not installed yet";
         fi
