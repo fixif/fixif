@@ -60,7 +60,6 @@ install:
 
           pip install git+https://gitlab.com/metalibm-dev/pythonsollya;
         else
-          brew install mpfr;
           brew install mpfi;
           git clone https://github.com/fplll/fplll.git;
           cd fplll;
