@@ -28,6 +28,7 @@ before_install:
     else
       brew update;
       brew upgrade python;
+      brew upgrade yacc;
       PATH=/usr/local/opt/python/libexec/bin:$PATH;
     fi
 
@@ -106,6 +107,6 @@ email: false
 
 after_success:
     # run coveralls for Python 3.6 under linux with Sollya and Slycot installed
-    - if [[ $TRAVIS_PYTHON_VERSION == '3.6' && $SOLLYA && $SLYCOT && "$TRAVIS_OS_NAME" == "linux" ]]; then
+    - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" && "$SOLLYA" && "$SLYCOT" && "$TRAVIS_OS_NAME" == "linux" ]]; then
           coveralls;
       fi
