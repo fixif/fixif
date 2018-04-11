@@ -30,10 +30,12 @@ from numpy.random import seed, randint
 from fixif.LTI import dSS, random_dSS, iter_random_dSS, iter_random_dTF, random_dTF
 from fixif.func_aux import python2mpf_matrix, mpf_to_numpy
 
+
 #FIXME: move this test somewhere else...
 def test_construct_sollya_slycot(capsys):
 	# tell if sollya or slycot are disabled
 	with capsys.disabled():
+		print("")
 		try:
 			import sollya
 			print("PythonSollya is installed")
