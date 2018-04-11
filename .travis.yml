@@ -29,8 +29,8 @@ before_install:
       sudo apt-get -qq update;
     else
       brew update;
-      brew install gcc || brew link --overwrite gcc;
       brew upgrade python;
+      brew install bison || brew link bison --force;
       PATH=/usr/local/opt/python/libexec/bin:$PATH;
     fi
 
@@ -43,7 +43,6 @@ install:
           sudo apt-get install libmpfi-dev;
         else
           brew install mpfi;
-          brew install bison || brew link bison --force;
         fi
 
         git clone https://github.com/fplll/fplll.git;
@@ -64,6 +63,7 @@ install:
         sudo apt-get build-dep python-scipy || travis_terminate 1;
       else
         pip install numpy || travis_terminate 1;
+        brew install gcc || brew link --overwrite gcc;
       fi;
       pip install slycot || travis_terminate 1;
     fi
