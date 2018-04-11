@@ -38,6 +38,8 @@ before_install:
 #          cd sollya-6.0/;
 #          ./configure && make -j && sudo make install;
 #          cd ..;
+#          git clone https://gitlab.com/metalibm-dev/pythonsollya.git;
+#          cd pythonsollya && make install && make test && cd ..;
 
 
 install:
@@ -55,8 +57,7 @@ install:
           git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b master sollya_git;
           cd sollya_git && sh autogen.sh && ./configure && make && make install && cd ..;
 
-          git clone https://gitlab.com/metalibm-dev/pythonsollya.git;
-          cd pythonsollya && make install && make test && cd ..;
+          pip install git+https://gitlab.com/metalibm-dev/pythonsollya;
         else
           echo "Sollya not installed yet";
         fi
