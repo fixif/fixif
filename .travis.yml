@@ -28,7 +28,7 @@ before_install:
     else
       brew update;
       brew upgrade python;
-      brew upgrade yacc;
+      brew upgrade bison;
       PATH=/usr/local/opt/python/libexec/bin:$PATH;
     fi
 
