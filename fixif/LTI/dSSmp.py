@@ -4,7 +4,7 @@ _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
 __credits__ = ["Anastasia Volkova"]
 
-__license__ = "CECILL-C"
+__license__ = "GPL v3"
 __version__ = "0.4"
 __maintainer__ = "Anastasia Volkova"
 __email__ = "Anastasia.Volkova@lip6.fr"

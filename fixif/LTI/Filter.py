@@ -8,7 +8,7 @@ __author__ = "Thibault Hilaire"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
 __credits__ = ["Thibault Hilaire"]
 
-__license__ = "CECILL-C"
+__license__ = "GPL v3"
 __version__ = "0.4"
 __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
