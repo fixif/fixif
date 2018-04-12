@@ -140,6 +140,7 @@ class dTF(object):
 		Parameters
 		----------
 		other: dTF object
+		eps:
 		"""
 		# add zeros for the smallest (in size) numerator so that the comparison can be done
 		max_order = max( self.order, other.order)+1

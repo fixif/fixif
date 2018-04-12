@@ -459,8 +459,8 @@ class dSSmp(object):
 				yk[:, i] = mpf_matrix_fmul(self._C, xk)
 				yk[:, i] = mpf_matrix_fadd(yk[:, i], mpf_matrix_fmul(self._D, u[:, i]))
 
-				for i in range(0, xk.rows):
-					xk[i, 0] = mpmath.fadd(xkp1[i, 0], mpmath.mp.zero, prec=64, rounding='n')
+			for i in range(0, xk.rows):
+				xk[i, 0] = mpmath.fadd(xkp1[i, 0], mpmath.mp.zero, prec=64, rounding='n')
 
 
 		return yk

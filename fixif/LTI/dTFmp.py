@@ -35,7 +35,7 @@ class dTFmp(object):
 				b = python2mpf_matrix(b)
 				a = python2mpf_matrix(a)
 			else:
-				raise ValueError('Cannot create a dTFmp object: expected mpmath.matrix or numpy.matrix arguments but instead got %s and %s' % type(b), type(a))
+				raise ValueError('Cannot create a dTFmp object: expected mpmath.matrix or numpy.matrix arguments but instead got %s and %s' % (type(b), type(a)))
 
 		#check if user gave transposed matrices
 		if b.cols > 1 and b.rows == 1:

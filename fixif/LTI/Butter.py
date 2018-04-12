@@ -37,6 +37,7 @@ class Butter(Filter):
 
 		Returns a Butter object (Filter)
 		"""
+		# TODO: call the constructor of Filter !!
 		self._stable = True
 		self._butterworth = True
 		self._dSS = None
@@ -67,9 +68,9 @@ def iter_random_Butter( number, n=(5,10), Wc=(0.1,0.8), W1=(0.1,0.5), W2=(0.5,0.
 		- seeded: (boolean) indicates if the random dSS should be done with a particular seed or not (in order to be reproductible, the seed is stored in the name of the filter)
 
 	"""
-	seeds = [randint(0, 1e9) if seeded else None for i in range(number)]  # generate a particular seed for each random dSS, or None (if seeded is set to False)
+	seeds = [randint(0, 1e9) if seeded else None for _ in range(number)]  # generate a particular seed for each random dSS, or None (if seeded is set to False)
 	for s in seeds:
-		yield random_Butter(n=n, Wc=Wc, form=form, onlyEven=onlyEven, seed=s)
+		yield random_Butter(n=n, Wc=Wc, W1=W1, W2=W2, form=form, onlyEven=onlyEven, seed=s)
 
 
 

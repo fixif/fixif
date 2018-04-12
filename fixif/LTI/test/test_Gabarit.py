@@ -80,14 +80,14 @@ def test_GabaritConstruction():
 
 
 @mark.parametrize("g", iterSimpleGabarit(), ids='')
-@mark.parametrize("type", ('butter', 'cheby1', 'cheby2', 'ellip'))
+@mark.parametrize("ftype", ('butter', 'cheby1', 'cheby2', 'ellip'))
 #@mark.parametrize("type", ['ellip'])
 @mark.parametrize("method", ('matlab','scipy'))
-def test_Gabarit_to_dTF(g,type,method):
+def test_Gabarit_to_dTF(g,ftype,method):
 	"""
 	Test if the conversion to_dTF works for matlab/scipy and various types
 	"""
-	H = g.to_dTF(method=method, ftype=type, designMargin=1e-3)
+	H = g.to_dTF(method=method, ftype=ftype, designMargin=1e-3)
 	print(H)
 	# check it's in the gabarit +/- 1dB
 	#assert(g.check_dTF(H,margin=0)[0])

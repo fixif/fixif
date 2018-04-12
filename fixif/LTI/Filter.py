@@ -141,7 +141,7 @@ class Filter(object):
 
 
 
-def iter_random_Filter( number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True, type='all'):
+def iter_random_Filter( number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True, ftype='all'):
 	"""
 	Generate some n-th order stable random filter
 	Parameters
@@ -158,14 +158,14 @@ def iter_random_Filter( number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True
 	"""
 	pq = {'SISO':( (1,2), (1,2) ), 'SIMO': (p,(1,2)), 'MISO': ((1,2),q), 'MIMO': (p,q)}
 
-	seeds = [randint(0, 1e9) if seeded else None for i in range(number)]  # generate a particular seed for each random dSS, or None (if seeded is set to False)
+	seeds = [randint(0, 1e9) if seeded else None for _ in range(number)]  # generate a particular seed for each random dSS, or None (if seeded is set to False)
 
 	for s in seeds:
-		if type not in pq.keys():
-			type = choice( list(pq.keys()) )
+		if ftype not in pq.keys():
+			ftype = choice( list(pq.keys()) )
 		nn = randint(*n)
-		pp = randint(*pq[type][0])
-		qq = randint(*pq[type][1])
+		pp = randint(*pq[ftype][0])
+		qq = randint(*pq[ftype][1])
 		yield random_Filter(n=nn, p=pp, q=qq, seed=s)
 
 

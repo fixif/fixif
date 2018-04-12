@@ -108,7 +108,7 @@ class Band(object):
 		try:
 			stopGain = self._stopGain-other if self._stopGain else None
 			passGains = (self._passGains[0]-other, self._passGains[1]-other) if self._passGains else None
-		except Exception as e:
+		except Exception:
 			raise ValueError("The gain should be a constant")
 		return Band(self._Fs, self._F1, self._F2, passGains or stopGain)
 
@@ -454,8 +454,6 @@ def random_Gabarit(form=None, seed=None):
 		form = choice(("lowpass"))
 
 	Fs = randint(500,100000)
-	bands = []
-	Gains = []
 
 	# lowpass
 	if form=='lowpass':

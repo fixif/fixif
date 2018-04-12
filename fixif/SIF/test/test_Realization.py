@@ -53,7 +53,7 @@ def test_construction(S):
 #N = 10
 #u = 300 * rand(1,N)# random input of N samples
 
-@pytest.mark.parametrize( "F", iter_random_Filter(5, type='SISO'), ids=lambda x: x.name)
+@pytest.mark.parametrize( "F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
 #@pytest.mark.parametrize( "F", [ random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
 def test_implementCdouble(F):
 

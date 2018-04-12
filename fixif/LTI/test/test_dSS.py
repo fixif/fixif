@@ -17,21 +17,18 @@ __status__ = "Beta"
 
 import numpy
 
-#from fixif.SIF import SIF
-
 import pytest
 import mpmath
 from numpy import array, zeros, absolute, eye, all
 from numpy import matrix as mat
 from numpy.linalg import eigvals
 from numpy.testing import assert_allclose
-from numpy.random import seed, randint
+from numpy.random import randint
 
-from fixif.LTI import dSS, random_dSS, iter_random_dSS, iter_random_dTF, random_dTF
-from fixif.func_aux import python2mpf_matrix, mpf_to_numpy
+from fixif.LTI import dSS, random_dSS, iter_random_dSS
 
 
-#FIXME: move this test somewhere else...
+# FIXME: move this test somewhere else...
 def test_construct_sollya_slycot(capsys):
 	# tell if sollya or slycot are disabled
 	with capsys.disabled():
@@ -137,9 +134,9 @@ def test_Gramians ( S ):
 	S._Wc = None
 	S._Wo = None
 	with pytest.raises(ValueError):
-		t = S.Wc
+		S.Wc
 	with pytest.raises(ValueError):
-		t = S.Wo
+		S.Wo
 
 	dSS._W_method = 'slycot'
 
@@ -175,8 +172,6 @@ def test_wcpg (S):
 			powerA = powerA * S.A
 
 		return res + absolute(S.D)
-
-	S = random_dSS(5,1,1)
 
 	nit = 5000
 	rel_tol_wcpg = 1e-5
@@ -229,7 +224,7 @@ def test_balanced( S ):
 		import slycot   # ununsed, but just to know if slycot exists
 	except ImportError:
 		with pytest.raises(ImportError):
-			Sb = S.balanced()
+			S.balanced()
 	else:
 		Sb = S.balanced()
 		# check if S and Sb represent the same systems
