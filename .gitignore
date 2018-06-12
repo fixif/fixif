@@ -75,8 +75,10 @@ target/
 # pyCharm
 .idea
 
+#pytest
+.pytest_cache/
 
-# FIPOGEN
+# Fixif
 generated/code
 generated/LaTeX
 generated/latex
