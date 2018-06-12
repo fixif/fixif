@@ -23,14 +23,14 @@ from numpy.linalg import inv, solve
 from numpy.linalg.linalg import LinAlgError
 from scipy.linalg import solve_discrete_lyapunov
 
-from copy import copy
-#from scipy.weave import inline
 from scipy.signal import ss2tf
 from numpy.core.umath import pi, cos, sin
 from numpy.random.mtrand import randint, rand, randn
 import numpy
 from itertools import chain
 from numpy.testing import assert_allclose
+
+from fixif.WCPG import WCPG_ABCD
 
 try:
 	from slycot import sb03md, ab09ad
@@ -133,7 +133,7 @@ class dSS(object):
 
 	@property
 	def p(self):
-		"""Returns the nunmber of outputs"""
+		"""Returns the number of outputs"""
 		return self._p
 
 	@property
@@ -395,6 +395,7 @@ class dSS(object):
 
 		return self._WCPG
 
+
 	def WCPG(self):
 		r"""
 		Compute the Worst Case Peak Gain of the state space
@@ -402,36 +403,12 @@ class dSS(object):
 		.. math::
 			\langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
 
-		Using algorithm developed in paper :
-		[CIT001]_
-
-		.. [CIT001]
-			Lozanova & al., calculation of WCPG
+		Using algorithm developed in paper, and implement in the WCPG library (and its Python wrapper) :
 
 		"""
 		# compute the WCPG value if it's not already done
 		if self._WCPG is None:
-
-			try:
-				# noinspection PyUnusedLocal
-				A, B, C, D = array(self._A), array(self._B), array(self._C), array(self._D)
-				n, p, q = self.size
-				W = empty((p, q), dtype=float64)
-
-				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q);"
-				support = 'extern "C" int WCPG_ABCD(double *W, double *A, double *B, double *C, double *D, ' \
-				        'uint64_t n, uint64_t p, uint64_t q);'
-				err = inline(code, ['W', 'A', 'B', 'C', 'D', 'n', 'p', 'q'], support_code=support, libraries=["WCPG"])
-				if err == 0:
-					# change numpy display formatter, so that we can display the full coefficient in hex
-					# (equivalent to printf("%a",...) in C)
-					set_printoptions(formatter={'float_kind': lambda x: x.hex()})
-					print(self)
-					raise ValueError("WCPG: cannot compute WCPG")
-				self._WCPG = mat(W)
-			except:
-				raise ValueError("dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
-
+			self._WCPG = WCPG_ABCD(self._A, self._B, self._C, self._D)
 		return self._WCPG
 
 
@@ -772,8 +749,8 @@ def iter_random_dSS(number, stable=True, n=(5, 10), p=(1, 5), q=(1, 5),
 		- number: number of state-space to generate
 		- stable: indicate if the state-spaces are stable or not
 		- n: tuple (mini,maxi) number of states (default:  random between 5 and 10)
-		- p: number of outputs (default: 1)
-		- q: number of inputs (default: 1)
+		- p: 1 or a tuple (mini,maxi) number of outputs (default: 1)
+		- q: 1 or a tuple (mini,maxi) number of inputs (default: 1)
 
 		- pRepeat: Probability of repeating a previous root (default: 0.01)
 		- pReal: Probability of choosing a real root (default: 0.5). Note that when choosing a complex root,

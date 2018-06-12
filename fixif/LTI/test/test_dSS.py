@@ -176,8 +176,9 @@ def test_wcpg (S):
 	nit = 5000
 	rel_tol_wcpg = 1e-5
 
-	wcpg = calc_wcpg_approx(S, nit)
+
 	W = S.WCPG()
+	wcpg = calc_wcpg_approx(S, nit)
 
 	assert_allclose( array(W), array(wcpg), rtol=rel_tol_wcpg)
 
