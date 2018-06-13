@@ -21,7 +21,7 @@ from numpy import eye, zeros
 
 
 
-def makeSS( filter, form=None ):
+def makeSS(filt, form=None):
 	"""
 	Factory function to make a state-space Realization
 
@@ -32,12 +32,12 @@ def makeSS( filter, form=None ):
 	- a dictionary of necessary infos to build the Realization
 	"""
 
-	if form==None:
-		S = filter.dSS
-	elif form=='balanced':
-		S = filter.dSS.balanced()
-	elif form=='ctrl' or form=='obs':
-		S = filter.dTF.to_dSS(form)
+	if form is None:
+		S = filt.dSS
+	elif form == 'balanced':
+		S = filt.dSS.balanced()
+	elif form == 'ctrl' or form == 'obs':
+		S = filt.dTF.to_dSS(form)
 	else:
 		raise ValueError("State-Space: the form '%s' is invalid. Must be in (None, 'balanced', 'ctrl', 'obs')"%form)
 
@@ -49,16 +49,16 @@ def makeSS( filter, form=None ):
 
 
 
-def acceptSS(filter, form):
+def acceptSS(filt, form ):
 	"""
 	The forms 'ctrl' and 'obs' cannot be applied for SISO filters
 	'balanced' form is for stable filter
 	otherwise, it can always be used
 	"""
-	if form=='balanced':
-		return filter.isStable()
-	if form=='ctrl' or form=='obs':
-		return filter.isSISO()
+	if form == 'balanced':
+		return filt.isStable()
+	if form == 'ctrl' or form == 'obs':
+		return filt.isSISO()
 
 	# otherwise
 	return True
@@ -68,6 +68,6 @@ def acceptSS(filter, form):
 try:
 	import slycot
 except ImportError:
-	State_Space = Structure(shortName="SS", fullName="State-Space", options={ 'form': (None, 'ctrl', 'obs') }, make=makeSS, accept=acceptSS)
+	State_Space = Structure(shortName="SS", fullName="State-Space", options={'form': (None, 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
 else:
-	State_Space = Structure( shortName="SS", fullName="State-Space", options={ 'form': (None, 'balanced', 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
+	State_Space = Structure( shortName="SS", fullName="State-Space", options={'form': (None, 'balanced', 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
