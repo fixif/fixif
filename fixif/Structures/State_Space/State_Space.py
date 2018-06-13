@@ -41,9 +41,9 @@ def makeSS(filt, form=None):
 	else:
 		raise ValueError("State-Space: the form '%s' is invalid. Must be in (None, 'balanced', 'ctrl', 'obs')"%form)
 
-	n,p,q = S.size
+	n, p, q = S.size
 	l = 0
-	JtoS = ( eye((l)), zeros((n,l)), zeros((p,l)), zeros((l,n)), zeros((l,q)), S.A, S.B, S.C, S.D )
+	JtoS = (eye(l), zeros((n,l)), zeros((p,l)), zeros((l,n)), zeros((l,q)), S.A, S.B, S.C, S.D)
 
 	return {"JtoS": JtoS}
 
@@ -51,7 +51,7 @@ def makeSS(filt, form=None):
 
 def acceptSS(filt, form ):
 	"""
-	The forms 'ctrl' and 'obs' cannot be applied for SISO filters
+	The forms 'ctrl' and 'obs' cannot be applied to MIMO filters
 	'balanced' form is for stable filter
 	otherwise, it can always be used
 	"""
