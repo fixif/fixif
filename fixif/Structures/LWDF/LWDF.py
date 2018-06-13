@@ -39,6 +39,7 @@ try:
 			MH = MatlabHelper()
 			eng = MH.engine
 
+			# TODO: correct this shit !
 			#we suppose that we start in the root of the git repository, i.e. at yourlocalpath/fipogen
 			p = os.getcwd() + '/construct/fwrtoolbox/FWRToolbox/'
 			eng.cd(p)
@@ -56,17 +57,17 @@ try:
 			raise ValueError('Could not create the LWDF structure using matlab.\n')
 
 		# build SIF
-		return { "JtoS": ( (mat(R['J']), mat(R['K']), mat(R['L']), mat(R['M']), mat(R['N']), mat(R['P']), mat(R['Q']), mat(R['R']), mat(R['S'])) ) }
+		return {"JtoS": (mat(R['J'], mat(R['K']), mat(R['L']), mat(R['M']), mat(R['N']), mat(R['P']), mat(R['Q']), mat(R['R']), mat(R['S'])))}
 
 
 
-	def acceptLWDF(filter):
+	def acceptLWDF(filt ):
 		"""
 		a LWDF realization can be build only if the filter is SISO and has EVEN order
 		"""
-		return (filter.dSS._n%2 == 1) and (filter.dSS._p == 1) and (filter.dSS._q == 1)
+		return (filt.order % 2 == 1) and filt.isSISO()
 
-	LWDF = Structure( shortName='LWDF', fullName="Lattice Wave Digital Filter", make=makeLWDF, accept=acceptLWDF)
+	LWDF = Structure(shortName='LWDF', fullName="Lattice Wave Digital Filter", make=makeLWDF, accept=acceptLWDF)
 
 except ImportError:
 	#matlab Python engine is not installed
