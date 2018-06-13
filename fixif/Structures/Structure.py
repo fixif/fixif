@@ -16,7 +16,7 @@ To Build a structure, we should
 """
 
 __author__ = "Thibault Hilaire"
-__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__copyright__ = "Copyright 2015, FiXiF project, LIP6"
 __credits__ = ["Thibault Hilaire", "Chevrel Philippe"]
 
 __license__ = "GPL v3"
@@ -29,6 +29,7 @@ __status__ = "Beta"
 from itertools import product      #izip for Python 2.x
 from fixif.SIF import Realization
 from fixif.LTI.Filter import iter_random_Filter
+
 
 class Structure(object):
 	"""
@@ -56,17 +57,33 @@ class Structure(object):
 	def name(self):
 		return self._fullName
 
+	@property
+	def options(self):
+		return self._options
 
-	def canAcceptFilter(self, filter, **options):
+	@classmethod
+	def iterAllStructures(cls ):
+		return cls._allStructures.values()
+
+	@classmethod
+	def getFromName(cls, name):
+		"""Get a structure from its name"""
+		if name in cls._allStructures:
+			return cls._allStructures[name]
+		else:
+			raise ValueError("Structure: the realization '%s' doesn't exist (must be in {%s})", name, ", ".join(cls._allStructures.keys()))
+
+
+	def canAcceptFilter(self, filt, **options ):
 		"""
 		Indicates if the structure is able to implement the filter
 		(some structures cannot implement MIMO filters, some are dedicated to butterworth, etc.)
 		Returns a boolean
 		"""
-		return self._accept( filter, **options)
+		return self._accept(filt, **options)
 
 
-	def makeRealization(self, filter, **options):
+	def makeRealization(self, filt, **options ):
 		"""
 		Factory function
 		Return the structured realization of a given filter
@@ -74,11 +91,11 @@ class Structure(object):
 		if no value is passed for a given option, the DEFAULT value for is option (FIRST value in the tuple of possible values) is chosen
 		"""
 		if self._options:
-			Ropt = { k:v[0] for k,v in self._options.items() }
+			Ropt = {k:v[0] for k,v in self._options.items()}
 		else:
 			Ropt = {}
 
-		#TODO: vérifier les options correctement (faut-il rajouter aussi les paramètres? voir la rhoDFIIt qui peut avoir besoin de paramètres comme les gammas)
+		#TODO: check correctly the options (should we also add the parameters ? see the rhoDFIIt that can require some extra parameters like the gammas)
 		# # check the options
 		for opt, val in options.items():
 		# 	if self._options is None:
@@ -91,21 +108,22 @@ class Structure(object):
 		 	Ropt[opt] = val
 
 		# call the "factory" function
-		d = self._make( filter, **Ropt)
-		structName = self._fullName + " (" + ", ".join( '%s:%s'%(key,str(val)) for key,val in Ropt.items() ) + ")"
+		d = self._make( filt, **Ropt)
+		structName = self._fullName + " (" + ", ".join('%s:%s'%(key,str(val)) for key, val in Ropt.items()) + ")"
 
 		# build the realization
-		return Realization( filter, structureName = structName, **d)
+		return Realization(filt, structureName=structName, **d)
+
 
 	def __call__(self, *args, **kwargs):
 		"""
 		Call the factory
 		StateSpace(filter, ...) is equivalent to StateSpace.makeRealization(filter,...)
 		"""
-		return self.makeRealization( *args, **kwargs)
+		return self.makeRealization(*args, **kwargs)
 
 
-def iterAllRealizations(filter):
+def iterAllRealizations(filt):
 	"""
 	Iterate over all the possible structures, to build (and return through a generator) all the possible realization
 	of a given Filter filter (lti)
@@ -125,37 +143,37 @@ def iterAllRealizations(filter):
 	(ie Direct Form I (with nbSum=1 and also nbSum=2), State-Space (balanced, canonical observable form, canonical controlable, etc.), etc.)
 
 	"""
-	for st in Structure._allStructures.values():
-		if st._options:
+	for st in Structure.iterAllStructures():
+		if st.options:
 			# list of all the possible values for dictionnary
 			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
-			vl = ( dict(zip(st._options, x)) for x in product(*st._options.values()) )
+			vl = (dict(zip(st.options, x)) for x in product(*st.options.values()))
 			for options in vl:
-				if st.canAcceptFilter(filter, **options):
-					yield st.makeRealization(filter, **options)
+				if st.canAcceptFilter(filt, **options):
+					yield st.makeRealization(filt, **options)
 		else:
-			if st.canAcceptFilter(filter):
-				yield st.makeRealization(filter)
+			if st.canAcceptFilter(filt):
+				yield st.makeRealization(filt)
 
 
-
-def iterStructuresAndOptions(fakeFilter):
-	"""
-	Iterate over all the possibles structures
-	fakeFilter is used to determine the options
-	Returns a 2-tuple (structure,options)
-	"""
-	for st in Structure._allStructures.values():
-		if st._options:
-			# list of all the possible values for dictionnary
-			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
-			vl = ( dict(zip(st._options, x)) for x in product(*st._options.values()) )
-			for options in vl:
-				if st.canAcceptFilter(fakeFilter, **options):
-					yield st, options
-		else:
-			if st.canAcceptFilter(fakeFilter):
-				yield st, options
+# TODO: check if this is really unused (if yes, then remove)
+# def iterStructuresAndOptions(filt):
+# 	"""
+# 	Iterate over all the possibles structures
+# 	filt is used to determine the options
+# 	Returns a 2-tuple (structure,options)
+# 	"""
+# 	for st in Structure.iterAllStructures():
+# 		if st.options:
+# 			# list of all the possible values for dictionnary
+# 			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
+# 			vl = ( dict(zip(st.options, x)) for x in product(*st.options.values()))
+# 			for options in vl:
+# 				if st.canAcceptFilter(filt, **options):
+# 					yield st, options
+# 		else:
+# 			if st.canAcceptFilter(filt):
+# 				yield st, st.options
 
 
 
@@ -165,7 +183,7 @@ def iterAllRealizationsRandomFilter(number, n = (5, 10), p = (1, 5), q = (1, 5),
 	it just call iterAllRealization for all the random filters
 	Parameters are those of iter_random_Filter
 	"""
-	for F in iter_random_Filter( number, n, p, q, seeded, type):
+	for F in iter_random_Filter(number, n, p, q, seeded, type):
 		for R in iterAllRealizations(F):
 			yield R
 
@@ -173,7 +191,7 @@ def iterAllRealizationsRandomFilter(number, n = (5, 10), p = (1, 5), q = (1, 5),
 
 
 
-def makeARealization( filter, realizationName, **options):
+def makeARealization(filt, realizationName, **options ):
 	"""
 	Factory function to make a realization given its name (among 'DirectForms', 'DFII', etc.)
 
@@ -183,9 +201,5 @@ def makeARealization( filter, realizationName, **options):
 
 	print the Direct Form I transposed realization of the filter
 	"""
-	try:
-		R = Structure._allStructures[ realizationName]
-	except:
-		raise ValueError( "Structure: the realization '%s' doesn't exist (must be in {%s}", realizationName, ", ".join(Structure._allStructures.keys()))
-
-	return R.makeRealization( filter, **options)
+	S = Structure.getByName(realizationName)
+	return S.makeRealization( filt, **options)
