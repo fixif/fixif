@@ -109,7 +109,7 @@ class dTF(object):
 			C = mat( fliplr( self.num[0,1:] ) - fliplr( self.den[0,1:] )*self.num[0,0] )
 			D = mat( atleast_2d(self.num[0,0]) )
 		elif form=='obs':
-			#TODO!!
+			# TODO: check!!
 			A,B,C,D = tf2ss( array(self.num)[0,:], array(self.den)[0,:] )
 		else:
 			raise ValueError( 'dTF.to_dSS: the form "%s" is invalid (must be "ctrl" or "obs")'%form )
