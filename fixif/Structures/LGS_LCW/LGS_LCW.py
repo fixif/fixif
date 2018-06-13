@@ -23,11 +23,12 @@ import numpy as np
 import scipy as sp
 import random as rd
 from numpy import linalg as la
-from numpy.linalg import inv  # Calcule l'inverse d'une matrice
+from numpy.linalg import inv
 from numpy import eye
-from math import sqrt  # Racine carrée
+from math import sqrt
 from scipy import signal
-from scipy.io import savemat, loadmat
+
+
 
 np.set_printoptions(suppress=True)
 
@@ -369,21 +370,21 @@ def makeLCW(filt, transposed=False):
 	#TODO: use transposed ???
 
 	# return useful infos to build the Realization
-	return { "JtoS": JtoS }
+	return {"JtoS": JtoS}
 
 
 
 def acceptLGSLCW(filt, **options):
 	"""
-	return True only if the filter is SISO
+	return True only if the filter is SISO and stable
 	"""
 	return filt.isSISO() and filt.isStable()
 
 
 # build the Direct Form I
 # as an instance of the class structure
-LGS = Structure( shortName='LGS', fullName="Li-Gevers-Sun", options={ "transposed" : (False,True) }, make=makeLGS, accept=acceptLGSLCW)
-LCW = Structure( shortName='LCW', fullName="Li-Chu-Wu", options={ "transposed" : (False,True) }, make=makeLCW, accept=acceptLGSLCW)
+LGS = Structure(shortName='LGS', fullName="Li-Gevers-Sun", options={"transposed": (False,True)}, make=makeLGS, accept=acceptLGSLCW)
+LCW = Structure(shortName='LCW', fullName="Li-Chu-Wu", options={"transposed": (False,True)}, make=makeLCW, accept=acceptLGSLCW)
 
-#TODO: relire, recommenter en anglais, virer les listes (et mettre du numpy matrix à la place), etc.
-#TODO: et bien sûr, passer en multiprécision (et un jour savoir quelle précision est suffisante...)
+#TODO: read, comment in english, remove the lists (and use numpy matrix instead), etc.
+#TODO: and of course, use multiprecision (if one day we know wich precision is enough...)
