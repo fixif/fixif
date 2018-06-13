@@ -1,4 +1,4 @@
-#coding: UTF8
+# coding: UTF8
 
 """
 This file contains rho Direct Form II structure
@@ -15,23 +15,20 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-
-
 from fixif.Structures.Structure import Structure
 from fixif.LTI import dSS
 from numpy import mat, array_equal
-from numpy import zeros,  poly, sqrt, prod, transpose, diagflat, r_, c_, ones, atleast_2d, eye
+from numpy import zeros, poly, sqrt, prod, transpose, diagflat, r_, c_, ones, atleast_2d, eye
 from numpy import matrix as mat
 from numpy.linalg import inv
 from math import floor, log
 
 
-def floor2( x):
+def floor2(x):
 	"""
 	Compute the power of two just below x
 	"""
-	return 2**floor(log(x,2))
-
+	return 2 ** floor(log(x, 2))
 
 
 def makerhoDFII(filt, gamma=None, Delta=None, transposed=True, scaling=None, equiv_dSS=False):
@@ -54,9 +51,8 @@ def makerhoDFII(filt, gamma=None, Delta=None, transposed=True, scaling=None, equ
 
 	n = filt.order
 	if gamma is None:
-		gamma = ones( (1,n) )
+		gamma = ones((1, n))
 	gamma = mat(gamma)
-
 
 	# =====================================
 	#  Step 1: build Valapha_bar, Vbeta_bar
@@ -68,17 +64,17 @@ def makerhoDFII(filt, gamma=None, Delta=None, transposed=True, scaling=None, equ
 	Vb = transpose(filt.dTF.num)
 
 	# Build Tbar
-	Tbar = mat(zeros( (n+1,n+1) ))
+	Tbar = mat(zeros((n + 1, n + 1)))
 	Tbar[n, n] = 1
-	for i in range(n-1, -1, -1):
-		Tbar[i, i:n+1] = poly( gamma[0,i:n].A1 )
+	for i in range(n - 1, -1, -1):
+		Tbar[i, i:n + 1] = poly(gamma[0, i:n].A1)
 
 	# Valpha_bar, Vbeta_bar
 	Valpha_bar = transpose(inv(Tbar)) * Va
 	Vbeta_bar = transpose(inv(Tbar)) * Vb
 
 	# Equivalent state space (Abar, Bbar, Cbar, Dbar)
-	A0 = diagflat(mat(ones( (n-1, 1) )), 1)
+	A0 = diagflat(mat(ones((n - 1, 1))), 1)
 	A0[:, 0] = - Valpha_bar[1:, 0]
 	Abar = diagflat(gamma) + A0
 	Bbar = Vbeta_bar[1:, 0] - Vbeta_bar[0, 0] * Valpha_bar[1:, 0]
@@ -86,54 +82,51 @@ def makerhoDFII(filt, gamma=None, Delta=None, transposed=True, scaling=None, equ
 	Cbar[0, 0] = 1
 	Dbar = Vbeta_bar[0, 0]
 
-
 	# ============================================
 	# Step 2: Compute Delta according to scaling
-	#	(when Delta is not given)
+	# (when Delta is not given)
 	# ============================================
 
 	if Delta is None:
-		#We need to compute the Deltas, according to the option 'scaling'
+		# We need to compute the Deltas, according to the option 'scaling'
 
 		if scaling is None:
-			Delta = ones( (1,n) )
+			Delta = ones((1, n))
 
 		else:
 			Wc = dSS(Abar, Bbar, Cbar, Dbar).Wc
-			Delta = zeros( (1,n) )
+			Delta = zeros((1, n))
 			if scaling == 'l2':
 				# compute the Deltas that perform a l2-scaling (see Li04b)
-				Delta[0, 0] = sqrt( Wc[0, 0])
+				Delta[0, 0] = sqrt(Wc[0, 0])
 				for i in range(1, n):
-					Delta[0, i] = sqrt(Wc[i, i] / Wc[i-1, i-1])
+					Delta[0, i] = sqrt(Wc[i, i] / Wc[i - 1, i - 1])
 
 			elif scaling == 'l2-relaxed':
 				# compute the Deltas that perform a l2-scaling (see Hila09b)
-				Delta[0, 0] = floor2( sqrt (Wc[0, 0]) )
+				Delta[0, 0] = floor2(sqrt(Wc[0, 0]))
 				for i in range(1, n):
-					Delta[0, i] = floor2( sqrt(Wc[i, i] / Wc[i-1, i-1]) )
+					Delta[0, i] = floor2(sqrt(Wc[i, i] / Wc[i - 1, i - 1]))
 
 			else:
-				raise ValueError( "rhoDFII: the `scaling` parameter should be None, 'l2' or 'l2-relaxed'")
+				raise ValueError("rhoDFII: the `scaling` parameter should be None, 'l2' or 'l2-relaxed'")
 
 	# ============================================
 	# Step 3: Compute the coefficients (Valpha, Vbeta
 	# ============================================
 
-
 	# compute Valpha and Vbeta
 	#  compute Tbar
-	Tbar = mat(zeros( (n+1, n+1) ))
+	Tbar = mat(zeros((n + 1, n + 1)))
 	Tbar[n, n] = 1
 
-	for i in range( n-1, -1, -1):
-		Tbar[i, i:n + 1] = poly( gamma[0, i:n].A1 ) / prod( Delta[0, i:n])
+	for i in range(n - 1, -1, -1):
+		Tbar[i, i:n + 1] = poly(gamma[0, i:n].A1) / prod(Delta[0, i:n])
 
-	Ka = prod(Delta[0,:])
+	Ka = prod(Delta[0, :])
 
-	Valpha = transpose( inv( Ka*Tbar ) ) * Va
-	Vbeta = transpose( inv( Ka*Tbar ) ) * Vb
-
+	Valpha = transpose(inv(Ka * Tbar)) * Va
+	Vbeta = transpose(inv(Ka * Tbar)) * Vb
 
 	# ============================
 	# Step 4 : build SIF
@@ -142,15 +135,15 @@ def makerhoDFII(filt, gamma=None, Delta=None, transposed=True, scaling=None, equ
 	if equiv_dSS:
 
 		# Equivalent state space (A, B, C, D)
-		A0 = diagflat(mat(ones( (n-1, 1) )), 1)
+		A0 = diagflat(mat(ones((n - 1, 1))), 1)
 		A0[:, 0] = - Valpha[1:, 0]
 		Arho = diagflat(gamma) + A0 * diagflat(Delta)
 		Brho = Vbeta[1:, 0] - Vbeta[0, 0] * Valpha[1:, 0]
 		Crho = mat(zeros((1, n)))
-		Crho[0, 0] = Delta[0,0]
+		Crho[0, 0] = Delta[0, 0]
 		Drho = mat(Vbeta[0, 0])
 
-		J = eye((0))
+		J = eye(0)
 		K = zeros((n, 0))
 		L = zeros((1, 0))
 		M = zeros((0, n))
@@ -160,55 +153,51 @@ def makerhoDFII(filt, gamma=None, Delta=None, transposed=True, scaling=None, equ
 		R = Crho
 		S = Drho
 
-		#TODO: build dJtodS matrix, according to gammaExact and DeltaExact options
+	# TODO: build dJtodS matrix, according to gammaExact and DeltaExact options
 
 	else:
-		if array_equal(Delta, ones( (1,n) )):
+		if array_equal(Delta, ones((1, n))):
 			# specific SIF when the Delta are all equal to 1 (the temporary variables are not necessary, since t_i = x_i * Delta_i)
 			J = mat(1)
-			K = -Valpha[1:n+1, 0]
+			K = -Valpha[1:n + 1, 0]
 			L = mat(1)
-			M = c_[ atleast_2d(1), zeros((1, n-1)) ]
-			N = mat(Vbeta[0,0])
-			P = mat(diagflat(Delta)) + mat(diagflat(ones( (1, n-1) ), 1))
-			Q = Vbeta[1:n+1, 0]
-			R = zeros( (1,n) )
+			M = c_[atleast_2d(1), zeros((1, n - 1))]
+			N = mat(Vbeta[0, 0])
+			P = mat(diagflat(Delta)) + mat(diagflat(ones((1, n - 1)), 1))
+			Q = Vbeta[1:n + 1, 0]
+			R = zeros((1, n))
 			S = mat(0)
 
 		else:
 			J = eye(n)
-			K = mat(diagflat(ones( (1, n-1) ), 1))
-			K[:,0] = -Valpha[1:n+1, 0]
-			L = c_[ atleast_2d(1), zeros((1, n-1)) ]
+			K = mat(diagflat(ones((1, n - 1)), 1))
+			K[:, 0] = -Valpha[1:n + 1, 0]
+			L = c_[atleast_2d(1), zeros((1, n - 1))]
 			M = mat(diagflat(Delta))
-			N = r_[ atleast_2d(Vbeta[0, 0]), zeros((n-1, 1)) ]
+			N = r_[atleast_2d(Vbeta[0, 0]), zeros((n - 1, 1))]
 			P = mat(diagflat(gamma))
-			Q = Vbeta[1:n+1, 0]
-			R = zeros( (1,n) )
+			Q = Vbeta[1:n + 1, 0]
+			R = zeros((1, n))
 			S = mat(0)
 
 	if not transposed:
 		# matrices J, K, L, M, N, P, Q, R and S were for transposed form
-			K, M = M.transpose(), K.transpose()
-			P = P.transpose()
-			R, Q = Q.transpose(), R.transpose()
-			L, N = N.transpose(), L.transpose()
-			J = J.transpose()
-			S = S.transpose()  # no need to really do this, since S is a scalar
+		K, M = M.transpose(), K.transpose()
+		P = P.transpose()
+		R, Q = Q.transpose(), R.transpose()
+		L, N = N.transpose(), L.transpose()
+		J = J.transpose()
+		S = S.transpose()  # no need to really do this, since S is a scalar
 
-	#TODO: store gamma !!
-	return {"JtoS": (J,K,L,M,N,P,Q,R,S) }
+	# TODO: store gamma !!
+	return {"JtoS": (J, K, L, M, N, P, Q, R, S)}
 
 
-
-def acceptrhoDFII(filter, **options):
+def acceptrhoDFII(filt, **options):
 	"""
 	return True only if the filter is SISO
 	"""
-	return filter.isSISO() and filter.isStable()
+	return filt.isSISO() and filt.isStable()
 
 
-
-
-
-rhoDFII = Structure( shortName="rhoDFII", fullName="rho Direct Form II", options={ 'transposed': (True, False), 'equiv_dSS':(False, True), 'scaling':(None,'l2','l2-relaxed') }, make=makerhoDFII, accept=acceptrhoDFII)
+rhoDFII = Structure(shortName="rhoDFII", fullName="rho Direct Form II", options={'transposed': (True, False), 'equiv_dSS': (False, True), 'scaling': (None, 'l2', 'l2-relaxed')}, make=makerhoDFII, accept=acceptrhoDFII)

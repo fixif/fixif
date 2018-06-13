@@ -25,8 +25,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-
-from itertools import product      #izip for Python 2.x
+from itertools import product  # izip for Python 2.x
 from fixif.SIF import Realization
 from fixif.LTI.Filter import iter_random_Filter
 
@@ -52,7 +51,6 @@ class Structure(object):
 		# store it in the disctionary of existing structures
 		self._allStructures[shortName] = self
 
-
 	@property
 	def name(self):
 		return self._fullName
@@ -62,7 +60,7 @@ class Structure(object):
 		return self._options
 
 	@classmethod
-	def iterAllStructures(cls ):
+	def iterAllStructures(cls):
 		return cls._allStructures.values()
 
 	@classmethod
@@ -73,8 +71,7 @@ class Structure(object):
 		else:
 			raise ValueError("Structure: the realization '%s' doesn't exist (must be in {%s})", name, ", ".join(cls._allStructures.keys()))
 
-
-	def canAcceptFilter(self, filt, **options ):
+	def canAcceptFilter(self, filt, **options):
 		"""
 		Indicates if the structure is able to implement the filter
 		(some structures cannot implement MIMO filters, some are dedicated to butterworth, etc.)
@@ -82,8 +79,7 @@ class Structure(object):
 		"""
 		return self._accept(filt, **options)
 
-
-	def makeRealization(self, filt, **options ):
+	def makeRealization(self, filt, **options):
 		"""
 		Factory function
 		Return the structured realization of a given filter
@@ -91,29 +87,28 @@ class Structure(object):
 		if no value is passed for a given option, the DEFAULT value for is option (FIRST value in the tuple of possible values) is chosen
 		"""
 		if self._options:
-			Ropt = {k:v[0] for k,v in self._options.items()}
+			Ropt = {k: v[0] for k, v in self._options.items()}
 		else:
 			Ropt = {}
 
-		#TODO: check correctly the options (should we also add the parameters ? see the rhoDFIIt that can require some extra parameters like the gammas)
+		# TODO: check correctly the options (should we also add the parameters ? see the rhoDFIIt that can require some extra parameters like the gammas)
 		# # check the options
 		for opt, val in options.items():
-		# 	if self._options is None:
-		# 		raise ValueError( self._shortName + ": the option " + opt + "=" + str(val) + " is not correct")
-		# 	if opt not in self._options:
-		# 		raise ValueError( self._shortName + ": the input argument " + opt + " doesn't exist")
-		# 	if val not in self._options[opt]:
-		# 		raise ValueError( self._shortName + ": the option " + opt + "=" + str(val) + " is not correct")
-		# 	# fill the dictionary of option's value with the options given
-		 	Ropt[opt] = val
+			# 	if self._options is None:
+			# 		raise ValueError( self._shortName + ": the option " + opt + "=" + str(val) + " is not correct")
+			# 	if opt not in self._options:
+			# 		raise ValueError( self._shortName + ": the input argument " + opt + " doesn't exist")
+			# 	if val not in self._options[opt]:
+			# 		raise ValueError( self._shortName + ": the option " + opt + "=" + str(val) + " is not correct")
+			# 	# fill the dictionary of option's value with the options given
+			Ropt[opt] = val
 
 		# call the "factory" function
-		d = self._make( filt, **Ropt)
-		structName = self._fullName + " (" + ", ".join('%s:%s'%(key,str(val)) for key, val in Ropt.items()) + ")"
+		d = self._make(filt, **Ropt)
+		structName = self._fullName + " (" + ", ".join('%s:%s' % (key, str(val)) for key, val in Ropt.items()) + ")"
 
 		# build the realization
 		return Realization(filt, structureName=structName, **d)
-
 
 	def __call__(self, *args, **kwargs):
 		"""
@@ -135,6 +130,8 @@ def iterAllRealizations(filt):
 	-------
 	a generator of
 
+	>>> from fixif.LTI import Filter
+	>>> from fixif.Structures import Structure
 	>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
 	>>> for R in Structure.iterAllRealizations(f):
 	>>>    print(R)
@@ -176,30 +173,28 @@ def iterAllRealizations(filt):
 # 				yield st, st.options
 
 
-
-def iterAllRealizationsRandomFilter(number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True, type='all'):
+def iterAllRealizationsRandomFilter(number, n=(5, 10), p=(1, 5), q=(1, 5), seeded=True, ftype='all'):
 	"""
 	Iterate over all the possible structures (exactly like iterAllRealizations), except that it does it for `number` random filters
 	it just call iterAllRealization for all the random filters
 	Parameters are those of iter_random_Filter
 	"""
-	for F in iter_random_Filter(number, n, p, q, seeded, type):
+	for F in iter_random_Filter(number, n, p, q, seeded, ftype):
 		for R in iterAllRealizations(F):
 			yield R
 
 
-
-
-
-def makeARealization(filt, realizationName, **options ):
+def makeARealization(filt, realizationName, **options):
 	"""
 	Factory function to make a realization given its name (among 'DirectForms', 'DFII', etc.)
 
+	>>> from fixif.LTI import Filter
+	>>> from fixif.Structures import Structure
 	>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
 	>>> R = Structure.makeARealization(f, 'DirectForms', transposed=True)
 	>>> print(R)
 
 	print the Direct Form I transposed realization of the filter
 	"""
-	S = Structure.getByName(realizationName)
-	return S.makeRealization( filt, **options)
+	S = Structure.getFromName(realizationName)
+	return S.makeRealization(filt, **options)

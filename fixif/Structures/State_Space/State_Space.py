@@ -1,4 +1,4 @@
-#coding: UTF8
+# coding: UTF8
 
 """
 This file contains State-Space structure
@@ -15,10 +15,8 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-
 from fixif.Structures.Structure import Structure
 from numpy import eye, zeros
-
 
 
 def makeSS(filt, form=None):
@@ -39,17 +37,16 @@ def makeSS(filt, form=None):
 	elif form == 'ctrl' or form == 'obs':
 		S = filt.dTF.to_dSS(form)
 	else:
-		raise ValueError("State-Space: the form '%s' is invalid. Must be in (None, 'balanced', 'ctrl', 'obs')"%form)
+		raise ValueError("State-Space: the form '%s' is invalid. Must be in (None, 'balanced', 'ctrl', 'obs')" % form)
 
 	n, p, q = S.size
 	l = 0
-	JtoS = (eye(l), zeros((n,l)), zeros((p,l)), zeros((l,n)), zeros((l,q)), S.A, S.B, S.C, S.D)
+	JtoS = (eye(l), zeros((n, l)), zeros((p, l)), zeros((l, n)), zeros((l, q)), S.A, S.B, S.C, S.D)
 
 	return {"JtoS": JtoS}
 
 
-
-def acceptSS(filt, form ):
+def acceptSS(filt, form):
 	"""
 	The forms 'ctrl' and 'obs' cannot be applied to MIMO filters
 	'balanced' form is for stable filter
@@ -70,4 +67,4 @@ try:
 except ImportError:
 	State_Space = Structure(shortName="SS", fullName="State-Space", options={'form': (None, 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
 else:
-	State_Space = Structure( shortName="SS", fullName="State-Space", options={'form': (None, 'balanced', 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
+	State_Space = Structure(shortName="SS", fullName="State-Space", options={'form': (None, 'balanced', 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)

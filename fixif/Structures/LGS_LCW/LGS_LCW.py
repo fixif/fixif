@@ -1,4 +1,4 @@
-#coding=utf8
+# coding=utf8
 
 """
 This file contains LGS and LCW structures
@@ -7,7 +7,7 @@ This file contains LGS and LCW structures
 
 __author__ = "Benoit Lopez, Thibault Hilaire"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
-__credits__ = ["Benoit Lopez", "Thibault Hilaire" ]
+__credits__ = ["Benoit Lopez", "Thibault Hilaire"]
 
 __license__ = "GPL v3"
 __version__ = "0.4"
@@ -15,20 +15,16 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-
 from fixif.Structures.Structure import Structure
-from fixif.LTI import Filter
+
 
 import numpy as np
-import scipy as sp
 import random as rd
 from numpy import linalg as la
 from numpy.linalg import inv
 from numpy import eye
 from math import sqrt
 from scipy import signal
-
-
 
 np.set_printoptions(suppress=True)
 
@@ -42,7 +38,7 @@ def PhiKLD(s):
 	K = sqrt(2) * IAinv * s.B
 	L = sqrt(2) * s.C * IAinv
 	D = s.D - s.C * IAinv * s.B
-	return (Phi, K, L, D)
+	return Phi, K, L, D
 
 
 def PhiKLD_in(alpha, Phi, K, L, D):
@@ -85,7 +81,7 @@ def PhiKLD_in(alpha, Phi, K, L, D):
 	for i in range(LL.size):
 		L_in.append(LL.item(i).real)
 	L_in = np.matrix(L_in)
-	return (Phi_in, K_in, L_in, D)
+	return Phi_in, K_in, L_in, D
 
 
 def ABCd_in(Phi, K, L, D):
@@ -96,7 +92,7 @@ def ABCd_in(Phi, K, L, D):
 	B = sqrt(2) / 2 * (I + A) * K
 	C = sqrt(2) / 2 * L * (I + A)
 	d = D + C * inv(I + A) * B
-	return (A, B, C, d)
+	return A, B, C, d
 
 
 def ABCd_star(A, B, C, d, Phi, K):
@@ -104,7 +100,7 @@ def ABCd_star(A, B, C, d, Phi, K):
 	As = np.transpose(A)
 	Bs = np.transpose(inv(I - Phi)) * np.transpose(C)
 	Cs = sqrt(2) * np.transpose(K)
-	return (As, Bs, Cs, d)
+	return As, Bs, Cs, d
 
 
 def A_decomposition_LGS(alpha, Phi_in):
@@ -117,7 +113,7 @@ def A_decomposition_LGS(alpha, Phi_in):
 	gamma = [1 / (1 + alpha[0] ** 2)]
 	for i in range(1, n - 1):
 		beta.append(-alpha[i] / (1 - alpha[i - 1] * beta[i - 1]))
-		if (i < n - 2):
+		if i < n - 2:
 			gamma.append(1 / (1 - alpha[i] * beta[i]))
 	beta.append(-alpha[n - 1] / (1 + alpha[n - 1] - alpha[n - 2] * beta[n - 2]))
 	gamma.append(1 / (1 + alpha[n - 1] - alpha[n - 2] * beta[n - 2]))
@@ -142,7 +138,7 @@ def A_decomposition_LCW(alpha, Phi_in):
 	gamma = [1 / (1 + alpha[0] ** 2)]
 	for i in range(1, n - 1):
 		beta.append(-alpha[i] / (1 - alpha[i - 1] * beta[i - 1]))
-		if (i < n - 2):
+		if i < n - 2:
 			gamma.append(1 / (1 - alpha[i] * beta[i]))
 	beta.append(-alpha[n - 1] / (1 + alpha[n - 1] - alpha[n - 2] * beta[n - 2]))
 	gamma.append(1 / (1 + alpha[n - 1] - alpha[n - 2] * beta[n - 2]))
@@ -196,7 +192,6 @@ def Matrice_JtoS_LGS(Ad, A_in, B_in, C_in, d):
 	R = C_in
 	S = d
 
-
 	return J, K, L, M, N, P, Q, R, S
 
 
@@ -240,22 +235,22 @@ def Matrice_JtoS_LCW(Ad, As, Bs, Cs, d):
 	Q = Bs
 	R = Cs
 	S = d
-	return (J, K, L, M, N, P, Q, R, S)
+	return J, K, L, M, N, P, Q, R, S
 
 
 def U(i, j, x, n):
 	"""Construit la matrice U(i,j,x) de taille n telle que
 	U est la matric identité et
 	le j-ème élément de la i-ème ligne vaut x."""
-	U = np.eye(n)
-	U[i][j] = x
-	U = np.matrix(U)
-	return U
+	matU = np.eye(n)
+	matU[i][j] = x
+	matU = np.matrix(matU)
+	return matU
 
 
 def JSS_trans(D):
 	"""Calcul la décomposition en fraction continue"""
-	D=list(D.flat)#TODO:ugly!!
+	D = list(D.flat)  # TODO:ugly!!
 	n = len(D)
 	Ol = []
 	El = []
@@ -343,11 +338,10 @@ def makeLGS(filt, transposed=False):
 	# Then, we deduce J to S matrices
 	JtoS = Matrice_JtoS_LGS(Ad, A_in, B_in, C_in, d)
 
-	#TODO: use transposed ???
+	# TODO: use transposed ???
 
 	# return useful infos to build the Realization
-	return { "JtoS": JtoS }
-
+	return {"JtoS": JtoS}
 
 
 def makeLCW(filt, transposed=False):
@@ -367,11 +361,10 @@ def makeLCW(filt, transposed=False):
 	Ad = A_decomposition_LCW(alpha, Phi_in)
 	# On construit les matrices qui forment Z
 	JtoS = Matrice_JtoS_LCW(Ad, As, Bs, Cs, d)
-	#TODO: use transposed ???
+	# TODO: use transposed ???
 
 	# return useful infos to build the Realization
 	return {"JtoS": JtoS}
-
 
 
 def acceptLGSLCW(filt, **options):
@@ -383,8 +376,8 @@ def acceptLGSLCW(filt, **options):
 
 # build the Direct Form I
 # as an instance of the class structure
-LGS = Structure(shortName='LGS', fullName="Li-Gevers-Sun", options={"transposed": (False,True)}, make=makeLGS, accept=acceptLGSLCW)
-LCW = Structure(shortName='LCW', fullName="Li-Chu-Wu", options={"transposed": (False,True)}, make=makeLCW, accept=acceptLGSLCW)
+LGS = Structure(shortName='LGS', fullName="Li-Gevers-Sun", options={"transposed": (False, True)}, make=makeLGS, accept=acceptLGSLCW)
+LCW = Structure(shortName='LCW', fullName="Li-Chu-Wu", options={"transposed": (False, True)}, make=makeLCW, accept=acceptLGSLCW)
 
-#TODO: read, comment in english, remove the lists (and use numpy matrix instead), etc.
-#TODO: and of course, use multiprecision (if one day we know wich precision is enough...)
+# TODO: read, comment in english, remove the lists (and use numpy matrix instead), etc.
+# TODO: and of course, use multiprecision (if one day we know wich precision is enough...)

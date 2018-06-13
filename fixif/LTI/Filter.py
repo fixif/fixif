@@ -115,10 +115,7 @@ class Filter(object):
 		"""
 		Returns True if the lti filter is a Single Input Single Output filter
 		"""
-		if self._dTF or self._dSS.D.shape == (1,1):
-			return True
-		else:
-			return False
+		return self._dTF or self._dSS.D.shape == (1,1)
 
 
 	def isStable(self):

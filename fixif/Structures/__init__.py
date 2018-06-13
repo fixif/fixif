@@ -4,7 +4,7 @@ from fixif.Structures.DirectForms.DFI import DFI
 from fixif.Structures.DirectForms.DFII import DFII
 from fixif.Structures.State_Space.State_Space import State_Space
 from fixif.Structures.rhoDFIIt.rhoDFIIt import rhoDFII
-#from fixif.Structures.LGS_LCW.LGS_LCW import LGS, LCW
+from fixif.Structures.LGS_LCW.LGS_LCW import LGS, LCW
 
 try:
 	from fixif.Structures.LWDF.LWDF import LWDF
