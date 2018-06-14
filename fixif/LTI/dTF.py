@@ -1,8 +1,8 @@
-#coding=utf8
+# coding: utf8
 
 # This class describes a SISO transfer function
 from numpy.random.mtrand import randint, rand
-#from scipy.weave import inline
+# from scipy.weave import inline
 
 __author__ = "Thibault Hilaire"
 __copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
@@ -17,14 +17,16 @@ __status__ = "Beta"
 
 import mpmath
 import numpy
+from fixif.WCPG import WCPG_TF
 from numpy import ndenumerate, array, zeros, matrix, matrix, set_printoptions, empty, float64
 from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
 from scipy.linalg import norm
-#import sollya
+# import sollya
 
 from numpy.testing import assert_allclose
+
 
 class dTF(object):
 
@@ -38,19 +40,19 @@ class dTF(object):
 		den = mat(den)
 		num = mat(num)
 
-		if (num.shape[0]!=1) or (den.shape[0]!=1):
+		if (num.shape[0] != 1) or (den.shape[0] != 1):
 			raise ValueError('dTF: num and den should be 1D matrixes')
 
 		# we normalize if den[0] is not equal to 1
-		if den[0,0]==0:
+		if den[0, 0] == 0:
 			raise ValueError('dTF: The 1st coefficient of the denominator cannot be ZERO !')
 		else:
-			self._num = num/den[0,0]
-			self._den = den/den[0,0]
+			self._num = num/den[0, 0]
+			self._den = den/den[0, 0]
 
 		# filter order
-		#if den.shape!=num.shape:
-		#	raise ValueError( 'Numerator and denomintator must have same length !')
+		# if den.shape!=num.shape:
+		# 	raise ValueError( 'Numerator and denomintator must have same length !')
 
 		self._order = num.shape[1]-1
 
@@ -73,14 +75,14 @@ class dTF(object):
 
 	def __str__(self):
 		"""pretty print of the transfer function"""
-		str_num = " + ".join( str(c)+"z^"+str(-j) if j>0 else str(c) for (i,j),c in ndenumerate(self.num) )
-		str_den = " + ".join( str(c)+"z^"+str(-j) if j>0 else str(c) for (i,j),c in ndenumerate(self.den) )
+		str_num = " + ".join(str(c)+"z^"+str(-j) if j > 0 else str(c) for (i, j), c in ndenumerate(self.num))
+		str_den = " + ".join(str(c)+"z^"+str(-j) if j > 0 else str(c) for (i, j), c in ndenumerate(self.den))
 
 		fraclen = max(len(str_num), len(str_den))
-		sp_num = " "*int(( fraclen - len(str_num) ) / 2)
-		sp_den = " "*int(( fraclen - len(str_den) ) / 2)
+		sp_num = " "*int((fraclen - len(str_num)) / 2)
+		sp_den = " "*int((fraclen - len(str_den)) / 2)
 
-		str_tf  = "\n"
+		str_tf = "\n"
 		str_tf += " "*7 + sp_num + str_num + "\n"
 		str_tf += "H(z) = " + '-'*fraclen + "\n"
 		str_tf += " "*7 + sp_den + str_den + "\n"
@@ -99,22 +101,22 @@ class dTF(object):
 			- form: controllable canonical form ('ctrl') or observable canonical form ('obs')
 
 		"""
-		#TODO: code it without scipy
+		# TODO: code it without scipy
 
 		from fixif.LTI import dSS
-		if form=='ctrl':
-			A = mat( diagflat(ones((1, self.order-1)), 1) )
-			A[self.order-1,:] = fliplr( -self.den[0,1:] )
-			B = mat( r_[ zeros((self.order-1, 1)), atleast_2d(1) ] )
-			C = mat( fliplr( self.num[0,1:] ) - fliplr( self.den[0,1:] )*self.num[0,0] )
-			D = mat( atleast_2d(self.num[0,0]) )
-		elif form=='obs':
-			# TODO: check!!
-			A,B,C,D = tf2ss( array(self.num)[0,:], array(self.den)[0,:] )
+		if form == 'ctrl':
+			A = mat(diagflat(ones((1, self.order-1)), 1))
+			A[self.order-1, :] = fliplr(-self.den[0, 1:])
+			B = mat(r_[zeros((self.order-1, 1)), atleast_2d(1)])
+			C = mat(fliplr(self.num[0, 1:]) - fliplr(self.den[0, 1:])*self.num[0, 0])
+			D = mat(atleast_2d(self.num[0, 0]))
+		elif form == 'obs':
+			# TODO: to it manually!!
+			A, B, C, D = tf2ss(array(self.num)[0, :], array(self.den)[0, :])
 		else:
-			raise ValueError( 'dTF.to_dSS: the form "%s" is invalid (must be "ctrl" or "obs")'%form )
+			raise ValueError('dTF.to_dSS: the form "%s" is invalid (must be "ctrl" or "obs")' % form)
 
-		return dSS(A,B,C,D)
+		return dSS(A, B, C, D)
 
 
 	def to_Sollya(self):
@@ -127,7 +129,7 @@ class dTF(object):
 		if not self._sollya:
 			num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(self.num)[0, :])))
 			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(self.den)[0, :])))
-			self._sollya = (num,den)
+			self._sollya = (num, den)
 		return self._sollya
 
 
@@ -143,18 +145,18 @@ class dTF(object):
 		eps:
 		"""
 		# add zeros for the smallest (in size) numerator so that the comparison can be done
-		max_order = max( self.order, other.order)+1
-		snum = zeros((1,max_order))
-		snum[ :1, :self.num.shape[1] ] = self.num
-		onum = zeros((1,max_order))
-		onum[ :1, :other.num.shape[1] ] = other.num
-		sden = zeros((1,max_order))
-		sden[ :1, :self.den.shape[1] ] = self.den
-		oden = zeros((1,max_order))
-		oden[ :1, :other.den.shape[1] ] = other.den
+		max_order = max(self.order, other.order)+1
+		snum = zeros((1, max_order))
+		snum[:1, :self.num.shape[1]] = self.num
+		onum = zeros((1, max_order))
+		onum[:1, :other.num.shape[1]] = other.num
+		sden = zeros((1, max_order))
+		sden[:1, :self.den.shape[1]] = self.den
+		oden = zeros((1, max_order))
+		oden[:1, :other.den.shape[1]] = other.den
 
-		assert( norm(snum-onum)<eps )
-		assert( norm(sden-oden)<eps )
+		assert(norm(snum-onum) < eps)
+		assert(norm(sden-oden) < eps)
 
 	def WCPG(self):
 		r"""
@@ -163,34 +165,11 @@ class dTF(object):
 		"""
 		# compute the WCPG value if it's not already done
 		if self._WCPG is None:
-			try:
-				# noinspection PyUnusedLocal
-				num = self._num
-				denum = self._den
-				Nb = self._num.shape[1]
-				Na = self._den.shape[1]
-				W = empty((1, 1), dtype=float64)
-
-				code = "return_val = WCPG_tf( &W[0,0], &num[0,0], &denum[0,0], Nb, Na);"
-				support = 'extern "C" int WCPG_tf(double *W, double *num, double *denum, uint64_t Nb, uint64_t Na);'
-				err = inline(code, ['W', 'num', 'denum', 'Nb', 'Na'], support_code=support, libraries=["WCPG"])
-				if err == 0:
-					# change numpy display formatter, so that we can display the full coefficient in hex
-					# (equivalent to printf("%a",...) in C)
-					set_printoptions(formatter={'float_kind': lambda x: x.hex()})
-					print(self)
-					raise ValueError("WCPG: cannot compute WCPG")
-				self._WCPG = mat(W)
-			except:
-				raise ValueError("dSS: Impossible to compute WCPG matrix. Is WCPG library really installed ?")
-
+			self._WCPG = WCPG_TF(self._num, self._den)
 		return self._WCPG
 
 
-
-
-
-def iter_random_dTF(number , order = (5, 10)):
+def iter_random_dTF(number, order=(5, 10)):
 	"""
 	Generate some n-th order random (stable or not) SISO transfer functions
 
@@ -208,11 +187,11 @@ def iter_random_dTF(number , order = (5, 10)):
 
 	"""
 	for i in range(number):
-		yield random_dTF( order )
+		yield random_dTF(order)
 
 
 
-def random_dTF( order = (5, 10) ):
+def random_dTF(order=(5, 10)):
 	"""
 	Generate a n-th order random transfer function (not necessary stable)
 	Parameters:
@@ -222,9 +201,9 @@ def random_dTF( order = (5, 10) ):
 		n = order[0]
 	else:
 		n = randint(*order)
-	num = mat(rand(1,n))
-	den = mat(rand(1,n))
-	return dTF( num, den)
+	num = mat(rand(1, n))
+	den = mat(rand(1, n))
+	return dTF(num, den)
 
 
 # def to_dSSmp(b, a, mpmatrices=True):

@@ -13,7 +13,8 @@ from numpy.random.mtrand import randint, rand
 from fixif.func_aux import python2mpf_matrix, mpf_to_numpy, mpf_matrix_to_sollya
 import mpmath
 import numpy
-#import sollya
+# import sollya
+
 
 class dTFmp(object):
 
@@ -37,22 +38,22 @@ class dTFmp(object):
 			else:
 				raise ValueError('Cannot create a dTFmp object: expected mpmath.matrix or numpy.matrix arguments but instead got %s and %s' % (type(b), type(a)))
 
-		#check if user gave transposed matrices
+		# check if user gave transposed matrices
 		if b.cols > 1 and b.rows == 1:
 			b = b.transpose()
 		if a.cols > 1 and a.rows == 1:
 			a = a.transpose()
 
-		if a.cols != 1 or  b.cols!= 1: # or b.rows != a.rows :
+		if a.cols != 1 or b.cols != 1:  # or b.rows != a.rows :
 			raise ValueError('Cannot create a dTFmp pbject: incorrect sizes')
 
 
 		n = a.rows
-		if a[0,0] != mpmath.mp.one:
+		if a[0, 0] != mpmath.mp.one:
 			for i in range(0, n):
 				# division cannot be performed exactly but we do it with doubled precision
-				a[i,0] = mpmath.fdiv(a[i,0], a[0,0], prec = a[i,0]._mpf_[3] * 2)
-				b[i, 0] = mpmath.fdiv(b[i, 0], b[0, 0], prec = b[i,0]._mpf_[3] * 2)
+				a[i, 0] = mpmath.fdiv(a[i, 0], a[0, 0], prec=a[i, 0]._mpf_[3] * 2)
+				b[i, 0] = mpmath.fdiv(b[i, 0], b[0, 0], prec=b[i, 0]._mpf_[3] * 2)
 
 		self._order = n - 1
 		self._num = b
@@ -137,7 +138,7 @@ class dTFmp(object):
 
 		D = mpmath.matrix([self.num[0, 0]])
 
-		return dSSmp(A,B,C,D)
+		return dSSmp(A, B, C, D)
 
 
 	def to_Sollya(self):
@@ -178,6 +179,7 @@ def iter_random_dTFmp(number, order=(5, 10)):
 	"""
 	for i in range(number):
 		yield random_dTFmp(order)
+
 
 def random_dTFmp(order=(5, 10)):
 	"""

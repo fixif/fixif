@@ -42,7 +42,7 @@ class Butter(Filter):
 		self._butterworth = True
 		self._dSS = None
 		num, den = butter(n, Wn, btype)
-		self._dTF = dTF( num, den)
+		self._dTF = dTF(num, den)
 		self._name = name
 
 		self.n = n
@@ -52,7 +52,7 @@ class Butter(Filter):
 
 
 
-def iter_random_Butter( number, n=(5,10), Wc=(0.1,0.8), W1=(0.1,0.5), W2=(0.5,0.8), form=None, onlyEven=True, seeded=True):
+def iter_random_Butter(number, n=(5, 10), Wc=(0.1, 0.8), W1=(0.1, 0.5), W2=(0.5, 0.8), form=None, onlyEven=True, seeded=True):
 	"""
 	Generate some n-th order Butterworh filters
 	Parameters
@@ -112,4 +112,4 @@ def random_Butter(n=(5, 10), Wc=(0.1, 0.8), W1=(0.1, 0.5), W2=(0.5, 0.8), form=N
 	if onlyEven and order % 2 == 0:
 		order += 1
 
-	return Butter( order, W, form, name='Butterworth-random-%d' % seed)
+	return Butter(order, W, form, name='Butterworth-random-%d' % seed)

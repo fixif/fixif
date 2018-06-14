@@ -14,12 +14,12 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from fixif.LTI import dSS,dTF, random_dSS
+from fixif.LTI import dSS, dTF, random_dSS
 from numpy.random import seed as numpy_seed, randint, choice
 from re import compile
 
 
-regRF = compile("RandomFilter-([0-9]+)/([0-9]+)/([0-9]+)-([0-9]+)")	# used to recognize random filter names
+regRF = compile("RandomFilter-([0-9]+)/([0-9]+)/([0-9]+)-([0-9]+)")		# used to recognize random filter names
 
 
 
@@ -43,19 +43,19 @@ class Filter(object):
 		self._name = name
 
 		if A is not None and B is not None and C is not None and D is not None:
-			self._dSS = dSS( A, B, C, D)
+			self._dSS = dSS(A, B, C, D)
 		elif num is not None and den is not None:
-			self._dTF = dTF( num, den)
+			self._dTF = dTF(num, den)
 		elif tf is not None:
 			self._dTF = tf
 		elif ss is not None:
 			self._dSS = ss
 		else:
-			raise ValueError( 'Filter: the values given to the Filter constructor are not correct')
+			raise ValueError('Filter: the values given to the Filter constructor are not correct')
 
 		# is the filter stable?
 		if stable is None:
-			#TODO: compute the eigenvalues to know if it is stable or not
+			# TODO: compute the eigenvalues to know if it is stable or not
 			self._stable = False
 		else:
 			self._stable = stable
@@ -72,7 +72,7 @@ class Filter(object):
 	@property
 	def dTF(self):
 		if not self.isSISO():
-			raise ValueError( 'Filter: cannot convert a MIMO filter to dTF (not yet)')
+			raise ValueError('Filter: cannot convert a MIMO filter to dTF (not yet)')
 		if self._dTF is None:
 			self._dTF = self._dSS.to_dTF()
 		return self._dTF
@@ -115,7 +115,7 @@ class Filter(object):
 		"""
 		Returns True if the lti filter is a Single Input Single Output filter
 		"""
-		return self._dTF or self._dSS.D.shape == (1,1)
+		return self._dTF or self._dSS.D.shape == (1, 1)
 
 
 	def isStable(self):
@@ -138,7 +138,7 @@ class Filter(object):
 
 
 
-def iter_random_Filter( number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True, ftype='all'):
+def iter_random_Filter(number, n=(5, 10), p=(1, 5), q=(1, 5), seeded=True, ftype='all'):
 	"""
 	Generate some n-th order stable random filter
 	Parameters
@@ -153,13 +153,13 @@ def iter_random_Filter( number, n = (5, 10), p = (1, 5), q = (1, 5), seeded=True
 			-> for 'all', it randomly choose one among 'MIMO', 'SISO', 'SIMO' and 'SISO'
 
 	"""
-	pq = {'SISO':( (1,2), (1,2) ), 'SIMO': (p,(1,2)), 'MISO': ((1,2),q), 'MIMO': (p,q)}
+	pq = {'SISO': ((1, 2), (1, 2)), 'SIMO': (p, (1, 2)), 'MISO': ((1, 2), q), 'MIMO': (p, q)}
 
 	seeds = [randint(0, 1e9) if seeded else None for _ in range(number)]  # generate a particular seed for each random dSS, or None (if seeded is set to False)
 
 	for s in seeds:
 		if ftype not in pq.keys():
-			ftype = choice( list(pq.keys()) )
+			ftype = choice(list(pq.keys()))
 		nn = randint(*n)
 		pp = randint(*pq[ftype][0])
 		qq = randint(*pq[ftype][1])
@@ -185,21 +185,21 @@ def random_Filter(n=10, p=5, q=5, seed=None, name=None):
 	Returns a Filter object
 	"""
 	if name:
-		m=regRF.match(name)
+		m = regRF.match(name)
 		if m:
-			res = tuple( map( int, m.groups()) )
+			res = tuple(map(int, m.groups()))
 			n = res[0]
 			p = res[1]
 			q = res[2]
 			seed = res[3]
 		else:
-			raise ValueError( "randomFilter: the string should be a valid string, ie be like 'RandomFilter-7/1/4-12345678'")
+			raise ValueError("randomFilter: the string should be a valid string, ie be like 'RandomFilter-7/1/4-12345678'")
 	# change the seed if asked
 	if seed:
 		numpy_seed(seed)
-		name = 'RandomFilter-%d/%d/%d-%d'%(n,p,q,seed)	# for example 'RandomFilter-(5,10)/(1,2)/(1,10)-12345678' for a MISO filter (#states between 5 and 10, #inputs between 1 and 10), seed=12345678)
+		name = 'RandomFilter-%d/%d/%d-%d' % (n, p, q, seed) 	# for example 'RandomFilter-(5,10)/(1,2)/(1,10)-12345678' for a MISO filter (#states between 5 and 10, #inputs between 1 and 10), seed=12345678)
 	else:
 		name = 'RandomFilter'
 
 	# return a Filter from a random dSS
-	return Filter( ss=random_dSS(n, p, q), name=name, stable=True)
+	return Filter(ss=random_dSS(n, p, q), name=name, stable=True)

@@ -1,4 +1,4 @@
-#import sollya
+# import sollya
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
@@ -16,6 +16,7 @@ import numpy
 from numpy.random.mtrand import randint, rand
 from fixif.func_aux import python2mpf_matrix, mpf_to_numpy, mp_poly_product, mpf_matrix_fadd, mpf_matrix_fmul, mpf_matrix_to_sollya
 from fixif.LTI import random_dSS
+
 
 class dSSmp(object):
 
@@ -81,7 +82,7 @@ class dSSmp(object):
 				raise ValueError('Cannot create dSSmp object: expected mpmath.matrix of numpy.matrix')
 
 
-		#checking sizes
+		# checking sizes
 		# n = A.rows
 
 
@@ -236,7 +237,7 @@ class dSSmp(object):
 
 
 		A = mpmath.mp.zeros(self.n + S.n, self.n + S.n)
-		B = mpmath.mp.zeros(self.n + S.n,self.q)
+		B = mpmath.mp.zeros(self.n + S.n, self.q)
 		C = mpmath.mp.zeros(self.p, self.n + S.n)
 		D = mpmath.mp.zeros(self.p, self.q)
 
@@ -249,13 +250,13 @@ class dSSmp(object):
 				A[i + self.n, j + self.n] = S.A[i, j]
 
 		for i in range(0, self.n):
-			for j in range(0,self.q):
+			for j in range(0, self.q):
 				B[i, j] = self.B[i, j]
 		for i in range(0, S.n):
-			for j in range(0,self.q):
+			for j in range(0, self.q):
 				B[i + self.n, j] = S.B[i, j]
 
-		for i in range(0,self.p):
+		for i in range(0, self.p):
 			for j in range(0, self.n):
 				C[i, j] = self.C[i, j]
 
@@ -323,7 +324,7 @@ class dSSmp(object):
 		a = mpmath.mp.zeros(Q.rows, 1)
 		for i in range(0, P.rows):
 			b[i, 0] = P[i, 0].real
-			b[i, 0] = mpmath.fadd(b[i,0], mpmath.mp.zero, prec=prec)
+			b[i, 0] = mpmath.fadd(b[i, 0], mpmath.mp.zero, prec=prec)
 		for i in range(0, Q.rows):
 			a[i, 0] = Q[i, 0].real
 			a[i, 0] = mpmath.fadd(a[i, 0], mpmath.mp.zero, prec=prec)
@@ -353,19 +354,19 @@ class dSSmp(object):
 		import sys
 
 		# load gabarit.sol
-		#sollya.suppressmessage(57, 174, 130, 457)
+		# sollya.suppressmessage(57, 174, 130, 457)
 		sollya.execute("fipogen/LTI/wcpg.sol")
 
 		wcpg = sollya.parse("wcpg")
 
 
-		#construct the inputs for the wcpg function in sollyaObject format
-		A,_,_ = mpf_matrix_to_sollya(self._A)
-		B,_,_ = mpf_matrix_to_sollya(self._B)
-		C,_,_ = mpf_matrix_to_sollya(self._C)
-		D,_,_ = mpf_matrix_to_sollya(self._D)
+		# construct the inputs for the wcpg function in sollyaObject format
+		A, _, _ = mpf_matrix_to_sollya(self._A)
+		B, _, _ = mpf_matrix_to_sollya(self._B)
+		C, _, _ = mpf_matrix_to_sollya(self._C)
+		D, _, _ = mpf_matrix_to_sollya(self._D)
 
-		#W = sollya.parse("wcpg")(A, B, C, D, self._n, self._p, self._q, eps)
+		# W = sollya.parse("wcpg")(A, B, C, D, self._n, self._p, self._q, eps)
 		W = wcpg(A, B, C, D, self._n, self._p, self._q, delta)
 		return W
 
@@ -373,10 +374,10 @@ class dSSmp(object):
 
 	def simulate_rounded(self, u, prec=53):
 
-		#suppose u is a mpmath matrix
+		# suppose u is a mpmath matrix
 		xk = mpmath.mp.zeros(self._n, 1)
 
-		#xk = mpf_matrix_to_sollya(xk)[0]
+		# xk = mpf_matrix_to_sollya(xk)[0]
 
 		nSimulations = u.shape[1]
 		yk = mpmath.mp.zeros(self._p, nSimulations)
@@ -391,7 +392,7 @@ class dSSmp(object):
 
 
 			xk = mpmath.matrix([float(sollya.round(mpf_matrix_to_sollya(xkp1)[0][j], prec, sollya.RN)) for j in range(0, self._n)])
-			yk_sollya[i] = sollya.round(mpf_matrix_to_sollya(yk[:,i])[0][0], prec, sollya.RN)
+			yk_sollya[i] = sollya.round(mpf_matrix_to_sollya(yk[:, i])[0][0], prec, sollya.RN)
 
 		return yk_sollya
 
@@ -471,12 +472,12 @@ class dSSmp(object):
 
 
 
-def random_dSSmp(n, p, q, pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
+def random_dSSmp(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5):
 	return random_dSS(n, p, q, pRepeat, pReal, pBCmask, pDmask, pDzero).to_dSSmp()
 
 
 
-def iter_random_dSSmp(number, stable = True, n = (5, 10), p = (1, 5), q = (1, 5), pRepeat = 0.01, pReal = 0.5, pBCmask = 0.90, pDmask = 0.8, pDzero = 0.5):
+def iter_random_dSSmp(number, stable=True, n=(5, 10), p=(1, 5), q=(1, 5), pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5):
 	"""
 	Generate some n-th order random (stable or not) state-spaces, with q inputs and p outputs
 	copy/Adapted from control-python library (thanks guys): https://sourceforge.net/projects/python-control/
@@ -506,12 +507,12 @@ def iter_random_dSSmp(number, stable = True, n = (5, 10), p = (1, 5), q = (1, 5)
 			nn = randint(*n)
 			pp = randint(*p)
 			qq = randint(*q)
-			A = numpy.matrix(rand(nn,nn))
-			B = numpy.matrix(rand(nn,qq))
-			C = numpy.matrix(rand(pp,nn))
-			D = numpy.matrix(rand(pp,qq))
+			A = numpy.matrix(rand(nn, nn))
+			B = numpy.matrix(rand(nn, qq))
+			C = numpy.matrix(rand(pp, nn))
+			D = numpy.matrix(rand(pp, qq))
 
-			yield dSSmp(A,B,C,D)
+			yield dSSmp(A, B, C, D)
 
 
 

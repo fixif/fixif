@@ -378,7 +378,7 @@ class dSS(object):
 				W = empty((p, q), dtype=float64)
 				mpeps = 2**-120
 
-				#int WCPG_ABCD_mprec(mpfr_t *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q, mpfr_t mpeps);
+				# int WCPG_ABCD_mprec(mpfr_t *W, double *A, double *B, double *C, double *D, uint64_t n, uint64_t p, uint64_t q, mpfr_t mpeps);
 				code = "return_val = WCPG_ABCD( &W[0,0], &A[0,0], &B[0,0], &C[0,0], &D[0,0], n, p, q, mpeps);"
 				support = 'extern "C" int WCPG_ABCD_mprec(double *W, double *A, double *B, double *C, double *D, ' \
 				          'uint64_t n, uint64_t p, mpfr_t mpeps);'
@@ -427,7 +427,7 @@ class dSS(object):
 		if self._DC_gain is None:
 			try:
 				self._DC_gain = self._C * inv(identity(self._n) - self._A) * self._B + self._D
-			except:
+			except LinAlgError:
 				raise ValueError('dSS: Impossible to compute DC-gain from current discrete state space')
 
 		return self._DC_gain
@@ -603,7 +603,7 @@ class dSS(object):
 		while newS.n > numpy.linalg.matrix_rank(newS._A):
 			l = list()
 			for i in range(0, newS.n):
-				if numpy.count_nonzero(newS._A[i,:]) == 0:
+				if numpy.count_nonzero(newS._A[i, :]) == 0:
 					l.append(i)
 
 			A = newS._A
@@ -627,7 +627,7 @@ class dSS(object):
 
 			newS = dSS(A, B, C, D)
 
-			print ("number of states: %d \n rank: %d " % (newS.n , numpy.linalg.matrix_rank(newS._A)))
+			print("number of states: %d \n rank: %d " % (newS.n, numpy.linalg.matrix_rank(newS._A)))
 
 		return newS
 
@@ -904,7 +904,7 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
 	# Apply masks.
 	B *= Bmask
 	C *= Cmask
-	#D *= Dmask
+	# D *= Dmask
 
 	return dSS(A, B, C, D)
 

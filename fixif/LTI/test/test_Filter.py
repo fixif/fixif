@@ -21,15 +21,15 @@ from fixif.LTI import iter_random_Butter
 import pytest
 
 
-def test_construction( ):
+def test_construction():
 	"""
 	Test the constructor
 	"""
 	# test non-consistency size
 	with pytest.raises(ValueError):
-		Filter(num=[1, 2, 3], den=[0, 6 , 7])		# den[0] cannot be zero
-	#with pytest.raises(ValueError):
-	#	Filter(num=[1, 2, 3], den=[1, 2])		# num should not be longer than den
+		Filter(num=[1, 2, 3], den=[0, 6, 7])		# den[0] cannot be zero
+	# with pytest.raises(ValueError):
+	# 	Filter(num=[1, 2, 3], den=[1, 2])		# num should not be longer than den
 
 	# test non-consistency size
 	with pytest.raises(ValueError):
@@ -44,15 +44,16 @@ def test_construction( ):
 	with pytest.raises(ValueError):
 		Filter(A=[[1, 2], [3, 4]], B=[[1], [2]], C=[[1, 2]], num=[1, 2, 3])
 
-	Filter(A=[[1, 2], [3, 4]], B=[[1], [2]], C=[[1, 2]], D=3, num=[1, 2, 3], den=[0, 6 , 7])
+	Filter(A=[[1, 2], [3, 4]], B=[[1], [2]], C=[[1, 2]], D=3, num=[1, 2, 3], den=[0, 6, 7])
 
 
-@pytest.mark.parametrize( "H", iter_random_Butter(20, onlyEven=True), ids=lambda x:x.name)
-def test_butter( H ):
+@pytest.mark.parametrize("H", iter_random_Butter(20, onlyEven=True), ids=lambda x: x.name)
+def test_butter(H):
 	print(H.dTF)
 
-@pytest.mark.parametrize( "H", iter_random_Filter(20, seeded=True, ftype='all'), ids=lambda x:x.name)
+
+@pytest.mark.parametrize("H", iter_random_Filter(20, seeded=True, ftype='all'), ids=lambda x: x.name)
 def test_randomFilter(H):
 
-	F = random_Filter( name=H.name)
+	F = random_Filter(name=H.name)
 	F.dSS.assert_close(H.dSS)

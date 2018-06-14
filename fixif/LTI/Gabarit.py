@@ -26,14 +26,14 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 import mpmath
-#import sollya
+# import sollya
 
 
 # load 'gabarit.sol'
 
-#-> TO uncomment when sollya is installed
-#sollya.suppressmessage(57, 174, 130, 457)
-#sollya.execute("fipogen/LTI/gabarit.sol")
+# -> TO uncomment when sollya is installed
+# sollya.suppressmessage(57, 174, 130, 457)
+# sollya.execute("fipogen/LTI/gabarit.sol")
 
 
 
@@ -58,7 +58,7 @@ class Band(object):
 		if isinstance(Gain, (tuple, list)):
 			# pass band (the gains are sorted)
 			self._stopGain = None
-			self._passGains = (Gain[0],Gain[1]) if Gain[0]<Gain[1] else (Gain[1],Gain[0])
+			self._passGains = (Gain[0], Gain[1]) if Gain[0] < Gain[1] else (Gain[1], Gain[0])
 		else:
 			# stop band
 			self._stopGain = Gain
@@ -103,7 +103,7 @@ class Band(object):
 		"""compare two bands"""
 		return self.F1 < other.F1
 
-	def __sub__(self,other):
+	def __sub__(self, other):
 		"""Substract a Band and a Gain"""
 		try:
 			stopGain = self._stopGain-other if self._stopGain else None
@@ -117,11 +117,11 @@ class Band(object):
 
 	def __str__(self):
 		if self.isPassBand:
-			return "Freq. [%sHz,%sHz]: Passband in [%sdB, %sdB]"%(self.F1, self.F2, self._passGains[0], self._passGains[1])
+			return "Freq. [%sHz,%sHz]: Passband in [%sdB, %sdB]" % (self.F1, self.F2, self._passGains[0], self._passGains[1])
 		else:
-			return "Freq. [%sHz,%sHz]: Stopband at %sdB"%(self.F1, self.F2, self._stopGain)
+			return "Freq. [%sHz,%sHz]: Stopband at %sdB" % (self.F1, self.F2, self._stopGain)
 
-	def sollyaConstraint(self,margin):
+	def sollyaConstraint(self, margin):
 		"""
 		Parameter:
 		- margin: margin we add to the band (not in dB)
@@ -141,9 +141,9 @@ class Band(object):
 			betaInf = 0
 			betaSup = 10 ** (sollya.SollyaObject(self._stopGain) / 20) + margin
 
-		assert( betaInf < betaSup)
+		assert(betaInf < betaSup)
 
-		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": sollya.round(betaInf, 53, sollya.RU), "betaSup": sollya.round(betaSup,53, sollya.RD)}
+		return {"Omega": sollya.Interval(w1, w2), "omegaFactor": sollya.pi, "betaInf": sollya.round(betaInf, 53, sollya.RU), "betaSup": sollya.round(betaSup, 53, sollya.RD)}
 
 	def Rectangle(self, dB, minG=-200):
 		"""
@@ -171,7 +171,7 @@ class Band(object):
 		(positive when we reduce the band)
 		"""
 		if self.isPassBand:
-			self._passGains =  self._passGains[0] + margin, self._passGains[1] - margin
+			self._passGains = self._passGains[0] + margin, self._passGains[1] - margin
 		else:
 			self._stopGain -= margin
 
@@ -202,15 +202,15 @@ class Gabarit(object):
 			raise ValueError("Fbands and Abands should be lists/tuples with same size")
 
 		# store the bands (sorted)
-		self._bands = [ Band(Fs, F1, F2, G) for (F1,F2),G in zip(Fbands, Abands) ]
+		self._bands = [Band(Fs, F1, F2, G) for (F1, F2), G in zip(Fbands, Abands)]
 		self._bands.sort()
 
 		self._type = None
 		self._seed = seed
 
 	def __str__(self):
-		seed = "Seed=%s\n"%(self._seed) if self._seed else ""
-		return "%sType: %s (Fs=%sHz)\n%s"%(seed, self.type, self._Fs, "\n".join(str(b) for b in self._bands))
+		seed = "Seed=%s\n" % (self._seed) if self._seed else ""
+		return "%sType: %s (Fs=%sHz)\n%s" % (seed, self.type, self._Fs, "\n".join(str(b) for b in self._bands))
 
 	@property
 	def seed(self):
@@ -247,7 +247,7 @@ class Gabarit(object):
 	def bands(self):
 		return self._bands
 
-	def to_dTF(self, ftype='butter', method='scipy', designMargin = 0, centeredZero=False):
+	def to_dTF(self, ftype='butter', method='scipy', designMargin=0, centeredZero=False):
 		"""
 		This methods HELPS to find a transfer function that *should* satisfy the gabarit
 		It is just here to quickly determine a transfer function that satisfy the gabarit in a simple way
@@ -268,18 +268,18 @@ class Gabarit(object):
 		"""
 		# Start Matlab if needed
 		matlabEng = None
-		if method=='matlab':
+		if method == 'matlab':
 			MH = MatlabHelper()
 			matlabEng = MH.engine
 
 		# normalize bands (with pass gain centered in 0dB)
-		centerPassGain = max( (b.passGains[0]+b.passGains[1])/2.0 for b in self._bands if b.isPassBand )
-		bands = [ b-centerPassGain for b in self._bands ]
+		centerPassGain = max((b.passGains[0]+b.passGains[1])/2.0 for b in self._bands if b.isPassBand)
+		bands = [b-centerPassGain for b in self._bands]
 		for b in bands:
 			b.applyDesignMargin(designMargin)
 
 		# arguments for matlab/scipy functions, for each type of band
-		if self.type=='lowpass':
+		if self.type == 'lowpass':
 			passb, stopb = bands
 			matlabParams = [passb.w2, stopb.w1, -passb.passGains[0], -stopb.stopGain]
 			scipyParams = [passb.w2, stopb.w1, -passb.passGains[0], -stopb.stopGain]
@@ -312,10 +312,10 @@ class Gabarit(object):
 			# call fdesign.lowpass/highpass/bandpass/bandstop functions, according to self.type
 			try:
 				de = matlabEng.fdesign.__getattr__(self.type)(*matlabParams)
-				h = matlabEng.design(de, ftype,'SystemObject',1)
+				h = matlabEng.design(de, ftype, 'SystemObject', 1)
 			except Exception as e:
-				raise ValueError("Matlab cannot deal with the following gabarit:\n%s\n%s"%(self,e))
-			numM,denM = matlabEng.tf(h, nargout=2)
+				raise ValueError("Matlab cannot deal with the following gabarit:\n%s\n%s" % (self, e))
+			numM, denM = matlabEng.tf(h, nargout=2)
 			# transform to numpy array
 			num = array(numM._data.tolist())
 			den = array(denM._data.tolist())
@@ -341,7 +341,7 @@ class Gabarit(object):
 		if tf:
 			w, h = freqz(tf.num.transpose(), tf.den.transpose())
 			if dB:
-				plt.plot( (self._Fs * 0.5 / pi) * w, 20*log10(abs(h)) )
+				plt.plot((self._Fs * 0.5 / pi) * w, 20*log10(abs(h)))
 				minG = min(20 * log10(abs(h)))
 			else:
 				plt.plot((self._Fs * 0.5 / pi)*w, abs(h))
@@ -349,7 +349,7 @@ class Gabarit(object):
 
 		currentAxis = plt.gca()
 		for b in self._bands:
-			currentAxis.add_patch( b.Rectangle(dB, minG))
+			currentAxis.add_patch(b.Rectangle(dB, minG))
 
 		plt.show()
 
@@ -371,13 +371,13 @@ class Gabarit(object):
 		- res: sollya object embedded the result
 		"""
 		# get num,den as sollya objects
-		num,den = tf.to_Sollya()
+		num, den = tf.to_Sollya()
 
 		# build the constraints to verify
 		constraints = [b.sollyaConstraint(margin) for b in self._bands]
 
 		# run sollya check
-		#print("-> calling checkModulusFilterInSpecification")
+		# print("-> calling checkModulusFilterInSpecification")
 		res = sollya.parse("checkModulusFilterInSpecification")(num, den, constraints, prec)
 		sollya.parse("presentResults")(res)
 
@@ -386,14 +386,14 @@ class Gabarit(object):
 
 
 	def findMinimumMargin(self, tf, initMargin=0):
-		margin = sollya.round( initMargin, 53, sollya.RU)
+		margin = sollya.round(initMargin, 53, sollya.RU)
 		deltaMargin = -infty
 		gPass = False
 		nbIter = 0
-		while (not gPass) and (nbIter<25):
+		while (not gPass) and (nbIter < 25):
 			nbIter += 1
 			# check if margin
-			gPass, res = self.check_dTF(tf,margin=margin)
+			gPass, res = self.check_dTF(tf, margin=margin)
 			if not gPass:
 				oldDeltaMargin = deltaMargin
 				# find the maximum margin we should apply, according to the results
@@ -409,12 +409,12 @@ class Gabarit(object):
 
 				# if the old margin is lower than the new margin, and it is not the first iteration
 				if oldDeltaMargin <= deltaMargin and oldDeltaMargin != -infty and margin != 0:
-					print ("deltaMargin does not decrease:\n old=%s\n new=%s") % (oldDeltaMargin, deltaMargin)
-					#deltaMargin *=2
-					#raise ValueError("deltaMargin does not decrease")
+					print("deltaMargin does not decrease:\n old=%s\n new=%s") % (oldDeltaMargin, deltaMargin)
+					# deltaMargin *=2
+					# raise ValueError("deltaMargin does not decrease")
 
 				# increase the margin
-				#margin += deltaMargin
+				# margin += deltaMargin
 				margin = sollya.round(deltaMargin+margin, 53, sollya.RU)
 
 
@@ -422,7 +422,7 @@ class Gabarit(object):
 		return margin
 
 
-def iter_random_Gabarit( number, form=None):
+def iter_random_Gabarit(number, form=None):
 	"""
 	Generate some random gabarits
 	Parameters
@@ -450,20 +450,20 @@ def random_Gabarit(form=None, seed=None):
 
 	# choose a form if asked
 	if form is None:
-		#form = choice(("lowpass", "highpass", "bandpass", "bandstop"))
+		# form = choice(("lowpass", "highpass", "bandpass", "bandstop"))
 		form = choice(("lowpass"))
 
-	Fs = randint(500,100000)
+	Fs = randint(500, 100000)
 
 	# lowpass
-	if form=='lowpass':
-		Fpass = uniform(0.01,0.9)*Fs/2  # Wpass between 0.01 and 0.9
-		Fstop = uniform(Fpass,Fs/2)     # Wstop between Wpass and 1
-		gp = uniform(-5,5)              # upperband for pass in [-5;5]
-		gps = uniform(0.1,5)            # pass width in [0.1;5]
-		gs = uniform( -80, 2*(gp-gps))   # stop band in [-80 and 2*lowerband]
-		bands = [ (0,Fpass), (Fstop,None) ]
-		Gains = [ (gp, gp-gps), gs ]
+	if form == 'lowpass':
+		Fpass = uniform(0.01, 0.9)*Fs/2  # Wpass between 0.01 and 0.9
+		Fstop = uniform(Fpass, Fs/2)     # Wstop between Wpass and 1
+		gp = uniform(-5, 5)              # upperband for pass in [-5;5]
+		gps = uniform(0.1, 5)            # pass width in [0.1;5]
+		gs = uniform(-80, 2*(gp-gps))   # stop band in [-80 and 2*lowerband]
+		bands = [(0, Fpass), (Fstop, None)]
+		Gains = [(gp, gp-gps), gs]
 	else:
 		raise ValueError('The form is not valid')
 
