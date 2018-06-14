@@ -73,7 +73,7 @@ def PhiKLD_in(alpha, Phi, K, L, D):
 			A = np.matrix(L * inv(c * I - Phi) * K)
 		else:
 			b = np.matrix(inv(c * I - Phi_in) * K_in)
-			B = np.c_[B, b]
+			B = np.c_[B, b]			# TODO: local variable 'B' might be referenced before assignment !
 			a = np.matrix(L * inv(c * I - Phi) * K)
 			A = np.c_[A, a]
 	LL = A * inv(B)
