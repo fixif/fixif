@@ -64,8 +64,7 @@ def implementCdouble(self, funcName):
 	env = Environment( loader=PackageLoader('fipogen','SIF/templates'), trim_blocks=True, lstrip_blocks=True )
 	cTemplate = env.get_template('implementC_template.c')
 
-	cDict = {}	# dictionary used to fill the template
-	cDict['funcName'] = funcName
+	cDict = {'funcName': funcName}	# dictionary used to fill the template
 	if self._filter.isSISO():
 		cDict['SIFname'] = self.name + '\n' + str(self._filter.dTF)
 	else:
@@ -83,8 +82,8 @@ def implementCdouble(self, funcName):
 	strU = genCvarNames('u', q)
 	strY = genCvarNames('y', p)
 	strXk = genCvarNames('xk', n)
-	strXkp = [ 'x%d_kp1'%(i) for i in range(n) ]
-	strT = 	[ 'T%d'%(i) for i in range(l) ]
+	strXkp = [ 'x%d_kp1'%(i,) for i in range(n) ]
+	strT = 	[ 'T%d'%(i,) for i in range(l) ]
 
 	strTXU = strT + strXk + strU
 
@@ -211,6 +210,7 @@ def runCdouble(self, u):
 	----------
 	self: the SIF object
 	u: the input (qxN), where N is the number of samples
+
 	Returns:
 		the ouput (pxN)
 	"""

@@ -51,6 +51,33 @@ def isTrivial(x, epsilon):
 	return abs(alpha) < epsilon*(1-epsilon/2)
 
 
+def _check_dimensions(JtoS):
+	"""
+	Compute the size 'l, n, p, q' of a SIF
+	Check size of matrices 'J' to 'S'
+	Instead of ad-hoc tests, we have a list of required sizes (empty at the beginning), and we check the consistency, matrix after matrix
+	"""
+
+	l = []  # we keep the size of the matrices in 2-element lists (size+name of the matrix that gives the size)
+	n = []
+	p = []
+	q = []
+	matrices = [ ("J",l,l), ("K",n,l), ("L",p,l), ("M",l,n), ("N",l,q), ("P",n,n), ("Q",n,q), ("R",p,n), ("S",p,q) ]
+
+	# we check every matrix
+	for X, (name,a,b) in zip(JtoS, matrices):
+		# get the size if it's the first time we see them
+		if not a:
+			a.extend( [X.shape[0], name] )
+		if not b:
+			b.extend( [X.shape[1], name] )
+		# check for consistency
+		if (a[0],b[0]) != X.shape:
+			pb = a[1] if a[0]!=X.shape[0] else b[1]
+			raise ValueError( "The matrix %s is a %dx%d matrix, instead of being a %dx%d matrix (to be consistent with matrix %s)" % (name, X.shape[0], X.shape[1], a[0], b[0], pb) )
+
+	return l[0], n[0], p[0], q[0]
+
 
 
 
@@ -107,11 +134,13 @@ class SIF(object):
 		"""
 		#  set and check sizes
 		self._l, self._n, self._p, self._q = self._check_dimensions(JtoS)
+		self._Z = None
 		self._build_Z(JtoS)
 		self._invJ = inv(JtoS[0])		#TODO: do it properly (no need to call inv() )
 		self._build_fromZ()
 
 		# build _dZ, the associated state space _dSS (contains AZ, BZ, CZ, DZ, gramians, etc.), _M1 _M2 _N1 _N2 and the *_bar matrices
+		self._dZ = None
 		self._build_dZ( dJtodS )
 
 
@@ -182,7 +211,7 @@ class SIF(object):
 		self._N2 = r_[self._invJ * self.N, self.BZ, self.DZ]
 
 
-	def _build_dZ( self, dJtodS ):
+	def _build_dZ(self, dJtodS):
 		"""
 		Build dZ form dJ to dS matrices
 		If None, then build dZ from Z
@@ -218,19 +247,19 @@ class SIF(object):
 	# AZ to DZ getters
 	@property
 	def AZ(self):
-		return self._dSS._A
+		return self._dSS.A
 
 	@property
 	def BZ(self):
-		return self._dSS._B
+		return self._dSS.B
 
 	@property
 	def CZ(self):
-		return self._dSS._C
+		return self._dSS.C
 
 	@property
 	def DZ(self):
-		return self._dSS._D
+		return self._dSS.D
 
 	@property
 	def dSS(self):
@@ -395,7 +424,7 @@ class SIF(object):
 	@P.setter
 	def P( self, mymat ):
 		self._Z[self._l: self._l + self._n, self._l: self._l + self._n] = mymat
-		self._build_dZ()
+		self._build_dZ(None)	# TODO: all these setters should call _build_dZ(None) !!
 		self._build_AZtoDZ()
 
 	@Q.setter
@@ -453,32 +482,6 @@ class SIF(object):
 		self._dZ[self._l + self._n: self._l + self._n + self._p, self._l + self._n: self._l + self._n + self._q] = mymat
 
 
-	def _check_dimensions( self, JtoS ):
-		"""
-		Compute the size 'l, n, p, q' of SIF
-		Check size of matrices 'J' to 'S'
-		Instead of ad-hoc tests, we have a list of required sizes (empty at the beginning), and we check the consistency, matrix after matrix
-		"""
-
-		l = []  # we keep the size of the matrices in 2-element lists (size+name of the matrix that gives the size)
-		n = []
-		p = []
-		q = []
-		matrices = [ ("J",l,l), ("K",n,l), ("L",p,l), ("M",l,n), ("N",l,q), ("P",n,n), ("Q",n,q), ("R",p,n), ("S",p,q) ]
-
-		# we check every matrix
-		for X, (name,a,b) in zip( JtoS, matrices ):
-			# get the size if it's the first time we see them
-			if not a:
-				a.extend( [X.shape[0], name] )
-			if not b:
-				b.extend( [X.shape[1], name] )
-			# check for consistency
-			if (a[0],b[0]) != X.shape:
-				pb = a[1] if a[0]!=X.shape[0] else b[1]
-				raise ValueError( "The matrix %s is a %dx%d matrix, instead of being a %dx%d matrix (to be consistent with matrix %s)" % (name, X.shape[0], X.shape[1], a[0], b[0], pb) )
-
-		return l[0],n[0], p[0], q[0]
 
 
 	@property
@@ -500,7 +503,6 @@ class SIF(object):
 	@property
 	def l(self):
 		return self._l
-
 
 	def __str__(self):
 		"""

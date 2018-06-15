@@ -83,7 +83,7 @@ def test_computeMSBSIF(nSimulations=1000):
 	lsb_y = [lsb[0, i] for i in range(SS.l + SS.n, SS.l + SS.n + SS.p)]
 
 	msb_ext = SS.compute_MSB_allvar_extended(u_bar, lsb_t, lsb_x, lsb_y)
-	if ((msb != msb_ext).any()):
+	if (msb != msb_ext).any():
 		print('MSB computed with taking into account the propagation of the error due to the format (msb, lsb) differs from the initial format. Changing MSBs.\n')
 		print('new MSBs:')
 		msb = msb_ext

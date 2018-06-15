@@ -38,7 +38,7 @@ from numpy.testing import assert_allclose
 def test_construction(S):
 	# random SIF from dSS (J=identity, K=zero, L=zero, M=random, N=random)
 	l = randint(0,10)
-	JtoS = (eye((l)), zeros((S.n, l)), zeros((S.p, l)), rand(l, S.n), rand(l, S.q), S.A, S.B, S.C, S.D)
+	JtoS = (eye(l), zeros((S.n, l)), zeros((S.p, l)), rand(l, S.n), rand(l, S.q), S.A, S.B, S.C, S.D)
 	R = Realization( Filter(ss=S), JtoS )
 
 	assert len(R._varNameT) == l

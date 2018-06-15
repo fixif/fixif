@@ -38,7 +38,7 @@ from numpy.testing import assert_allclose
 def test_dSSexact( S ):
 
 	l = randint(1, 10)
-	myJtoS = (numpy.eye((l)), numpy.zeros((S.n, l)), numpy.zeros((S.p, l)), rand(l, S.n), rand(l, S.q), S.A, S.B, S.C, S.D)
+	myJtoS = (numpy.eye(l), numpy.zeros((S.n, l)), numpy.zeros((S.p, l)), rand(l, S.n), rand(l, S.q), S.A, S.B, S.C, S.D)
 
 	mySIF = SIF(myJtoS)
 
@@ -106,7 +106,7 @@ def test_construction():
 
 		# test the construction with not consistent matrices
 		# when the 4 sizes are all different
-		if len( set( (l,n,p,q) ) ) == 4:
+		if len({l, n, p, q}) == 4:
 			shuffle(myJtoS)
 			with pytest.raises(ValueError):
 				t = SIF(myJtoS)

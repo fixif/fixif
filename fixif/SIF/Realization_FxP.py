@@ -19,7 +19,7 @@ from fixif.SIF import Realization
 from fixif.SIF import SIF
 from fixif.func_aux import dynMethodAdder
 
-import numpy as np
+import numpy
 
 # list of methods to be added to the Realization class
 __all__ = ['_compute_LSB', '_compute_MSB', 'compute_MSB_allvar_extended', 'flopoco']
@@ -41,7 +41,7 @@ def flopoco(self, LSB_y_out, u_bar):
 	Parameters
 	----------
 	self
-	LSB_y_out - a p - element list of integers representing the LSB constraints on the y
+	LSB_y_out: a p-element list of integers representing the LSB constraints on the y
 	u_bar
 
 	Returns
@@ -139,7 +139,7 @@ def compute_MSB_allvar_extended(self, u_bar, lsb_t, lsb_x, lsb_y):
 	lsb_bar = np.matrix([2 ** lsb_bar[0, i] for i in range(0, lsb_bar.size)])
 	delta_bar = wcpgDeltaH * lsb_bar.transpose()
 
-	if(y_bar.size == delta_bar.size):
+	if y_bar.size == delta_bar.size:
 		msb = np.bmat([np.ceil(np.log2(y_bar[i] + delta_bar[i])) for i in range(0, delta_bar.size)])
 		return msb
 	else:

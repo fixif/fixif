@@ -98,7 +98,7 @@ def algorithmLaTeX(R, out_file=None, caption=None):
 			comp_str += "\t\\tcp{\\emph{Intermediate variables}}\n"
 		elif (i == l+1) and not(n == 0):
 			comp_str += "\t\\tcp{\\emph{States}}\n"
-		elif (i == l+n+1):
+		elif i == l+n+1:
 			comp_str += "\t\\tcp{\\emph{Outputs}}\n"
 
 		comp_str += "\t" + "$" + strTXY[i-1] + " \leftarrow " + _scalprodCdouble(Zbis[i-1,:],strTXU) + "$\;\n"

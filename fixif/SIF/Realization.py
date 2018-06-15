@@ -51,7 +51,7 @@ class Realization(SIF):
 	- _filter: the filter that it implements
 	- _varNameT, _varNameX, _varNameU, _varNameY : lists of the name of the intermediate variables (varNameT), the states (varNameX), the inputs (varNameU) and the outputs (varNameY)
 	"""
-	def __init__(self, filter, JtoS, dJtodS=None, structureName="", varNameTX=None):
+	def __init__(self, filt, JtoS, dJtodS=None, structureName="", varNameTX=None):
 		"""
 		the Realization object is built from the matrices J, K, L, M, N, P, Q, R and S, and a filter
 		Parameters
@@ -86,8 +86,8 @@ class Realization(SIF):
 		self._LSB = None
 
 		# store the filter
-		if filter is not None:
-			self._filter = filter
+		if filt is not None:
+			self._filter = filt
 		else:
 			# build the filter from the SIF...
 			self._filter = Filter( tf=self.to_dTF() )
@@ -261,7 +261,7 @@ class Realization(SIF):
 		lsb_bar = np.matrix([2 ** lsb_bar[0, i] for i in range(0, lsb_bar.size)])
 		delta_bar = wcpgDeltaH * lsb_bar.transpose()
 
-		if(y_bar.size == delta_bar.size):
+		if y_bar.size == delta_bar.size:
 			msb = np.bmat([np.ceil(np.log2(y_bar[i] + delta_bar[i])) for i in range(0, delta_bar.size)])
 			return msb
 		else:
