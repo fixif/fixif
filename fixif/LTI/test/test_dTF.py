@@ -17,10 +17,9 @@ __status__ = "Beta"
 
 
 from fixif.LTI import dTF, iter_random_dTF
-from fixif.func_aux import python2mpf_matrix
+
 import mpmath
 import pytest
-import numpy
 
 
 def my_assert_allclose_mp(A, AA, abs_tol):
@@ -36,7 +35,7 @@ def my_assert_allclose_mp(A, AA, abs_tol):
 		if isinstance(A[0, 0], mpmath.mpc):
 			for i in range(0, A.rows):
 				for j in range(0, A.cols):
-					if not mpmath.almosteq(A[i, j].real, AA[i, j].real, abs_eps=abs_tol) or not mpmath.almosteq(A[i, j].imag, AA[i, j.imag], abs_eps=abs_tol):
+					if not mpmath.almosteq(A[i, j].real, AA[i, j].real, abs_eps=abs_tol) or not mpmath.almosteq(A[i, j].imag, AA[i, j].imag, abs_eps=abs_tol):
 						assert False
 		else:
 			for i in range(0, A.rows):

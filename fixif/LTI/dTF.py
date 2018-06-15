@@ -15,17 +15,12 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-import mpmath
-import numpy
 from fixif.WCPG import WCPG_TF
-from numpy import ndenumerate, array, zeros, matrix, matrix, set_printoptions, empty, float64
+from numpy import ndenumerate, array
 from numpy import matrix as mat
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
 from scipy.signal import tf2ss
 from scipy.linalg import norm
-# import sollya
-
-from numpy.testing import assert_allclose
 
 
 class dTF(object):

@@ -35,8 +35,8 @@ class Filter(object):
 		----------
 		num, den: numerator and denominator of the transfer function
 		A,B,C,D: State-Space matrices
-		dTF: a dTF object
-		dSS: a dSS object
+		tf: a dTF object
+		ss: a dSS object
 		"""
 		self._dSS = None
 		self._dTF = None

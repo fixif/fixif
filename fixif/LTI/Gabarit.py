@@ -15,8 +15,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from fixif.LTI import dTF, dTFmp
-from fixif.func_aux import mpf_matrix_to_sollya, MatlabHelper
+from fixif.LTI import dTF
+from fixif.func_aux import MatlabHelper
 
 from scipy.signal import iirdesign, freqz
 from numpy import array, pi, log10, infty
@@ -25,7 +25,6 @@ from numpy.random import seed as set_seed, choice, randint, uniform
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
-import mpmath
 # import sollya
 
 

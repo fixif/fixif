@@ -15,7 +15,6 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-import numpy
 
 import pytest
 import mpmath
@@ -25,7 +24,7 @@ from numpy.linalg import eigvals
 from numpy.testing import assert_allclose
 from numpy.random import randint
 
-from fixif.LTI import dSS, random_dSS, iter_random_dSS
+from fixif.LTI import dSS, iter_random_dSS
 
 
 # FIXME: move this test somewhere else...
@@ -134,9 +133,9 @@ def test_Gramians(S):
 	S._Wc = None
 	S._Wo = None
 	with pytest.raises(ValueError):
-		S.Wc
+		_ = S.Wc
 	with pytest.raises(ValueError):
-		S.Wo
+		_ = S.Wo
 
 	dSS._W_method = 'slycot'
 
@@ -151,6 +150,18 @@ def test_wcpgMP(S):
 	assert True
 
 
+def calc_wcpg_approx(S, nit):
+	"""Very bad WCPG approximation (we hope to get the first digits....)
+	Only used to compare with true, reliable Anastasia's WCPG"""
+
+	res = mat(zeros((S.p, S.q)))
+	powerA = mat(eye(S.n, S.n))
+
+	for i in range(0, nit):
+		res += absolute(S.C * powerA * S.B)
+		powerA = powerA * S.A
+
+	return res + absolute(S.D)
 
 
 @pytest.mark.parametrize("S", iter_random_dSS(20, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
@@ -159,23 +170,8 @@ def test_wcpg(S):
 	"""
 	Test Worst Case Peak Gain calculation
 	"""
-
-	def calc_wcpg_approx(S, nit):
-		"""Very bad WCPG approximation (we hope to get the first digits....)
-		Only used to compare with true, reliable Anastasia's WCPG"""
-
-		res = mat(zeros((S.p, S.q)))
-		powerA = mat(eye(S.n, S.n))
-
-		for i in range(0, nit):
-			res += absolute(S.C * powerA * S.B)
-			powerA = powerA * S.A
-
-		return res + absolute(S.D)
-
 	nit = 5000
 	rel_tol_wcpg = 1e-5
-
 
 	W = S.WCPG()
 	wcpg = calc_wcpg_approx(S, nit)

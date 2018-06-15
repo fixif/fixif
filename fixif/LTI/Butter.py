@@ -18,7 +18,7 @@ __status__ = "Beta"
 from numpy.random.mtrand import randint, seed as numpy_seed, choice, random_sample		# seed is renamed numpy_seed, so that I can use the variable seed
 from scipy.signal import butter
 
-from fixif.LTI import Filter, dTF
+from fixif.LTI import Filter
 
 
 class Butter(Filter):
@@ -28,8 +28,8 @@ class Butter(Filter):
 		Create a Butterworth filter
 		Parameters
 		----------
-		N: (int) The order of the filter
-		W: (array-like) A scalar or length-2 sequence giving the critical frequencies. For a Butterworth filter, this is the point at which the gain drops to 1/sqrt(2) that of the passband (the “-3 dB point”). For digital filters, Wn is normalized from 0 to 1, where 1 is the Nyquist frequency, pi radians/sample. (Wn is thus in half-cycles / sample.) For analog filters, Wn is an angular frequency (e.g. rad/s).
+		n: (int) The order of the filter
+		Wn: (array-like) A scalar or length-2 sequence giving the critical frequencies. For a Butterworth filter, this is the point at which the gain drops to 1/sqrt(2) that of the passband (the “-3 dB point”). For digital filters, Wn is normalized from 0 to 1, where 1 is the Nyquist frequency, pi radians/sample. (Wn is thus in half-cycles / sample.) For analog filters, Wn is an angular frequency (e.g. rad/s).
 
 		btype: (string) {‘lowpass’, ‘highpass’, ‘bandpass’, ‘bandstop’}. Gives the type of filter (default is ‘lowpass’)
 
@@ -37,17 +37,16 @@ class Butter(Filter):
 
 		Returns a Butter object (Filter)
 		"""
-		# TODO: call the constructor of Filter !!
-		self._stable = True
-		self._butterworth = True
-		self._dSS = None
-		num, den = butter(n, Wn, btype)
-		self._dTF = dTF(num, den)
-		self._name = name
 
+		self._butterworth = True
 		self.n = n
 		self.Wn = Wn
 		self.btype = btype
+
+		# call the parent class constructor
+		num, den = butter(n, Wn, btype)
+		super(Butter, self).__init__(num=num, den=den, stable=True, name=name)
+
 
 
 

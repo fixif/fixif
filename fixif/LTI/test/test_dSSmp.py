@@ -14,7 +14,7 @@ import mpmath
 # from numpy.testing import assert_allclose
 # from fixif.func_aux import *
 
-from fixif.LTI import dSS, dSSmp, dTFmp, iter_random_dSSmp, Filter, iter_random_dSS
+from fixif.LTI import dSSmp, iter_random_dSSmp, Filter, iter_random_dSS
 # from fixif.SIF import SIF
 # from fixif.Structures import State_Space
 
@@ -90,7 +90,7 @@ def test_WCPGmp(S):
 	Rq = R.quantize(16)
 	Sq = Rq.to_dSSexact()
 	l = list()
-	import sollya
+
 	for prec in range(50, 1000, 100):
 		H_hat = Sq.to_dTFmp(prec)
 		S_H = H_hat.to_dSSmp()

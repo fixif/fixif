@@ -161,7 +161,7 @@ class dSSmp(object):
 			if isinstance(S, dSS):
 				S = dSSmp(S.A, S.B, S.C, S.D)
 			else:
-				raise ValueError('Cannot substract two dSSmp filters: expected a dSSmp but instead got %s') % type(S)
+				raise ValueError('Cannot substract two dSSmp filters: expected a dSSmp but instead got %s', type(S))
 
 		if self.q != S.q:
 			raise ValueError('Cannot substract two State-Space systems with different size of inputs')
@@ -227,7 +227,7 @@ class dSSmp(object):
 			if isinstance(S, dSS):
 				S = dSSmp(S.A, S.B, S.C, S.D)
 			else:
-				raise ValueError('Cannot substract two dSSmp filters: expected a dSSmp but instead got %s') % type(S)
+				raise ValueError('Cannot substract two dSSmp filters: expected a dSSmp but instead got %s', type(S))
 
 
 		if self.q != S.q:
@@ -351,7 +351,7 @@ class dSSmp(object):
 		"""
 
 		import sollya
-		import sys
+
 
 		# load gabarit.sol
 		# sollya.suppressmessage(57, 174, 130, 457)

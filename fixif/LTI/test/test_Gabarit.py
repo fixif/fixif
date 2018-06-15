@@ -17,7 +17,7 @@ __status__ = "Beta"
 
 from pytest import mark
 from pytest import raises
-from fixif.LTI import Gabarit, dTF
+from fixif.LTI import Gabarit
 
 
 # a simple gabarit iterator
