@@ -49,7 +49,7 @@ def test_GabaritConstruction():
 	assert(g.bands[0].w2 == 0.4)
 	assert(g.bands[1].w1 == 0.5)
 	assert(g.bands[1].F2 == 24000)
-	assert(g.bands[0].isPassBand)
+	assert g.bands[0].isPassBand
 	assert(g.bands[0].passGains == (-1, 0))
 	assert(not g.bands[1].isPassBand)
 	assert(g.bands[1].stopGain == -20)

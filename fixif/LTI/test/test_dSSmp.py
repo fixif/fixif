@@ -31,7 +31,7 @@ def my_assertEqual_matrix(A, B):
 			if not A[i, j] - B[i, j] == mpmath.mp.zero:
 				raise ValueError('Matrices are not equal.')
 
-	assert(True)
+	assert True
 
 
 def my_assertAlmostEqual_matrix(A, B, rel_eps=None, abs_eps=None):
@@ -46,7 +46,7 @@ def my_assertAlmostEqual_matrix(A, B, rel_eps=None, abs_eps=None):
 			if not mpmath.almosteq(A[i, j], B[i, j], rel_eps, abs_eps):
 				raise ValueError('Matrices are not almost equal.')
 
-	assert(True)
+	assert True
 
 
 

@@ -52,13 +52,13 @@ def my_assert_allclose_TFmp(H, b, a, tol):
 
 	for i in range(0, b.rows):
 		if mpmath.fabs(b[i, 0] - H.num[0, i]) < tol:
-			assert(True)
+			assert True
 		else:
 			raise ValueError("MP transfer function is not close to the dTF")
 
 	for i in range(0, a.rows):
 		if mpmath.fabs(a[i, 0] - H.den[0, i]) < tol:
-			assert(True)
+			assert True
 		else:
 			raise ValueError("MP transfer function is not close to the dTF")
 
@@ -213,7 +213,7 @@ def test_str(S):
 def test_to_dTF(S):
 	if S.p > 1 or S.q > 1:
 		print('Case of %d and %d' % (S.p, S.q))
-		assert(True)
+		assert True
 	else:
 		H = S.to_dTF()
 		SS = H.to_dSS()

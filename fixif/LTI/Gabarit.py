@@ -209,7 +209,7 @@ class Gabarit(object):
 		self._seed = seed
 
 	def __str__(self):
-		seed = "Seed=%s\n" % (self._seed) if self._seed else ""
+		seed = "Seed=%s\n" % (self._seed,) if self._seed else ""
 		return "%sType: %s (Fs=%sHz)\n%s" % (seed, self.type, self._Fs, "\n".join(str(b) for b in self._bands))
 
 	@property
@@ -451,7 +451,7 @@ def random_Gabarit(form=None, seed=None):
 	# choose a form if asked
 	if form is None:
 		# form = choice(("lowpass", "highpass", "bandpass", "bandstop"))
-		form = choice(("lowpass"))
+		form = choice(("lowpass",))
 
 	Fs = randint(500, 100000)
 
