@@ -6,7 +6,7 @@ This file contains Lattice Wave Digital Filter
 """
 
 __author__ = "Thibault Hilaire, Anastasia Volkova"
-__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__copyright__ = "Copyright 2015, FiXiF Project, LIP6"
 __credits__ = ["Thibault Hilaire", "Anastasia Volkova"]
 
 __license__ = "GPL v3"

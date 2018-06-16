@@ -1,6 +1,6 @@
 
 _author__ = "Anastasia Volkova"
-__copyright__ = "Copyright 2016, FIPOgen Project, LIP6"
+__copyright__ = "Copyright 2016, FiXiF Project, LIP6"
 __credits__ = ["Anastasia Volkova"]
 
 __license__ = "GPL v3"

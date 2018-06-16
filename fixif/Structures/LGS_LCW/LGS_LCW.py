@@ -6,7 +6,7 @@ This file contains LGS and LCW structures
 """
 
 __author__ = "Benoit Lopez, Thibault Hilaire"
-__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__copyright__ = "Copyright 2015, FiXiF Project, LIP6"
 __credits__ = ["Benoit Lopez", "Thibault Hilaire"]
 
 __license__ = "GPL v3"

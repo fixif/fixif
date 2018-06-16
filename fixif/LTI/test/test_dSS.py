@@ -6,7 +6,7 @@ This file contains tests for the dSS class and its methods
 
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
-__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__copyright__ = "Copyright 2015, FiXiF Project, LIP6"
 __credits__ = ["Thibault Hilaire", "Joachim Kruithof"]
 
 __license__ = "GPL v3"

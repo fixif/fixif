@@ -7,7 +7,7 @@ arg : each block take in its constructor an etree element, a <tag> form xml
 
 
 __author__ = "Maminionja Ravoson"
-__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__copyright__ = "Copyright 2015, FiXiF Project, LIP6"
 __credits__ = ["Maminionja Ravoson", "Thibault Hilaire"]
 
 __license__ = "GPL v3"

@@ -5,7 +5,7 @@ This file contains Object and methods for a Butterworth filter
 """
 
 __author__ = "Thibault Hilaire"
-__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__copyright__ = "Copyright 2015, FiXiF Project, LIP6"
 __credits__ = ["Thibault Hilaire"]
 
 __license__ = "GPL v3"

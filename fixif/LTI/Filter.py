@@ -5,7 +5,7 @@ This file contains Object and methods for a Linear Time Invariant System (called
 """
 
 __author__ = "Thibault Hilaire"
-__copyright__ = "Copyright 2015, FIPOgen Project, LIP6"
+__copyright__ = "Copyright 2015, FiXiF Project, LIP6"
 __credits__ = ["Thibault Hilaire"]
 
 __license__ = "GPL v3"
