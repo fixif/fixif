@@ -14,6 +14,6 @@ from fixif.func_aux.mpf_matrix_fsub import mpf_matrix_fsub
 from fixif.func_aux.mpf_matrix_lt_inverse import  mpf_matrix_lt_inverse
 from fixif.func_aux.mpf_matrix_to_sollya import mpf_matrix_to_sollya
 from fixif.func_aux.sollya_matrix_print import sollya_matrix_print
-from fixif.func_aux.MatlabHelper import MatlabHelper
+from fixif.func_aux.MatlabHelper import MatlabHelper, isMatlabInstalled
 from fixif.func_aux.MPFMatrix import MPFMatrix
 from fixif.func_aux.sollya_matrix_to_numpy import sollya_matrix_to_numpy
