@@ -67,6 +67,10 @@ install:
       fi;
       pip install slycot || travis_terminate 1;
     fi
+  # install WCPG and its python wrapper
+  - git clone https://github.com/fixif/WCPG.git
+  - cd WCPG; sh autogen.sh && ./configure && make -j&& sudo make install; python setup.py instal; cd..
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
   # install required python packages for build and coverage
   - pip install pytest
   - pip install pytest-cov
