@@ -29,8 +29,9 @@ def makeLWDF(filt):
 	# connect to matlab if not already connected
 	MH = MatlabHelper(raiseError=True)
 	# add path to matlab files
-	MH.addpath('LWDF/matlab')
-	MH.addpath('LWDF/matlab/wdf_tbx')	# path to the LWDF matlab toolbox from TU Delf (http://www.latech.nl/mtbx)
+	MH.addpath('fixif/Structures/LWDF/matlab')
+	# path to the LWDF matlab toolbox from TU Delf (http://www.latech.nl/mtbx)
+	MH.addpath('fixif/Structures/LWDF/matlab/wdf_tbx')
 	# call the TF2LWDF2SIF matlab function
 	from matlab import double as m_double
 	R = MH.TF2LWDF2SIF(m_double(filt.dTF.num.tolist()), m_double(filt.dTF.den.tolist()))

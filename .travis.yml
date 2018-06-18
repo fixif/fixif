@@ -94,7 +94,7 @@ install:
 
 script:
     #- pytest -k construct --cov=fixif -s
-    - pytest --cov=fixif -s
+    - pytest -k "(LTI and not Gabarit) or (Structures and not simulink)" --cov=fixif -s
 
 notifications:
 email: false
