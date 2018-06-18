@@ -68,6 +68,19 @@ install:
       pip install slycot || travis_terminate 1;
     fi
   # install WCPG and its python wrapper
+   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      sudo apt-get install f2c || travis_terminate 1;
+      sudo apt-get install libmpfr-dev || travis_terminate 1;
+      sudo apt-get install libmpfi-dev || travis_terminate 1;
+      sudo apt-get build-dep python-scipy || travis_terminate 1;
+    else
+      brew install mpfi;
+      pip install numpy;
+      brew install gcc || brew link --overwrite gcc;
+      brew tap homebrew/boneyard;
+      wget http://hpc.sourceforge.net/buildf2c;
+      sh buildf2c;
+    fi
   - git clone https://github.com/fixif/WCPG.git
   - cd WCPG; sh autogen.sh && ./configure && make -j&& sudo make install
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
