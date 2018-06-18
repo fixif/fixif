@@ -133,7 +133,7 @@ class SIF(object):
 		a SIF object
 		"""
 		#  set and check sizes
-		self._l, self._n, self._p, self._q = self._check_dimensions(JtoS)
+		self._l, self._n, self._p, self._q = _check_dimensions(JtoS)
 		self._Z = None
 		self._build_Z(JtoS)
 		self._invJ = inv(JtoS[0])		#TODO: do it properly (no need to call inv() )
