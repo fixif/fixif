@@ -20,10 +20,7 @@ if nargin~=3
 end
 
 % list of properties that can be changed
-Props = {   'J','K','L','M','N','P','Q','R','S','Z', ...
-            'WJ','WK','WL','WM','WN','WP','WQ','WR','WS','WZ', ...
-            'FPIS', ...
-            'fp','block'};
+Props = {   'J','K','L','M','N','P','Q','R','S','Z'};
 
 % find the property in the list
 num = find( strcmpi(propName, Props) );
@@ -42,35 +39,11 @@ if num<21
     % compute appropriate parameters
     if num<10                                % 'J' to 'S'
         R = computeZ(R);
-        R = computeAZBZCZDZWcWo(R);
     elseif num==10                          % 'Z'
         R = computeJtoS(R);
-        R = computeAZBZCZDZWcWo(R);
-    elseif num<20                           % 'WJ' to 'WS'
-        R = computeZ(R);
-    elseif num==20                          % 'WZ'
-        R = computeJtoS(R);
-    end
-elseif num==21                              % 'FPIS'
-    R=setFPIS(R,value);
-elseif num==22                              % 'fp' or 'block'
-    fp = {'fixed','floating'};
-    fpv = find( strcmpi(value, fp) );
-    if isempty(fpv)
-        error('The ''fp'' field must be ''fixed'' or ''floating''');
-    else
-        R.fp = fpv;
-    end
-else                                        % 'block'
-    block = {'full','natural','none'};
-    vblock = find( strcmpi(value,block) );
-    if isempty(vblock)
-        error('The ''block'' field must be ''full'', ''natural'' or ''none''');
-    else
-        R.block = vblock;
+
     end
 end
-R = compute_rZ(R);
 
 
 %Description:

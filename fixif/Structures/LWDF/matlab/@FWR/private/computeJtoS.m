@@ -25,16 +25,6 @@ R.Q = R.Z(R.l+1:R.l+R.n,R.l+R.n+1:R.l+R.n+R.m);
 R.R = R.Z(R.l+R.n+1:R.l+R.n+R.p,R.l+1:R.l+R.n);
 R.S = R.Z(R.l+R.n+1:R.l+R.n+R.p,R.l+R.n+1:R.l+R.n+R.m);
 
-% WJ, WK, WL, WM, WN, WP, WQ, WR, WS
-R.WJ = R.WZ(1:R.l,1:R.l);
-R.WK = R.WZ(R.l+1:R.l+R.n,1:R.l);
-R.WL = R.WZ(R.l+R.n+1:R.l+R.n+R.p,1:R.l);
-R.WM = R.WZ(1:R.l,R.l+1:R.l+R.n);
-R.WN = R.WZ(1:R.l,R.l+R.n+1:R.l+R.n+R.m);
-R.WP = R.WZ(R.l+1:R.l+R.n,R.l+1:R.l+R.n);
-R.WQ = R.WZ(R.l+1:R.l+R.n,R.l+R.n+1:R.l+R.n+R.m);
-R.WR = R.WZ(R.l+R.n+1:R.l+R.n+R.p,R.l+1:R.l+R.n);
-R.WS = R.WZ(R.l+R.n+1:R.l+R.n+R.p,R.l+R.n+1:R.l+R.n+R.m);
 
 %Description:
 % 	\begin{center}\I{Internal function}\end{center}

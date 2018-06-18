@@ -14,7 +14,6 @@
 function R=computeZ(R)
 
 R.Z = [ -R.J R.M R.N; R.K R.P R.Q; R.L R.R R.S];
-R.WZ = [ R.WJ R.WM R.WN; R.WK R.WP R.WQ; R.WL R.WR R.WS];
 
 
 %Description:

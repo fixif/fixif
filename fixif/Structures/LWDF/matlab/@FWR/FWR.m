@@ -14,7 +14,7 @@
 %		:"fixed" (default value) or "floating"
 % block: block-representation scheme. The coefficients in a same block share the same representation (same scale factor, etc...). Take the following values:
 %		: "full": same representation for all coefficients of R
-%		: "natural" (default value): blocks are made of matrices J,K,L,M,N,P,Q,R,S 
+%		: "natural" (default value): blocks are made of matrices J,K,L,M,N,P,Q,R,S
 %		: "none": each coefficient has its own representation (according to its value)
 %
 % $Id: FWR.m 208 2009-01-05 13:52:19Z fengyu $
@@ -27,12 +27,6 @@ if nargin==0
     R.l=0; R.m=0; R.n=0; R.p=0;
     R.J=[]; R.K=[]; R.L=[]; R.M=[]; R.N=[];
     R.P=[]; R.Q=[]; R.R=[]; R.S=[]; R.Z=[];
-    R.WJ=[]; R.WK=[]; R.WL=[]; R.WM=[]; R.WN=[];
-    R.WP=[]; R.WQ=[]; R.WR=[]; R.WS=[]; R.WZ=[];
-    R.AZ=[]; R.BZ=[]; R.CZ=[]; R.DZ=[];
-    R.Wc=[]; R.Wo=[];
-    R.FPIS=[];
-    R.fp=1; R.block=2; R.rZ=[];
     R = class(R,'FWR');
     
 elseif nargin==1
@@ -57,34 +51,11 @@ else
     R.R = varargin{8};
     R.S = varargin{9};
     R.Z=[];
-    R.WJ=[]; R.WK=[]; R.WL=[]; R.WM=[]; R.WN=[];
-    R.WP=[]; R.WQ=[]; R.WR=[]; R.WS=[]; R.WZ=[];
-    R.AZ=[]; R.BZ=[]; R.CZ=[]; R.DZ=[];
-    R.Wc=[]; R.Wo=[];
-    R.FPIS=[];
-    % check args on fp and block
-    fp = {'fixed','floating'};
-    block = {'full','natural','none'};
-    if (nargin<10)
-        R.fp=1;
-    else
-        fpv = [ find( strcmpi(varargin{10},fp) ) 1 ];  
-        R.fp = fpv(1);          % 1 is the default value if varargin{10} is not in fp
-    end
-    if (nargin<11)
-        R.block=2;
-    else
-        vblock = [ find( strcmpi(varargin{11},block) ) 2 ];
-        R.block = vblock(1);    % 2 is the default value if varargin{11} is not in block
-    end
-    R.rZ=[];
     % build the class
     R = class(R,'FWR');
     % compute the other parameters
     R = computelmnp(R);
-    R = computeW(R);
-    R = computeAZBZCZDZWcWo(R);
-    R = compute_rZ(R);
+    R=computeZ(R);
 end
 
 
