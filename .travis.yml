@@ -93,7 +93,8 @@ install:
   - python setup.py  install
 
 script:
-    - pytest -k construct --cov=fixif -s
+    #- pytest -k construct --cov=fixif -s
+    - pytest --cov=fixif -s
 
 notifications:
 email: false
