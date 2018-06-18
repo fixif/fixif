@@ -15,16 +15,10 @@ LWDF = Hs2LWDF(Hsfilter,0);
 Hz_LWDF = LWDF2Hz(LWDF);
 [num1, num2] = Hz_LWDF.poly_fz;
 [denum1, denum2] = Hz_LWDF.poly_gz;
-checkTF_LWDF = norm(tf(num1, denum1, 1) - tf(b,a,1))
-
-
 
 order = max(length(b) - 1, length(a) - 1);
 R = LWDF2SIF(LWDF, order, 'LPF');
 [R, ~ ] = simplify2(R);
-
-checkTF_SIF = norm(tf(R) - tf(b,a,1))
-
 
 R = struct(R);
 end
