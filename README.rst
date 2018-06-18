@@ -17,31 +17,41 @@ regular packages:
 - jinja2 (>=2.8)
 - pytest (>=3.0)
 
-$ pip install numpy scipy matplotlib cython mpmath bottle jinja2 pytest
+    $ pip install numpy scipy matplotlib cython mpmath bottle jinja2 pytest
 
 Others:
 - pythonsollya (needs Sollya)
 - slycot (pip install slycot, see https://github.com/avventi/Slycot)
 - matlabengineforpython (needs Matlab http://fr.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html)
-- WCPG
+- WCPG (needs the fixif.WCPG library and its Python wrapper, see https://github.com/fixif/WCPG)
+
+You can have a look at the `travis.yml` file to see how we install it on a fresh linux (and osx) machine for the tests.
 
 
 -----
 TESTS
 
 - Run all the tests (-v is for verbose)
-$ py.test fipogen/ -v
+$ py.test fixif/ -v
 
 - Run some tests (like those about LTIs)
-$ py.test fipogen/LTI -v
-
-- Run some specific tests (like those with the name 'wcpg')
-$ py.test -v -k wcpg
+$ py.test fixif/LTI -v
 
 -----
 AUTHORS
 - Thibault HILAIRE
+- Anastasia VOLKOVA
 - Benoit LOPEZ
 - Joachim KRUITHOF
-- Anastasia VOLKOVA
--
+- Maminionja RAVOSON
+
+
+
+.. image:: https://travis-ci.org/fixif/fixif.svg?branch=master
+    :target: https://travis-ci.org/fixif/fixif
+    :align: right
+.. image:: https://coveralls.io/repos/github/fixif/fixif/badge.svg?branch=master
+    :target: https://coveralls.io/github/fixif/fixif?branch=master
+    :align: right
+
+
