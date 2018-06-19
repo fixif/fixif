@@ -15,11 +15,11 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-
+from copy import copy
 from numpy import empty, float64, identity, dot, array
 from numpy import matrix as mat, set_printoptions
 from numpy import eye, zeros, r_, c_, sqrt
-from numpy.linalg import inv, solve
+from numpy.linalg import inv, solve, norm
 from numpy.linalg.linalg import LinAlgError
 from scipy.linalg import solve_discrete_lyapunov
 
@@ -640,7 +640,7 @@ class dSS(object):
 
 
 
-	def assert_close(self, other, atol=1e-12):
+	def assert_close(self, other, eps=1e-5):
 		"""
 		Check if two dSS are almost equal
 		Parameters:
@@ -654,10 +654,15 @@ class dSS(object):
 		# self.D == other.D
 
 		# TODO: this is probably not enough...
-		assert_allclose(self.C*self.B, other.C*other.B, atol=atol)
-		assert_allclose(self.C*self.A*self.B, other.C*other.A*other.B, atol=atol)
-		assert_allclose(self.C*self.A*self.A*self.B, other.C*other.A*other.A*other.B, atol=atol)
-		assert_allclose(self.D, other.D, atol=atol)
+		# assert_allclose(self.C * self.B, other.C * other.B, rtol=rtol)
+		# assert_allclose(self.C * self.A * self.B, other.C * other.A * other.B, rtol=rtol)
+		# assert_allclose(self.C * self.A * self.A * self.B, other.C * other.A * other.A * other.B, rtol=rtol)
+		# assert_allclose(self.D, other.D, rtol=rtol)
+		assert norm(self.C * self.B - other.C * other.B) < eps
+		assert norm(self.C * self.A * self.B - other.C * other.A * other.B) < eps
+		assert norm(self.C * self.A * self.A * self.B - other.C * other.A * other.A * other.B) < eps
+		assert norm(self.D - other.D) < eps
+
 
 
 	def balanced(self):

@@ -27,7 +27,7 @@ def test_buildAllPossibleSISORealizationsFromdTF(H):
 
 	for R in iterAllRealizations(Filter(tf=H, stable=False)):
 		print(R.name + "\t")
-		H.assert_close(R.dSS.to_dTF(), eps=1e-6)
+		H.assert_close(R.dSS.to_dTF(), eps=1e-4)
 
 
 @pytest.mark.parametrize("F", iter_random_Filter(20, n=(5, 15), p=(1, 5), q=(1, 5)))
@@ -39,7 +39,7 @@ def test_buildAllPossibleMIMORealizationsFromdSS(F):
 	print('')
 	for R in iterAllRealizations(F):
 		print(R.name + "\t")
-		F.dSS.assert_close(R.dSS)
+		F.dSS.assert_close(R.dSS, eps=1e-3)
 
 
 @pytest.mark.parametrize("F", iter_random_Filter(20, n=(5, 10), p=(1, 2), q=(1, 2)))
