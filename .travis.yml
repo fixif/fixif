@@ -31,6 +31,7 @@ before_install:
       brew update;
       brew upgrade python;
       brew install bison || brew link --overwrite bison;
+      brew install libtool;
       PATH=/usr/local/opt/bison/bin:/usr/local/opt/python/libexec/bin:$PATH;
     fi
 
