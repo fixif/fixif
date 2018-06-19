@@ -1,10 +1,13 @@
+FiXiF
+*****
+
 FiXiF is a suite of tools to implement filters on embedded devices (usually DSPs, micro-controllers or FPGAs) with finite-precision effects in mind.
 It allows to transform a filter/controller into some code (to be executed on a given target) using Fixed-Point Arithmetic, and guaranteeing that the final output error (due to the quantization of the coefficients and the round-off error) is less than a given epsilon.
 It allows to consider various possible equivalent (in infinite precision, but no more in finite precision) algorithms (like direct Forms, lattice, state-space, rho-operator based, etc), and find a "good" one, and perform the error analysis.
 
 For the moment FiXif is not fully usable (partly because it is the merge of various previous tools) for everyone, but we want to make "soon" a release. It is based on a several years research work done in academic lab.
 
---------------------
+====================
 INSTALL/REQUIREMENTS
 
 regular packages:
@@ -28,7 +31,7 @@ Others:
 You can have a look at the `travis.yml` file to see how we install it on a fresh linux (and osx) machine for the tests.
 
 
------
+=====
 TESTS
 
 - Run all the tests (-v is for verbose)
@@ -37,7 +40,7 @@ $ py.test fixif/ -v
 - Run some tests (like those about LTIs)
 $ py.test fixif/LTI -v
 
------
+=======
 AUTHORS
 - Thibault HILAIRE
 - Anastasia VOLKOVA
