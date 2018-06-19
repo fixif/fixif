@@ -10,7 +10,7 @@ try:
 	from fixif.Structures.LWDF.LWDF import LWDF
 except ImportError:
 	# cannot import LWDF when matlab python engine is not installed
-	pass
+	LWDF = None
 
 
 

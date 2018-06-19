@@ -11,11 +11,8 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 from fixif.Structures import iterAllRealizations, LWDF
-from fixif.LTI import Filter, iter_random_Filter, random_Filter
-from fixif.LTI import iter_random_Butter
+from fixif.LTI import Filter, iter_random_Filter
 from fixif.LTI import iter_random_dTF
-from fixif.Structures import DFI
-
 import pytest
 import numpy
 
@@ -64,11 +61,12 @@ def test_LWDF(F):
 	Check the LWDF structure
 	check that the correspong transfer function is equal to the initial transfer function
 	"""
-	if F.dTF._order % 2 == 1:
-		R = LWDF.makeRealization(F)
-		F.dTF.assert_close(R.to_dTF(), eps=1e-8)
-	else:
-		assert True
+	if LWDF:
+		if F.dTF._order % 2 == 1:
+			R = LWDF.makeRealization(F)
+			F.dTF.assert_close(R.to_dTF(), eps=1e-8)
+		else:
+			assert True
 
 
 def test_LWDF1():
@@ -82,6 +80,7 @@ def test_LWDF1():
 	a = numpy.matrix([1.000000000000000e+00, - 4.340164570232563e+00, 7.668918353331406e+00, - 6.884599315526233e+00, \
 					  3.136630548401215e+00, - 5.797542329642728e-01])
 
-	F = Filter(num=b, den=a)
-	R = LWDF.makeRealization(F)
-	F.dTF.assert_close(R.to_dTF(), eps=1e-8)
+	if LWDF:
+		F = Filter(num=b, den=a)
+		R = LWDF.makeRealization(F)
+		F.dTF.assert_close(R.to_dTF(), eps=1e-8)
