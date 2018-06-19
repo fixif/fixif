@@ -9,7 +9,7 @@ For the moment FiXif is not fully usable (partly because it is the merge of vari
 
 ====================
 INSTALL/REQUIREMENTS
-
+====================
 regular packages:
 - numpy (>=1.11)
 - scipy (>=0.18)
@@ -33,7 +33,7 @@ You can have a look at the `travis.yml` file to see how we install it on a fresh
 
 =====
 TESTS
-
+=====
 - Run all the tests (-v is for verbose)
 $ py.test fixif/ -v
 
@@ -42,6 +42,7 @@ $ py.test fixif/LTI -v
 
 =======
 AUTHORS
+=======
 - Thibault HILAIRE
 - Anastasia VOLKOVA
 - Benoit LOPEZ
