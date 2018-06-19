@@ -70,7 +70,7 @@ def test_to_dSS(H):
 	S = H.to_dSS()
 	HH = S.to_dTF()
 
-	H.assert_close(HH)
+	H.assert_close(HH, eps=1e-6)
 
 
 

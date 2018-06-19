@@ -52,7 +52,7 @@ def test_buildAllPossibleStableSISORealizationsFromdSS(F):
 	for R in iterAllRealizations(F):
 		print(R.name + "\t")
 		# F.dSS.assert_close( R.dSS )
-		F.dTF.assert_close(R.to_dTF(), eps=1e-4)
+		F.dTF.assert_close(R.to_dTF(), eps=1e-3)
 
 
 @pytest.mark.parametrize( "F", iter_random_Filter(20, n=(3, 15), p=(1, 2), q=(1, 2)))
