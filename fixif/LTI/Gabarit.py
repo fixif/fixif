@@ -16,7 +16,7 @@ __status__ = "Beta"
 
 
 from fixif.LTI import dTF
-from fixif.func_aux import MatlabHelper
+from fixif.func_aux import MatlabHelper, isMatlabInstalled
 
 from scipy.signal import iirdesign, freqz
 from numpy import array, pi, log10, infty
@@ -25,15 +25,11 @@ from numpy.random import seed as set_seed, choice, randint, uniform
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
-# import sollya
-
-
-# load 'gabarit.sol'
-
-# -> TO uncomment when sollya is installed
-# sollya.suppressmessage(57, 174, 130, 457)
-# sollya.execute("fipogen/LTI/gabarit.sol")
-
+# try to install sollya
+try:
+	import sollya
+except ImportError:
+	pass
 
 
 class Band(object):
@@ -41,6 +37,7 @@ class Band(object):
 	It could be a pass band (gain in [G1;G2]) or astop band (gain<G)
 	Gains are in dB, frequencies in Hz (except if Fs is None, otherwise frequencies are Nyquist normalised frequencies)
 	"""
+
 	def __init__(self, Fs, F1, F2, Gain):
 		"""
 		Constructor of a band (a pass band or a stop band)
@@ -127,6 +124,9 @@ class Band(object):
 			margin is negative when the band is reduced
 		Returns a dictonary for sollya checkModulusFilterInSpecification
 		"""
+		# deal with Sollya
+		Gabarit.readyToRunWithSollya()
+
 		w1 = 2*sollya.SollyaObject(self._F1)/self._Fs
 		w2 = 2*sollya.SollyaObject(self._F2)/self._Fs if self._F2 else 1    # F2==None -> F2=Fs/2, so w2=1
 		margin = sollya.SollyaObject(margin)
@@ -181,6 +181,22 @@ class Gabarit(object):
 	A Gabarit object represents a freq. specification
 	It is decomposed in bands, that can be pass-band (amplitude in [x;y]) or stop-band (amplitude less than z)
 	"""
+	isSollyaRunning = None		# None (untested), True or False
+
+	@staticmethod
+	def readyToRunWithSollya():
+		"""load gabarit.sol and check if ready/ok"""
+
+		if not Gabarit.isSollyaRunning:
+			Gabarit.isSollyaRunning = True
+			try:
+				sollya.suppressmessage(57, 174, 130, 457)
+				sollya.execute("fixif/LTI/gabarit.sol")
+			except NameError:
+				raise ValueError("Sollya and SollyaPython are not installed !")
+
+
+
 
 	def __init__(self, Fs, Fbands, Abands, seed=None):
 		"""
@@ -260,16 +276,15 @@ class Gabarit(object):
 			- Chebyshev II  : 'cheby2'
 			- Cauer/elliptic: 'ellip'
 			- Bessel/Thomson: 'bessel'
-		- method: (string) the method used ('scipy' for scipy.signal.iirdesign, or 'matlab' for matlab fdesign functions)
+		- method: (string) the method used ('scipy' for scipy.signal.iirdesign, 'matlab' for matlab fdesign functions)
 		- designMargin: margin (in dB) the designer wants to add to its design (positive reduce the band)
 
 		Returns a transfer function (dTF object)
 		"""
 		# Start Matlab if needed
 		matlabEng = None
-		if method == 'matlab':
-			MH = MatlabHelper()
-			matlabEng = MH.engine
+		if method == 'matlab' and isMatlabInstalled():
+			matlabEng = MatlabHelper(raiseError=False)
 
 		# normalize bands (with pass gain centered in 0dB)
 		centerPassGain = max((b.passGains[0]+b.passGains[1])/2.0 for b in self._bands if b.isPassBand)
@@ -369,6 +384,9 @@ class Gabarit(object):
 		- isOk: True if the transfer function is in the gabarit
 		- res: sollya object embedded the result
 		"""
+
+		Gabarit.readyToRunWithSollya()
+
 		# get num,den as sollya objects
 		num, den = tf.to_Sollya()
 
@@ -385,6 +403,9 @@ class Gabarit(object):
 
 
 	def findMinimumMargin(self, tf, initMargin=0):
+
+		Gabarit.readyToRunWithSollya()
+
 		margin = sollya.round(initMargin, 53, sollya.RU)
 		deltaMargin = -infty
 		gPass = False
@@ -408,7 +429,7 @@ class Gabarit(object):
 
 				# if the old margin is lower than the new margin, and it is not the first iteration
 				if oldDeltaMargin <= deltaMargin and oldDeltaMargin != -infty and margin != 0:
-					print("deltaMargin does not decrease:\n old=%s\n new=%s") % (oldDeltaMargin, deltaMargin)
+					print(("deltaMargin does not decrease:\n old=%s\n new=%s") % (oldDeltaMargin, deltaMargin))
 					# deltaMargin *=2
 					# raise ValueError("deltaMargin does not decrease")
 

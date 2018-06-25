@@ -122,6 +122,10 @@ class dTF(object):
 		- num, den: (sollya object) numerator and denominator of the transfer function
 		"""
 		if not self._sollya:
+			try:
+				import sollya
+			except ImportError:
+				raise ImportError("Sollya and SollyaPython are required (but not installed) !")
 			num = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(self.num)[0, :])))
 			den = sollya.horner(sum(sollya.SollyaObject(x) * sollya._x_ ** i for i, x in enumerate(array(self.den)[0, :])))
 			self._sollya = (num, den)
