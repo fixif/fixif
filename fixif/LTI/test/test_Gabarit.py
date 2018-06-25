@@ -88,10 +88,10 @@ def test_Gabarit_to_dTF(g, ftype, method):
 	Test if the conversion to_dTF works for matlab/scipy and various types
 	"""
 	H = g.to_dTF(method=method, ftype=ftype, designMargin=1e-3)
-	print(H)
+	#print(H)
 	# check it's in the gabarit +/- 1dB
 	# assert(g.check_dTF(H,margin=0)[0])
-	print(g.findMinimumMargin(H))
+	assert(g.findMinimumMargin(H)<0.5)
 	# g.plot(H)
 
 
@@ -100,11 +100,11 @@ def test_minimumMargin(g):
 	# g = Gabarit(48000,[ (0,9600), (12000,None) ], [-20, (0,-1)])
 	H = g.to_dTF(method='matlab', ftype='ellip')
 	# H2 = dTF(1.1*H.num,H.den)
-	print(g.findMinimumMargin(H))
+	assert (g.findMinimumMargin(H) < 1)
 
 
 def test_cql():
 	g = Gabarit(48000, [(0, 9600), (12000, None)], [(0, -1), -20])
 	H = g.to_dTF(method='matlab', ftype='cheby1')
-	print(H)
-	print(g.findMinimumMargin(H))
+	#print(H)
+	assert (g.findMinimumMargin(H) < 0.109)

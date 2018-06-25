@@ -422,8 +422,8 @@ class Gabarit(object):
 				if deltaMargin == 0:
 					deltaMargin += 10**(1e-3 + self.maxGain()/20) - 10**(self.maxGain()/20)
 
-				print('deltaMargin='+str(deltaMargin))
-				print('margin='+str(margin))
+				#print('deltaMargin='+str(deltaMargin))
+				#print('margin='+str(margin))
 				# check if we have something to improve
 				# check if the margin decrease
 
