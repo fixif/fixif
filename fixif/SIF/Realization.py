@@ -98,10 +98,6 @@ class Realization(SIF):
 		# store the run module (that contains C functions generated to "evaluate" the realization (double, FxP, multiprecision, etc.))
 		self._runModule = None
 
-	def __del__(self):
-		# remove the module file (.so) when it exists
-		if self._runModule is not None:
-			remove( self._runModule.__file__ )
 
 	@property
 	def MSB(self):
