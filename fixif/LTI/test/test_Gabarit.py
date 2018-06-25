@@ -83,15 +83,20 @@ def test_GabaritConstruction():
 @mark.parametrize("ftype", ('butter', 'cheby1', 'cheby2', 'ellip'))
 # @mark.parametrize("type", ['ellip'])
 @mark.parametrize("method", ('matlab', 'scipy'))
-def test_Gabarit_to_dTF(g, ftype, method):
+def test_Gabarit_to_dTF(g,ftype, method):
 	"""
 	Test if the conversion to_dTF works for matlab/scipy and various types
 	"""
 	H = g.to_dTF(method=method, ftype=ftype, designMargin=1e-3)
 	#print(H)
 	# check it's in the gabarit +/- 1dB
-	# assert(g.check_dTF(H,margin=0)[0])
-	assert(g.findMinimumMargin(H)<0.5)
+	res = g.check_dTF(H, margin=1e-3)[0]
+	if ftype == 'cheby1' and len(g.bands)==2:
+		assert(not res)		# the two first gabarit (lowpass and highpass) should fail with cheby1 method
+	else:
+		assert(res)
+
+	# assert(g.findMinimumMargin(H)<0.5)
 	# g.plot(H)
 
 
