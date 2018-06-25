@@ -202,7 +202,7 @@ def test_subsystems(S):
 
 @pytest.mark.parametrize("S", iter_random_dSS(20))
 def test_str(S):
-	print(str(S))
+	str(S)
 
 
 @pytest.mark.parametrize("S", iter_random_dSS(20, False, n=(5, 15), p=(1, 2), q=(1, 2)))
