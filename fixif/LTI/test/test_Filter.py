@@ -49,7 +49,7 @@ def test_construction():
 
 @pytest.mark.parametrize("H", iter_random_Butter(20, onlyEven=True), ids=lambda x: x.name)
 def test_butter(H):
-	print(H.dTF)
+	_ = H.dTF
 
 
 @pytest.mark.parametrize("H", iter_random_Filter(20, seeded=True, ftype='all'), ids=lambda x: x.name)
