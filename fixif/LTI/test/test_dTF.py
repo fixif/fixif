@@ -62,7 +62,7 @@ def test_construction():
 
 @pytest.mark.parametrize("H", iter_random_dTF(20))
 def test_str(H):
-	print(str(H))
+	str(H)
 
 
 @pytest.mark.parametrize("H", iter_random_dTF(20))
