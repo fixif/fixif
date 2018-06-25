@@ -44,8 +44,9 @@ install:
           sudo apt-get install libmpfi-dev;
         else
           brew install mpfi;
+          sudo ln -s /usr/local/lib /lib;
         fi;
-        ln -s /usr/local/lib /lib;
+
         git clone https://github.com/fplll/fplll.git;
         cd fplll;
         ./autogen.sh && ./configure && make -j&& sudo make install; cd ..;
