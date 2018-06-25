@@ -97,10 +97,10 @@ install:
 script:
     #- pytest -k construct --cov=fixif -s
     - if "$SOLLYA"; then
-          pytest -k "(LTI and not WCPGmp) or (Structures and not simulink)" --cov=fixif -s
+          pytest -k "(LTI and not WCPGmp) or (Structures and not simulink)" --cov=fixif -s;
       else
-          pytest -k "(LTI and not Gabarit and not WCPGmp) or (Structures and not simulink)" --cov=fixif -s
-      fi;
+          pytest -k "(LTI and not Gabarit and not WCPGmp) or (Structures and not simulink)" --cov=fixif -s;
+      fi
 
 notifications:
 email: false
