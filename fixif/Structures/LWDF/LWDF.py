@@ -15,7 +15,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-import os
+
 from fixif.Structures.Structure import Structure
 from numpy import matrix as mat
 from fixif.func_aux import MatlabHelper, isMatlabInstalled
