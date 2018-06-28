@@ -17,7 +17,7 @@ __status__ = "Beta"
 
 import pytest
 from colorama import Fore
-
+from itertools import chain
 from fixif.SIF import Realization
 from numpy import matrix as mat, zeros,eye, empty, float64
 
@@ -35,11 +35,11 @@ from numpy.testing import assert_allclose
 
 
 @pytest.mark.parametrize("S", iter_random_dSS(5, n=(5, 15), p=(1, 5), q=(1, 5)))
-def test_construction(S):
+def test_construction_from_dSS(S):
 	# random SIF from dSS (J=identity, K=zero, L=zero, M=random, N=random)
 	l = randint(0,10)
 	JtoS = (eye(l), zeros((S.n, l)), zeros((S.p, l)), rand(l, S.n), rand(l, S.q), S.A, S.B, S.C, S.D)
-	R = Realization( Filter(ss=S), JtoS )
+	R = Realization(Filter(ss=S), JtoS)
 
 	assert len(R._varNameT) == l
 	assert len(R._varNameX) == S.n
@@ -48,6 +48,11 @@ def test_construction(S):
 
 
 
+@pytest.mark.parametrize("F", iter_random_Filter(10, ftype='SISO'), ids=lambda x: x.name)
+def test_construction_SISO(F):
+	# iter on realizations
+	for R in iterAllRealizations(F):
+		pass
 
 
 @pytest.mark.parametrize("F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
