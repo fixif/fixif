@@ -232,16 +232,13 @@ def test_MSBcomputation():
 	wcpgDeltaH = deltaH.dSS.WCPG()
 
 
-	#print H.to_dSS().WCPG_tf()
-	#print H.to_dSS().to_dSSmp().WCPGmp(2**-53)
-
-
-
+	print(H.to_dSS().WCPG_tf())
+	print(H.to_dSS().to_dSSmp().WCPGmp(2**-53))
 
 	nSimulations = 100
 
 
-	#assert(test_computeMSBSIF(nSimulations))
+	assert(test_computeMSBSIF(nSimulations))
 
 
 

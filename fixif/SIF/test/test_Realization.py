@@ -34,7 +34,7 @@ from numpy.random import seed, rand, randint, shuffle
 from numpy.testing import assert_allclose
 
 
-@pytest.mark.parametrize( "S", iter_random_dSS(5, n=(5,15), p=(1,5), q=(1,5) ))
+@pytest.mark.parametrize("S", iter_random_dSS(5, n=(5, 15), p=(1, 5), q=(1, 5)))
 def test_construction(S):
 	# random SIF from dSS (J=identity, K=zero, L=zero, M=random, N=random)
 	l = randint(0,10)
@@ -50,8 +50,8 @@ def test_construction(S):
 
 
 
-@pytest.mark.parametrize( "F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
-#@pytest.mark.parametrize( "F", [ random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
+@pytest.mark.parametrize("F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
+# @pytest.mark.parametrize("F", [random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
 def test_implementCdouble(F):
 
 	N = 10
@@ -59,7 +59,7 @@ def test_implementCdouble(F):
 
 	from numpy.linalg import norm
 
-	for R in iterAllRealizations( F ):
+	for R in iterAllRealizations(F):
 		print('\n'+Fore.RED + str(R.name)+ Fore.RESET+'\n\t')
 
 		#y = R.simulateMP(u)
@@ -68,18 +68,17 @@ def test_implementCdouble(F):
 
 		yC = R.runCdouble(u)
 
-		assert( norm( yb-yC)<1e-5)
+		assert norm(yb-yC) < 1e-5
 
 
 
-
-def test_makeModule():
-	F = random_Filter()
+@pytest.mark.parametrize( "F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
+def test_makeModule(F):
 	R = State_Space(F)
 	R.makeModule()
 
 
-@pytest.mark.parametrize( "R", iterAllRealizationsRandomFilter(1), ids=lambda x: x.name)
+@pytest.mark.parametrize("R", iterAllRealizationsRandomFilter(1), ids=lambda x: x.name)
 def test_rea2(R):
 	N = 10
 	u = 300 * rand(R.filter.q,1)  # random input of N samples

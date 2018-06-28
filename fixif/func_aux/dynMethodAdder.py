@@ -1,4 +1,4 @@
-#coding=UTF8
+# coding: utf-8
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FiXiF Project, LIP6"
@@ -32,18 +32,18 @@ def dynMethodAdder(t_class):
 
 	# look at all the .py files in the same directory as t_class and starting with its name plus '_'
 	path_mod = dirname(getfile(t_class))
-	file_pattern = join( path_mod, t_class.__name__ + "_*.py" )
-	for f_name in glob( file_pattern ):
+	file_pattern = join(path_mod, t_class.__name__ + "_*.py")
+	for f_name in glob(file_pattern):
 
 		submod_name = basename(f_name)[:-3]   # basename without the extension .py
-		f, tmp_filename, description = find_module( submod_name, [dirname(f_name)])
+		f, tmp_filename, description = find_module(submod_name, [dirname(f_name)])
 
 		try:
-			mod_mod = load_module( submod_name, f, tmp_filename, description)
+			mod_mod = load_module(submod_name, f, tmp_filename, description)
 
 			# iter over all the method listed in __all__
 			for func_name in mod_mod.__all__:
-				setattr( t_class, func_name, mod_mod.__dict__[func_name])
+				setattr(t_class, func_name, mod_mod.__dict__[func_name])
 
 		except ImportError as err:
 			print('ImportError:', err)
