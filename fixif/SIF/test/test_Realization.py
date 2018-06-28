@@ -49,21 +49,18 @@ def test_construction(S):
 
 
 
-#seed(120)
-#N = 10
-#u = 300 * rand(1,N)# random input of N samples
 
 @pytest.mark.parametrize( "F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
 #@pytest.mark.parametrize( "F", [ random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
 def test_implementCdouble(F):
 
 	N = 10
-	u = 3000 * rand(F.q,N)  # random input of N samples
+	u = 3000 * rand(F.q, N)  # random input of N samples
 
 	from numpy.linalg import norm
 
 	for R in iterAllRealizations( F ):
-		print( '\n'+Fore.RED + str(R.name)+ Fore.RESET+'\n\t')
+		print('\n'+Fore.RED + str(R.name)+ Fore.RESET+'\n\t')
 
 		#y = R.simulateMP(u)
 

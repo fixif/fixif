@@ -43,10 +43,10 @@ def isTrivial(x, epsilon):
 
 	return value is boolean
 	"""
-	if x==0:
+	if x == 0:
 		return True
-	p = round( log(abs(x),2) )
-	alpha = log(abs(x),2) - p
+	p = round(log(abs(x), 2))
+	alpha = log(abs(x), 2) - p
 
 	return abs(alpha) < epsilon*(1-epsilon/2)
 
@@ -62,19 +62,19 @@ def _check_dimensions(JtoS):
 	n = []
 	p = []
 	q = []
-	matrices = [ ("J",l,l), ("K",n,l), ("L",p,l), ("M",l,n), ("N",l,q), ("P",n,n), ("Q",n,q), ("R",p,n), ("S",p,q) ]
+	matrices = [("J", l, l), ("K", n, l), ("L", p, l), ("M", l, n), ("N", l, q), ("P", n, n), ("Q", n, q), ("R", p, n), ("S", p, q)]
 
 	# we check every matrix
-	for X, (name,a,b) in zip(JtoS, matrices):
+	for X, (name, a, b) in zip(JtoS, matrices):
 		# get the size if it's the first time we see them
 		if not a:
-			a.extend( [X.shape[0], name] )
+			a.extend([X.shape[0], name])
 		if not b:
-			b.extend( [X.shape[1], name] )
+			b.extend([X.shape[1], name])
 		# check for consistency
-		if (a[0],b[0]) != X.shape:
-			pb = a[1] if a[0]!=X.shape[0] else b[1]
-			raise ValueError( "The matrix %s is a %dx%d matrix, instead of being a %dx%d matrix (to be consistent with matrix %s)" % (name, X.shape[0], X.shape[1], a[0], b[0], pb) )
+		if (a[0], b[0]) != X.shape:
+			pb = a[1] if a[0] != X.shape[0] else b[1]
+			raise ValueError("The matrix %s is a %dx%d matrix, instead of being a %dx%d matrix (to be consistent with matrix %s)", name, X.shape[0], X.shape[1], a[0], b[0], pb)
 
 	return l[0], n[0], p[0], q[0]
 
@@ -120,7 +120,7 @@ class SIF(object):
 	epsilondZ = 1e-8    # used to deduced dJ, dK, dL, dM, dN, dP, dQ, dR and dS matrices when they are not specified
 
 
-	def __init__ ( self, JtoS, dJtodS=None):
+	def __init__(self, JtoS, dJtodS=None):
 		"""
 		the SIF object is built from the matrices J, K, L, M, N, P, Q, R and S
 		Parameters
@@ -136,20 +136,20 @@ class SIF(object):
 		self._l, self._n, self._p, self._q = _check_dimensions(JtoS)
 		self._Z = None
 		self._build_Z(JtoS)
-		self._invJ = inv(JtoS[0])		#TODO: do it properly (no need to call inv() )
+		self._invJ = inv(JtoS[0])		# TODO: do it properly (no need to call inv() )
 		self._build_fromZ()
 
 		# build _dZ, the associated state space _dSS (contains AZ, BZ, CZ, DZ, gramians, etc.), _M1 _M2 _N1 _N2 and the *_bar matrices
 		self._dZ = None
-		self._build_dZ( dJtodS )
+		self._build_dZ(dJtodS)
 
 
-	def _build_Z( self, JtoS ):
+	def _build_Z(self, JtoS):
 		"""
 		build Z or dZ depending on provided matrix tuple
 		"""
 		J, K, L, M, N, P, Q, R, S = [np.matrix(X) for X in JtoS]
-		self._Z = np.bmat( [[-J, M, N], [K, P, Q], [L, R, S]] )
+		self._Z = np.bmat([[-J, M, N], [K, P, Q], [L, R, S]])
 
 
 
@@ -207,7 +207,7 @@ class SIF(object):
 		# compute the useful matrices M1, M2, N1 and N2
 		self._M1 = c_[self.K * self._invJ, eye(self._n), zeros((self._n, self._p))]
 		self._M2 = c_[self.L * self._invJ, zeros((self._p, self._n)), eye(self._p)]
-		self._N1 = r_[self._invJ * self.M, self.AZ, self.CZ ]
+		self._N1 = r_[self._invJ * self.M, self.AZ, self.CZ]
 		self._N2 = r_[self._invJ * self.N, self.BZ, self.DZ]
 
 
@@ -225,10 +225,10 @@ class SIF(object):
 		'dZ' is :math:`\delta Z`
 		"""
 		if dJtodS is None:
-			self._dZ = np.vectorize( lambda x: int(not isTrivial(x, SIF.epsilondZ))) ( self._Z)
+			self._dZ = np.vectorize(lambda x: int(not isTrivial(x, SIF.epsilondZ)))(self._Z)
 		else:
 			dJ, dK, dL, dM, dN, dP, dQ, dR, dS = [np.matrix(X) for X in dJtodS]
-			self._dZ = np.bmat( [[dJ, dM, dN], [dK, dP, dQ], [dL, dR, dS]] )
+			self._dZ = np.bmat([[dJ, dM, dN], [dK, dP, dQ], [dL, dR, dS]])
 
 
 
@@ -288,7 +288,7 @@ class SIF(object):
 		it's Z, except that the term `J` has zeros on its diagonal
 		"""
 		Zcomp = copy(self._Z)
-		Zcomp[0:self._l,0:self._l] = -self.J + eye(self._l) # to set to 0 the diagonal terms of J
+		Zcomp[0:self._l, 0:self._l] = -self.J + eye(self._l)  # to set to 0 the diagonal terms of J
 		return Zcomp
 
 
@@ -298,13 +298,13 @@ class SIF(object):
 
 	# Z, dZ setters
 	@Z.setter
-	def Z( self, mymat ):
+	def Z(self, mymat):
 		self._Z = mymat
 		self._invJ = inv(self.J)
 		self._build_fromZ()
 
 	@dZ.setter
-	def dZ( self, mymat ):
+	def dZ(self, mymat):
 		self._dZ = mymat
 
 
@@ -394,51 +394,51 @@ class SIF(object):
 
 	# JtoS setters
 	# J to N : we rebuild all matrices
-	#TODO: is it really useful ?
+	# TODO: is it really useful ?
 	@J.setter
-	def J( self, mymat ):
+	def J(self, mymat):
 		self._Z[0: self._l, 0: self._l] = - mymat
 		self._invJ = inv(mymat)
 		self._build_fromZ()
 
 	@K.setter
-	def K( self, mymat ):
+	def K(self, mymat):
 		self._Z[self._l: self._l + self._n, 0: self._l] = mymat
 		self._build_fromZ()
 
 	@L.setter
-	def L( self, mymat ):
+	def L(self, mymat):
 		self._Z[self._l + self._n: self._l + self._n + self._p, 0:self._l] = mymat
 		self._build_fromZ()
 
 	@M.setter
-	def M( self, mymat ):
+	def M(self, mymat):
 		self._Z[0: self._l, self._l: self._l + self._n] = mymat
 		self._build_fromZ()
 
 	@N.setter
-	def N( self, mymat ):
+	def N(self, mymat):
 		self._Z[0: self._l, self._l + self._n: self._l + self._n + self._q] = mymat
 		self._build_fromZ()
 
 	@P.setter
-	def P( self, mymat ):
+	def P(self, mymat):
 		self._Z[self._l: self._l + self._n, self._l: self._l + self._n] = mymat
-		self._build_dZ(None)	# TODO: all these setters should call _build_dZ(None) !!
+		self._build_dZ(None)  # TODO: all these setters should call _build_dZ(None) !!
 		self._build_AZtoDZ()
 
 	@Q.setter
-	def Q( self, mymat ):
+	def Q(self, mymat):
 		self._Z[self._l: self._l + self._n, self._l + self._n: self._l + self._n + self._q] = mymat
 		self._build_fromZ()
 
 	@R.setter
-	def R( self, mymat ):
+	def R(self, mymat):
 		self._Z[self._l + self._n: self._l + self._n + self._p, self._l: self._l + self._n] = mymat
 		self._build_fromZ()
 
 	@S.setter
-	def S( self, mymat ):
+	def S(self, mymat):
 		self._Z[self._l + self._n: self._l + self._n + self._p, self._l + self._n: self._l + self._n + self._q] = mymat
 		self._build_fromZ()
 
@@ -446,39 +446,39 @@ class SIF(object):
 	# dJtodS setters
 	# we only modify dZ matrix so no need to rebuild anything
 	@dJ.setter
-	def dJ( self, mymat ):
+	def dJ(self, mymat):
 		self._dZ[0: self._l, 0: self._l] = mymat
 
 	@dK.setter
-	def dK( self, mymat ):
+	def dK(self, mymat):
 		self._dZ[self._l: self._l + self._n, 0: self._l] = mymat
 
 	@dL.setter
-	def dL( self, mymat ):
+	def dL(self, mymat):
 		self._dZ[self._l + self._n: self._l + self._n + self._p, 0:self._l] = mymat
 
 	@dM.setter
-	def dM( self, mymat ):
+	def dM(self, mymat):
 		self._dZ[0: self._l, self._l: self._l + self._n] = mymat
 
 	@dN.setter
-	def dN( self, mymat ):
+	def dN(self, mymat):
 		self._dZ[0: self._l, self._l + self._n: self._l + self._n + self._q] = mymat
 
 	@dP.setter
-	def dP(self, mymat ):
+	def dP(self, mymat):
 		self._dZ[self._l: self._l + self._n, self._l: self._l + self._n] = mymat
 
 	@dQ.setter
-	def dQ( self, mymat ):
+	def dQ(self, mymat):
 		self._dZ[self._l: self._l + self._n, self._l + self._n: self._l + self._n + self._q] = mymat
 
 	@dR.setter
-	def dR( self, mymat ):
+	def dR(self, mymat):
 		self._dZ[self._l + self._n: self._l + self._n + self._p, self._l: self._l + self._n] = mymat
 
 	@dS.setter
-	def dS( self, mymat ):
+	def dS(self, mymat):
 		self._dZ[self._l + self._n: self._l + self._n + self._p, self._l + self._n: self._l + self._n + self._q] = mymat
 
 
@@ -494,12 +494,15 @@ class SIF(object):
 	@property
 	def n(self):
 		return self._n
+
 	@property
 	def p(self):
 		return self._p
+
 	@property
 	def q(self):
 		return self._q
+
 	@property
 	def l(self):
 		return self._l
@@ -508,8 +511,8 @@ class SIF(object):
 		"""
 		Returns a string describing the SIF
 		"""
-		def plural ( n ):
-			return 's' if n>1 else ''
+		def plural(n):
+			return 's' if n > 1 else ''
 
 		mystr = "l={0}, n={1}, p={2}, q={3} ({0} intermediate variable{4}, {1} state{5}, {3} input{7}, {2} output{6})\n".format(
 			self._l, self._n, self._p, self._q, plural(self._l), plural(self._n), plural(self._p), plural(self._q))
@@ -555,7 +558,7 @@ class SIF(object):
 		u = np.matrix(np.zeros([self._dSS.q, N]))
 		u[:, 0] = self.dSS.D
 		for i in range(1, N):
-			u[:, i] = u_bar * np.sign(self.dSS.B * (self.dSS.A ** (N - i )) * self.dSS.C)
+			u[:, i] = u_bar * np.sign(self.dSS.B * (self.dSS.A ** (N - i)) * self.dSS.C)
 		return u
 
 
@@ -568,18 +571,18 @@ class SIF(object):
 		Returns:
 			- y: a p*N matrix
 		"""
-		u=mat(u)
+		u = mat(u)
 		N = u.shape[1]
 		if u.shape[0] != self._q:
-			raise ValueError( "SIF.simulate: u should be a %d*N matrix"%self._q )
-		y = mat(zeros( (self._p,N) ))
+			raise ValueError("SIF.simulate: u should be a %d*N matrix", self._q)
+		y = mat(zeros((self._p, N)))
 
-		xk = mat(zeros( (self._n,1) ))	# TODO: add the possibility to start with a non-zero state
+		xk = mat(zeros((self._n, 1)))  # TODO: add the possibility to start with a non-zero state
 
 		# loop to compute the outputs
 		for i in range(N):
-			xkp1 = self.AZ*xk + self.BZ*u[:,i]
-			y[:,i] = self.CZ*xk + self.DZ*u[:,i]
+			xkp1 = self.AZ*xk + self.BZ*u[:, i]
+			y[:, i] = self.CZ*xk + self.DZ*u[:, i]
 			xk = xkp1
 
 		return y
@@ -589,10 +592,7 @@ class SIF(object):
 
 
 	def simplify(self):
-
-
-
-
+		# TODO: !!!!
 		return self
 
 	def computeDeltaSIF(self):
@@ -640,18 +640,18 @@ class SIF(object):
 		Returns a TikZ string
 		"""
 		tikzLines = []
-		l,n,p,q = self.size
+		l, n, p, q = self.size
 		for i in range(l+n+p):
 			line = []
 			for j in range(l+n+q):
 				# check the value of the coefficient Z(i,j)
-				if self.Z[i,j]==1:
+				if self.Z[i, j] == 1:
 					line.append(r"\node [one] {};")
-				elif self.Z[i,j]==-1:
+				elif self.Z[i, j] == -1:
 					line.append(r"\node [minusone] {};")
-				elif self.Z[i,j] == 0:
+				elif self.Z[i, j] == 0:
 					line.append(r"")
-				elif self.dZ[i,j]==0:
+				elif self.dZ[i, j] == 0:
 					line.append(r"\node [power2] {};")
 				else:
 					line.append(r"\node [coef] {};")
