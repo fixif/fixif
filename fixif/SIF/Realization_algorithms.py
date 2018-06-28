@@ -12,7 +12,7 @@ __status__ = "Beta"
 
 
 from jinja2 import Environment, PackageLoader
-from numpy import tril, all, r_, c_
+from numpy import tril, all, r_, c_, mat, zeros
 
 
 # list of methods to be added to the Realization class
@@ -35,7 +35,7 @@ def algorithmLaTeX(R, out_file=None, caption=None):
 
 	"""
 
-
+	# TODO: write it in a file ?
 
 	env = Environment(loader=PackageLoader('SIF','templates'),
 		block_start_string= '%<',
@@ -49,14 +49,14 @@ def algorithmLaTeX(R, out_file=None, caption=None):
 
 	texPlate = env.get_template('algorithmLaTeX_template.tex')
 
-	l,m,n,p = R.size
+	l, m, n, p = R.size
 
 	texDict = {}
 
 	# Lower triangular part non-null ?
 	isPnut = True
 
-	if all(tril(R.P,-1) == 0):
+	if all(tril(R.P, -1) == 0):
 		isPnut = False
 
 	texDict['isPnut'] = isPnut
@@ -68,7 +68,7 @@ def algorithmLaTeX(R, out_file=None, caption=None):
 	else:
 		strTXY = _genVarName('T', l) + _genVarName('xn', n) + _genVarName('y', m)
 
-	#Caption
+	# Caption
 	if caption is None:
 		caption = "Pseudocode algorithm ..."
 
@@ -79,13 +79,13 @@ def algorithmLaTeX(R, out_file=None, caption=None):
 	texDict['xn'] = {}
 	texDict['T'] = {}
 
-	#Inputs
+	# Inputs
 	texDict['u']['numVar'] = m
-	#Outputs
+	# Outputs
 	texDict['y']['numVar'] = p
-	#States
+	# States
 	texDict['xn']['numVar'] = n
-	#Intermediate variables
+	# Intermediate variables
 	texDict['T']['numVar'] = l
 
 	Zbis = R.Z + mat(r_[c_[eye(l), zeros((l,n+m))], zeros((n+p,l+n+m))])

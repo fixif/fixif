@@ -48,106 +48,108 @@ def flopoco(self, LSB_y_out, u_bar):
 	-------
 
 	"""
-
-
-
-def _compute_LSB(self, l_y_out):
-
-	l_y_out = np.matrix([l_y_out])
-
-	#construct the error-filter
-	deltaSIF = self.computeDeltaSIF()
-
-	#compute the WCPG of the error filter
-	wcpgDeltaH = deltaSIF.dSS.WCPG()
-
-	#we repartition the error budget equally for all variables
-	c = self.l + self.n + self.p
-
-
-	# In order to respect the overall error |deltaY(k)| < 2^(l_y_out-1)
-	# we need to compute the temporary, state and output variables with LSB l_i
-	# l_i = max(l_y_out) - g_i
-	# where the correction term g_i is computed via
-	# g_i = 1 + max_j { ceil( log2 ( c * wcpgDeltaH[j, i] ) )}
-
-	g = np.bmat([1 + max(np.ceil(np.log2(c * wcpgDeltaH[:,i]))) for i in range(0, c)])
-
-	for x in (g==np.inf):
-		if x.any():
-			print('Divided by zero\n')
-
-
-	lsb = np.bmat([max(l_y_out) - g])
-
-	return lsb
+	pass
 
 
 
 
-def _compute_MSB(self, u_bar):
+	def _compute_LSB(self, l_y_out):
 
-	# self._Z = np.bmat([[-J, M, N], [K, P, Q], [L, R, S]])
+		if not isinstance(l_y_out, int):
+			raise ValueError("I implemented the function only for the case of 1 output! \n")
+		# we need to add one more bit to the account for the
+		# final rounding error
+		l_y_out = l_y_out-1
 
-	C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]]) #L
-	C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])	#R
-	C3 = np.bmat([ [np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])	#S
+		# construct the error-filter
+		deltaSIF = self.computeDeltaSIF()
+
+		# compute the WCPG of the error filter
+		wcpgDeltaH = deltaSIF.dSS.WCPG()
+
+		# we repartition the error budget equally for all variables
+		c = self.l + self.n + self.p
+
+		# In order to respect the overall error |deltaY(k)| < 2^(l_y_out-1)
+		# we need to compute the temporary, state and output variables with LSB l_i
+		# l_i = max(l_y_out) - g_i
+		# where the correction term g_i is computed via
+		# g_i = 1 + max_j { ceil( log2 ( c * wcpgDeltaH[j, i] ) )}
+
+		g = np.bmat([1 + max(np.ceil(np.log2(c * wcpgDeltaH[:, i] * 2**-l_y_out))) for i in range(0, c)])
+
+		# the error budget for the output y(k) that will be later passed on to FloPoCo
+		error_budget_y = 2**-mpmath.ceil(mpmath.log(c * wcpgDeltaH[0, c-1] * 2**-l_y_out, 2))/2**(l_y_out+1)
+
+		for x in (g == np.inf):
+			if x.any():
+				print('Divided by zero\n')
 
 
-	#building an extended SIF
-	S_ext = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
+		lsb = np.bmat(l_y_out - g - 1)
 
-	#print "New number of outputs: "
-	#print S_ext.p
+		return lsb, error_budget_y
 
-	wcpg = S_ext.dSS.WCPG()
 
-	#print "WCPG:"
-	#print wcpg
 
-	y_bar = wcpg * u_bar
-	msb=np.bmat([np.ceil(np.log2(x)) for x in y_bar])
 
-	return msb
+	def _compute_MSB(self, u_bar):
 
-def compute_MSB_allvar_extended(self, u_bar, lsb_t, lsb_x, lsb_y):
+		# self._Z = np.bmat([[-J, M, N], [K, P, Q], [L, R, S]])
 
-	# building L, R and S matrices for the extended SIF, which will have
-	# a vector (t,x,y) as an output vector
-	C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]])  # L
-	C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])  # R
-	C3 = np.bmat([[np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])  # S
+		C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]])  # L
+		C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])  # R
+		C3 = np.bmat([[np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])  # S
 
-	# building an extended SIF
-	S_ext = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
+		print(self.J)
+		# building an extended SIF
+		S_ext = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
 
-	wcpg = S_ext.dSS.WCPG()
+		SS = S_ext.dSS.simplify()
 
-	#compute the error filter deltaH which corresponds to the extended SIF
-	deltaH = S_ext.computeDeltaSIF()
-	wcpgDeltaH = deltaH.dSS.WCPG()
+		wcpg = SS.WCPG()
 
-	# compute msb via formula
-	# msb_i = ceil( log2 ( (<<H>> * u_bar)_i + (<<deltaH>> * 2^lsb_ext)_i ))
+		y_bar = wcpg * u_bar
+		msb = np.bmat([np.ceil(np.log2(x)) for x in y_bar])
 
-	y_bar = wcpg * u_bar
-
-	#lsb_ext2 = np.matrix([ lsb_ext[0, 0:deltaH.l] lsb_ext[0, deltaH.l:deltaH.l + deltaH.n] lsb_ext[0] ])
-	lsb_bar = np.concatenate((lsb_t, lsb_x, lsb_t, lsb_x, lsb_y), axis=0)
-	lsb_bar = np.bmat([lsb_bar])
-
-	lsb_bar = np.matrix([2 ** lsb_bar[0, i] for i in range(0, lsb_bar.size)])
-	delta_bar = wcpgDeltaH * lsb_bar.transpose()
-
-	if y_bar.size == delta_bar.size:
-		msb = np.bmat([np.ceil(np.log2(y_bar[i] + delta_bar[i])) for i in range(0, delta_bar.size)])
 		return msb
-	else:
-		print('Something went wrong, error with sizes :( \n')
-		return 0
+
+	def compute_MSB_allvar_extended(self, u_bar, lsb_t, lsb_x, lsb_y):
+
+		# building L, R and S matrices for the extended SIF, which will have
+		# a vector (t,x,y) as an output vector
+		C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]])  # L
+		C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])  # R
+		C3 = np.bmat([[np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])  # S
+
+		# building an extended SIF
+		S_ext = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
+
+		wcpg = S_ext.dSS.WCPG()
+
+
+		# compute the error filter deltaH which corresponds to the extended SIF
+		deltaH = S_ext.computeDeltaSIF()
+		wcpgDeltaH = deltaH.dSS.WCPG()
 
 
 
+		# compute msb via formula
+		# msb_i = ceil( log2 ( (<<H>> * u_bar)_i + (<<deltaH>> * 2^lsb_ext)_i ))
 
+		y_bar = wcpg * u_bar
 
+		# lsb_ext2 = np.matrix([ lsb_ext[0, 0:deltaH.l] lsb_ext[0, deltaH.l:deltaH.l + deltaH.n] lsb_ext[0] ])
+		lsb_bar = np.concatenate((lsb_t, lsb_x, lsb_t, lsb_x, lsb_y), axis=0)
+		lsb_bar = np.bmat([lsb_bar])
+
+		lsb_bar = np.matrix([2 ** lsb_bar[0, i] for i in range(0, lsb_bar.size)])
+		delta_bar = wcpgDeltaH * lsb_bar.transpose()
+
+		if y_bar.size == delta_bar.size:
+			msb = np.bmat([np.ceil(np.log2(y_bar[i] + delta_bar[i])) for i in range(0, delta_bar.size)])
+			return msb
+		else:
+			print('Something went wrong, error with sizes :( \n')
+			return 0
 
