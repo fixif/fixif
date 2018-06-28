@@ -27,7 +27,7 @@ from fixif.func_aux import write_matrix_mpf, write_matrix_hex, mpf_matrix_to_sol
 
 from fixif.Structures import LWDF, DFII, State_Space, DFI
 
-from fixif.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
+from fixif.Structures import iterAllRealizationsRandomFilter
 from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter, random_dSS, dSS
 #from scipy.weave import inline
 

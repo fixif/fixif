@@ -21,7 +21,7 @@ from itertools import chain
 from fixif.SIF import Realization
 from numpy import matrix as mat, zeros,eye, empty, float64
 
-from fixif.Structures import iterAllRealizations, iterAllRealizationsRandomFilter
+from fixif.Structures import iterAllRealizationsRandomFilter
 from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
 from fixif.Structures import State_Space
 #from scipy.weave import inline
@@ -51,7 +51,7 @@ def test_construction_from_dSS(S):
 @pytest.mark.parametrize("F", iter_random_Filter(10, ftype='SISO'), ids=lambda x: x.name)
 def test_construction_SISO(F):
 	# iter on realizations
-	for R in iterAllRealizations(F):
+	for R in F.iterAllRealizations():
 		pass
 
 
@@ -64,7 +64,7 @@ def test_implementCdouble(F):
 
 	from numpy.linalg import norm
 
-	for R in iterAllRealizations(F):
+	for R in F.iterAllRealizations():
 		print('\n'+Fore.RED + str(R.name)+ Fore.RESET+'\n\t')
 
 		#y = R.simulateMP(u)

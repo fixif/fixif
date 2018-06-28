@@ -25,7 +25,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from itertools import product  # izip for Python 2.x
+
 from fixif.SIF import Realization
 from fixif.LTI.Filter import iter_random_Filter
 
@@ -118,39 +118,6 @@ class Structure(object):
 		return self.makeRealization(*args, **kwargs)
 
 
-def iterAllRealizations(filt):
-	"""
-	Iterate over all the possible structures, to build (and return through a generator) all the possible realization
-	of a given Filter filter (lti)
-	Parameters
-	----------
-	- filter: the filter (Filter object) we want to implement
-	- exceptStructures: (list) list of structure name we don't want to use
-	Returns
-	-------
-	a generator of
-
-	>>> from fixif.LTI import Filter
-	>>> from fixif.Structures import Structure
-	>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
-	>>> for R in Structure.iterAllRealizations(f):
-	>>>    print(R)
-
-	print the realizations (filter f implemeted in all the existing structures wih all the possible options)
-	(ie Direct Form I (with nbSum=1 and also nbSum=2), State-Space (balanced, canonical observable form, canonical controlable, etc.), etc.)
-
-	"""
-	for st in Structure.iterAllStructures():
-		if st.options:
-			# list of all the possible values for dictionnary
-			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
-			vl = (dict(zip(st.options, x)) for x in product(*st.options.values()))
-			for options in vl:
-				if st.canAcceptFilter(filt, **options):
-					yield st.makeRealization(filt, **options)
-		else:
-			if st.canAcceptFilter(filt):
-				yield st.makeRealization(filt)
 
 
 # TODO: should we turn this into a method of Filter class ?????????
@@ -183,7 +150,7 @@ def iterAllRealizationsRandomFilter(number, n=(5, 10), p=(1, 5), q=(1, 5), seede
 	Parameters are those of iter_random_Filter
 	"""
 	for F in iter_random_Filter(number, n, p, q, seeded, ftype):
-		for R in iterAllRealizations(F):
+		for R in F.iterAllRealizations():
 			yield R
 
 

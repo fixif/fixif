@@ -10,7 +10,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-from fixif.Structures import iterAllRealizations, LWDF
+from fixif.Structures import LWDF
 from fixif.LTI import Filter, iter_random_Filter
 from fixif.LTI import iter_random_dTF
 import pytest
@@ -23,9 +23,8 @@ def test_buildAllPossibleSISORealizationsFromdTF(H):
 	Check all the SISO structures (including MIMO structures)
 	check that the correspong transfer function is equal to the initial transfer function
 	"""
-	print('')
-
-	for R in iterAllRealizations(Filter(tf=H, stable=False)):
+	F = Filter(tf=H, stable=False)
+	for R in F.iterAllRealizations():
 		print(R.name + "\t")
 		H.assert_close(R.dSS.to_dTF(), eps=1e-4)
 
@@ -37,7 +36,7 @@ def test_buildAllPossibleMIMORealizationsFromdSS(F):
 	Check that the corresponding system (state-space) corresponds to the initial one
 	"""
 	print('')
-	for R in iterAllRealizations(F):
+	for R in F.iterAllRealizations():
 		print(R.name + "\t")
 		F.dSS.assert_close(R.dSS, eps=1e-3)
 
@@ -49,7 +48,7 @@ def test_buildAllPossibleStableSISORealizationsFromdSS(F):
 	Check that the corresponding system (state-space) corresponds to the initial one
 	"""
 	print('')
-	for R in iterAllRealizations(F):
+	for R in F.iterAllRealizations():
 		print(R.name + "\t")
 		# F.dSS.assert_close( R.dSS )
 		F.dTF.assert_close(R.to_dTF(), eps=1e-3)

@@ -19,7 +19,6 @@ import numpy
 
 from fixif.SIF import SIF
 from numpy import matrix as mat
-from fixif.Structures import iterAllRealizations
 from fixif.LTI import Filter, iter_random_dTF, iter_random_dSS
 
 
@@ -54,30 +53,30 @@ def test_dSSexact( S ):
 
 def test_construction():
 
-	for i in range( 50):
-		l = randint( 0, 15)
-		n = randint( 5, 20)
-		p = randint( 1, 5)
-		q = randint( 1, 5)
+	for i in range(50):
+		l = randint(0, 15)
+		n = randint(5, 20)
+		p = randint(1, 5)
+		q = randint(1, 5)
 
 		# (n,n)
-		myP = mat(rand(n,n))
+		myP = mat(rand(n, n))
 		# (l,l)
-		myJ = mat(rand(l,l))
+		myJ = mat(rand(l, l))
 		# (n,l)
-		myK = mat(rand(n,l))
+		myK = mat(rand(n, l))
 		# (p,l)
-		myL = mat(rand(p,l))
+		myL = mat(rand(p, l))
 		# (l,n)
-		myM = mat(rand(l,n))
+		myM = mat(rand(l, n))
 		# (l,q)
-		myN = mat(rand(l,q))
+		myN = mat(rand(l, q))
 		# (n,q)
-		myQ = mat(rand(n,q))
+		myQ = mat(rand(n, q))
 		# (p,n)
-		myR = mat(rand(p,n))
+		myR = mat(rand(p, n))
 		# (p,q)
-		myS = mat(rand(p,q))
+		myS = mat(rand(p, q))
 
 		myJtoS = [myJ, myK, myL, myM, myN, myP, myQ, myR, myS]
 

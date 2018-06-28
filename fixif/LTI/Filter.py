@@ -17,6 +17,7 @@ __status__ = "Beta"
 from fixif.LTI import dSS, dTF, random_dSS
 from numpy.random import seed as numpy_seed, randint, choice
 from re import compile
+from itertools import product  # izip for Python 2.x
 
 
 regRF = compile("RandomFilter-([0-9]+)/([0-9]+)/([0-9]+)-([0-9]+)")		# used to recognize random filter names
@@ -135,6 +136,43 @@ class Filter(object):
 
 	def __repr__(self):
 		return self._name
+
+
+	def iterAllRealizations(self):
+		"""
+		Iterate over all the possible structures, to build (and return through a generator) all the possible realization
+		of a given Filter filter (lti)
+		Parameters
+		----------
+		- filter: the filter (Filter object) we want to implement
+		- exceptStructures: (list) list of structure name we don't want to use
+		Returns
+		-------
+		a generator of
+
+		>>> from fixif.LTI import Filter
+		>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
+		>>> for R in f.iterAllRealizations():
+		>>>    print(R)
+
+		print the realizations (filter f implemeted in all the existing structures wih all the possible options)
+		(ie Direct Form I (with nbSum=1 and also nbSum=2), State-Space (balanced, canonical observable form, canonical controlable, etc.), etc.)
+
+		"""
+		from fixif.Structures.Structure import Structure
+
+		for st in Structure.iterAllStructures():
+			if st.options:
+				# list of all the possible values for dictionnary
+				# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
+				vl = (dict(zip(st.options, x)) for x in product(*st.options.values()))
+				for options in vl:
+					if st.canAcceptFilter(self, **options):
+						yield st.makeRealization(self, **options)
+			else:
+				if st.canAcceptFilter(self):
+					yield st.makeRealization(self)
+
 
 
 
