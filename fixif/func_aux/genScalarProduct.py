@@ -1,4 +1,4 @@
-#coding: utf8
+# coding: utf8
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FiXiF Project, LIP6"
@@ -12,6 +12,7 @@ __status__ = "Beta"
 
 
 from textwrap import wrap
+
 
 def scalarProduct(var, coefs, dcoefs=None):
 	"""
@@ -33,18 +34,18 @@ def scalarProduct(var, coefs, dcoefs=None):
 	# iterate over each coefficient	and variable for the dot product
 	dp = []
 	for v, c, dv in zip(var, coefs.flat, dcoefs.flat):
-		if dv==1:
-			dp.append( v+'*'+float.hex(c) )
+		if dv == 1:
+			dp.append(v+'*'+float.hex(c))
 		else:
-			if c==1:
-				dp.append( v )
-			elif c==-1:
-				dp.append( '-'+v)
-			elif c!=0:
+			if c == 1:
+				dp.append(v)
+			elif c == -1:
+				dp.append('-' + v)
+			elif c != 0:
 				dp.append(v + '*' + float.hex(c))
 
-	S = " + ".join( dp )
+	S = " + ".join(dp)
 	if S == "":
 		S = "0"
-	return "\n".join( wrap(S, 60))
+	return "\n".join(wrap(S, 60))
 
