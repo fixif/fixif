@@ -18,7 +18,6 @@ __status__ = "Beta"
 
 
 from fixif.LTI import dSS
-from fixif.func_aux import dynMethodAdder
 import numpy as np
 
 from numpy import c_, r_, eye, zeros, matrix as mat
@@ -81,7 +80,6 @@ def _check_dimensions(JtoS):
 
 
 
-@dynMethodAdder
 class SIF(object):
 	"""
 	Special Implicit Form (formely FWR, Finite Wordlength Realization)
@@ -116,6 +114,11 @@ class SIF(object):
 	'AZ, BZ, CZ, DZ' are deduced accordingly
 
 	"""
+
+	# add the methods defined in other files
+	# see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY and http://www.qtrac.eu/pyclassmulti.html
+	# TODO: from fixif.SIF.SIF_tilde_error import something...
+
 
 	epsilondZ = 1e-8    # used to deduced dJ, dK, dL, dM, dN, dP, dQ, dR and dS matrices when they are not specified
 
