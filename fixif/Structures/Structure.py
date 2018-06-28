@@ -153,6 +153,9 @@ def iterAllRealizations(filt):
 				yield st.makeRealization(filt)
 
 
+# TODO: should we turn this into a method of Filter class ?????????
+
+
 # TODO: check if this is really unused (if yes, then remove)
 # def iterStructuresAndOptions(filt):
 # 	"""
@@ -193,8 +196,7 @@ def makeARealization(filt, realizationName, **options):
 	>>> f = Filter( num=[1, 2, 3, 4], den=[5.0,6.0,7.0, 8.0])
 	>>> R = Structure.makeARealization(f, 'DirectForms', transposed=True)
 	>>> print(R)
-
-	print the Direct Form I transposed realization of the filter
+	this code prints the Direct Form I transposed realization of the filter
 	"""
 	S = Structure.getFromName(realizationName)
 	return S.makeRealization(filt, **options)
