@@ -49,10 +49,12 @@ def test_construction_from_dSS(S):
 
 
 @pytest.mark.parametrize("F", iter_random_Filter(10, ftype='SISO'), ids=lambda x: x.name)
-def test_construction_SISO(F):
+def test_algorithmLaTeX(F):
 	# iter on realizations
 	for R in F.iterAllRealizations():
-		pass
+		print(R.name + "\t")
+		# F.dSS.assert_close( R.dSS )
+		R.algorithmLaTeX()
 
 
 @pytest.mark.parametrize("F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)

@@ -14,7 +14,7 @@ __status__ = "Beta"
 from textwrap import wrap
 
 
-def scalarProduct(var, coefs, dcoefs=None):
+def scalarProduct(var, coefs, dcoefs=None, hexa=False):
 	"""
 	Return a string corresponding to a scalar product (dot product) between a vector of variables (var) and a vector of coefficients (coefs)
 
@@ -24,7 +24,7 @@ def scalarProduct(var, coefs, dcoefs=None):
 		- var: list of name of the variables
 		- coefs: vector of coefficients used in the scalar product (np.matrix, so 2d)
 		- dcoefs: vector of values (1 or 0) indicating if the associated coefficient is trivial (0 or not): comes from the dZ matrix
-
+		- hexa: True to display the coefficients in floating-point hexadecimal
 	Returns string
 	The coefficients are converted in their litteral floating-point hexadecimal representation (exact representation)
 	"""
@@ -33,7 +33,7 @@ def scalarProduct(var, coefs, dcoefs=None):
 
 	# iterate over each coefficient	and variable for the dot product
 	dp = []
-	for v, c, dv in zip(var, coefs.flat, dcoefs.flat):
+	for v, c, dv in zip(var, coefs.tolist()[0], dcoefs):
 		if dv == 1:
 			dp.append(v+'*'+float.hex(c))
 		else:
