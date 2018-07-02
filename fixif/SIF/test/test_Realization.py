@@ -29,9 +29,36 @@ from fixif.Structures import State_Space
 #from func_aux.get_data import get_data
 #from func_aux.MtlbHelper import MtlbHelper
 
+from tempfile import TemporaryFile
 
 from numpy.random import seed, rand, randint, shuffle
 from numpy.testing import assert_allclose
+
+from subprocess import Popen, PIPE
+
+
+def compileLaTeX(latexStr):
+	""""compile some LaTeX code
+	and check if it fails or not
+	Returns True if the compilation works, False if it fails
+	"""
+	# create a temporary folder and write the latex file
+	#with TemporaryFile() as f:
+	with open("test.tex", "w") as f:
+		f.write(latexStr)
+		f.flush()
+		# compile latex and convert to image format
+		command = "pdflatex " + f.name
+		proc = Popen(command, stdout=PIPE, shell=True)
+		line = 'xxx'
+		while line:
+			line = proc.stdout.readline().decode("utf-8")
+			# LaTeX errors start with '!'
+			if line.startswith('!'):
+				print("LaTeX failed with the following error:" + 	line)
+				return False
+	return True
+
 
 
 @pytest.mark.parametrize("S", iter_random_dSS(5, n=(5, 15), p=(1, 5), q=(1, 5)))
@@ -53,8 +80,10 @@ def test_algorithmLaTeX(F):
 	# iter on realizations
 	for R in F.iterAllRealizations():
 		print(R.name + "\t")
-		# F.dSS.assert_close( R.dSS )
-		R.algorithmLaTeX()
+		# get LaTeX code
+		str = R.algorithmLaTeX()
+		# compile it
+		assert compileLaTeX(str)
 
 
 @pytest.mark.parametrize("F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)

@@ -1,7 +1,3 @@
-\documentclass{standalone}
-
-\usepackage{algorithm2e}
-
 %< macro declare(baseName, numVar, kwName) >%
 %< if numVar > 1>%
 	\<<kwName>>{$<<baseName>>$: array [1..<<numVar>>] of reals}
@@ -9,9 +5,16 @@
 	\<<kwName>>{$<<baseName>>$: real}
 %<- endif >%
 %< endmacro >%
-\begin{algorithm}[h]
-	\caption{<}
-<<caption>>
+
+
+\documentclass{standalone}
+
+\usepackage{algorithm2e}
+
+\begin{document}
+
+\begin{algorithm}[H]
+	\caption{<<caption>>}
 	\SetAlgoLined
 	\Begin{
 <<declare('u', u.numVar, 'KwIn')>>
@@ -25,3 +28,5 @@
 }
 <<computations>>
 \end{algorithm}
+
+\end{document}
