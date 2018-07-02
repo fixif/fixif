@@ -14,7 +14,7 @@ with codecs.open('README.rst', encoding='utf-8') as f:
 
 # setup arguments
 setup(
-	name='fixif.fixif',
+	name='fixif',
 	#namespace='fixif',
 	version='0.4',
 	description='Fixed-Point filters',
