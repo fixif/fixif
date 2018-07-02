@@ -113,15 +113,11 @@ class R_algorithm:
 			comp_str += "\t" + "$" + strTXY[i-1] + " \leftarrow " + scalarProduct(strTXU, self.Zcomp[i-1, :]) + "$\;\n"
 
 		if isPnut:
-
-			comp_str += " \n\t\\tcp{\\emph{Permutations}}\n"
+			comp_str += "\t\\tcp{\\emph{Permutations}}\n"
 			comp_str += "\t$xn \\leftarrow xnp$\;"
 
-		# TODO: test jinja2 only works with unicode
 		texDict['computations'] = comp_str
 
-		texContents = texPlate.render(**texDict)
-
-		return texContents
+		return texPlate.render(**texDict)
 
 

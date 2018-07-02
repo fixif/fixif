@@ -43,7 +43,7 @@ setup(
 		# "matlabengineforpython",
 		# "sollya",
 		# "cython",
-		# "lxml",
+		"lxml",		# used for the simulink import
 		"colorama",
 		"mpmath",
 		'jinja2',
