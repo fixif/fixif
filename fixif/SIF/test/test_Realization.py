@@ -67,7 +67,7 @@ def test_implementCdouble(F):
 	from numpy.linalg import norm
 
 	for R in F.iterAllRealizations():
-		print('\n'+Fore.RED + str(R.name)+ Fore.RESET+'\n\t')
+		print('\n'+Fore.RED + str(R.name) + Fore.RESET+'\n\t')
 
 		#y = R.simulateMP(u)
 
