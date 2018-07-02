@@ -89,10 +89,9 @@ install:
   - pip list
   # install for matplotlib
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      echo"todo";
+      cd .;
     else
-      brew install freetype;
-      brew install pkg-config;
+      brew install libpng freetype pkg-config;
       fi;
   # install required python packages for build and coverage
   - pip install pytest
