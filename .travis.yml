@@ -97,9 +97,9 @@ install:
 script:
     #- pytest -k construct --cov=fixif -s
     - if "$SOLLYA"; then
-          pytest -v -k "(LTI and not WCPGmp) or (Structures and not simulink) and algorithmLaTeX" --cov=fixif -s;
+          pytest -v -k "(LTI and not WCPGmp) or (Structures and not simulink) and algorithmLaTeX" --cov=fixif fixif/;
       else
-          pytest -v -k "(LTI and not Gabarit and not WCPGmp) or (Structures and not simulink) and algorithmLaTeX" --cov=fixif -s;
+          pytest -v -k "(LTI and not Gabarit and not WCPGmp) or (Structures and not simulink) and algorithmLaTeX" --cov=fixif fixif/;
       fi
 
 notifications:
