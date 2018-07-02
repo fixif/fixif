@@ -18,13 +18,15 @@ __status__ = "Beta"
 
 
 from fixif.SIF import SIF
-
+from fixif.SIF.Realization_algorithms import R_algorithm
+from fixif.SIF.Realization_FxP import R_FxP
+from fixif.SIF.Realization_implementation import R_implementation
 from fixif.LTI import Filter
 from fixif.FxP import Constant
 import numpy as np
 from copy import copy
 
-import mpmath
+
 
 def genVarName(baseName, nbVar):
 	"""
@@ -39,20 +41,18 @@ def genVarName(baseName, nbVar):
 		return [baseName + "_{%d}(k)" % (i+1) for i in range(nbVar)]
 
 
-class Realization(SIF):
+
+class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 	"""
 	a Realization is a structured SIF object implementing a particular filter
 	Inherit from a SIF, and also contains:
 	- _filter: the filter that it implements
 	- _varNameT, _varNameX, _varNameU, _varNameY : lists of the name of the intermediate variables (varNameT), the states (varNameX), the inputs (varNameU) and the outputs (varNameY)
-	"""
 
-	# add the methods defined in other files
+	Some other methods are defined in the mixin classes R_algorithm, R_FxP and R_implementation
 	# see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY and http://www.qtrac.eu/pyclassmulti.html
-	from fixif.SIF.Realization_algorithms import algorithmLaTeX
-	from fixif.SIF.Realization_FxP import _compute_LSB, _compute_MSB, compute_MSB_allvar_extended
-	from fixif.SIF.Realization_implements import implementCdouble, makeModule, runCdouble
 
+	"""
 
 	def __init__(self, filt, JtoS, dJtodS=None, structureName="", varNameTX=None):
 		"""

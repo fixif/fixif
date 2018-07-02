@@ -29,94 +29,99 @@ def genVarName(baseName, numVar):
 	return varNames
 
 
-
-def algorithmLaTeX(self, out_file=None, caption=None):
-
+class R_algorithm:
 	"""
-
-	Generate a tex file to use with package algorithm2e to create a LaTex output of algorithm
-
-	- `R` is a SIF object
-	- `caption` is an additional caption
-
+	Mixin class (see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY)
+	Allow to embedd the algorithmXXX methods in the Realization class
+	the Realization class will inherit from R_algorihtm class
 	"""
+	def algorithmLaTeX(self, out_file=None, caption=None):
 
-	# TODO: write it in a file ?
+		"""
 
-	env = Environment(loader=PackageLoader('fixif', 'SIF/templates'),
-				block_start_string='%<',
-				block_end_string ='>%',
-				variable_start_string ='<<',
-				variable_end_string ='>>',
-				comment_start_string='[§',
-				comment_end_string ='§]',
-				trim_blocks=True,
-				lstrip_blocks=True)
+		Generate a tex file to use with package algorithm2e to create a LaTex output of algorithm
 
-	texPlate = env.get_template('algorithmLaTeX_template.tex')
+		- `R` is a SIF object
+		- `caption` is an additional caption
 
-	l, n, p, q = self.size
+		"""
 
-	texDict = {}
+		# TODO: write it in a file ?
 
-	# Lower triangular part non-null ?
-	isPnut = True
+		env = Environment(loader=PackageLoader('fixif', 'SIF/templates'),
+					block_start_string='%<',
+					block_end_string ='>%',
+					variable_start_string ='<<',
+					variable_end_string ='>>',
+					comment_start_string='[§',
+					comment_end_string ='§]',
+					trim_blocks=True,
+					lstrip_blocks=True)
 
-	if all(tril(self.P, -1) == 0):
-		isPnut = False
+		texPlate = env.get_template('algorithmLaTeX_template.tex')
 
-	texDict['isPnut'] = isPnut
+		l, n, p, q = self.size
 
-	strTXU = genVarName('T', l) + genVarName('xn', n) + genVarName('u', q)
+		texDict = {}
 
-	if isPnut:
-		strTXY = genVarName('T', l) + genVarName('xnp', n) + genVarName('y', q)
-	else:
-		strTXY = genVarName('T', l) + genVarName('xn', n) + genVarName('y', q)
+		# Lower triangular part non-null ?
+		isPnut = True
 
-	# Caption
-	if caption is None:
-		caption = "Pseudocode algorithm ..."
+		if all(tril(self.P, -1) == 0):
+			isPnut = False
 
-	texDict["caption"] = caption
+		texDict['isPnut'] = isPnut
 
-	texDict['u'] = {}
-	texDict['y'] = {}
-	texDict['xn'] = {}
-	texDict['T'] = {}
+		strTXU = genVarName('T', l) + genVarName('xn', n) + genVarName('u', q)
 
-	# Inputs
-	texDict['u']['numVar'] = q
-	# Outputs
-	texDict['y']['numVar'] = p
-	# States
-	texDict['xn']['numVar'] = n
-	# Intermediate variables
-	texDict['T']['numVar'] = l
+		if isPnut:
+			strTXY = genVarName('T', l) + genVarName('xnp', n) + genVarName('y', q)
+		else:
+			strTXY = genVarName('T', l) + genVarName('xn', n) + genVarName('y', q)
 
-	comp_str = ""
+		# Caption
+		if caption is None:
+			caption = "Pseudocode algorithm ..."
 
-	for i in range(1, l+n+p+1):
+		texDict["caption"] = caption
 
-		if i == 1:
-			comp_str += "\t\\tcp{\\emph{Intermediate variables}}\n"
-		elif (i == l+1) and not(n == 0):
-			comp_str += "\t\\tcp{\\emph{States}}\n"
-		elif i == l+n+1:
-			comp_str += "\t\\tcp{\\emph{Outputs}}\n"
+		texDict['u'] = {}
+		texDict['y'] = {}
+		texDict['xn'] = {}
+		texDict['T'] = {}
 
-		comp_str += "\t" + "$" + strTXY[i-1] + " \leftarrow " + scalarProduct(strTXU, self.Zcomp[i-1, :]) + "$\;\n"
+		# Inputs
+		texDict['u']['numVar'] = q
+		# Outputs
+		texDict['y']['numVar'] = p
+		# States
+		texDict['xn']['numVar'] = n
+		# Intermediate variables
+		texDict['T']['numVar'] = l
 
-	if isPnut:
+		comp_str = ""
 
-		comp_str += " \n\t\\tcp{\\emph{Permutations}}\n"
-		comp_str += "\t$xn \\leftarrow xnp$\;"
+		for i in range(1, l+n+p+1):
 
-	# TODO: test jinja2 only works with unicode
-	texDict['computations'] = comp_str
+			if i == 1:
+				comp_str += "\t\\tcp{\\emph{Intermediate variables}}\n"
+			elif (i == l+1) and not(n == 0):
+				comp_str += "\t\\tcp{\\emph{States}}\n"
+			elif i == l+n+1:
+				comp_str += "\t\\tcp{\\emph{Outputs}}\n"
 
-	texContents = texPlate.render(**texDict)
+			comp_str += "\t" + "$" + strTXY[i-1] + " \leftarrow " + scalarProduct(strTXU, self.Zcomp[i-1, :]) + "$\;\n"
 
-	return texContents
+		if isPnut:
+
+			comp_str += " \n\t\\tcp{\\emph{Permutations}}\n"
+			comp_str += "\t$xn \\leftarrow xnp$\;"
+
+		# TODO: test jinja2 only works with unicode
+		texDict['computations'] = comp_str
+
+		texContents = texPlate.render(**texDict)
+
+		return texContents
 
 
