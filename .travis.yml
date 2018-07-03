@@ -52,7 +52,7 @@ install:
         ./autogen.sh && ./configure && make -j&& sudo make install; cd ..;
 
         export LD_LIBRARY_PATH=/usr/local/lib;
-        git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b fixif sollya_git;
+        git clone https://scm.gforge.inria.fr/anonscm/git/sollya/sollya.git -b remotes/origin/sollya-7.0RC1 sollya_git;
         cd sollya_git && sh autogen.sh && ./configure && make && sudo make install && cd ..;
 
         export PYTHON=python;
