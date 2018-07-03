@@ -24,10 +24,10 @@ from numpy import matrix as mat, zeros,eye, empty, float64
 from fixif.Structures import iterAllRealizationsRandomFilter
 from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
 from fixif.Structures import State_Space
-#from scipy.weave import inline
 
-#from func_aux.get_data import get_data
-#from func_aux.MtlbHelper import MtlbHelper
+from latex import build_pdf, LatexBuildError
+from latex.build import LatexBuilder
+
 
 from tempfile import TemporaryFile
 
@@ -43,8 +43,7 @@ def compileLaTeX(latexStr):
 	Returns True if the compilation works, False if it fails
 	"""
 	# create a temporary folder and write the latex file
-	#with TemporaryFile() as f:
-	with open("test.tex", "w") as f:
+	with TemporaryFile() as f:
 		f.write(latexStr)
 		f.flush()
 		# compile latex and convert to image format
@@ -55,7 +54,7 @@ def compileLaTeX(latexStr):
 			line = proc.stdout.readline().decode("utf-8")
 			# LaTeX errors start with '!'
 			if line.startswith('!'):
-				print("LaTeX failed with the following error:" + 	line)
+				print("LaTeX failed with the following error:" + line)
 				return False
 	return True
 
@@ -83,7 +82,17 @@ def test_algorithmLaTeX(F):
 		# get LaTeX code
 		str = R.algorithmLaTeX()
 		# compile it
-		assert compileLaTeX(str)
+		try:
+			build_pdf(str)
+		except LatexBuildError as e:
+			for err in e.get_errors():
+				print(err)
+			raise LatexBuildError
+		except RuntimeError:
+			print("LaTeX is not installed")
+
+
+
 
 
 @pytest.mark.parametrize("F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
