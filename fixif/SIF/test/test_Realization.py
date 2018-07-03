@@ -62,7 +62,7 @@ def test_algorithmLaTeX(F):
 			build_pdf(code)
 		except LatexBuildError as e:
 			for err in e.get_errors():
-				print(err)
+				print(err["context"][1])
 			raise LatexBuildError
 		except RuntimeError:
 			print("LaTeX is not installed")
