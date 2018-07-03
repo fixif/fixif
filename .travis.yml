@@ -44,6 +44,7 @@ install:
         else
           brew cask install mactex;
         fi;
+    fi;
   # install sollya
   - if "$SOLLYA"; then
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then

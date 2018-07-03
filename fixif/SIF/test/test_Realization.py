@@ -29,34 +29,10 @@ from latex import build_pdf, LatexBuildError
 from latex.build import LatexBuilder
 
 
-from tempfile import TemporaryFile
 
 from numpy.random import seed, rand, randint, shuffle
 from numpy.testing import assert_allclose
 
-from subprocess import Popen, PIPE
-
-
-def compileLaTeX(latexStr):
-	""""compile some LaTeX code
-	and check if it fails or not
-	Returns True if the compilation works, False if it fails
-	"""
-	# create a temporary folder and write the latex file
-	with TemporaryFile() as f:
-		f.write(latexStr)
-		f.flush()
-		# compile latex and convert to image format
-		command = "pdflatex " + f.name
-		proc = Popen(command, stdout=PIPE, shell=True)
-		line = 'xxx'
-		while line:
-			line = proc.stdout.readline().decode("utf-8")
-			# LaTeX errors start with '!'
-			if line.startswith('!'):
-				print("LaTeX failed with the following error:" + line)
-				return False
-	return True
 
 
 
