@@ -2,14 +2,14 @@ language: python
 
 python:
   - "2.7"
-  - "3.5"
+#  - "3.5"
   - "3.6"
 
 cache: pip
 
 env:
-  - SOLLYA=true SLYCOT=true
-  - SOLLYA=false  SLYCOT=false
+  - SOLLYA=true   SLYCOT=true   LATEX=true
+  - SOLLYA=false  SLYCOT=false  LATEX=false
 
 
 matrix:
@@ -20,7 +20,7 @@ matrix:
       env:
         - SOLLYA=true
         - SLYCOT=true
-
+        - LATEX=true
 #
 
 before_install:
@@ -29,6 +29,7 @@ before_install:
       sudo apt-get -qq update;
     else
       brew update;
+      brew install caskroom/cask/brew-cask;
       brew upgrade python;
       brew install bison || brew link --overwrite bison;
       brew unlink libtool && brew uninstall libtool && brew install libtool;
@@ -36,9 +37,15 @@ before_install:
     fi
 
 install:
+  # install LaTeX
+  - if "$LATEX"; then
+        if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+          sudo apt-get install -y texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra;
+        else
+          brew cask install mactex;
+        fi;
   # install sollya
   - if "$SOLLYA"; then
-
         if [ "$TRAVIS_OS_NAME" == "linux" ]; then
           sudo apt-get install libmpfr-dev;
           sudo apt-get install libmpfi-dev;
