@@ -19,7 +19,7 @@ from fixif.func_aux import scalarProduct
 # used to build the Cython module
 from distutils.core import setup
 from distutils.extension import Extension
-#from Cython.Distutils import build_ext
+# from Cython.Distutils import build_ext
 
 from imp import load_dynamic, find_module, load_module
 

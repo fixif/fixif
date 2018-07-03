@@ -1,4 +1,4 @@
-#import sollya
+# coding: utf-8
 
 _author__ = "Anastasia Volkova"
 __copyright__ = "Copyright 2015, FiXiF Project, LIP6"
@@ -10,8 +10,9 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-import pytest
 
+import pytest
+#import sollya
 
 from fixif.LTI import dSS, Butter, dTF
 #from fixif.SIF import Realization, Realization_FxP

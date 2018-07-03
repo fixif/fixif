@@ -22,8 +22,8 @@ from numpy import matrix as mat
 from fixif.LTI import Filter, iter_random_dTF, iter_random_dSS
 
 
-#from func_aux.get_data import get_data
-#from func_aux.MtlbHelper import MtlbHelper
+# from func_aux.get_data import get_data
+# from func_aux.MtlbHelper import MtlbHelper
 
 from fixif.func_aux import mpf_to_numpy
 
@@ -33,8 +33,8 @@ from numpy.testing import assert_allclose
 
 
 
-@pytest.mark.parametrize("S", iter_random_dSS(25, n=(5, 15), p=(1, 5), q=(1, 5) ))
-def test_dSSexact( S ):
+@pytest.mark.parametrize("S", iter_random_dSS(25, n=(5, 15), p=(1, 5), q=(1, 5)))
+def test_dSSexact(S):
 
 	l = randint(1, 10)
 	myJtoS = (numpy.eye(l), numpy.zeros((S.n, l)), numpy.zeros((S.p, l)), rand(l, S.n), rand(l, S.q), S.A, S.B, S.C, S.D)

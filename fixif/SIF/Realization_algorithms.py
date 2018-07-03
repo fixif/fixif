@@ -1,4 +1,4 @@
-#coding=UTF8
+# coding: utf-8
 
 __author__ = "Thibault Hilaire, Joachim Kruithof"
 __copyright__ = "Copyright 2015, FiXiF Project, LIP6"
@@ -46,15 +46,13 @@ class R_algorithm:
 
 		"""
 
-		# TODO: write it in a file ?
-
 		env = Environment(loader=PackageLoader('fixif', 'SIF/templates'),
 					block_start_string='%<',
-					block_end_string ='>%',
-					variable_start_string ='<<',
-					variable_end_string ='>>',
+					block_end_string='>%',
+					variable_start_string='<<',
+					variable_end_string='>>',
 					comment_start_string='[§',
-					comment_end_string ='§]',
+					comment_end_string='§]',
 					trim_blocks=True,
 					lstrip_blocks=True)
 

@@ -19,7 +19,7 @@ import pytest
 from colorama import Fore
 from itertools import chain
 from fixif.SIF import Realization
-from numpy import matrix as mat, zeros,eye, empty, float64
+from numpy import matrix as mat, zeros, eye, empty, float64
 
 from fixif.Structures import iterAllRealizationsRandomFilter
 from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
@@ -39,7 +39,7 @@ from numpy.testing import assert_allclose
 @pytest.mark.parametrize("S", iter_random_dSS(5, n=(5, 15), p=(1, 5), q=(1, 5)))
 def test_construction_from_dSS(S):
 	# random SIF from dSS (J=identity, K=zero, L=zero, M=random, N=random)
-	l = randint(0,10)
+	l = randint(0, 10)
 	JtoS = (eye(l), zeros((S.n, l)), zeros((S.p, l)), rand(l, S.n), rand(l, S.q), S.A, S.B, S.C, S.D)
 	R = Realization(Filter(ss=S), JtoS)
 
@@ -56,10 +56,10 @@ def test_algorithmLaTeX(F):
 	for R in F.iterAllRealizations():
 		print(R.name + "\t")
 		# get LaTeX code
-		str = R.algorithmLaTeX()
+		code = R.algorithmLaTeX()
 		# compile it
 		try:
-			build_pdf(str)
+			build_pdf(code)
 		except LatexBuildError as e:
 			for err in e.get_errors():
 				print(err)
@@ -83,17 +83,15 @@ def test_implementCdouble(F):
 	for R in F.iterAllRealizations():
 		print('\n'+Fore.RED + str(R.name) + Fore.RESET+'\n\t')
 
-		#y = R.simulateMP(u)
-
+		# y = R.simulateMP(u)
 		yb = R.simulate(u)
-
 		yC = R.runCdouble(u)
 
 		assert norm(yb-yC) < 1e-5
 
 
 
-@pytest.mark.parametrize( "F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
+@pytest.mark.parametrize("F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
 def test_makeModule(F):
 	R = State_Space(F)
 	R.makeModule()
@@ -102,7 +100,7 @@ def test_makeModule(F):
 @pytest.mark.parametrize("R", iterAllRealizationsRandomFilter(1), ids=lambda x: x.name)
 def test_rea2(R):
 	N = 10
-	u = 300 * rand(R.filter.q,1)  # random input of N samples
+	u = 300 * rand(R.filter.q, 1)  # random input of N samples
 
 	print(str(R.name) + "\t")
 
@@ -110,9 +108,9 @@ def test_rea2(R):
 	yC = R.runCdouble(u)
 	assert_allclose(y, yC, atol=1e-5)
 
-	R.filter.dSS.assert_close( R.dSS )
+	R.filter.dSS.assert_close(R.dSS)
 	if R.filter.isSISO():
-		R.filter.dTF.assert_close( R.dSS.to_dTF() )
+		R.filter.dTF.assert_close(R.dSS.to_dTF())
 
 
 
