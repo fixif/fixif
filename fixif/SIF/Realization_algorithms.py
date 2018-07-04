@@ -10,7 +10,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-
+from jinja2.loaders import FileSystemLoader
 from jinja2 import Environment, PackageLoader
 from numpy import tril, all, r_, c_, mat, zeros, eye
 from scipy.linalg import norm
@@ -46,7 +46,7 @@ class R_algorithm:
 
 		"""
 
-		env = Environment(loader=PackageLoader('fixif', 'SIF/templates'),
+		env = Environment(loader=FileSystemLoader('fixif/SIF/templates'),#PackageLoader('fixif', 'SIF/templates'),
 					block_start_string='%<',
 					block_end_string='>%',
 					variable_start_string='<<',
