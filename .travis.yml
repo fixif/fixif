@@ -108,6 +108,11 @@ install:
   # and then install fixif
   - python setup.py  install
 
+  # some infos about the machine
+  - uname -a
+  - gcc --version
+  - sollya --version
+
 script:
     #- pytest -k construct --cov=fixif -s
     - if "$SOLLYA"; then
