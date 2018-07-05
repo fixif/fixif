@@ -14,19 +14,53 @@ from jinja2.loaders import FileSystemLoader
 from jinja2 import Environment, PackageLoader
 from numpy import tril, all, r_, c_, mat, zeros, eye
 from scipy.linalg import norm
-from fixif.func_aux import scalarProduct
+# from fixif.func_aux import scalarProduct
+from textwrap import wrap
 
 
-def genVarName(baseName, numVar):
-	varNames = []
 
-	if numVar is 1:
-		varNames.append(baseName)
-	else:
-		for i in range(0, numVar):
-			varNames.append(baseName + "_{" + str(i + 1) + "}")
+def scalarProduct(var, coefs, dcoefs=None, hexa=False):
+	"""
+	Return a string corresponding to a scalar product (dot product) between a vector of variables (var) and a vector of coefficients (coefs)
 
-	return varNames
+	Ex: var(0)*coefs(0) + var(1)*coefs(1) + ... + var(n-1)*coefs(n)
+
+	Parameters:
+		- var: list of name of the variables
+		- coefs: vector of coefficients used in the scalar product (np.matrix, so 2d)
+		- dcoefs: vector of values (1 or 0) indicating if the associated coefficient is trivial (0 or not): comes from the dZ matrix
+		- hexa: True to display the coefficients in floating-point hexadecimal
+	Returns string
+	The coefficients are converted in their litteral floating-point hexadecimal representation (exact representation)
+	"""
+	if dcoefs is None:
+		dcoefs = [1]*coefs.shape[0]
+
+	# iterate over each coefficient	and variable for the dot product
+	dp = []
+	for v, c, dv in zip(var, coefs.tolist()[0], dcoefs):
+		if dv == 1:
+			dp.append(v+'*'+float.hex(c))
+		else:
+			if c == 1:
+				dp.append(v)
+			elif c == -1:
+				dp.append('-' + v)
+			elif c != 0:
+				dp.append(v + '*' + float.hex(c))
+
+	S = " + ".join(dp)
+	if S == "":
+		S = "0"
+	return "\n".join(wrap(S, 60))
+
+
+
+
+
+
+
+
 
 
 class R_algorithm:
@@ -35,15 +69,11 @@ class R_algorithm:
 	Allow to embedd the algorithmXXX methods in the Realization class
 	the Realization class will inherit from R_algorihtm class
 	"""
-	def algorithmLaTeX(self, out_file=None, caption=None):
+	def algorithmLaTeX(self, caption=None):
 
 		"""
-
 		Generate a tex file to use with package algorithm2e to create a LaTex output of algorithm
-
-		- `R` is a SIF object
 		- `caption` is an additional caption
-
 		"""
 
 		env = Environment(loader=FileSystemLoader('fixif/SIF/templates'),#PackageLoader('fixif', 'SIF/templates'),
@@ -118,4 +148,56 @@ class R_algorithm:
 
 		return texPlate.render(**texDict)
 
+
+# %< macro declare(baseName, numVar, kwName) >%
+# %< if numVar > 1>%
+# 	\<<kwName>>{$<<baseName>>$: array [1..<<numVar>>] of reals}
+# %<- else >%
+# 	\<<kwName>>{$<<baseName>>$: real}
+# %<- endif >%
+# %< endmacro >%
+
+# <<declare('u', u.numVar, 'KwIn')>>
+# <<declare('y', y.numVar, 'KwOut')>>
+# %< if isPnut >%
+# <<declare('xn, xnp', xn.numVar, 'KwData')>>
+# %< else >%
+# <<declare('xn', xn.numVar, 'KwData')>>
+# %< endif >%
+# <<declare('T', T.numVar, 'KwData')>>
+
+		#- generic names with time (t with/without time)
+		#- surname with time (t without time)
+		#- generic names without time (input: u, output: y, intern static array: x)
+
+	def algorithmTxt(self, coefFormat=None, withTime=True, withSurname=False, comments=True):
+		"""
+		Generate the algorithm core in text
+		- coefFormat: (str) formatter used to display the coefficients. If empty, floating-point hexadecimal is used.
+		Otherwise, should be in C formatting format (like "%4.f" for example)
+		"""
+		# names of the variables T, X and U
+		varTXU = [v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameT]
+		varTXU.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameX)
+		varTXU.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameU)
+		# names of the variables T, X and Y
+		varTXY = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname) for v in self._varNameT]
+		varTXY.extend(v.toStr(withTime=withTime, shift=1, withSurname=withSurname) for v in self._varNameX)
+		varTXY.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameY)
+
+		# iter over all SoP
+		algoStr = []
+		for i in range(1, self._l + self._n + self._p + 1):
+			# comments
+			if comments:
+				if i == 1 and self._l>0:
+					algoStr.append("/ Temporary variables /")
+				elif (i == self._l+1) and self._n > 0:
+					algoStr.append("/ States /")
+				elif i == self._l + self._n + 1:
+					algoStr.append("/ Outputs /")
+			# sum of product
+			algoStr.append(varTXY[i-1] + '<-' + scalarProduct(varTXU, self.Zcomp[i, :].tolist()[0], self.dZ[i, :].tolist()[0], coefFormat) + '\n')
+
+		return "\n".join(algo)
 

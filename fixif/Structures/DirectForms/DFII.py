@@ -16,7 +16,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 from fixif.Structures.Structure import Structure
-
+from fixif.SIF.varName import varName, generateNames
 from numpy import matrix as mat
 from numpy import diagflat, zeros, eye, rot90, ones, r_, atleast_2d, fliplr
 from numpy.linalg import inv
@@ -68,13 +68,14 @@ def makeDFII(filt, transposed=True):
 		Q = invT * Q
 
 	# name of the intermediate variables and states
+	var_T = [varName('t')]
 	if transposed:
-		varName = [('t',), tuple('x_%d(k)' % i for i in range(1, n + 1))]
+		var_X = generateNames('x', n)
 	else:
-		varName = [('t',), tuple('v(k-%d)' % i for i in range(n, 0, -1))]
+		var_X = [varName('x', 'v', -i) for i in range(n, 0, -1)]
 
 	# return useful infos to build the Realization
-	return {"JtoS": (J, K, L, M, N, P, Q, R, S), "varNameTX": varName}
+	return {"JtoS": (J, K, L, M, N, P, Q, R, S), "varNameT": var_T, "varNameX": var_X}
 
 
 def acceptDFII(filt, **options):

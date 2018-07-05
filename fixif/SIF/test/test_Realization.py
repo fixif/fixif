@@ -68,6 +68,17 @@ def test_algorithmLaTeX(F):
 			print("LaTeX is not installed")
 
 
+@pytest.mak.parametrize("coefFormat", [None, '%.4f', '%e'], ids=['hexa', '4 digits', 'exp'])
+@pytest.mark.parametrize("F", iter_random_Filter(10, ftype='SISO'), ids=lambda x: x.name)
+def test_algorithmTxt(F, coefFormat):
+	# iter on realizations
+	for R in F.iterAllRealizations():
+		print(R.name + "\t")
+		print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=False, comments=True))
+		print('---')
+		print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=True, comments=True))
+		print('---')
+		print(R.algorithmTxt(coefFormat=coefFormat, withTime=False, withSurname=False, comments=True))
 
 
 

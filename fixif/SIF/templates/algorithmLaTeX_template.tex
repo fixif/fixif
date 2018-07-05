@@ -1,10 +1,4 @@
-%< macro declare(baseName, numVar, kwName) >%
-%< if numVar > 1>%
-	\<<kwName>>{$<<baseName>>$: array [1..<<numVar>>] of reals}
-%<- else >%
-	\<<kwName>>{$<<baseName>>$: real}
-%<- endif >%
-%< endmacro >%
+
 
 
 \documentclass{standalone}
@@ -14,19 +8,10 @@
 \begin{document}
 
 \begin{algorithm}[H]
-	\caption{<<caption>>}
+	\caption{\Var{caption}}
 	\SetAlgoLined
-	\Begin{
-<<declare('u', u.numVar, 'KwIn')>>
-<<declare('y', y.numVar, 'KwOut')>>
-%< if isPnut >%
-<<declare('xn, xnp', xn.numVar, 'KwData')>>
-%< else >%
-<<declare('xn', xn.numVar, 'KwData')>>
-%< endif >%
-<<declare('T', T.numVar, 'KwData')>>
-}
-<<computations>>
+	\Begin{\Var{declaration}}
+    \Var{computations}
 \end{algorithm}
 
 \end{document}

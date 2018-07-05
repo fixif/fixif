@@ -2,3 +2,4 @@
 
 from fixif.SIF.SIF import SIF
 from fixif.SIF.Realization import Realization
+from fixif.SIF.varName import varName, generateNames
