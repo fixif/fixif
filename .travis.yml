@@ -70,19 +70,21 @@ install:
   # install slycot (first install requirement like gfortran and/or numpy/scipy)
   - if "$SLYCOT"; then
       if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        sudo apt-get build-dep python-scipy || travis_terminate 1;
+        sudo apt-get build-dep python-scipy;
+        sudo apt-get install liblapack-dev libblas-dev;
+        sudo apt-get install gfortran;
       else
-        pip install numpy || travis_terminate 1;
+        pip install numpy;
         brew install gcc || brew link --overwrite gcc;
       fi;
-      pip install slycot || travis_terminate 1;
+      LAPACKLIBS=lapack:blas pip install slycot;
     fi
   # install WCPG and its python wrapper
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      sudo apt-get install f2c || travis_terminate 1;
-      sudo apt-get install libmpfr-dev || travis_terminate 1;
-      sudo apt-get install libmpfi-dev || travis_terminate 1;
-      sudo apt-get build-dep python-scipy || travis_terminate 1;
+      sudo apt-get install f2c;
+      sudo apt-get install libmpfr-dev;
+      sudo apt-get install libmpfi-dev;
+      sudo apt-get build-dep python-scipy;
     else
       brew install mpfi;
       pip install numpy;
@@ -111,8 +113,6 @@ install:
   # some infos about the machine
   - uname -a
   - gcc --version
-  - sollya --version
-  - cd sollya_git && make test && cd ..
 
 script:
     #- pytest -k construct --cov=fixif -s
