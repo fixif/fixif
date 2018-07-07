@@ -94,7 +94,7 @@ def makeDFI(filt, nbSum=1, transposed=True):
 	# name of the intermediate variables and states
 	var_T = generateNames('t', nbSum)
 	if transposed:
-		var_X = generateNames('x', n+1)
+		var_X = generateNames('x', 2*n)
 	else:
 		var_X = [varName('x', 'u', -i) for i in range(n, 0, -1)]
 		var_X.extend([varName('x', 'y', -i) for i in range(n, 0, -1)])

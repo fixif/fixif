@@ -26,7 +26,7 @@ from fixif.FxP import Constant
 import numpy as np
 from copy import copy
 
-from fixif.SIF import generateNames
+from fixif.SIF.varName import generateNames
 
 
 
@@ -62,12 +62,18 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 		# call the parent class constructor
 		super(Realization, self).__init__(JtoS, dJtodS)
 
+
 		# names (list) of the variables t, x, u and y
 		self._varNameT = generateNames('t', self._l) if varNameT is None else varNameT
 		self._varNameX = generateNames('x', self._n) if varNameX is None else varNameX
 		self._varNameU = generateNames('u', self._q)
 		self._varNameY = generateNames('y', self._p)
 
+		if len(self._varNameT) != self._l:
+			raise ValueError("Realization: varNameT should be a vector of size %d (%d instead)", self._l, len(self._varNameT))
+
+		if len(self._varNameX) != self._n:
+			raise ValueError("Realization: varNameX should be a vector of size %d (%d instead)", self._n, len(self._varNameX))
 
 		self._MSB = None
 		self._LSB = None

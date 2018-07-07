@@ -68,17 +68,33 @@ def test_algorithmLaTeX(F):
 			print("LaTeX is not installed")
 
 
-@pytest.mak.parametrize("coefFormat", [None, '%.4f', '%e'], ids=['hexa', '4 digits', 'exp'])
+@pytest.mark.parametrize("coefFormat", [None, '%.4f', '%e'], ids=['hexa', '4 digits', 'exp'])
 @pytest.mark.parametrize("F", iter_random_Filter(10, ftype='SISO'), ids=lambda x: x.name)
 def test_algorithmTxt(F, coefFormat):
 	# iter on realizations
 	for R in F.iterAllRealizations():
 		print(R.name + "\t")
-		print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=False, comments=True))
-		print('---')
-		print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=True, comments=True))
-		print('---')
-		print(R.algorithmTxt(coefFormat=coefFormat, withTime=False, withSurname=False, comments=True))
+		R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=False, comments=True)
+		R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=True, comments=True)
+		R.algorithmTxt(coefFormat=coefFormat, withTime=False, withSurname=False, comments=True)
+
+
+
+
+def test_algorithmTxt2():
+	F = random_Filter(3, 1, 1, 12345678)
+	print(F.dTF)
+	coefFormat = '%.4f'
+	# iter on realizations
+	from fixif.Structures import DFI, DFII
+	for tr in [True, False]:
+		for R in [DFI(F, nbSum=1, transposed=tr), DFI(F, nbSum=2, transposed=tr), DFII(F, transposed=tr)]:
+			print(R.name + "\t")
+			print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=False, comments=True))
+			print('---')
+			print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=True, comments=True))
+			print('---')
+			print(R.algorithmTxt(coefFormat=coefFormat, withTime=False, withSurname=False, comments=True))
 
 
 

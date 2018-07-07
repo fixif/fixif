@@ -14,52 +14,8 @@ from jinja2.loaders import FileSystemLoader
 from jinja2 import Environment, PackageLoader
 from numpy import tril, all, r_, c_, mat, zeros, eye
 from scipy.linalg import norm
-# from fixif.func_aux import scalarProduct
+from fixif.func_aux import scalarProduct
 from textwrap import wrap
-
-
-
-def scalarProduct(var, coefs, dcoefs=None, hexa=False):
-	"""
-	Return a string corresponding to a scalar product (dot product) between a vector of variables (var) and a vector of coefficients (coefs)
-
-	Ex: var(0)*coefs(0) + var(1)*coefs(1) + ... + var(n-1)*coefs(n)
-
-	Parameters:
-		- var: list of name of the variables
-		- coefs: vector of coefficients used in the scalar product (np.matrix, so 2d)
-		- dcoefs: vector of values (1 or 0) indicating if the associated coefficient is trivial (0 or not): comes from the dZ matrix
-		- hexa: True to display the coefficients in floating-point hexadecimal
-	Returns string
-	The coefficients are converted in their litteral floating-point hexadecimal representation (exact representation)
-	"""
-	if dcoefs is None:
-		dcoefs = [1]*coefs.shape[0]
-
-	# iterate over each coefficient	and variable for the dot product
-	dp = []
-	for v, c, dv in zip(var, coefs.tolist()[0], dcoefs):
-		if dv == 1:
-			dp.append(v+'*'+float.hex(c))
-		else:
-			if c == 1:
-				dp.append(v)
-			elif c == -1:
-				dp.append('-' + v)
-			elif c != 0:
-				dp.append(v + '*' + float.hex(c))
-
-	S = " + ".join(dp)
-	if S == "":
-		S = "0"
-	return "\n".join(wrap(S, 60))
-
-
-
-
-
-
-
 
 
 
@@ -176,28 +132,34 @@ class R_algorithm:
 		- coefFormat: (str) formatter used to display the coefficients. If empty, floating-point hexadecimal is used.
 		Otherwise, should be in C formatting format (like "%4.f" for example)
 		"""
+		# Lower triangular part non-null ?
+		isPnut = True
+		if all(tril(self.P, -1) == 0):
+			isPnut = False
+
 		# names of the variables T, X and U
-		varTXU = [v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameT]
+		varTXU = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname) for v in self._varNameT]
 		varTXU.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameX)
 		varTXU.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameU)
 		# names of the variables T, X and Y
 		varTXY = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname) for v in self._varNameT]
-		varTXY.extend(v.toStr(withTime=withTime, shift=1, withSurname=withSurname) for v in self._varNameX)
+		varTXY.extend(v.toStr(withTime=withTime, shift=1, withSurname=withSurname, suffix='p' if isPnut else '') for v in self._varNameX)
 		varTXY.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameY)
+
 
 		# iter over all SoP
 		algoStr = []
-		for i in range(1, self._l + self._n + self._p + 1):
+		for i in range(self._l + self._n + self._p):
 			# comments
 			if comments:
-				if i == 1 and self._l>0:
+				if i == 0 and self._l>0:
 					algoStr.append("/ Temporary variables /")
-				elif (i == self._l+1) and self._n > 0:
+				elif (i == self._l) and self._n > 0:
 					algoStr.append("/ States /")
-				elif i == self._l + self._n + 1:
+				elif i == self._l + self._n:
 					algoStr.append("/ Outputs /")
 			# sum of product
-			algoStr.append(varTXY[i-1] + '<-' + scalarProduct(varTXU, self.Zcomp[i, :].tolist()[0], self.dZ[i, :].tolist()[0], coefFormat) + '\n')
+			algoStr.append(varTXY[i] + '<-' + scalarProduct(varTXU, self.Zcomp[i, :].tolist()[0], coefFormat) + '\n')
 
-		return "\n".join(algo)
+		return "\n".join(algoStr)
 

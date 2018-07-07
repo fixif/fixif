@@ -25,12 +25,17 @@ class varName:
 		self._shift = shift
 
 
-	def toStr(self, withTime=True, shift=0, withSurname=False):
+	def toStr(self, withTime=True, shift=0, withSurname=False, suffix=''):
 		"""
 		a method to display a varName in different ways:
 		- generic names with time (t with/without time)
 		- surname with time (t without time)
 		- generic names without time (input: u, output: y, intern static array: x)
+
+		withTime: (bool) adds the time "(k)" or "(k+1)"
+		shift: (int) defines the shift (in time, ie shift=1 for time (k+1)
+		withSurname: (bool) uses surname instead of name
+		suffix: (str) add a suffix to the name (before the '_')
 
 		>>> u=varName('u'); t=varName('x_2', 'u_3',shift=-1)
 		>>> u.toStr()
@@ -45,14 +50,22 @@ class varName:
 		>>> 'u_3(k-1)'
 		>>> t.toStr(withSurname=True, shift=2)
 		>>> 'u_3(k+1)'
+		>>> t.toStr(withSurname=True, shift=2, prime='p')
+		>>> 'up_3(k+1)'
 		"""
 		s = self._surname if withSurname else self._name
+		if suffix:
+			if '_' in s:
+				s = s.replace('_', suffix+'_')
+			else:
+				s = s + suffix
 		if withTime:
 			shift += self._shift
 			if shift == 0:
 				s += '(k)'
 			else:
 				s += '(k%+d)' % (shift,)
+		return s
 
 
 def generateNames(baseName, nbVar):
@@ -64,11 +77,11 @@ def generateNames(baseName, nbVar):
 	if the number is larger than 9, braces are added ('u_{12}' for example) to be compliant with LaTeX
 	"""
 	if nbVar == 1:
-		return [varName(baseName, 0)]
+		return [varName(baseName)]
 	elif nbVar < 10:
-		return [varName(baseName + "_%d" % (i+1), 0) for i in range(1, nbVar+1)]
+		return [varName(baseName + "_%d" % (i+1)) for i in range(1, nbVar+1)]
 	else:
-		return [varName(baseName + "_{%d}" % (i + 1), 0) for i in range(1, nbVar+1)]
+		return [varName(baseName + "_{%d}" % (i + 1)) for i in range(1, nbVar+1)]
 
 
 
