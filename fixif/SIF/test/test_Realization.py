@@ -82,19 +82,107 @@ def test_algorithmTxt(F, coefFormat):
 
 
 def test_algorithmTxt2():
-	F = random_Filter(3, 1, 1, 12345678)
-	print(F.dTF)
-	coefFormat = '%.4f'
+	F = Filter(num=[2,3,4],den=[1,5,6])
+	st = ""
+	res = """Realization `Direct Form I (transposed:False, nbSum:1)` for filter `noname`	
+t(k+1) <- -6*x_4(k) + -5*x_3(k) + 4*x_2(k) + 3*x_1(k) + 2*u(k)
+x_4(k+1) <- x_3(k)
+x_3(k+1) <- t(k+1)
+x_2(k+1) <- x_1(k)
+x_1(k+1) <- u(k)
+y(k) <- t(k+1)
+---
+t <- -6*y(k-2) + -5*y(k-1) + 4*u(k-2) + 3*u(k-1) + 2*u(k)
+y(k) <- t
+---
+t <- -6*x_4 + -5*x_3 + 4*x_2 + 3*x_1 + 2*u
+x_4 <- x_3
+x_3 <- t
+x_2 <- x_1
+x_1 <- u
+y <- t
+Realization `Direct Form I (transposed:False, nbSum:2)` for filter `noname`	
+t_1(k+1) <- 4*x_2(k) + 3*x_1(k) + 2*u(k)
+t_2(k+1) <- t_1(k+1) + -6*x_4(k) + -5*x_3(k)
+x_4(k+1) <- x_3(k)
+x_3(k+1) <- t_2(k+1)
+x_2(k+1) <- x_1(k)
+x_1(k+1) <- u(k)
+y(k) <- t_2(k+1)
+---
+t_1 <- 4*u(k-2) + 3*u(k-1) + 2*u(k)
+t_2 <- t_1 + -6*y(k-2) + -5*y(k-1)
+y(k) <- t_2
+---
+t_1 <- 4*x_2 + 3*x_1 + 2*u
+t_2 <- t_1 + -6*x_4 + -5*x_3
+x_4 <- x_3
+x_3 <- t_2
+x_2 <- x_1
+x_1 <- u
+y <- t_2
+Realization `Direct Form I (transposed:True, nbSum:1)` for filter `noname`	
+t(k+1) <- x_3(k) + u(k)
+x_1(k+1) <- 3*t(k+1) + x_2(k)
+x_2(k+1) <- 4*t(k+1)
+x_3(k+1) <- -5*t(k+1) + x_4(k)
+x_4(k+1) <- -6*t(k+1)
+y(k) <- 2*t(k+1) + x_1(k)
+---
+t <- x_3(k) + u(k)
+x_1(k+1) <- 3*t + x_2(k)
+x_2(k+1) <- 4*t
+x_3(k+1) <- -5*t + x_4(k)
+x_4(k+1) <- -6*t
+y(k) <- 2*t + x_1(k)
+---
+t <- x_3 + u
+x_1 <- 3*t + x_2
+x_2 <- 4*t
+x_3 <- -5*t + x_4
+x_4 <- -6*t
+y <- 2*t + x_1
+Realization `Direct Form II (transposed:False)` for filter `noname`	
+t(k+1) <- -6*x_2(k) + -5*x_1(k) + u(k)
+x_2(k+1) <- x_1(k)
+x_1(k+1) <- t(k+1)
+y(k) <- 2*t(k+1) + 4*x_2(k) + 3*x_1(k)
+---
+v <- -6*v(k-2) + -5*v(k-1) + u(k)
+y(k) <- 2*v + 4*v(k-2) + 3*v(k-1)
+---
+t <- -6*x_2 + -5*x_1 + u
+x_2 <- x_1
+x_1 <- t
+y <- 2*t + 4*x_2 + 3*x_1
+Realization `Direct Form II (transposed:True)` for filter `noname`	
+t(k+1) <- x_1(k) + 2*u(k)
+x_1(k+1) <- -5*t(k+1) + x_2(k) + 3*u(k)
+x_2(k+1) <- -6*t(k+1) + 4*u(k)
+y(k) <- t(k+1)
+---
+t <- x_1(k) + 2*u(k)
+x_1(k+1) <- -5*t + x_2(k) + 3*u(k)
+x_2(k+1) <- -6*t + 4*u(k)
+y(k) <- t
+---
+t <- x_1 + 2*u
+x_1 <- -5*t + x_2 + 3*u
+x_2 <- -6*t + 4*u
+y <- t
+"""
 	# iter on realizations
 	from fixif.Structures import DFI, DFII
-	for tr in [True, False]:
-		for R in [DFI(F, nbSum=1, transposed=tr), DFI(F, nbSum=2, transposed=tr), DFII(F, transposed=tr)]:
-			print(R.name + "\t")
-			print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=False, comments=True))
-			print('---')
-			print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=True, comments=True))
-			print('---')
-			print(R.algorithmTxt(coefFormat=coefFormat, withTime=False, withSurname=False, comments=True))
+	for R in [DFI(F, nbSum=1, transposed=False), DFI(F, nbSum=2, transposed=False), DFI(F, nbSum=1, transposed=True), DFII(F, transposed=False), DFII(F, transposed=True)]:
+
+		st += R.name + "\t\n"
+		st += R.algorithmTxt(coefFormat="%d", withTime=True, withSurname=False, comments=False) + "\n"
+		st += '---\n'
+		st += R.algorithmTxt(coefFormat="%d", withTime=True, withSurname=True, comments=False) + "\n"
+		st += '---\n'
+		st += R.algorithmTxt(coefFormat="%d", withTime=False, withSurname=False, comments=False) + "\n"
+
+	assert st == res
 
 
 

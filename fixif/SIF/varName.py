@@ -50,7 +50,7 @@ class varName:
 		>>> 'u_3(k-1)'
 		>>> t.toStr(withSurname=True, shift=2)
 		>>> 'u_3(k+1)'
-		>>> t.toStr(withSurname=True, shift=2, prime='p')
+		>>> t.toStr(withSurname=True, shift=2, suffix='p')
 		>>> 'up_3(k+1)'
 		"""
 		s = self._surname if withSurname else self._name
@@ -60,7 +60,8 @@ class varName:
 			else:
 				s = s + suffix
 		if withTime:
-			shift += self._shift
+			if withSurname:
+				shift += self._shift
 			if shift == 0:
 				s += '(k)'
 			else:
@@ -79,9 +80,9 @@ def generateNames(baseName, nbVar):
 	if nbVar == 1:
 		return [varName(baseName)]
 	elif nbVar < 10:
-		return [varName(baseName + "_%d" % (i+1)) for i in range(1, nbVar+1)]
+		return [varName(baseName + "_%d" % (i,)) for i in range(1, nbVar+1)]
 	else:
-		return [varName(baseName + "_{%d}" % (i + 1)) for i in range(1, nbVar+1)]
+		return [varName(baseName + "_{%d}" % (i,)) for i in range(1, nbVar+1)]
 
 
 

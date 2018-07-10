@@ -130,36 +130,60 @@ class R_algorithm:
 		"""
 		Generate the algorithm core in text
 		- coefFormat: (str) formatter used to display the coefficients. If empty, floating-point hexadecimal is used.
+		- withTime: True if the variable are labeled with time (cannot be False if withSurname is True)
+		- withSurname: True if the surname of the variables (when they exist) are used; in that case, the temporary variables do not have time (t instead of t(k+1))
 		Otherwise, should be in C formatting format (like "%4.f" for example)
 		"""
+		if withSurname and not withTime:
+			raise ValueError("algorithmTxt: wichSurname=True and withTime=False are incoherent")
 		# Lower triangular part non-null ?
 		isPnut = True
 		if all(tril(self.P, -1) == 0):
 			isPnut = False
 
 		# names of the variables T, X and U
-		varTXU = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname) for v in self._varNameT]
-		varTXU.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameX)
-		varTXU.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameU)
+		varT = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname) for v in self._varNameT]
+		varTnoTime = [v.toStr(withTime=withTime and not withSurname, shift=1, withSurname=withSurname) for v in self._varNameT]	 # variable T without time when its with surname
+		varX = [v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameX]
+		varU = [v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameU]
+		varTXU = varT + varX + varU
+		varTXUnoTime = varTnoTime + varX + varU
 		# names of the variables T, X and Y
-		varTXY = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname) for v in self._varNameT]
-		varTXY.extend(v.toStr(withTime=withTime, shift=1, withSurname=withSurname, suffix='p' if isPnut else '') for v in self._varNameX)
-		varTXY.extend(v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameY)
+		varXp1 = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname, suffix='p' if isPnut else '') for v in self._varNameX]
+		varY = [v.toStr(withTime=withTime, shift=0, withSurname=withSurname) for v in self._varNameY]
+		varTXY = varT + varXp1 + varY
+		varTXYnoTime = varTnoTime + varXp1 + varY
 
+		# print("varTXU=" + str(varTXU))
+		# print("varTXY="+str(varTXY))
+		# TOFIX: remove this
+
+		# varTXU and varTXUnoTime is just a trick when withSurname=True: we don't want to display useless line, like "v(k)<-v(k)".
+		# But when the time is removed with surname, we can have (it happens with DFII), something like "t<-v(k)" (here the surname of t(k+1) is v(k)
+		# in "v(k)<-v(k)" the 2nd comes from the surname of t, the 1st is because v(k-1) is the surname of x(k), but we display x(k+1)
+		# to avoid this, we build the "src <- dest" line with varTXU (without time removed for the temporary variables), and if src is different than dest
+		# then we use varTXUnoTime for the display
 
 		# iter over all SoP
 		algoStr = []
 		for i in range(self._l + self._n + self._p):
 			# comments
 			if comments:
-				if i == 0 and self._l>0:
+				if i == 0 and self._l > 0:
 					algoStr.append("/ Temporary variables /")
 				elif (i == self._l) and self._n > 0:
 					algoStr.append("/ States /")
 				elif i == self._l + self._n:
 					algoStr.append("/ Outputs /")
 			# sum of product
-			algoStr.append(varTXY[i] + '<-' + scalarProduct(varTXU, self.Zcomp[i, :].tolist()[0], coefFormat) + '\n')
+			src = varTXY[i]
+			dst = scalarProduct(varTXU, self.Zcomp[i, :].tolist()[0], coefFormat)	 # varTXU is used for dst and the comparison with src
+			if src != dst:
+				# finally, we use the varTXUnoTime for the result
+				src = varTXYnoTime[i]
+				dst = scalarProduct(varTXUnoTime, self.Zcomp[i, :].tolist()[0], coefFormat)
+				if (src + ' <- ' + dst) not in algoStr:		# to avoid redondant lines (append for DFI with surname)
+					algoStr.append(src + ' <- ' + dst)
 
 		return "\n".join(algoStr)
 
