@@ -68,11 +68,16 @@ def makeDFII(filt, transposed=True):
 		Q = invT * Q
 
 	# name of the intermediate variables and states
-	var_T = [varName('t')]
+
 	if transposed:
+		var_T = [varName('t')]
 		var_X = generateNames('x', n)
 	else:
-		var_X = [varName('x', 'v', -i) for i in range(n, 0, -1)]
+		var_T = [varName('t', 'v', -1)]
+		if n < 10:
+			var_X = [varName('x_%d'%(i,), 'v', -i) for i in range(n, 0, -1)]
+		else:
+			var_X = [varName('x_{%d}' % (i,), 'v', -i) for i in range(n, 0, -1)]
 
 	# return useful infos to build the Realization
 	return {"JtoS": (J, K, L, M, N, P, Q, R, S), "varNameT": var_T, "varNameX": var_X}

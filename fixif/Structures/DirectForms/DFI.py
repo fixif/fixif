@@ -28,14 +28,16 @@ def makeDFI(filt, nbSum=1, transposed=True):
 
 	Two options are available
 	- nbSum: number of sums (1 or 2) used for the computation of the output
-		nbSum=1 - compute \sum b_i u(k-i) and \sum a_i y(k-i) in the same Sum-of-Products
-		nbSum=2 - compute \sum b_i u(k-i) and \sum a_i y(k-i) in two Sums-of-Products
+		nbSum==1 - compute \sum b_i u(k-i) and \sum a_i y(k-i) in the same Sum-of-Products
+		nbSum==2 - compute \sum b_i u(k-i) and \sum a_i y(k-i) in two Sums-of-Products
 	- transposed: (boolean) indicates if the realization is transposed (Direct Form I or Direct Form I transposed)
 
 	Returns
 	- a dictionary of necessary infos to build the Realization
 
 	"""
+	if nbSum != 1 and nbSum != 2:
+		raise ValueError("DFI: nbSum should be equal to 1 or 2")
 
 	# convert everything to mat
 	n = filt.dTF.order
@@ -96,8 +98,14 @@ def makeDFI(filt, nbSum=1, transposed=True):
 	if transposed:
 		var_X = generateNames('x', 2*n)
 	else:
-		var_X = [varName('x', 'u', -i) for i in range(n, 0, -1)]
-		var_X.extend([varName('x', 'y', -i) for i in range(n, 0, -1)])
+		if n < 10:
+			var_X = [varName('x_%d' % (n + i,), 'y', -i) for i in range(n, 0, -1)]
+			var_X.extend([varName('x_%d' % (i,), 'u', -i) for i in range(n, 0, -1)])
+
+		else:
+			var_X = [varName('x_{%d}' % (n+i,), 'y', -i) for i in range(n, 0, -1)]
+			var_X.extend([varName('x_{%d}' % (i,), 'u', -i) for i in range(n, 0, -1)])
+
 
 	# return useful infos to build the Realization
 	return {"JtoS": (J, K, L, M, N, P, Q, R, S), "varNameT": var_T, "varNameX": var_X}
@@ -113,4 +121,6 @@ def acceptDFI(filt, **options):
 # build the Direct Form I
 # as an instance of the class structure
 DFI = Structure(shortName='DFI', fullName="Direct Form I", options={"nbSum": (1, 2), "transposed": (False, True)}, make=makeDFI, accept=acceptDFI)
+
+# TODO: nbSum=3 and transposed=True is the same as nbSum=1 and transposed=True (just an extra useless temporary variable (t_2=t_1))
 
