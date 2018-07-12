@@ -65,6 +65,7 @@ def _check_dimensions(JtoS):
 
 	# we check every matrix
 	for X, (name, a, b) in zip(JtoS, matrices):
+		X = mat(X)
 		# get the size if it's the first time we see them
 		if not a:
 			a.extend([X.shape[0], name])
