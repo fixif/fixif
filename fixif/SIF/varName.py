@@ -85,5 +85,17 @@ def generateNames(baseName, nbVar):
 		return [varName(baseName + "_{%d}" % (i,)) for i in range(1, nbVar+1)]
 
 
+def simpleVarNameList(prefix, names):
+	"""
+	Generate a list of varName, from the list of names
+	the varNames are simple, without shift
+	>>> simpleVarNameList('t', ['toto', 'titi', 'tutu'])
+	is the same as
+	>>> [varName('t_1', 'toto'), varName('t_2', 'titi'), varName('t_3'), 'tutu']
+	"""
+	if len(names)<10:
+		return [varName(prefix + '_%d' % (i,), name) for i, name in enumerate(names)]
+	else:
+		return [varName(prefix + '_{%d}' % (i,), name) for i, name in enumerate(names)]
 
 
