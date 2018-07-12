@@ -134,8 +134,8 @@ class R_algorithm:
 		- withSurname: True if the surname of the variables (when they exist) are used; in that case, the temporary variables do not have time (t instead of t(k+1))
 		Otherwise, should be in C formatting format (like "%4.f" for example)
 		"""
-		if withSurname and not withTime:
-			raise ValueError("algorithmTxt: wichSurname=True and withTime=False are incoherent")
+		# if withSurname and not withTime:
+		#	raise ValueError("algorithmTxt: wichSurname=True and withTime=False are incoherent")
 		# Lower triangular part non-null ?
 		isPnut = True
 		if all(tril(self.P, -1) == 0):
