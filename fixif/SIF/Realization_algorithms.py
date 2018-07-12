@@ -136,6 +136,8 @@ class R_algorithm:
 		"""
 		# if withSurname and not withTime:
 		#	raise ValueError("algorithmTxt: wichSurname=True and withTime=False are incoherent")
+		# TODO: keep this test BUT ONLY when at least one varName has a surname with time (with shift != 0)
+
 		# Lower triangular part non-null ?
 		isPnut = True
 		if all(tril(self.P, -1) == 0):
