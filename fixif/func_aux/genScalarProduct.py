@@ -39,6 +39,8 @@ def scalarProduct(variables, coefs, coefFormat=None):
 		elif co:
 			if coefFormat:
 				dp.append(coefFormat % (co,) + '*' + var)
+			else:
+				dp.append(co.hex() + '*' + var)
 
 	S = " + ".join(dp)
 	if S == "":
