@@ -1,7 +1,10 @@
 # coding=utf8
 
 """
-This simple class is used for the name of the variables
+This class is used for the name of the variables
+the variables can be named t(k), x(k), etc.
+but also be renamed
+they can be used for LaTeX export (so 't_1' or 't_{10}') but also for C code ('t1' or 't10')
 """
 
 
@@ -19,13 +22,22 @@ __status__ = "Beta"
 
 class varName:
 
-	def __init__(self, name, surname=None, shift=0):
-		self._name = name
-		self._surname = surname if surname is not None else name
+	def __init__(self, SIFname, SIFindex=None, surname=None, index=None, shift=0):
+		"""
+		Constructor
+		:param SIFname:
+		:param SIFindex:
+		:param surname:
+		:param shift:
+		"""
+		self._SIFname = SIFname
+		self._SIFindex = SIFindex
+		self._surname = surname if surname is not None else SIFname
+		self._index = index
 		self._shift = shift
 
 
-	def toStr(self, withTime=True, shift=0, withSurname=False, suffix=''):
+	def toStr(self, withTime=True, shift=0, withSurname=False, suffix='', LaTeX=False):
 		"""
 		a method to display a varName in different ways:
 		- generic names with time (t with/without time)
@@ -37,7 +49,8 @@ class varName:
 		withSurname: (bool) uses surname instead of name
 		suffix: (str) add a suffix to the name (before the '_')
 
-		>>> u=varName('u'); t=varName('x_2', 'u_3',shift=-1)
+		>>> u=varName('u');
+		>>> t=varName('x', 2, surname='u', index=3, shift=-1)		# t(k) = x_2(k) or t(k) = u_3(k-1)
 		>>> u.toStr()
 		>>> 'u(k)'
 		>>> u.toStr(withTime=False)
@@ -53,12 +66,18 @@ class varName:
 		>>> t.toStr(withSurname=True, shift=2, suffix='p')
 		>>> 'up_3(k+1)'
 		"""
-		s = self._surname if withSurname else self._name
-		if suffix:
-			if '_' in s:
-				s = s.replace('_', suffix+'_')
-			else:
-				s = s + suffix
+		# name or surname
+		s = self._surname if withSurname else self._SIFname
+		# add the index
+		index = self._index if withSurname else self._SIFindex
+		if LaTeX:
+			s += '_{'
+		s += '' if index is None else str(index)
+		if LaTeX:
+			s += '}'
+		# add the suffix
+		s = s + suffix
+		# add time
 		if withTime:
 			if withSurname:
 				shift += self._shift
@@ -69,33 +88,22 @@ class varName:
 		return s
 
 
-def generateNames(baseName, nbVar):
+def generateNames(baseName, nbVar, surnames=None):
 	"""
-	Generate a list of varName, based on the basedName and the number of variable
+	Generate a list of varName, based on the basedName, the number of variable and a list of surnames
+	the surnames are string, or tuple (surname, index, shift)
 	generateList( 'u', nbVar) returns:
 	- [varName('u',0)] if nbVar == 1	(ie it means 'u(k)')
-	- otherwise [ varName('u_1',0) , varName('u_2',0) , ..., varNames('u_n',0) ] that means 'u_1(k)', ...
-	if the number is larger than 9, braces are added ('u_{12}' for example) to be compliant with LaTeX
+	- otherwise [ varName('u', 1, 0) , varName('u',2, 0) , ..., varNames('u', n,0 ) ] that means 'u_1(k)', ...
 	"""
-	if nbVar == 1:
-		return [varName(baseName)]
-	elif nbVar < 10:
-		return [varName(baseName + "_%d" % (i,)) for i in range(1, nbVar+1)]
-	else:
-		return [varName(baseName + "_{%d}" % (i,)) for i in range(1, nbVar+1)]
+	if surnames is not None and len(surnames) != nbVar:
+		raise ValueError("generateNames: A wrong number of surnames are given")
+	# initial values when surnames is None
+	if surnames is None:
+		surnames = [(None, i+1 if nbVar > 1 else None, 0) for i in range(nbVar)]
+	elif isinstance(surnames[0], str):		# simple surnames, without index and shift
+		surnames = [(s, None, 0) for s in surnames]
 
-
-def simpleVarNameList(prefix, names):
-	"""
-	Generate a list of varName, from the list of names
-	the varNames are simple, without shift
-	>>> simpleVarNameList('t', ['toto', 'titi', 'tutu'])
-	is the same as
-	>>> [varName('t_1', 'toto'), varName('t_2', 'titi'), varName('t_3'), 'tutu']
-	"""
-	if len(names)<10:
-		return [varName(prefix + '_%d' % (i,), name) for i, name in enumerate(names)]
-	else:
-		return [varName(prefix + '_{%d}' % (i,), name) for i, name in enumerate(names)]
+	return [varName(baseName, i+1 if nbVar > 1 else None, sn, ind, sh) for i, (sn, ind, sh) in enumerate(surnames)]
 
 

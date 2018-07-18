@@ -16,7 +16,6 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 from fixif.Structures.Structure import Structure
-from fixif.SIF import varName, generateNames
 from numpy import matrix as mat
 from numpy import diagflat, zeros, eye, rot90, ones, r_, c_, atleast_2d
 from numpy.linalg import inv
@@ -93,22 +92,12 @@ def makeDFI(filt, nbSum=1, transposed=True):
 		P = invT * P * T
 		Q = invT * Q
 
-	# name of the intermediate variables and states
-	var_T = generateNames('t', nbSum)
-	if transposed:
-		var_X = generateNames('x', 2*n)
-	else:
-		if n < 10:
-			var_X = [varName('x_%d' % (n + i,), 'y', -i) for i in range(n, 0, -1)]
-			var_X.extend([varName('x_%d' % (i,), 'u', -i) for i in range(n, 0, -1)])
-
-		else:
-			var_X = [varName('x_{%d}' % (n+i,), 'y', -i) for i in range(n, 0, -1)]
-			var_X.extend([varName('x_{%d}' % (i,), 'u', -i) for i in range(n, 0, -1)])
-
+	# name of the intermediate variables and states (when non transposed form)
+	var_X = [('y', None, -i) for i in range(n, 0, -1)]		# x_i(k) := y(k-i)
+	var_X.extend([('u', None, -i) for i in range(n, 0, -1)])		# x_{i+n}(k) := u(k-i)
 
 	# return useful infos to build the Realization
-	return {"JtoS": (J, K, L, M, N, P, Q, R, S), "varNameT": var_T, "varNameX": var_X}
+	return {"JtoS": (J, K, L, M, N, P, Q, R, S), "surnameVarX": None if transposed else var_X}
 
 
 def acceptDFI(filt, **options):

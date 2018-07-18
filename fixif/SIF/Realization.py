@@ -42,7 +42,7 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 
 	"""
 
-	def __init__(self, filt, JtoS, dJtodS=None, structureName="", varNameT=None, varNameX=None):
+	def __init__(self, filt, JtoS, dJtodS=None, structureName="", surnameVarT=None, surnameVarX=None):
 		"""
 		the Realization object is built from the matrices J, K, L, M, N, P, Q, R and S, and a filter
 		Parameters
@@ -50,7 +50,7 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 		- JtoS: tuple (J, K, L, M, N, P, Q, R, S)
 		- dJtodS: tuple (dJ, dK, dL, dM, dN, dP, dQ, dR, dS) -> if None, they are computed from J to S matrices (0 if the coefficient is close to a power of 2 (with epsilondZ error))
 
-		- varT_Name and varX_Name: lists containing the name of the variables T and X, respectively (more precisely, list of tuple (name,shift) where the shift indicates shift in time: ('t',0) means t(k) and ('x_1',-3) means x_1(k-3)
+		- varNameT and varNameX: None or lists of surname or lists of tuple (surname, index, shift) about the surname of the variables T and X
 		- filter: the filter implemented by the Realization
 		- strucureName: name of a structure
 
@@ -64,17 +64,12 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 
 
 		# names (list) of the variables t, x, u and y
-		self._varNameT = generateNames('t', self._l) if varNameT is None else varNameT
-		self._varNameX = generateNames('x', self._n) if varNameX is None else varNameX
+		self._varNameT = generateNames('t', self._l, surnames=surnameVarT)
+		self._varNameX = generateNames('x', self._n, surnames=surnameVarX)
 		self._varNameU = generateNames('u', self._q)
-		self._varNameY = generateNames('y', self._p)
+		self._varNameY = generateNames('y', self._p)	 # TODO: do it for varNameU and varNameY ??
 
-		if len(self._varNameT) != self._l:
-			raise ValueError("Realization: varNameT should be a vector of size %d (%d instead)", self._l, len(self._varNameT))
-
-		if len(self._varNameX) != self._n:
-			raise ValueError("Realization: varNameX should be a vector of size %d (%d instead)", self._n, len(self._varNameX))
-
+		# MSB and LSB are not defined (yet)
 		self._MSB = None
 		self._LSB = None
 
@@ -85,13 +80,12 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 			# build the filter from the SIF...
 			# self._filter = Filter(tf=self.to_dTF())
 			self._filter = Filter(ss=self.dSS)
-			# TODO: check if this is sometimes useful (or if the Reazilation is always created with a Filter -> I think it *must* be built with a Filter)
 
 		# store the structure infos
 		self._structureName = structureName
 
 		# store the run module (that contains C functions generated to "evaluate" the realization (double, FxP, multiprecision, etc.))
-		self._runModule = None
+		# self._runModule = None
 
 
 	@property

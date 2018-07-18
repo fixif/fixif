@@ -156,10 +156,6 @@ class R_algorithm:
 		varTXY = varT + varXp1 + varY
 		varTXYnoTime = varTnoTime + varXp1 + varY
 
-		# print("varTXU=" + str(varTXU))
-		# print("varTXY="+str(varTXY))
-		# TOFIX: remove this
-
 		# varTXU and varTXUnoTime is just a trick when withSurname=True: we don't want to display useless line, like "v(k)<-v(k)".
 		# But when the time is removed with surname, we can have (it happens with DFII), something like "t<-v(k)" (here the surname of t(k+1) is v(k)
 		# in "v(k)<-v(k)" the 2nd comes from the surname of t, the 1st is because v(k-1) is the surname of x(k), but we display x(k+1)
