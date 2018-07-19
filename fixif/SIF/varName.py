@@ -37,6 +37,9 @@ class varName:
 		self._shift = shift
 
 
+	def hasSurnameWithIndex(self):
+		return self._SIFname != self._surname and self._shift != 0
+
 	def toStr(self, withTime=True, shift=0, withSurname=False, suffix='', LaTeX=False):
 		"""
 		a method to display a varName in different ways:

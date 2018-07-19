@@ -74,7 +74,7 @@ def test_algorithmTxt(F, coefFormat):
 	# iter on realizations
 	for R in F.iterAllRealizations():
 		print(R.name + "\t")
-		R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=False, comments=True)
+		print(R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=False, comments=True))
 		R.algorithmTxt(coefFormat=coefFormat, withTime=True, withSurname=True, comments=True)
 		R.algorithmTxt(coefFormat=coefFormat, withTime=False, withSurname=False, comments=True)
 
@@ -162,12 +162,6 @@ y <- t"""])
 		for wT, wS in [(True, False), (True, True), (False, False)]:
 			st = R.algorithmTxt(coefFormat="%d", withTime=wT, withSurname=wS, comments=False)
 			algo = next(res)
-
-			# print(st)
-			# print('--')
-			# print(algo)
-			# print("----------------")
-
 			assert st == algo
 
 
