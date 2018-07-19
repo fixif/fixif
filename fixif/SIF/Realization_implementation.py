@@ -14,12 +14,12 @@ __status__ = "Beta"
 from jinja2 import Environment, PackageLoader
 from numpy import tril, all
 from datetime import datetime
-from fixif.func_aux import scalarProduct
+from fixif.func_aux import scalarProductOld
 
 # used to build the Cython module
 from distutils.core import setup
 from distutils.extension import Extension
-# from Cython.Distutils import build_ext
+#from Cython.Distutils import build_ext
 
 from imp import load_dynamic, find_module, load_module
 
@@ -65,7 +65,7 @@ class R_implementation:
 			- funcName: name of the function
 		"""
 
-		env = Environment(loader=PackageLoader('fipogen', 'SIF/templates'), trim_blocks=True, lstrip_blocks=True)
+		env = Environment(loader=PackageLoader('fixif', 'SIF/templates'), trim_blocks=True, lstrip_blocks=True)
 		cTemplate = env.get_template('implementC_template.c')
 
 		cDict = {'funcName': funcName}  # dictionary used to fill the template
@@ -126,7 +126,7 @@ class R_implementation:
 		# and outputs y(k) = L.t + R.x(k) + S.u(k)
 		comp = []
 		for i in range(0, l+n+p):
-			comp.append("\t" + strTXY[i] + " = " + scalarProduct(strTXU, self.Zcomp[i, :], self.dZ[i, :]) + ";\n")
+			comp.append("\t" + strTXY[i] + " = " + scalarProductOld(strTXU, self.Zcomp[i, :], self.dZ[i, :]) + ";\n")
 		cDict["InterComp"] = "".join("\tdouble " + t for t in comp[0:l])
 		cDict["StatesComp"] = "".join(comp[l:l+n])
 		cDict["OutComp"] = "".join(comp[l+n:])
@@ -157,7 +157,7 @@ class R_implementation:
 		Generate C and Cython codes, compile them, build the Python module and import it
 		"""
 
-		env = Environment(loader=PackageLoader('fipogen', 'SIF/templates'), trim_blocks=True, lstrip_blocks=True)
+		env = Environment(loader=PackageLoader('fixif', 'SIF/templates'), trim_blocks=True, lstrip_blocks=True)
 		cTemplate = env.get_template('runC_template.c')
 		cythonTemplate = env.get_template('runCython_template.pyx')
 

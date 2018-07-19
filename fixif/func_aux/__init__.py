@@ -1,4 +1,4 @@
-from fixif.func_aux.genScalarProduct import scalarProduct
+from fixif.func_aux.genScalarProduct import scalarProduct, scalarProductOld
 from fixif.func_aux.write_matrix_hex import write_matrix_hex
 from fixif.func_aux.python2mpf_matrix import python2mpf_matrix
 from fixif.func_aux.mpf_poly_mult import mpf_poly_mult
