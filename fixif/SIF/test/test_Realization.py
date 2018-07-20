@@ -57,6 +57,7 @@ def test_algorithmLaTeX(F):
 		print(R.name + "\t")
 		# get LaTeX code
 		code = R.algorithmLaTeX()
+		print(code)
 		# compile it
 		try:
 			build_pdf(code)
@@ -166,6 +167,7 @@ y <- t"""])
 
 
 
+
 @pytest.mark.parametrize("F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
 # @pytest.mark.parametrize("F", [random_Filter(name='RandomFilter-8/4/3-396548150')], ids=lambda x: x.name)
 def test_implementCdouble(F):
@@ -206,7 +208,6 @@ def test_rea2(R):
 	R.filter.dSS.assert_close(R.dSS)
 	if R.filter.isSISO():
 		R.filter.dTF.assert_close(R.dSS.to_dTF())
-
 
 
 

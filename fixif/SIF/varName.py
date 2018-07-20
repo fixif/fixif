@@ -19,6 +19,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
+from pylatexenc.latexencode import utf8tolatex
 
 class varName:
 
@@ -36,6 +37,9 @@ class varName:
 		self._index = index
 		self._shift = shift
 
+	@property
+	def name(self):
+		return self._SIFname
 
 	def hasSurnameWithIndex(self):
 		return self._SIFname != self._surname and self._shift != 0
@@ -71,13 +75,15 @@ class varName:
 		"""
 		# name or surname
 		s = self._surname if withSurname else self._SIFname
+		if LaTeX:
+			s = utf8tolatex(s)
 		# add the index
 		index = self._index if withSurname else self._SIFindex
-		if LaTeX:
-			s += '_{'
-		s += '' if index is None else str(index)
-		if LaTeX:
-			s += '}'
+		index = '' if index is None else str(index)
+		if LaTeX and index:
+			s += '_{' + index + '}'
+		else:
+			s += index
 		# add the suffix
 		s = s + suffix
 		# add time
@@ -88,7 +94,7 @@ class varName:
 				s += '(k)'
 			else:
 				s += '(k%+d)' % (shift,)
-		return s
+		return '$' + s + '$' if LaTeX else s
 
 
 def generateNames(baseName, nbVar, surnames=None):

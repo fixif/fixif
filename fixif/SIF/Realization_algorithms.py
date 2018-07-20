@@ -11,13 +11,11 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 from jinja2.loaders import FileSystemLoader
-from jinja2 import Environment, PackageLoader
-from numpy import tril, all, r_, c_, mat, zeros, eye
-from scipy.linalg import norm
+from latex.jinja2 import make_env
 from fixif.func_aux import scalarProduct
-from textwrap import wrap
-
-
+from numpy import tril
+from datetime import datetime
+from pylatexenc.latexencode import utf8tolatex
 
 class R_algorithm:
 	"""
@@ -25,84 +23,47 @@ class R_algorithm:
 	Allow to embedd the algorithmXXX methods in the Realization class
 	the Realization class will inherit from R_algorihtm class
 	"""
-	def algorithmLaTeX(self, caption=None):
+	def algorithmLaTeX(self, caption=None, coefFormat=None, withTime=False, withSurname=False):
 
 		"""
 		Generate a tex file to use with package algorithm2e to create a LaTex output of algorithm
 		- `caption` is an additional caption
 		"""
 
-		env = Environment(loader=FileSystemLoader('fixif/SIF/templates'),#PackageLoader('fixif', 'SIF/templates'),
-					block_start_string='%<',
-					block_end_string='>%',
-					variable_start_string='<<',
-					variable_end_string='>>',
-					comment_start_string='[§',
-					comment_end_string='§]',
-					trim_blocks=True,
-					lstrip_blocks=True)
+		def declare(lvar, Kwname, isStatic=False):
+			"""generate algorithm2e code to declare variables"""
+			if len(lvar) == 0:
+				return ''
+			elif len(lvar) == 1:
+				return '\\%s{$%s$: %sreal}' % (Kwname, lvar[0].name, 'static ' if isStatic else '')
+			else:
+				return '\\%s{$%s$: %sarray [1..%d] of reals}' % (Kwname, lvar[0].name, 'static ' if isStatic else '', len(lvar))
 
-		texPlate = env.get_template('algorithmLaTeX_template.tex')
 
-		l, n, p, q = self.size
+		env = make_env(loader=FileSystemLoader('SIF/templates'))
+		tpl = env.get_template('algorithmLaTeX_template.tex')
 
-		texDict = {}
+		algoStr = [s+"\\\\" for s in self._algorithmCore(LaTeX=True, assign='$\leftarrow$', coefFormat=coefFormat, withTime=withTime, withSurname=withSurname)]
 
-		# Lower triangular part non-null ?
-		isPnut = True
+		# add comments
+		algoStr.insert(self._l + self._n, "\\tcp{Outputs}" if self._p > 1 else "\\tcp{Output}")
+		if self._n > 0:
+			algoStr.insert(self._l, "\\tcp{States}" if self._n > 1 else "\\tcp{State}")
+		if self._l > 0:
+			algoStr.insert(0, "\\tcp{Temporary variables}" if self._l > 1 else "\\tcp{Temporary variable}")
 
-		if all(tril(self.P, -1) == 0):
-			isPnut = False
-
-		texDict['isPnut'] = isPnut
-
-		strTXU = genVarName('T', l) + genVarName('xn', n) + genVarName('u', q)
-
-		if isPnut:
-			strTXY = genVarName('T', l) + genVarName('xnp', n) + genVarName('y', q)
-		else:
-			strTXY = genVarName('T', l) + genVarName('xn', n) + genVarName('y', q)
-
-		# Caption
+		# caption
 		if caption is None:
-			caption = "Pseudocode algorithm ..."
+			caption = utf8tolatex(self.name)		# TODO: complete ? caption should be a string, where we can insert self._Filter.name (like 'My algorithm of %s', or 'my algo' if we do not want to use self._Filter.name)
 
-		texDict["caption"] = caption
+		# initialization
+		init = []
+		init.append(declare(self._varNameU, 'KwIn'))
+		init.append(declare(self._varNameY, 'KwOut'))
+		init.append(declare(self._varNameX, 'KwData', isStatic=True))
+		init.append(declare(self._varNameT, 'KwData'))
 
-		texDict['u'] = {}
-		texDict['y'] = {}
-		texDict['xn'] = {}
-		texDict['T'] = {}
-
-		# Inputs
-		texDict['u']['numVar'] = q
-		# Outputs
-		texDict['y']['numVar'] = p
-		# States
-		texDict['xn']['numVar'] = n
-		# Intermediate variables
-		texDict['T']['numVar'] = l
-
-		comp_str = ""
-
-		for i in range(1, l+n+p+1):
-
-			if i == 1:
-				comp_str += "\t\\tcp{\\emph{Intermediate variables}}\n"
-			elif (i == l+1) and not(n == 0):
-				comp_str += "\t\\tcp{\\emph{States}}\n"
-			elif i == l+n+1:
-				comp_str += "\t\\tcp{\\emph{Outputs}}\n"
-
-			comp_str += "\t" + "$" + strTXY[i-1] + " \leftarrow " + scalarProduct(strTXU, self.Zcomp[i-1, :]) + "$\;\n"
-
-		if isPnut:
-			comp_str += "\t\\tcp{\\emph{Permutations}}\n"
-			comp_str += "\t$xn \\leftarrow xnp$\;"
-
-		texDict['computations'] = comp_str
-
-		return texPlate.render(**texDict)
+		return tpl.render(computations="\n".join(algoStr), caption=caption, initialization="\n".join(init), date=str(datetime.now()), SIF=self.name)
 
 
 # %< macro declare(baseName, numVar, kwName) >%
@@ -141,11 +102,11 @@ class R_algorithm:
 
 		# comments
 		if comments:
-			algoStr.insert(self._l + self._n, "/ Outputs /")
+			algoStr.insert(self._l + self._n, "/ Outputs /" if self._p>1 else "/ Output /")
 			if self._n > 0:
-				algoStr.insert(self._l, "/ States /")
+				algoStr.insert(self._l, "/ States /" if self._n>1 else "/ State /")
 			if self._l > 0:
-				algoStr.insert(0, "/ Temporary variables /")
+				algoStr.insert(0, "/ Temporary variables /" if self._l>1 else "/ Temporary variable /")
 
 		return "\n".join(algoStr)
 
@@ -167,11 +128,6 @@ class R_algorithm:
 				raise ValueError("algorithmTxt: wichSurname=True and withTime=False are incoherent")
 
 
-		# Lower triangular part non-null ?
-		isPnut = True
-		if all(tril(self.P, -1) == 0):
-			isPnut = False
-
 		# names of the variables T, X and U
 		varT = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname, LaTeX=LaTeX) for v in self._varNameT]
 		varTnoTime = [v.toStr(withTime=withTime and not withSurname, shift=1, withSurname=withSurname, LaTeX=LaTeX) for v in self._varNameT]	 # variable T without time when its with surname
@@ -180,7 +136,7 @@ class R_algorithm:
 		varTXU = varT + varX + varU
 		varTXUnoTime = varTnoTime + varX + varU
 		# names of the variables T, X and Y
-		varXp1 = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname, suffix='p' if isPnut else '', LaTeX=LaTeX) for v in self._varNameX]
+		varXp1 = [v.toStr(withTime=withTime, shift=1, withSurname=withSurname, suffix='p' if self.isPnut() else '', LaTeX=LaTeX) for v in self._varNameX]
 		varY = [v.toStr(withTime=withTime, shift=0, withSurname=withSurname, LaTeX=LaTeX) for v in self._varNameY]
 		varTXY = varT + varXp1 + varY
 		varTXYnoTime = varTnoTime + varXp1 + varY
