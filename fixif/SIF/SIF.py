@@ -20,7 +20,7 @@ __status__ = "Beta"
 from fixif.LTI import dSS
 import numpy as np
 
-from numpy import c_, r_, eye, zeros, matrix as mat
+from numpy import c_, r_, eye, zeros, matrix as mat, tril, all
 from numpy.linalg import inv
 from math import log
 from copy import copy
@@ -632,7 +632,14 @@ class SIF(object):
 	def Hepsilon(self):
 		return dSS(self.AZ, self._M1, self.CZ, self._M2)
 
-
+	def isPnut(self):
+		"""
+		Returns true if the Lower triangular part non-null
+		"""
+		isPnut = True
+		if all(tril(self.P,  -1) == 0):
+			isPnut = False
+		return isPnut
 
 	def getTiKZSparseMatrix(self):
 		"""
