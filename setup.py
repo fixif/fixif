@@ -35,19 +35,16 @@ setup(
 	keywords='fixed-point arithmetic',
 	packages=find_packages(exclude=['tests']),
 	install_requires=[
-		"numpy", "scipy",
-		"colorama",
-		"matplotlib",
-		"fixif.FxP>=0.1",
-		# "sollya",
-		# "matlabengineforpython",
-		# "sollya",
-		# "cython",
-		"latex",
-		"lxml",		# used for the simulink import
-		"colorama",
-		"mpmath",
-		'jinja2',
+		"numpy", "scipy",		# scientific computations, matrices, some signal processing stuff
+		"matplotlib",			# to plot
+		"fixif.FxP",			# for the FxP
+		"fixif.WCPG",			# Worst-Case Peak-Gain
+		"pylatexenc",			# to convert utf8 to LaTeX
+		"latex",				# to compile LaTeX and produce pdf
+		"lxml",					# used for the simulink import
+		"colorama",				# add colors in the logs
+		"mpmath",				# multiprecision math
+		'jinja2',				# use for the templates (code generation)
 		'pytest', 'pytest-cov', 'coveralls'],
 	 extras_require={
 	 	'slicot':  ['slycot'],
