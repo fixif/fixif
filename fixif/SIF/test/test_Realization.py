@@ -17,20 +17,17 @@ __status__ = "Beta"
 
 import pytest
 from colorama import Fore
-from itertools import chain
 from fixif.SIF import Realization
-from numpy import matrix as mat, zeros, eye, empty, float64
+from numpy import zeros, eye
 
 from fixif.Structures import iterAllRealizationsRandomFilter
-from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter
+from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS
 from fixif.Structures import State_Space
 
 from latex import build_pdf, LatexBuildError
-from latex.build import LatexBuilder
 
 
-
-from numpy.random import seed, rand, randint, shuffle
+from numpy.random import rand, randint
 from numpy.testing import assert_allclose
 
 
@@ -196,8 +193,7 @@ def test_makeModule(F):
 
 @pytest.mark.parametrize("R", iterAllRealizationsRandomFilter(1), ids=lambda x: x.name)
 def test_rea2(R):
-	N = 10
-	u = 300 * rand(R.filter.q, 1)  # random input of N samples
+	u = 30 * rand(R.filter.q, 1)  # random input of N samples
 
 	print(str(R.name) + "\t")
 

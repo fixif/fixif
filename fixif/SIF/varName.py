@@ -21,6 +21,7 @@ __status__ = "Beta"
 
 from pylatexenc.latexencode import utf8tolatex
 
+
 class varName:
 
 	def __init__(self, SIFname, SIFindex=None, surname=None, index=None, shift=0):
@@ -56,7 +57,7 @@ class varName:
 		withSurname: (bool) uses surname instead of name
 		suffix: (str) add a suffix to the name (before the '_')
 
-		>>> u=varName('u');
+		>>> u=varName('u')
 		>>> t=varName('x', 2, surname='u', index=3, shift=-1)		# t(k) = x_2(k) or t(k) = u_3(k-1)
 		>>> u.toStr()
 		>>> 'u(k)'

@@ -19,16 +19,12 @@ import numpy
 
 from fixif.SIF import SIF
 from numpy import matrix as mat
-from fixif.LTI import Filter, iter_random_dTF, iter_random_dSS
-
-
-# from func_aux.get_data import get_data
-# from func_aux.MtlbHelper import MtlbHelper
+from fixif.LTI import iter_random_dSS
 
 from fixif.func_aux import mpf_to_numpy
 
 
-from numpy.random import seed, rand, randint, shuffle
+from numpy.random import rand, randint, shuffle
 from numpy.testing import assert_allclose
 
 

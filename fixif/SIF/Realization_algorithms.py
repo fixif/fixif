@@ -13,9 +13,9 @@ __status__ = "Beta"
 from jinja2.loaders import FileSystemLoader
 from latex.jinja2 import make_env
 from fixif.func_aux import scalarProduct
-from numpy import tril
 from datetime import datetime
 from pylatexenc.latexencode import utf8tolatex
+
 
 class R_algorithm:
 	"""
@@ -57,35 +57,13 @@ class R_algorithm:
 			caption = utf8tolatex(self.name)		# TODO: complete ? caption should be a string, where we can insert self._Filter.name (like 'My algorithm of %s', or 'my algo' if we do not want to use self._Filter.name)
 
 		# initialization
-		init = []
-		init.append(declare(self._varNameU, 'KwIn'))
+		init = [declare(self._varNameU, 'KwIn')]
 		init.append(declare(self._varNameY, 'KwOut'))
 		init.append(declare(self._varNameX, 'KwData', isStatic=True))
 		init.append(declare(self._varNameT, 'KwData'))
 
 		return tpl.render(computations="\n".join(algoStr), caption=caption, initialization="\n".join(init), date=str(datetime.now()), SIF=self.name)
 
-
-# %< macro declare(baseName, numVar, kwName) >%
-# %< if numVar > 1>%
-# 	\<<kwName>>{$<<baseName>>$: array [1..<<numVar>>] of reals}
-# %<- else >%
-# 	\<<kwName>>{$<<baseName>>$: real}
-# %<- endif >%
-# %< endmacro >%
-
-# <<declare('u', u.numVar, 'KwIn')>>
-# <<declare('y', y.numVar, 'KwOut')>>
-# %< if isPnut >%
-# <<declare('xn, xnp', xn.numVar, 'KwData')>>
-# %< else >%
-# <<declare('xn', xn.numVar, 'KwData')>>
-# %< endif >%
-# <<declare('T', T.numVar, 'KwData')>>
-
-		#- generic names with time (t with/without time)
-		#- surname with time (t without time)
-		#- generic names without time (input: u, output: y, intern static array: x)
 
 
 
@@ -102,11 +80,11 @@ class R_algorithm:
 
 		# comments
 		if comments:
-			algoStr.insert(self._l + self._n, "/ Outputs /" if self._p>1 else "/ Output /")
+			algoStr.insert(self._l + self._n, "/ Outputs /" if self._p > 1 else "/ Output /")
 			if self._n > 0:
-				algoStr.insert(self._l, "/ States /" if self._n>1 else "/ State /")
+				algoStr.insert(self._l, "/ States /" if self._n > 1 else "/ State /")
 			if self._l > 0:
-				algoStr.insert(0, "/ Temporary variables /" if self._l>1 else "/ Temporary variable /")
+				algoStr.insert(0, "/ Temporary variables /" if self._l > 1 else "/ Temporary variable /")
 
 		return "\n".join(algoStr)
 
