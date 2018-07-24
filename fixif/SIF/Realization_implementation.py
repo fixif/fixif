@@ -51,11 +51,6 @@ class R_implementation:
 	"""
 
 
-
-
-
-
-
 	def implementCdouble(self, funcName):
 		"""
 		Returns the C-code (with double coefficients) correspoding to the evaluation of SIF self for one time-step
