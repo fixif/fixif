@@ -79,6 +79,5 @@ target/
 .pytest_cache/
 
 # Fixif
-generated/code/
-generated/LaTeX/
-server/cache/
+fixif/generated/code/
+fixif/generated/LaTeX/
