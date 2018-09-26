@@ -11,7 +11,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 from fixif.Structures import LWDF
-from fixif.LTI import Filter, iter_random_Filter
+from fixif.LTI import Filter, iter_random_Filter, random_Filter
 from fixif.LTI import iter_random_dTF
 import pytest
 import numpy
@@ -29,7 +29,8 @@ def test_buildAllPossibleSISORealizationsFromdTF(H):
 		H.assert_close(R.dSS.to_dTF(), eps=1e-4)
 
 
-@pytest.mark.parametrize("F", iter_random_Filter(20, n=(5, 15), p=(1, 5), q=(1, 5)))
+
+@pytest.mark.parametrize("F", [random_Filter(name='RandomFilter-14/1/1-623203621'),]+list(iter_random_Filter(20, n=(5, 15), p=(1, 5), q=(1, 5))))
 def test_buildAllPossibleMIMORealizationsFromdSS(F):
 	"""
 	Check all the possible realizations
