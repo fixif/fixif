@@ -50,7 +50,7 @@ def test_implementCdouble(F):
 @pytest.mark.parametrize("F", iter_random_Filter(5, ftype='SISO'), ids=lambda x: x.name)
 def test_makeModule(F):
 	R = State_Space(F)
-	R.makeModule()
+	R.makeCdouble()
 
 
 @pytest.mark.parametrize("R", iterAllRealizationsRandomFilter(1), ids=lambda x: x.name)

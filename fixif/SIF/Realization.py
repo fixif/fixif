@@ -42,9 +42,6 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 
 	"""
 
-	_runModule = None
-
-
 	def __init__(self, filt, JtoS, dJtodS=None, structureName="", surnameVarT=None, surnameVarX=None):
 		"""
 		the Realization object is built from the matrices J, K, L, M, N, P, Q, R and S, and a filter
@@ -87,8 +84,8 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 		# store the structure infos
 		self._structureName = structureName
 
-		# store the run module (that contains C functions generated to "evaluate" the realization (double, FxP, multiprecision, etc.))
-		# self._runModule = None
+		# store the C double fundction (generated from implementCdouble and runCdouble)
+		self._Cdouble = None
 
 
 	@property

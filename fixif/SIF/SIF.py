@@ -562,7 +562,7 @@ class SIF(object):
 		u = np.matrix(np.zeros([self._dSS.q, N]))
 		u[:, 0] = self.dSS.D
 		for i in range(1, N):
-			u[:, i] = u_bar * np.sign(self.dSS.B * (self.dSS.A ** (N - i)) * self.dSS.C)
+			u[:, i] = u_bar * np.sign(self.dSS.B * (self.dSS.A ** (N - i)) * self.dSS.C)		# TODO: ugly A**(N-i) !!
 		return u
 
 

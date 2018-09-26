@@ -12,19 +12,12 @@ __status__ = "Beta"
 
 
 from jinja2 import Environment, PackageLoader
-from numpy import tril, all
+from numpy import tril, all, zeros, matrix as mat
 from datetime import datetime
 from fixif.func_aux import scalarProductOld
-
-# used to build the Cython module
-from distutils.core import setup
-from distutils.extension import Extension
-#from Cython.Distutils import build_ext
-
-from imp import load_dynamic, find_module, load_module
-
+from subprocess import Popen, PIPE
+from ctypes import CDLL, POINTER, c_double
 import numpy
-from time import time
 
 GENERATED_PATH = 'generated/code/'
 
@@ -61,7 +54,7 @@ class R_implementation:
 		"""
 
 		env = Environment(loader=PackageLoader('fixif', 'SIF/templates'), trim_blocks=True, lstrip_blocks=True)
-		cTemplate = env.get_template('implementC_template.c')
+		cTemplate = env.get_template('implementCdouble_template.c')
 
 		cDict = {'funcName': funcName}  # dictionary used to fill the template
 		if self._filter.isSISO():
@@ -147,57 +140,33 @@ class R_implementation:
 
 
 
-	def makeModule(self):
+	def makeCdouble(self):
 		"""
-		Generate C and Cython codes, compile them, build the Python module and import it
+		Generate C code, compile it and link it with ctypes
 		"""
+		# TODO: manage the place where the code is generated (it should be an absolute path?)
 
-		env = Environment(loader=PackageLoader('fixif', 'SIF/templates'), trim_blocks=True, lstrip_blocks=True)
-		cTemplate = env.get_template('runC_template.c')
-		cythonTemplate = env.get_template('runCython_template.pyx')
-
-		# empty dictionay used for the template
-		cDict = {}
-		if self._filter.isSISO():
-			cDict['SIFname'] = self.name + '\n' + str(self._filter.dTF)
-		else:
-			cDict['SIFname'] = self.name + '\n' + str(self._filter.dSS)
-		cDict['date'] = datetime.now().strftime("%Y/%m/%d - %H:%M:%S")
-
-		pu_str = '*u' if self.q == 1 else 'u'
-		if self.p == 1:
-			cDict['callImplementCdouble'] = '*y = implementCdouble(%s, xk);' % pu_str
-		else:
-			cDict['callImplementCdouble'] = 'implementCdouble(y, %s, xk);' % pu_str
-		cDict['SIF'] = self
-
-		# add the implement functions
-		cDict['implementFunctions'] = self.implementCdouble("implementCdouble")		# implementCdouble
-
-		# write the C file
+		# generate C code
 		with open(GENERATED_PATH+"runC.c", "w") as cFile:
-			cFile.write(cTemplate.render(**cDict)) 	# write the C function containing the `implementC` functions and `runC` functions
+			cFile.write(self.implementCdouble("implementCdouble"))
 
-		# write the Cython file
-		with open(GENERATED_PATH+"runCython.pyx", "w") as cFile:
-			cFile.write(cythonTemplate.render(**cDict))  # write the Cython wrapper
+		print("Compiling runC.c")
 
-		# build all (in GENERATED_PATH)
+		# compile it
+		proc = Popen("cd " + GENERATED_PATH + "&& cc -Wall -fPIC -shared -o runC.so runC.c ", stderr=PIPE, shell=True)
+		# check the output and print it
+		line = 'non-empty'
+		while line:
+			line = proc.stderr.readline().decode('utf-8')
+			print(line[:-1])		# TODO: log it somewhere ?
 
-		uniqueName = 'runC'+str(time()).replace('.', '')
-		setup(
-			cmdclass={'build_ext': build_ext},
-			ext_modules=[Extension(uniqueName,
-							sources=[GENERATED_PATH+"runCython.pyx", GENERATED_PATH+"runC.c"],
-							extra_compile_args=['-Wno-unused-function'],
-							include_dirs=[numpy.get_include()])],
-			script_args=['build_ext', '--build-lib', GENERATED_PATH, '--force']
-		)
+		# use ctype
+		self._Cdouble = CDLL(GENERATED_PATH + 'runC.so').implementCdouble
+		if self.p == 1:
+			self._Cdouble.argtypes = (c_double if self._q == 1 else POINTER(c_double), POINTER(c_double))
+		else:
+			self._Cdouble.argtypes = (POINTER(c_double), c_double if self._q == 1 else POINTER(c_double), POINTER(c_double))
 
-		# and finally import it
-		self._runModule = load_dynamic(uniqueName, GENERATED_PATH+uniqueName+'.so')
-		# f, pathname, desc = find_module( 'runC', ['.'])
-		# self._runModule = load_module('runC', f, pathname, desc)
 
 
 
@@ -212,9 +181,19 @@ class R_implementation:
 
 		Returns the ouput (pxN)
 		"""
-		if self._runModule is None:
-			self.makeModule()
+		# generate and compile code, if it is not yet done
+		if self._Cdouble is None:
+			self.makeCdouble()
 
-		ut = numpy.ascontiguousarray(u.transpose())
+		u = mat(u)
+		N = u.shape[1]
 
-		return self._runModule.simCdouble(ut).transpose()
+		x = zeros((self._n, 1))		# TODO: add the possibility to start with a non-zero state
+		px = x.ctypes.data_as(POINTER(c_double))
+		y = zeros((self._p, N))
+
+		# loop to compute the outputs
+		if self.p == 1 and self.q == 1:
+			for i in range(N):
+				y[:, i] = self._Cdouble(u[:, i], px)
+		return y
