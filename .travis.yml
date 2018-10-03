@@ -89,7 +89,7 @@ install:
       brew install mpfi;
       pip install numpy;
       brew install gcc || brew link --overwrite gcc;
-      wget http://hpc.sourceforge.net/buildf2c;
+      wget https://gist.github.com/thilaire/e9ec0af8432408c6f2499d20c17aca3b/raw -O buildf2c;
       sh buildf2c;
     fi
   - git clone https://github.com/fixif/WCPG.git
