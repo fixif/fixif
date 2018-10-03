@@ -36,7 +36,7 @@ setup(
 	packages=find_packages(exclude=['tests']),
 	install_requires=[
 		"numpy", "scipy",		# scientific computations, matrices, some signal processing stuff
-		'matplotlib=2.2.3;python_version<=3.4',			# matplotlib 3 is for python 3.5 and above only
+		'matplotlib<=2.5;python_version<=3.4',			# matplotlib 3 is for python 3.5 and above only
 		'matplotlib;python_version>3.4',
 		"fixif.FxP",			# for the FxP
 		"fixif.WCPG",			# Worst-Case Peak-Gain
