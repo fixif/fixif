@@ -37,7 +37,7 @@ setup(
 	install_requires=[
 		"numpy", "scipy",		# scientific computations, matrices, some signal processing stuff
 		'matplotlib<"3.0";python_version<="3.4"',			# matplotlib 3 is for python 3.5 and above only
-		'matplotlib;python_version>"3.4"'
+		'matplotlib;python_version>"3.4"',
 		"fixif.FxP",			# for the FxP
 		"fixif.WCPG",			# Worst-Case Peak-Gain
 		"pylatexenc",			# to convert utf8 to LaTeX
