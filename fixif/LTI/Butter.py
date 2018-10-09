@@ -38,7 +38,7 @@ class Butter(Filter):
 		Returns a Butter object (Filter)
 		"""
 
-		self._butterworth = True
+		# self._butterworth = True
 		self.n = n
 		self.Wn = Wn
 		self.btype = btype

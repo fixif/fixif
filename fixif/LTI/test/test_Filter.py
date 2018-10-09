@@ -16,7 +16,8 @@ __status__ = "Beta"
 
 
 from fixif.LTI import Filter, random_Filter, iter_random_Filter
-from fixif.LTI import iter_random_Butter
+from fixif.LTI import iter_random_Butter, iter_random_Elliptic
+
 
 import pytest
 
@@ -49,6 +50,10 @@ def test_construction():
 
 @pytest.mark.parametrize("H", iter_random_Butter(20, onlyEven=True), ids=lambda x: x.name)
 def test_butter(H):
+	_ = H.dTF
+
+@pytest.mark.parametrize("H", iter_random_Elliptic(20), ids=lambda x: x.name)
+def test_elliptic(H):
 	_ = H.dTF
 
 
