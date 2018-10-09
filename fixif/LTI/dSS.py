@@ -396,10 +396,11 @@ class dSS(object):
 		return self._WCPG
 
 
-	def WCPG(self):
+	def WCPG(self, res=None):
 		r"""
 		Compute the Worst Case Peak Gain of the state space
-
+		if res is given, it should be a dictionary that will be fill by WCPG library.
+		It then contains some informations about the computation (nb iterations, etc.)
 		.. math::
 			\langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
 
@@ -407,8 +408,8 @@ class dSS(object):
 
 		"""
 		# compute the WCPG value if it's not already done
-		if self._WCPG is None:
-			self._WCPG = WCPG_ABCD(self._A, self._B, self._C, self._D)
+		if self._WCPG is None or res is not None:
+			self._WCPG = WCPG_ABCD(self._A, self._B, self._C, self._D, res)
 		return self._WCPG
 
 
