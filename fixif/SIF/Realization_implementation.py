@@ -11,7 +11,7 @@ __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
 from numpy import tril, all, zeros, matrix as mat
 from datetime import datetime
 from fixif.func_aux import scalarProductOld
@@ -19,7 +19,17 @@ from subprocess import Popen, PIPE
 from ctypes import CDLL, POINTER, c_double
 import numpy
 
-GENERATED_PATH = 'generated/code/'
+
+#TODO: put theses path into a global Option object (that can be modified elsewhere)
+
+# set the PATHS
+from inspect import getfile
+from fixif import SIF
+from os.path import dirname
+FIXIF_SIF_PATH = dirname(getfile(SIF))
+
+GENERATED_PATH = FIXIF_SIF_PATH + '/../generated/code/'
+TEMPLATE_PATH = FIXIF_SIF_PATH + '/templates/'
 
 
 def genCvarNames(baseName, nbVar):
@@ -53,7 +63,7 @@ class R_implementation:
 			- funcName: name of the function
 		"""
 
-		env = Environment(loader=PackageLoader('fixif', 'SIF/templates'), trim_blocks=True, lstrip_blocks=True)
+		env = Environment(loader=FileSystemLoader(TEMPLATE_PATH), trim_blocks=True, lstrip_blocks=True)
 		cTemplate = env.get_template('implementCdouble_template.c')
 
 		cDict = {'funcName': funcName}  # dictionary used to fill the template
