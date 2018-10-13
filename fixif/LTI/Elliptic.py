@@ -56,6 +56,9 @@ class Elliptic(Filter):
 		super(Elliptic, self).__init__(num=num, den=den, stable=True, name=name)
 
 
+	def details(self):
+		"""return a dictionary detailling the filter"""
+		return {"n": self.n, "ripple passband": self.rp, "attenuation stopband": self.rs, "frequency": self.Wn, "type": self.etype}
 
 
 
