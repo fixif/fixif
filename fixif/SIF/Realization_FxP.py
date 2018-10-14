@@ -92,24 +92,19 @@ class R_FxP:
 
 
 
-	def _compute_MSB(self, u_bar):
+	def computeNaiveMSB(self, u_bar, output_info):
+		"""Compute the MSB of t, x and y without taking into account the errors in the filter evaluation, and the
+		errors in the computation of this MSB (the WCPG computation and the log2 associated)
+		Returns a vector of MSB"""
 
-		# self._Z = np.bmat([[-J, M, N], [K, P, Q], [L, R, S]])
-
-		C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]])  # L
-		C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])  # R
-		C3 = np.bmat([[np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])  # S
-
-		print(self.J)
-		# building an extended SIF
-		S_ext = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
-
+		# get H_zeta
+		S_ext = self.Hzeta()
 		SS = S_ext.dSS.simplify()
-
-		wcpg = SS.WCPG()
-
+		# compute its WCPG
+		wcpg = SS.WCPG(output_info)
+		# and then the log2
 		y_bar = wcpg * u_bar
-		msb = np.bmat([np.ceil(np.log2(x)) for x in y_bar])
+		msb = [int(np.ceil(np.log2(x[0]))) for x in y_bar.tolist()]
 
 		return msb
 

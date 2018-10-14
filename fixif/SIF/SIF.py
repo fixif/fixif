@@ -621,6 +621,16 @@ class SIF(object):
 		"""
 		return self.dSS.to_dTF()
 
+	def Hzeta(self):
+		"""Hzeta system is a SIF where the temporary variables and states are given on the output
+		Used for determining the MSB position"""
+		# associated matrices
+		C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]])  # L
+		C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])  # R
+		C3 = np.bmat([[np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])  # S
+
+		# building an extended SIF
+		return SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
 
 
 	@property
