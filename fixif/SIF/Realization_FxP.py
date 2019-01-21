@@ -12,7 +12,7 @@ __status__ = "Beta"
 
 import numpy as np
 from fixif.SIF import SIF
-
+from mpmath import ceil, floor, log, workprec, power
 
 
 
@@ -90,23 +90,33 @@ class R_FxP:
 		return lsb, error_budget_y
 
 
-
-
 	def computeNaiveMSB(self, u_bar, output_info):
 		"""Compute the MSB of t, x and y without taking into account the errors in the filter evaluation, and the
 		errors in the computation of this MSB (the WCPG computation and the log2 associated)
 		Returns a vector of MSB"""
 
-		# get H_zeta
-		S_ext = self.Hzeta()
-		SS = S_ext.dSS.simplify()
-		# compute its WCPG
-		wcpg = SS.WCPG(output_info)
-		# and then the log2
-		y_bar = wcpg * u_bar
-		msb = [int(np.ceil(np.log2(x[0]))) for x in y_bar.tolist()]
+		# compute the WCPG of Hzeta
+		zeta_bar = self.Hzeta.WCPG(output_info) * u_bar
+
+		with workprec(500):  # TODO: use right precision !! Or do it as it should be done, as in FxPF (see Nastia thesis p113)
+			# and then the log2
+			msb = [int(ceil(log(x[0], 2))) for x in zeta_bar.tolist()]
 
 		return msb
+
+	def w_tilde(self, u_bar):
+		"""compute w_tilde, the threshold for the word-length w such that
+		MSB = computeNaiveMSB    if w >= w_tilde
+		MSB = computeNaiveMSB+1  if w < w_tilde
+		(this doesn't count into account the roundoff error, as in FxPF"""
+
+		zeta_bar = self.Hzeta.WCPG() * u_bar
+
+		with workprec(500):  # TODO: compute how many bit we need !!
+			wtilde = [int(1+ceil(log(x[0], 2)) - floor(log(power(2, ceil(log(x[0], 2))) - x[0], 2))) for x in zeta_bar.tolist()]
+
+		return wtilde
+
 
 	def compute_MSB_allvar_extended(self, u_bar, lsb_t, lsb_x, lsb_y):
 
