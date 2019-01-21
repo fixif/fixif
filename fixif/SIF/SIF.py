@@ -147,6 +147,11 @@ class SIF(object):
 		self._dZ = None
 		self._build_dZ(dJtodS)
 
+		# extra state-space associated (computed only the 1st time they are required)
+		self._Hu = None
+		self._Hepsilon = None
+		self._Hzeta = None
+
 
 	def _build_Z(self, JtoS):
 		"""
@@ -593,11 +598,10 @@ class SIF(object):
 
 
 
-
-
 	def simplify(self):
 		# TODO: !!!!
 		return self
+
 
 	def computeDeltaSIF(self):
 		"""Compute an error filter deltaH which takes an error-vector as inputs
@@ -621,26 +625,34 @@ class SIF(object):
 		"""
 		return self.dSS.to_dTF()
 
+	@property
 	def Hzeta(self):
-		"""Hzeta system is a SIF where the temporary variables and states are given on the output
+		"""Hzeta system is a state-space where the temporary variables and states are given on the output
 		Used for determining the MSB position"""
-		# associated matrices
-		C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]])  # L
-		C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])  # R
-		C3 = np.bmat([[np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])  # S
+		if self._Hzeta is None:
+			# associated matrices
+			C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]])  # L
+			C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])  # R
+			C3 = np.bmat([[np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])  # S
 
-		# building an extended SIF
-		return SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
+			# building an extended SIF
+			self._Hzeta = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3)).dSS
+		return self._Hzeta
 
 
 	@property
 	def Hu(self):
-		"""return the Hu state-space"""
-		return dSS(self.AZ, self.BZ, self._N1, self._N2)
+		"""Hu system is the state-space system from the inputs to the intern variables t,x,y"""
+		if self._Hu is None:
+			self._Hu = dSS(self.AZ, self.BZ, self._N1, self._N2)
+		return self._Hu
 
 	@property
 	def Hepsilon(self):
-		return dSS(self.AZ, self._M1, self.CZ, self._M2)
+		"""Hepsilon is the state-space system from the roundoff errors to the output"""
+		if self._Hepsilon is None:
+			self._Hepsilon = dSS(self.AZ, self._M1, self.CZ, self._M2)
+		return self._Hepsilon
 
 	def isPnut(self):
 		"""
