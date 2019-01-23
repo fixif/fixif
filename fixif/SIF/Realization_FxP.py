@@ -90,7 +90,7 @@ class R_FxP:
 		return lsb, error_budget_y
 
 
-	def computeNaiveMSB(self, u_bar, output_info):
+	def computeNaiveMSB(self, u_bar, output_info=None):
 		"""Compute the MSB of t, x and y without taking into account the errors in the filter evaluation, and the
 		errors in the computation of this MSB (the WCPG computation and the log2 associated)
 		Returns a vector of MSB"""
