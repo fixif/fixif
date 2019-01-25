@@ -37,7 +37,7 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 	- _filter: the filter that it implements
 	- _varNameT, _varNameX, _varNameU, _varNameY : lists of the name of the intermediate variables (varNameT), the states (varNameX), the inputs (varNameU) and the outputs (varNameY)
 
-	Some other methods are defined in the mixin classes R_algorithm, R_FxP and R_implementation
+	Some other methods are defined in the mixin classes R_algorithm, R_FxP_Nastia and R_implementation
 	# see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY and http://www.qtrac.eu/pyclassmulti.html
 
 	"""

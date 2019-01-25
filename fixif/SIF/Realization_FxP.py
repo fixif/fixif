@@ -10,9 +10,33 @@ __status__ = "Beta"
 
 
 
-import numpy as np
-from fixif.SIF import SIF
-from mpmath import ceil, floor, log, workprec, power
+from os import path
+import mpmath
+from numpy import zeros, ones, matrix, power, ndenumerate, kron, multiply, nditer
+from numpy import floor, log2, ceil
+from string import Template
+
+from fixif.config import SIF_TEMPLATES_PATH
+
+# functions to define some parameters in a AMPL .dat file
+def generateAMPLParam(name, val, format="%f"):
+	"""generate AMPL code for the data of a given parameter
+	Parameters:
+		- name: name of the parameter
+		- val: value of this parameter (int or a numpy matrix)
+		- format: the C string format used to display the parameter ("%d" for an integer, etc.)
+	Returns: a string to be inserted in a .dat file
+	"""
+	if isinstance(val, int):
+		return "param %s := %d;" % (name, val)
+	if val.shape[0] == 1 or val.shape[1] == 1:
+		# 1d vector
+		return "param %s := \n%s;" % (name, "\n".join(("%d "+format) % (i[0]+1, wm) for i, wm in ndenumerate(val)))
+	else:
+		# 2d array
+		col = " ".join(str(x+1) for x in range(val.shape[1]))
+		data = "\n".join(str(i+1)+" "+" ".join(format%x for x in nditer(val[i,:])) for i in range(val.shape[0]))
+		return "param %s : %s := \n%s;" % (name, col, data)
 
 
 
@@ -21,139 +45,128 @@ class R_FxP:
 	"""
 	Mixin class (see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY)
 	Allow to embedd the following methods in the Realization class
-	the Realization class will inherit from R_algorihtm class
+	the Realization class will inherit from R_FxP class
+
+	This class adds methods to perform the FxP implementation with multiple wordlength paradigm
 	"""
 
 
-	def flopoco(self, LSB_y_out, u_bar):
-		"""
-		This function generates MSB and LSB formats for a Fixed-Point implementation
-		using the FloPoCo tool.
 
-		User must indicate the desired LSB format for the output and the bound on
-		the inputs.
-
-		As result, function sets fields MSB and LSB to the formats which will guarantee
-		that the output filter has output faithfully rounded to the LSB_y_out bits.
-
-
-		Parameters
-		----------
-		self
-		LSB_y_out: a p-element list of integers representing the LSB constraints on the y
-		u_bar
-
-		Returns
-		-------
-
-		"""
-		pass
-
-
-
-
-	def _compute_LSB(self, l_y_out):
-
-		if not isinstance(l_y_out, int):
-			raise ValueError("I implemented the function only for the case of 1 output! \n")
-		# we need to add one more bit to the account for the
-		# final rounding error
-		l_y_out = l_y_out-1
-
-		# construct the error-filter
-		deltaSIF = self.computeDeltaSIF()
-
-		# compute the WCPG of the error filter
-		wcpgDeltaH = deltaSIF.dSS.WCPG()
-
-		# we repartition the error budget equally for all variables
-		c = self.l + self.n + self.p
-
-		# In order to respect the overall error |deltaY(k)| < 2^(l_y_out-1)
-		# we need to compute the temporary, state and output variables with LSB l_i
-		# l_i = max(l_y_out) - g_i
-		# where the correction term g_i is computed via
-		# g_i = 1 + max_j { ceil( log2 ( c * wcpgDeltaH[j, i] ) )}
-
-		g = np.bmat([1 + max(np.ceil(np.log2(c * wcpgDeltaH[:, i] * 2**-l_y_out))) for i in range(0, c)])
-
-		# the error budget for the output y(k) that will be later passed on to FloPoCo
-		error_budget_y = 2**-mpmath.ceil(mpmath.log(c * wcpgDeltaH[0, c-1] * 2**-l_y_out, 2))/2**(l_y_out+1)
-
-		for x in (g == np.inf):
-			if x.any():
-				print('Divided by zero\n')
-
-
-		lsb = np.bmat(l_y_out - g - 1)
-
-		return lsb, error_budget_y
-
-
-	def computeNaiveMSB(self, u_bar, output_info=None):
+	def _computeNaiveMSB(self, u_bar, output_info=None):
 		"""Compute the MSB of t, x and y without taking into account the errors in the filter evaluation, and the
 		errors in the computation of this MSB (the WCPG computation and the log2 associated)
-		Returns a vector of MSB"""
+		Returns a vector of MSB
+		Parameters:
+			- u_bar: vector of bounds on the inputs of the system
+		Returns: a vector of MSB such that the intermediate variables, the states and the output do not overflow
+		WHEN WE DO NOT THE ROUNDOFF ERRORS INTO ACCOUNT
 
+		we just use the equation  m = ceil( log2( <<Hzeta>>. u_bar ) )
+		"""
 		# compute the WCPG of Hzeta
 		zeta_bar = self.Hzeta.WCPG(output_info) * u_bar
 
-		with workprec(500):  # TODO: use right precision !! Or do it as it should be done, as in FxPF (see Nastia thesis p113)
+		# TODO: Do it as it should be done, as in FxPF (see Nastia thesis p113)
+		with mpmath.workprec(500):
 			# and then the log2
-			msb = [int(ceil(log(x[0], 2))) for x in zeta_bar.tolist()]
+			msb = [int(mpmath.ceil(mpmath.log(x[0], 2))) for x in zeta_bar.tolist()]
 
 		return msb
 
-	def w_tilde(self, u_bar):
-		"""compute w_tilde, the threshold for the word-length w such that
+
+	def _w_tilde(self, u_bar):
+		"""Compute w_tilde, the threshold for the word-length w such that
 		MSB = computeNaiveMSB    if w >= w_tilde
 		MSB = computeNaiveMSB+1  if w < w_tilde
-		(this doesn't count into account the roundoff error, as in FxPF"""
+		(this doesn't count into account the roundoff error, as in FxPF)
+		See ARITH26 paper
+		Parameters:
+			- u_bar: vector of bounds on the inputs of the system
+		Returns: a vector of thresholds w_tilde
 
+		We use:  w_tilde = 1 + ceil(log2(zeta_bar)) - floor(log2( 2^ceil(log2(zeta_bar)) - zeta_bar ))
+		with zeta_bar = <<Hzeta>>.u_bar
+		"""
+		#TODO: test if zeta_bar is a power of 2 (should be +Inf in that case)
 		zeta_bar = self.Hzeta.WCPG() * u_bar
 
-		with workprec(500):  # TODO: compute how many bit we need !!
-			wtilde = [int(1+ceil(log(x[0], 2)) - floor(log(power(2, ceil(log(x[0], 2))) - x[0], 2))) for x in zeta_bar.tolist()]
+		with mpmath.workprec(500):  # TODO: compute how many bit we need !!
+			wtilde = [int(1+mpmath.ceil(mpmath.log(x[0], 2)) - mpmath.floor(mpmath.log(mpmath.power(2, mpmath.ceil(mpmath.log(x[0], 2))) - x[0], 2))) for x in zeta_bar.tolist()]
 
 		return wtilde
 
 
-	def compute_MSB_allvar_extended(self, u_bar, lsb_t, lsb_x, lsb_y):
+	def optimalUniformWL(self, u_bar, eps):
+		"""
+		Compute the minimal wordlength such that the output error is less than eps (component-wise)
+		in the context where ALL THE WORD-LENGTH ARE THE SAME (and with KCM SoP)
+		Parameters:
+			- u_bar: vector of bounds on the inputs of the system
+			- eps: vector of constraints on the output (each output must be less than the associate eps)
+		Returns: (integer) the wordlength that, when used for the intermediate variables, the states and the oututs,
+		satisfies the output error constraints
+		"""
 
-		# building L, R and S matrices for the extended SIF, which will have
-		# a vector (t,x,y) as an output vector
-		C1 = np.bmat([[np.eye(self.l, self.l)], [np.zeros([self.n, self.l])], [self.L]])  # L
-		C2 = np.bmat([[np.zeros([self.l, self.n])], [np.eye(self.n, self.n)], [self.R]])  # R
-		C3 = np.bmat([[np.zeros([self.l, self.q])], [np.zeros([self.n, self.q])], [self.S]])  # S
+		def delta(w):
+			"""function that compute delta(w), a vector of 0 or 1"""
+			d = zeros(w.shape)
+			for i in range(w.size):
+				d[i] = 1 if w[i] < w_tilde[i] else 0
+			return d
 
-		# building an extended SIF
-		S_ext = SIF((self.J, self.K, C1, self.M, self.N, self.P, self.Q, C2, C3))
+		# determining the MSB and w_tilde
+		m_tilde = matrix(self._computeNaiveMSB(u_bar)).transpose()
+		w_tilde = matrix(self._w_tilde(u_bar)).transpose()
 
-		wcpg = S_ext.dSS.WCPG()
+		# error
+		Weps = self.Hepsilon.WCPG()
+		E = multiply(Weps, kron(ones((self.p, 1)), power(2, m_tilde.transpose())))
+
+		# determining the minimal word-length with uniform scheme
+		w_guess = int(max(ceil(log2(E * ones((self.l + self.n + self.p, 1))) - log2(eps)))[0, 0])
+		return w_guess if all(E * power(2, -w_guess + delta(w_guess * ones((self.l + self.n + self.p, 1)))) < eps) else w_guess + 1
 
 
-		# compute the error filter deltaH which corresponds to the extended SIF
-		deltaH = S_ext.computeDeltaSIF()
-		wcpgDeltaH = deltaH.dSS.WCPG()
+	def optimalWL(self, u_bar, eps, AMPLfilename='xmpl.dat', AMPLpath='.', wmax=64):
+		""" see ARITH26 article
+		Compute the minimal wordlength such that the output error is less than eps (component-wise)
+		when the SoPC are done with KCM
+		-> define the optimal problem
+		-> generate the AMPL solver
+		#TODO: run the solver, and get back the result
 
+		Parameters:
+			- u_bar: vector of bounds on the inputs of the system
+			- eps: vector of constraints on the output (each output must be less than the associate eps)
+			- AMPLfilename: (string) name of the AMPL file generated
+			- path: (string) path where to store the AMPL file
+			- wmax: int maximum value for the word-length
+		Returns: (integer) the wordlength that, when used for the intermediate variables, the states and the oututs,
+		satisfies the output error constraints
+		"""
+		# make wmax a vector
+		wmax = wmax * ones((self.l + self.n + self.p, 1))
 
+		# determining the MSB
+		m_tilde = matrix(self._computeNaiveMSB(u_bar)).transpose()
+		w_tilde = matrix(self._w_tilde(u_bar)).transpose()
 
-		# compute msb via formula
-		# msb_i = ceil( log2 ( (<<H>> * u_bar)_i + (<<deltaH>> * 2^lsb_ext)_i ))
+		# error
+		Weps = self.Hepsilon.WCPG()
+		E = multiply(Weps, kron(ones((self.p, 1)), power(2, m_tilde.transpose())))
 
-		y_bar = wcpg * u_bar
+		# generate the .dat file
+		AMPLcode = {
+			'def_p': generateAMPLParam('p', self.p),
+			'def_np': generateAMPLParam('np', self.p + self.n + self.l),
+			'def_u': generateAMPLParam('u', wmax, "%d"),
+			'def_E': generateAMPLParam('E', E),
+			'def_eps': generateAMPLParam('eps', eps),
+			'def_wtilde': generateAMPLParam('wtilde', w_tilde, "%d")}
 
-		# lsb_ext2 = np.matrix([ lsb_ext[0, 0:deltaH.l] lsb_ext[0, deltaH.l:deltaH.l + deltaH.n] lsb_ext[0] ])
-		lsb_bar = np.concatenate((lsb_t, lsb_x, lsb_t, lsb_x, lsb_y), axis=0)
-		lsb_bar = np.bmat([lsb_bar])
-
-		lsb_bar = np.matrix([2 ** lsb_bar[0, i] for i in range(0, lsb_bar.size)])
-		delta_bar = wcpgDeltaH * lsb_bar.transpose()
-
-		if y_bar.size == delta_bar.size:
-			msb = np.bmat([np.ceil(np.log2(y_bar[i] + delta_bar[i])) for i in range(0, delta_bar.size)])
-			return msb
-		else:
-			print('Something went wrong, error with sizes :( \n')
-			return 0
+		# generate the xmpl.dat file
+		with open(SIF_TEMPLATES_PATH + "xmpl.dat.template") as f:
+			AMPL = Template(f.read())
+		with open(path.join(AMPLpath, AMPLfilename), 'w') as f:
+			f.write(AMPL.substitute(AMPLcode))
 
