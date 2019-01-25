@@ -1,0 +1,32 @@
+#---
+#--- Exemple fichier .dat pour modele arthi.mod
+#---
+#--- Auteur: Hacene Ouzia, Sorbonne Universite (01-2019)
+#--- 
+
+data; 
+
+#---
+#--- DIMENSIONS 
+${def_p}
+${def_np}
+
+#---
+#--- PARAMETRES
+
+#-- Valeur max var w
+${def_u}
+
+#-- Coefficients des contraintes (E) ....
+${def_E}
+
+
+#-- Second membre des contraintes (eps)...
+${def_eps}
+
+#-- wtilde
+${def_wtilde}
+
+
+
+ 
