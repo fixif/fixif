@@ -12,10 +12,11 @@ __status__ = "Beta"
 
 from jinja2.loaders import FileSystemLoader
 from latex.jinja2 import make_env
-from fixif.func_aux import scalarProduct
 from datetime import datetime
 from pylatexenc.latexencode import utf8tolatex
 
+from fixif.config import SIF_TEMPLATES_PATH
+from fixif.func_aux import scalarProduct
 
 class R_algorithm:
 	"""
@@ -40,7 +41,7 @@ class R_algorithm:
 				return '\\%s{$%s$: %sarray [1..%d] of reals}' % (Kwname, lvar[0].name, 'static ' if isStatic else '', len(lvar))
 
 
-		env = make_env(loader=FileSystemLoader('SIF/templates'))
+		env = make_env(loader=FileSystemLoader(SIF_TEMPLATES_PATH))
 		tpl = env.get_template('algorithmLaTeX_template.tex')
 
 		algoStr = [s+"\\\\" for s in self._algorithmCore(LaTeX=True, assign='$\leftarrow$', coefFormat=coefFormat, withTime=withTime, withSurname=withSurname)]
