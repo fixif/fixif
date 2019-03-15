@@ -141,8 +141,10 @@ class R_FxP:
 			- AMPLfilename: (string) name of the AMPL file generated
 			- path: (string) path where to store the AMPL file
 			- wmax: int maximum value for the word-length
-		Returns: (integer) the wordlength that, when used for the intermediate variables, the states and the oututs,
+
+		#TODO: Returns: (integer) the wordlength that, when used for the intermediate variables, the states and the oututs,
 		satisfies the output error constraints
+		Returns: (inter) sub-optimal solution (but easy to get; works well when p=1)
 		"""
 		# make wmax a vector
 		wmax = wmax * ones((self.l + self.n + self.p, 1))
@@ -170,3 +172,10 @@ class R_FxP:
 		with open(path.join(AMPLpath, AMPLfilename), 'w') as f:
 			f.write(AMPL.substitute(AMPLcode))
 
+		if self.p == 1:
+			return [ int(ceil(log2(Ei*(self.n+self.p+self.l)) - log2(eps[0,0]))) for Ei in nditer(E) ]
+		else:
+			weq=[]
+			for j in range(self.l+self.n+self.p):
+				weq.append( int(max(ceil(log2(E[i,j]*(self.n+self.p+self.l)) - log2(eps[i,0])) for i in range(self.p)) ))
+			return weq
