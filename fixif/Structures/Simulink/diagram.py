@@ -250,7 +250,7 @@ class System(object):
 		for eq in self.equations:
 			bout = self.getblockbysid(eq.out)
 			if bout.type == 'Sum':
-				for inp in eq.termes.keys(): # a copy of the dict key / dict is changing during iteration
+				for inp in list(eq.termes): # a copy of the dict key / dict is changing during iteration
 					inpb =  self.getblockbysid(inp)
 					inpcoeff = eq.termes[inp]
 					assert abs(inpcoeff) == 1.0 # Sum have no gain

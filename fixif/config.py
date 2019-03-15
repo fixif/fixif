@@ -16,4 +16,4 @@ Contains some configurations values, such as paths
 
 import pkg_resources
 
-SIF_TEMPLATES_PATH = pkg_resources.resource_filename('fixif.fixif', 'SIF/templates/')
+SIF_TEMPLATES_PATH = pkg_resources.resource_filename('fixif', 'SIF/templates/')
