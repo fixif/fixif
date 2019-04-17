@@ -108,7 +108,7 @@ class Structure(object):
 		structName = self._fullName + " (" + ", ".join('%s:%s' % (key, str(val)) for key, val in Ropt.items()) + ")"
 
 		# build the realization
-		return Realization(filt, structureName=structName, **d)
+		return Realization(filt, structureName=structName, shortName=self._shortName, **d)
 
 	def __call__(self, *args, **kwargs):
 		"""
