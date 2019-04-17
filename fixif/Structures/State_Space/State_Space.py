@@ -67,6 +67,6 @@ try:
 except ImportError:
 	State_Space = Structure(shortName="dSS", fullName="State-Space", options={'form': (None, 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
 else:
-	State_Space = Structure(shortName="dSS", fullName="State-Space", options={'form': (None, 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
-	#State_Space = Structure(shortName="SS", fullName="State-Space", options={'form': (None, 'balanced', 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
+	#State_Space = Structure(shortName="dSS", fullName="State-Space", options={'form': (None, 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
+	State_Space = Structure(shortName="dSS", fullName="State-Space", options={'form': (None, 'balanced', 'ctrl', 'obs')}, make=makeSS, accept=acceptSS)
 	# TODO: add the balanced form, when the balanced computation will be reliable...
