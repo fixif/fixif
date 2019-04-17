@@ -16,10 +16,10 @@ __status__ = "Beta"
 
 
 from fixif.WCPG import WCPG_TF
-from numpy import ndenumerate, array
-from numpy import matrix as mat
+from numpy import ndenumerate, array, linspace
+from numpy import matrix as mat, polymul, polyadd
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
-from scipy.signal import tf2ss
+from scipy.signal import tf2ss, TransferFunction, dbode
 from scipy.linalg import norm
 
 
@@ -84,6 +84,52 @@ class dTF(object):
 
 		return str_tf
 
+	def __neg__(self):
+		"""returns -dTF"""
+		return dTF(-self._num, self._den)
+
+	def __mul__(self, other):
+		"""multiply"""
+		if type(other) in [int, float]:
+			return dTF(self._num * other, self._den)
+		elif isinstance(other, dTF):
+			numer = polymul(self.num.A1, other.num.A1)
+			denom = polymul(self.den.A1, other.den.A1)
+			return dTF(numer, denom)
+		else:
+			raise ValueError("Cannot multiply a dTF with a %s", type(other))
+	__rmul__ = __mul__  # lazy definition
+
+	def __add__(self, other):
+		"""addition"""
+		if type(other) in [int, float]:
+			return dTF(polyadd(self._num.A1, self._den.A1 * other), self._den)
+		if isinstance(other, dTF):
+			numer = polyadd(polymul(self._num.A1, other.den.A1), polymul(self._den.A1, other.num.A1))
+			denom = polymul(self._den.A1, other.den.A1)
+			return dTF(numer, denom)
+		raise ValueError("Cannot add a dTF with a %s", type(other))
+	__radd__ = __add__  # lazy definition
+
+	def __sub__(self, other):
+		"""substraction"""
+		if type(other) in [int, float]:
+			return dTF(polyadd(self._num.A1, -self._den.A1 * other), self._den)
+		if isinstance(other, dTF):
+			numer = polyadd(polymul(self._num.A1, other.den.A1), -polymul(self._den.A1, other.num.A1))
+			denom = polymul(self._den.A1, other.den.A1)
+			return dTF(numer, denom)
+		raise ValueError("Cannot substract a dTF with a %s", type(other))
+
+	def __rsub__(self, other):
+		"""right substraction"""
+		if type(other) in [int, float]:
+			return dTF(polyadd(-self._num.A1, self._den.A1 * other), self._den)
+		if isinstance(other, dTF):
+			numer = polyadd(polymul(other.num.A1, self._den.A1), -polymul(other.den.A1, self._num.A1))
+			denom = polymul(self._den.A1, other.den.A1)
+			return dTF(numer, denom)
+
 
 	def to_dTFmp(self):
 		from fixif.LTI import dTFmp
@@ -114,6 +160,13 @@ class dTF(object):
 		return dSS(A, B, C, D)
 
 
+	def toTransferFunction(self):
+		"""
+		Convert the object to a scipy Transfer Function
+		"""
+		return TransferFunction(self.num.tolist()[0], self.den.tolist()[0], dt=1)
+
+
 	def to_Sollya(self):
 		"""
 		Convert transfer function into two Sollya polynomials (numerator and denomitator)
@@ -132,6 +185,34 @@ class dTF(object):
 		return self._sollya
 
 
+	def bode(self, wmin=1e-3, tikz=False):
+		"""Plot a bode graph
+		return tikz code if tikz is True, otherwise display it"""
+		# get the frequency, magnitude and phase
+		w, mag, phase = dbode(self.toTransferFunction(), linspace(wmin, 3.14159, 500))
+
+		import matplotlib.pyplot as plt
+		plt.figure(3)
+		plt.subplot(2, 1, 1)
+		plt.semilogx(w, mag, 'b-', linewidth=1)
+		plt.xlim((wmin, 3.5))
+		plt.grid(b=True, which='major', color='gray', linestyle='-')
+		plt.grid(b=True, which='minor', color='silver', linestyle='--')
+		plt.ylabel('Magnitude')
+		plt.axvline(x=3.14159, color='grey', zorder=2)
+		plt.subplot(2, 1, 2)
+		plt.semilogx(w, phase, 'b-', linewidth=1)
+		plt.xlim((wmin, 3.5))
+		plt.grid(b=True, which='major', color='gray', linestyle='-')
+		plt.grid(b=True, which='minor', color='silver', linestyle='--')
+		plt.axvline(x=3.14159, color='grey', zorder=2)
+		plt.ylabel('Phase')
+		plt.xlabel('Frequency')
+		if tikz:
+			import matplotlib2tikz
+			return matplotlib2tikz.get_tikz_code(figurewidth='15cm', figureheight='7cm')
+		else:
+			plt.show()
 
 
 	def assert_close(self, other, eps=1e-7):
