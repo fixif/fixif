@@ -434,6 +434,19 @@ class dSS(object):
 		return self._DC_gain
 
 
+
+	def similarity(self, T):
+		"""
+		Apply a similarity transform T
+		"""
+		#TODO: check T size
+		#TODO: check computational errors !
+		Tinv = inv(T)
+		self._A = Tinv * self._A * T
+		self._B = Tinv * self._B
+		self._C = self._C * T
+		# D is unchanged
+
 	# ======================================================================================
 	def _check_dimensions(self):
 		"""
