@@ -26,7 +26,7 @@ from numpy import eye
 from math import sqrt
 from scipy import signal
 
-np.set_printoptions(suppress=True)
+#np.set_printoptions(suppress=True)
 
 
 def PhiKLD(s):
