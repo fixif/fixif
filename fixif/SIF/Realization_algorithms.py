@@ -31,27 +31,30 @@ class R_algorithm:
 		- `caption` is an additional caption
 		"""
 
-		def declare(lvar, Kwname, isStatic=False):
+		def declare(lvar, Kwname, isStatic=False, suffix=''):
 			"""generate algorithm2e code to declare variables"""
 			if len(lvar) == 0:
 				return ''
 			elif len(lvar) == 1:
-				return '\\%s{$%s$: %sreal}' % (Kwname, lvar[0].name, 'static ' if isStatic else '')
+				return '\\%s{$%s$: %sreal}' % (Kwname, lvar[0].name+suffix, 'static ' if isStatic else '')
 			else:
-				return '\\%s{$%s$: %sarray [1..%d] of reals}' % (Kwname, lvar[0].name, 'static ' if isStatic else '', len(lvar))
+				return '\\%s{$%s$: %sarray [1..%d] of reals}' % (Kwname, lvar[0].name+suffix, 'static ' if isStatic else '', len(lvar))
 
 
 		env = make_env(loader=FileSystemLoader(SIF_TEMPLATES_PATH))
 		tpl = env.get_template('algorithmLaTeX_template.tex')
 
-		algoStr = [s+"\\\\" for s in self._algorithmCore(LaTeX=True, assign='$\leftarrow$', coefFormat=coefFormat, withTime=withTime, withSurname=withSurname)]
+		algoStr = [s+r"\\" for s in self._algorithmCore(LaTeX=True, assign='$\leftarrow$', coefFormat=coefFormat, withTime=withTime, withSurname=withSurname)]
 
 		# add comments
-		algoStr.insert(self._l + self._n, "\\tcp{Outputs}" if self._p > 1 else "\\tcp{Output}")
+		algoStr.insert(self._l + self._n, r"\tcp{Outputs}" if self._p > 1 else r"\tcp{Output}")
 		if self._n > 0:
-			algoStr.insert(self._l, "\\tcp{States}" if self._n > 1 else "\\tcp{State}")
+			algoStr.insert(self._l, r"\tcp{States}" if self._n > 1 else r"\tcp{State}")
 		if self._l > 0:
-			algoStr.insert(0, "\\tcp{Temporary variables}" if self._l > 1 else "\\tcp{Temporary variable}")
+			algoStr.insert(0, r"\tcp{Temporary variables}" if self._l > 1 else r"\tcp{Temporary variable}")
+		if withTime is False and self.isPnut():
+			algoStr.append(r"\tcp{Swap states}")
+			algoStr.append("$" + self._varNameX[0].name + ' \leftarrow ' + self._varNameX[0].name + "p$")
 
 		# caption
 		if caption is None:
@@ -62,6 +65,8 @@ class R_algorithm:
 		init.append(declare(self._varNameY, 'KwOut'))
 		init.append(declare(self._varNameX, 'KwData', isStatic=True))
 		init.append(declare(self._varNameT, 'KwData'))
+		if withTime is False and self.isPnut():
+			init.append(declare(self._varNameX, 'KwData', suffix='p'))
 
 		return tpl.render(computations="\n".join(algoStr), caption=caption, initialization="\n".join(init), date=str(datetime.now()), SIF=self.name)
 
