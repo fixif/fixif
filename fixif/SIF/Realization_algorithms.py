@@ -24,7 +24,7 @@ class R_algorithm:
 	Allow to embedd the algorithmXXX methods in the Realization class
 	the Realization class will inherit from R_algorihtm class
 	"""
-	def algorithmLaTeX(self, caption=None, coefFormat=None, withTime=False, withSurname=False):
+	def algorithmLaTeX(self, caption=None, coefFormat=None, withTime=False, withSurname=False, label=None):
 
 		"""
 		Generate a tex file to use with package algorithm2e to create a LaTex output of algorithm
@@ -60,6 +60,9 @@ class R_algorithm:
 		if caption is None:
 			caption = utf8tolatex(self.name)		# TODO: complete ? caption should be a string, where we can insert self._Filter.name (like 'My algorithm of %s', or 'my algo' if we do not want to use self._Filter.name)
 
+		# label
+		label = '' if label is None else '\label{' + label + '}'
+
 		# initialization
 		init = [declare(self._varNameU, 'KwIn')]
 		init.append(declare(self._varNameY, 'KwOut'))
@@ -68,7 +71,7 @@ class R_algorithm:
 		if withTime is False and self.isPnut():
 			init.append(declare(self._varNameX, 'KwData', suffix='p'))
 
-		return tpl.render(computations="\n".join(algoStr), caption=caption, initialization="\n".join(init), date=str(datetime.now()), SIF=self.name)
+		return tpl.render(computations="\n".join(algoStr), caption=caption, initialization="\n".join(init), date=str(datetime.now()), SIF=self.name, label=label)
 
 
 
