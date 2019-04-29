@@ -198,7 +198,7 @@ class dTF(object):
 		plt.xlim((wmin, 3.5))
 		plt.grid(b=True, which='major', color='gray', linestyle='-')
 		plt.grid(b=True, which='minor', color='silver', linestyle='--')
-		plt.ylabel('Magnitude')
+		plt.ylabel('Magnitude (dB)')
 		plt.axvline(x=3.14159, color='grey', zorder=2)
 		plt.subplot(2, 1, 2)
 		plt.semilogx(w, phase, 'b-', linewidth=1)
@@ -207,7 +207,7 @@ class dTF(object):
 		plt.grid(b=True, which='minor', color='silver', linestyle='--')
 		plt.axvline(x=3.14159, color='grey', zorder=2)
 		plt.ylabel('Phase')
-		plt.xlabel('Frequency')
+		plt.xlabel('Frequency ($rad.s^{-1}$)')
 		if tikz:
 			import matplotlib2tikz
 			return matplotlib2tikz.get_tikz_code(figurewidth='15cm', figureheight='7cm')
