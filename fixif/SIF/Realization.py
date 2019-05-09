@@ -42,7 +42,7 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 
 	"""
 
-	def __init__(self, filt, JtoS, dJtodS=None, structureName="", shortName = "",surnameVarT=None, surnameVarX=None):
+	def __init__(self, filt, JtoS, dJtodS=None, structureName="", shortName="", surnameVarT=None, surnameVarX=None):
 		"""
 		the Realization object is built from the matrices J, K, L, M, N, P, Q, R and S, and a filter
 		Parameters

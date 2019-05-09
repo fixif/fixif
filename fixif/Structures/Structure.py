@@ -79,7 +79,7 @@ class Structure(object):
 		"""
 		return self._accept(filt, **options)
 
-	def makeRealization(self, filt, **options):
+	def makeRealization(self, filt, structName=None, shortName=None, **options):
 		"""
 		Factory function
 		Return the structured realization of a given filter
@@ -105,10 +105,15 @@ class Structure(object):
 
 		# call the "factory" function
 		d = self._make(filt, **Ropt)
-		structName = self._fullName + " (" + ", ".join('%s:%s' % (key, str(val)) for key, val in Ropt.items()) + ")"
+
+		# structName and shortName
+		if structName is None:
+			structName = self._fullName + " (" + ", ".join('%s:%s' % (key, str(val)) for key, val in Ropt.items()) + ")"
+		if shortName is None:
+			shortName = self._shortName
 
 		# build the realization
-		return Realization(filt, structureName=structName, shortName=self._shortName, **d)
+		return Realization(filt, structureName=structName, shortName=shortName, **d)
 
 	def __call__(self, *args, **kwargs):
 		"""
