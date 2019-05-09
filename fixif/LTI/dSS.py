@@ -341,11 +341,11 @@ class dSS(object):
 		try:
 			# less errors when Wc is big and Wo is small
 			M = self._C * self.Wc * self._C.transpose() + self._D * self._D.transpose()
-			self._H2norm = sqrt(M.trace())
+			self._H2norm = sqrt(M.trace())[0,0]
 		except ValueError:  # TODO: check what kind of exception we need to catch here
 			try:
 				M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
-				self._H2norm = sqrt(M.trace())
+				self._H2norm = sqrt(M.trace())[0,0]
 			except ValueError:
 				raise ValueError("dSS: h2-norm : Impossible to compute M. Default value is 'inf'")
 
