@@ -20,7 +20,7 @@ __status__ = "Beta"
 from fixif.LTI import dSS
 import numpy as np
 
-from numpy import c_, r_, eye, zeros, matrix as mat, tril, all
+from numpy import c_, r_, eye, zeros, matrix as mat, tril, all, count_nonzero
 from numpy.linalg import inv
 from math import log
 from copy import copy
@@ -654,6 +654,16 @@ class SIF(object):
 			self._Hepsilon = dSS(self.AZ, self._M1, self.CZ, self._M2)
 		return self._Hepsilon
 
+
+	def nbOp(self):
+		"""
+		Returns the number of multiplication and the number of additions required
+		"""
+		# per line, the number of addition is equal to the number of non-zero coefficients - 1
+		# for the l first SoP, we need to decrease by 1 this number (the diagonal terms of J should not be counted)
+		# number of multiplication is equal to the number of non-trivial coefficients
+		return count_nonzero(self.dZ), count_nonzero(self.Z) - self.l - (self.l+self.n+self.p)
+
 	def isPnut(self):
 		"""
 		Returns true if the Lower triangular part non-null
@@ -701,3 +711,32 @@ class SIF(object):
 };
 \end{tikzpicture}
 """ % ("".join(tikzLines))
+
+	def getZtpmatrixLaTeX(self, sparse=True, strFormat='%.4g'):
+		"""
+		Similar to getTikzSparseMatrix, but using the tpmatrix environment (a tikz env. similar to pmatrix)
+		the null element are not shown when sparse=True
+		"""
+		l, n, p, q = self.size
+		code = [] if l > 0 else [r"\&" * (l + n + p) + r"\\" + "\n"]
+		for i in range(l+n+p):
+			line = [] if l>0 else [""]
+			for j in range(l+n+q):
+				# check the value of the coefficient Z(i,j)
+				if self.Z[i, j] == 0 and sparse:
+					line.append("")
+				elif int(self.Z[i, j]) == self.Z[i, j]:
+					line.append("%d" % self.Z[i,j])
+				else:
+					line.append(strFormat % self.Z[i, j])
+
+			code.append(r"\&".join(line) + r"\\" + "\n")
+
+		# remove last \\
+		code[-1] = code[-1][:-3]+ '\n'
+		# adjustment for state-space (no temporary variable, but need to draw some empty)
+		if l == 0:
+			l = 1
+		return r"""
+		\begin{tpmatrix}[{\mvline[dashed]{%d}\mvline[dashed]{%d}\mhline[dashed]{%d}\mhline[dashed]{%d}}]{}
+		%s\end{tpmatrix}""" % (l, l+n, l, l+n, "".join(code))
