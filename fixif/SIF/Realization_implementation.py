@@ -14,7 +14,6 @@ __status__ = "Beta"
 from jinja2 import Environment, FileSystemLoader
 from numpy import tril, all, zeros, matrix as mat
 from datetime import datetime
-from fixif.func_aux import scalarProductOld
 from subprocess import Popen, PIPE
 from ctypes import CDLL, POINTER, c_double
 import numpy
@@ -25,6 +24,7 @@ import numpy
 # set the PATHS
 from inspect import getfile
 from fixif import SIF
+from fixif.SoP import SoP
 from os.path import dirname
 FIXIF_SIF_PATH = dirname(getfile(SIF))
 
@@ -124,7 +124,8 @@ class R_implementation:
 		# and outputs y(k) = L.t + R.x(k) + S.u(k)
 		comp = []
 		for i in range(0, l+n+p):
-			comp.append("\t" + strTXY[i] + " = " + scalarProductOld(strTXU, self.Zcomp[i, :], self.dZ[i, :]) + ";\n")
+			sop = SoP(self.Zcomp[i, :].tolist()[0], strTXU, strTXY[i])      # TODO: not tested yet (tested when it used productScalarOld function)
+			comp.append("\t" + sop.toAlgoStr(" =")  + ";\n")
 		cDict["InterComp"] = "".join("\tdouble " + t for t in comp[0:l])
 		cDict["StatesComp"] = "".join(comp[l:l+n])
 		cDict["OutComp"] = "".join(comp[l+n:])

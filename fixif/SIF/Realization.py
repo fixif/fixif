@@ -26,8 +26,7 @@ from fixif.FxP import Constant
 import numpy as np
 from copy import copy
 
-from fixif.SIF.varName import generateNames
-
+from fixif.SoP import generateNames
 
 
 class Realization(SIF, R_algorithm, R_FxP, R_implementation):
@@ -66,7 +65,7 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 		self._varNameT = generateNames('t', self._l, surnames=surnameVarT)
 		self._varNameX = generateNames('x', self._n, surnames=surnameVarX)
 		self._varNameU = generateNames('u', self._q)
-		self._varNameY = generateNames('y', self._p)	 # TODO: do it for varNameU and varNameY ??
+		self._varNameY = generateNames('y', self._p)
 
 		# MSB and LSB are not defined (yet)
 		self._MSB = None
@@ -134,9 +133,8 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 		Returns: a new realization
 		"""
 
-		def quantize(x, wl):
+		def quant(x, wl):
 			"""Simple function to quantized x with w bits (fixed-point style)"""
-
 			return Constant(x, wl=wl, signed=True).approx if x else 0
 
 		# check arguments
@@ -145,7 +143,7 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 
 		# copy the realization and quantized the matrix Z
 		R = copy(self)
-		quantizeMat = np.vectorize(lambda x: quantize(x, w), otypes=[np.float])
+		quantizeMat = np.vectorize(lambda x: quant(x, w), otypes=[np.float])
 		R.Z = quantizeMat(R.Z)
 		return R
 

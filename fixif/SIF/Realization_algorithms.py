@@ -16,8 +16,7 @@ from datetime import datetime
 from pylatexenc.latexencode import utf8tolatex
 
 from fixif.config import SIF_TEMPLATES_PATH
-from fixif.func_aux import scalarProduct
-
+from fixif.SoP import SoP
 
 class R_algorithm:
 	"""
@@ -109,7 +108,7 @@ class R_algorithm:
 		Otherwise, should be in C formatting format (like "%4.f" for example)
 		"""
 		if withSurname and not withTime:
-			# it raises an error only when at least one varName has a surname with time (with shift != 0)
+			# it raises an error only when at least one VarName has a surname with time (with shift != 0)
 			v = [v for v in self._varNameT if v.hasSurnameWithIndex()]
 			v.extend([v for v in self._varNameT if v.hasSurnameWithIndex()])
 			if len(v) > 0:
@@ -139,14 +138,19 @@ class R_algorithm:
 		algoStr = []
 		for i in range(self._l + self._n + self._p):
 			# sum of product
-			src = varTXY[i]
-			dst = scalarProduct(varTXU, self.Zcomp[i, :].tolist()[0], coefFormat)	 # varTXU is used for dst and the comparison with src
-			if src != dst:
+			sop1 = SoP(self.Zcomp[i, :].tolist()[0], varTXU, varTXY[i])     # varTXU is used for dst and the comparison with src
+			# check if sop1 is not empty
+			if sop1.toAlgoStr('', coefFormat):
 				# finally, we use the varTXUnoTime for the result
-				src = varTXYnoTime[i]
-				dst = scalarProduct(varTXUnoTime, self.Zcomp[i, :].tolist()[0], coefFormat)
-				newLine = src + ' ' + assign + ' ' + dst
-				if newLine not in algoStr:		# to avoid redondant lines (append for DFI with surname)
+				sop2 = SoP(self.Zcomp[i, :].tolist()[0], varTXUnoTime, varTXYnoTime[i])
+				newLine = sop2.toAlgoStr(assign, coefFormat)
+				if newLine and newLine not in algoStr:  # to avoid redondant lines (append for DFI with surname)
 					algoStr.append(newLine)
+
+
+		#TODO: build the SoP with VarName (instead of just strings) and put this "trick" in the SoP.toAlgoStr method instead of here
+		#(or find another way to check these problem, rather than build 2 SoP and use only one)
+
+
 
 		return algoStr
