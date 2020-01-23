@@ -528,16 +528,8 @@ class dSS(object):
 		n1, p1, q1 = self.size
 		n2, p2, q2 = other.size
 
-		if n1 != n2:
-			raise ValueError("dSS: States spaces must have same number of states n")
-		elif p1 != n2:
-			raise ValueError("dSS: second state space should have same number of states as first state number of inputs")
-		elif n1 != q2:
-			raise ValueError("dSS: second state space should have same number of outputs as first state number of states")
-		elif p1 != q2:
-			raise ValueError("dSS: second state space should have number of outputs equal to first state space number of inputs")
-		elif q1 != p2:
-			raise ValueError("dSS: second state space number of inputs should be equal to first state space number of outputs")
+		if p1 != q2:
+			raise ValueError("dSS: second state space should have same number of inputs as first state number of outputs")
 
 		# TODO: possible simplification if self.A==other.A ??
 
@@ -714,6 +706,8 @@ class dSS(object):
 		Returns a dSS which is equal to (self - S)
 		"""
 
+		#TODO: check size and raise error
+
 		newA = numpy.concatenate((self.A, numpy.zeros([self.n, S.n])), axis=1)
 		tmp = numpy.concatenate((numpy.zeros([S.n, self.n]), S.A), axis=1)
 		newA = numpy.concatenate((newA, tmp), axis=0)
@@ -740,6 +734,8 @@ class dSS(object):
 
 		Returns a dSS which is equal to (self - S)
 		"""
+
+		# TODO: check size and raise error
 
 		newA = numpy.concatenate((self.A, numpy.zeros([self.n, S.n])), axis=1)
 		tmp = numpy.concatenate((numpy.zeros([S.n, self.n]), S.A), axis=1)

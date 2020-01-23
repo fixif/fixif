@@ -1,6 +1,6 @@
-__author__ = "Anastasia Volkova"
+__author__ = "Thibault Hilaire"
 __copyright__ = "Copyright 2015, FiXiF Project, LIP6"
-__credits__ = ["Anastasia Volkova", "Thibault Hilaire"]
+__credits__ = ["Thibault Hilaire", "Anastasia Volkova"]
 
 __license__ = "GPL v3"
 __version__ = "0.4"
@@ -13,7 +13,7 @@ __status__ = "Beta"
 from os import path
 import mpmath
 from numpy import zeros, ones, matrix, power, ndenumerate, kron, multiply, nditer
-from numpy import floor, log2, ceil
+from numpy import floor, log2, ceil, bmat, inf
 from string import Template
 
 from fixif.config import SIF_TEMPLATES_PATH
@@ -52,7 +52,7 @@ class R_FxP:
 
 
 
-	def _computeNaiveMSB(self, u_bar, output_info=None):
+	def computeNaiveMSB(self, u_bar, output_info=None):
 		"""Compute the MSB of t, x and y without taking into account the errors in the filter evaluation, and the
 		errors in the computation of this MSB (the WCPG computation and the log2 associated)
 		Returns a vector of MSB
@@ -179,3 +179,42 @@ class R_FxP:
 			for j in range(self.l+self.n+self.p):
 				weq.append( int(max(ceil(log2(E[i,j]*(self.n+self.p+self.l)) - log2(eps[i,0])) for i in range(self.p)) ))
 			return weq
+
+
+
+	def _compute_LSB(self, l_y_out):
+
+		if not isinstance(l_y_out, int):
+			raise ValueError("I implemented the function only for the case of 1 output! \n")
+		# we need to add one more bit to the account for the
+		# final rounding error
+		l_y_out = l_y_out-1
+
+		# construct the error-filter
+		deltaSIF = self.computeDeltaSIF()
+
+		# compute the WCPG of the error filter
+		wcpgDeltaH = deltaSIF.dSS.WCPG()
+
+		# we repartition the error budget equally for all variables
+		c = self.l + self.n + self.p
+
+		# In order to respect the overall error |deltaY(k)| < 2^(l_y_out-1)
+		# we need to compute the temporary, state and output variables with LSB l_i
+		# l_i = max(l_y_out) - g_i
+		# where the correction term g_i is computed via
+		# g_i = 1 + max_j { ceil( log2 ( c * wcpgDeltaH[j, i] ) )}
+
+		g = bmat([1 + max(ceil(log2(c * wcpgDeltaH[:, i] * 2**-l_y_out))) for i in range(0, c)])
+
+		# the error budget for the output y(k) that will be later passed on to FloPoCo
+		error_budget_y = 2**-ceil(log2(c * wcpgDeltaH[0, c-1] * 2**-l_y_out))/2**(l_y_out+1)
+
+		for x in (g == inf):
+			if x.any():
+				print('Divided by zero\n')
+
+
+		lsb = bmat(l_y_out - g - 1)
+
+		return lsb, error_budget_y

@@ -18,6 +18,7 @@ from pylatexenc.latexencode import utf8tolatex
 from fixif.config import SIF_TEMPLATES_PATH
 from fixif.func_aux import scalarProduct
 
+
 class R_algorithm:
 	"""
 	Mixin class (see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY)

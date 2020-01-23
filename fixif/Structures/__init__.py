@@ -1,5 +1,5 @@
 from fixif.Structures import Structure
-from fixif.Structures.Structure import makeARealization, iterAllRealizationsRandomFilter
+from fixif.Structures.Structure import makeARealization, iterAllRealizationsRandomFilter, iterStructuresAndOptions
 from fixif.Structures.DirectForms.DFI import DFI
 from fixif.Structures.DirectForms.DFII import DFII
 from fixif.Structures.State_Space.State_Space import State_Space

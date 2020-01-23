@@ -78,7 +78,7 @@ class R_FxP_Nastia:
 		g = np.bmat([1 + max(np.ceil(np.log2(c * wcpgDeltaH[:, i] * 2**-l_y_out))) for i in range(0, c)])
 
 		# the error budget for the output y(k) that will be later passed on to FloPoCo
-		error_budget_y = 2**-mpmath.ceil(mpmath.log(c * wcpgDeltaH[0, c-1] * 2**-l_y_out, 2))/2**(l_y_out+1)
+		error_budget_y = 2**-ceil(log(c * wcpgDeltaH[0, c-1] * 2**-l_y_out, 2))/2**(l_y_out+1)
 
 		for x in (g == np.inf):
 			if x.any():

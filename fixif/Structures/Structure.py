@@ -28,7 +28,7 @@ __status__ = "Beta"
 
 from fixif.SIF import Realization
 from fixif.LTI.Filter import iter_random_Filter
-
+from itertools import product
 
 class Structure(object):
 	"""
@@ -129,23 +129,23 @@ class Structure(object):
 
 
 # TODO: check if this is really unused (if yes, then remove)
-# def iterStructuresAndOptions(filt):
-# 	"""
-# 	Iterate over all the possibles structures
-# 	filt is used to determine the options
-# 	Returns a 2-tuple (structure,options)
-# 	"""
-# 	for st in Structure.iterAllStructures():
-# 		if st.options:
-# 			# list of all the possible values for dictionnary
-# 			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
-# 			vl = ( dict(zip(st.options, x)) for x in product(*st.options.values()))
-# 			for options in vl:
-# 				if st.canAcceptFilter(filt, **options):
-# 					yield st, options
-# 		else:
-# 			if st.canAcceptFilter(filt):
-# 				yield st, st.options
+def iterStructuresAndOptions(filt):
+	"""
+	Iterate over all the possibles structures
+	filt is used to determine the options
+	Returns a 2-tuple (structure,options)
+	"""
+	for st in Structure.iterAllStructures():
+		if st.options:
+			# list of all the possible values for dictionnary
+			# see http://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
+			vl = (dict(zip(st.options, x)) for x in product(*st.options.values()))
+			for options in vl:
+				if st.canAcceptFilter(filt, **options):
+					yield st, options
+		else:
+			if st.canAcceptFilter(filt):
+				yield st, st.options
 
 
 def iterAllRealizationsRandomFilter(number, n=(5, 10), p=(1, 5), q=(1, 5), seeded=True, ftype='all'):

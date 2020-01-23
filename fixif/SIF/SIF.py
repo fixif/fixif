@@ -25,7 +25,7 @@ from numpy.linalg import inv
 from math import log
 from copy import copy
 from fixif.func_aux import mpf_matrix_lt_inverse, mpf_matrix_fadd, mpf_matrix_fmul
-
+from fixif.SIF.SIF_sensibility import SIF_sensibility
 
 def isTrivial(x, epsilon):
 	"""
@@ -81,7 +81,7 @@ def _check_dimensions(JtoS):
 
 
 
-class SIF(object):
+class SIF(SIF_sensibility):
 	"""
 	Special Implicit Form (formely FWR, Finite Wordlength Realization)
 
@@ -114,10 +114,11 @@ class SIF(object):
 
 	'AZ, BZ, CZ, DZ' are deduced accordingly
 
+
+	Some other methods are defined in the mixin classes SIF_sensibility
+	see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY and http://www.qtrac.eu/pyclassmulti.html
 	"""
 
-	# add the methods defined in other files
-	# see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY and http://www.qtrac.eu/pyclassmulti.html
 	# TODO: from fixif.SIF.SIF_tilde_error import something...
 
 
