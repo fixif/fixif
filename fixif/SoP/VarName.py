@@ -22,8 +22,9 @@ __status__ = "Beta"
 from pylatexenc.latexencode import utf8tolatex
 
 
-class varName:
-
+class VarName:
+	"""class to define the name of variables
+	(it's not simply the name, but also it refers to time, etc.)"""
 	def __init__(self, SIFname, SIFindex=None, surname=None, index=None, shift=0):
 		"""
 		Constructor
@@ -47,7 +48,7 @@ class varName:
 
 	def toStr(self, withTime=True, shift=0, withSurname=False, suffix='', LaTeX=False):
 		"""
-		a method to display a varName in different ways:
+		a method to display a VarName in different ways:
 		- generic names with time (t with/without time)
 		- surname with time (t without time)
 		- generic names without time (input: u, output: y, intern static array: x)
@@ -57,8 +58,8 @@ class varName:
 		withSurname: (bool) uses surname instead of name
 		suffix: (str) add a suffix to the name (before the '_')
 
-		>>> u=varName('u')
-		>>> t=varName('x', 2, surname='u', index=3, shift=-1)		# t(k) = x_2(k) or t(k) = u_3(k-1)
+		>>> u=VarName('u')
+		>>> t=VarName('x', 2, surname='u', index=3, shift=-1)		# t(k) = x_2(k) or t(k) = u_3(k-1)
 		>>> u.toStr()
 		>>> 'u(k)'
 		>>> u.toStr(withTime=False)
@@ -100,11 +101,11 @@ class varName:
 
 def generateNames(baseName, nbVar, surnames=None):
 	"""
-	Generate a list of varName, based on the basedName, the number of variable and a list of surnames
+	Generate a list of VarName, based on the basedName, the number of variable and a list of surnames
 	the surnames are string, or tuple (surname, index, shift)
 	generateList( 'u', nbVar) returns:
-	- [varName('u',0)] if nbVar == 1	(ie it means 'u(k)')
-	- otherwise [ varName('u', 1, 0) , varName('u',2, 0) , ..., varNames('u', n,0 ) ] that means 'u_1(k)', ...
+	- [VarName('u',0)] if nbVar == 1	(ie it means 'u(k)')
+	- otherwise [ VarName('u', 1, 0) , VarName('u',2, 0) , ..., varNames('u', n,0 ) ] that means 'u_1(k)', ...
 	"""
 	if surnames is not None and len(surnames) != nbVar:
 		raise ValueError("generateNames: A wrong number of surnames are given")
@@ -114,6 +115,6 @@ def generateNames(baseName, nbVar, surnames=None):
 	elif isinstance(surnames[0], str):		# simple surnames, without index and shift
 		surnames = [(s, None, 0) for s in surnames]
 
-	return [varName(baseName, i+1 if nbVar > 1 else None, sn, ind, sh) for i, (sn, ind, sh) in enumerate(surnames)]
+	return [VarName(baseName, i + 1 if nbVar > 1 else None, sn, ind, sh) for i, (sn, ind, sh) in enumerate(surnames)]
 
 
