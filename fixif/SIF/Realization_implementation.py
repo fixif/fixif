@@ -125,7 +125,7 @@ class R_implementation:
 		comp = []
 		for i in range(0, l+n+p):
 			sop = SoP(self.Zcomp[i, :].tolist()[0], strTXU, strTXY[i])      # TODO: not tested yet (tested when it used productScalarOld function)
-			comp.append("\t" + sop.toAlgoStr(" =")  + ";\n")
+			comp.append("\t" + sop.toAlgoStr(" =") + ";\n")
 		cDict["InterComp"] = "".join("\tdouble " + t for t in comp[0:l])
 		cDict["StatesComp"] = "".join(comp[l:l+n])
 		cDict["OutComp"] = "".join(comp[l+n:])

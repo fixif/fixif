@@ -82,7 +82,7 @@ class Sif(object):
 					if block == outb:
 						feedback = True
 						break	
-				if feedback == True:
+				if feedback:
 					t.append(outb)
 					y.remove(outb)
 					new_out = get_new_sid(bsids)

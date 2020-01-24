@@ -2,7 +2,7 @@
 
 """Class SoP to deal with Sum-of-Products
 
-A Sum-of-Products is defined by s=\sum_{i=0}^{n-1} c_i * v_i
+A Sum-of-Products is defined by s = sum_{i=0}^{n-1} c_i * v_i
 where
 - n (integer) is the number of termes
 - the c_i are n constants

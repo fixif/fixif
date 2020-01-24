@@ -28,10 +28,10 @@ class VarName:
 	def __init__(self, SIFname, SIFindex=None, surname=None, index=None, shift=0):
 		"""
 		Constructor
-		:param SIFname:
-		:param SIFindex:
-		:param surname:
-		:param shift:
+		:param SIFname: name of the variable in the SIF
+		:param SIFindex: index of the variable in the SIF
+		:param surname: surname of the variable
+		:param shift: shift in time (shift=0 for var(k) and shift=1 for var(k+1))
 		"""
 		self._SIFname = SIFname
 		self._SIFindex = SIFindex
@@ -41,9 +41,11 @@ class VarName:
 
 	@property
 	def name(self):
+		"""Returns the name"""
 		return self._SIFname
 
 	def hasSurnameWithIndex(self):
+		"""Returns True if is has a surname with index"""
 		return self._SIFname != self._surname and self._shift != 0
 
 	def toStr(self, withTime=True, shift=0, withSurname=False, suffix='', LaTeX=False):

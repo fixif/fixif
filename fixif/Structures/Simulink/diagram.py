@@ -12,7 +12,7 @@ __maintainer__ = "Thibault Hilaire"
 __email__ = "thibault.hilaire@lip6.fr"
 __status__ = "Beta"
 
-
+import sys
 from lxml import etree
 from fixif.Structures.Simulink.blocks import *
 
