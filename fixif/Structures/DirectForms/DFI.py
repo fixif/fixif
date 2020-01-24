@@ -100,7 +100,7 @@ def makeDFI(filt, nbSum=1, transposed=True):
 	return {"JtoS": (J, K, L, M, N, P, Q, R, S), "surnameVarX": None if transposed else var_X}
 
 
-def acceptDFI(filt, **options):
+def acceptDFI(filt, **_):   # other parameters are ignored
 	"""
 	return True only if the filter is SISO
 	"""

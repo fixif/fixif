@@ -79,7 +79,7 @@ def makeDFII(filt, transposed=True):
 	return {"JtoS": (J, K, L, M, N, P, Q, R, S), "surnameVarT": var_T, "surnameVarX": var_X}
 
 
-def acceptDFII(filt, **options):
+def acceptDFII(filt, **_):  # other parameters are ignored
 	"""
 	return True only if the filter is SISO
 	"""
