@@ -16,6 +16,7 @@ import sys
 from lxml import etree
 from fixif.Structures.Simulink.blocks import *
 
+
 class System(object):
 
 	def __init__(self, xmlStr, constants):

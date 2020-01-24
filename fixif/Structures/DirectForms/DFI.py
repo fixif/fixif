@@ -27,8 +27,8 @@ def makeDFI(filt, nbSum=1, transposed=True):
 
 	Two options are available
 	- nbSum: number of sums (1 or 2) used for the computation of the output
-		nbSum==1 - compute \sum b_i u(k-i) and \sum a_i y(k-i) in the same Sum-of-Products
-		nbSum==2 - compute \sum b_i u(k-i) and \sum a_i y(k-i) in two Sums-of-Products
+		nbSum==1 - compute sum b_i u(k-i) and sum a_i y(k-i) in the same Sum-of-Products
+		nbSum==2 - compute sum b_i u(k-i) and sum a_i y(k-i) in two Sums-of-Products
 	- transposed: (boolean) indicates if the realization is transposed (Direct Form I or Direct Form I transposed)
 
 	Returns
@@ -83,7 +83,8 @@ def makeDFI(filt, nbSum=1, transposed=True):
 			M = invT * M
 			N = invT * N
 	else:
-		# transformation to 'optimize' the code, ie to make P upper triangular, so that there is no need to keep x(k+1) and x(k) in the same time in memory
+		# transformation to 'optimize' the code, ie to make P upper triangular,
+		# so that there is no need to keep x(k+1) and x(k) in the same time in memory
 		T = mat(rot90(eye(2 * n)))
 		invT = inv(T)
 
@@ -109,7 +110,9 @@ def acceptDFI(filt, **_):   # other parameters are ignored
 
 # build the Direct Form I
 # as an instance of the class structure
-DFI = Structure(shortName='DFI', fullName="Direct Form I", options={"nbSum": (1, 2), "transposed": (False, True)}, make=makeDFI, accept=acceptDFI)
+DFI = Structure(shortName='DFI', fullName="Direct Form I", options={"nbSum": (1, 2),
+                "transposed": (False, True)}, make=makeDFI, accept=acceptDFI)
 
-# TODO: nbSum=3 and transposed=True is the same as nbSum=1 and transposed=True (just an extra useless temporary variable (t_2=t_1))
+# TODO: nbSum=3 and transposed=True is the same as nbSum=1 and transposed=True
+# (just an extra useless temporary variable (t_2=t_1))
 

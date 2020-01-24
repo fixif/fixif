@@ -64,10 +64,8 @@ class R_algorithm:
 		label = '' if label is None else '\label{' + label + '}'
 
 		# initialization
-		init = [declare(self._varNameU, 'KwIn'),
-				declare(self._varNameY, 'KwOut'),
-				declare(self._varNameX, 'KwData', isStatic=True),
-				declare(self._varNameT, 'KwData')]
+		init = [declare(self._varNameU, 'KwIn'), declare(self._varNameY, 'KwOut'),
+                declare(self._varNameX, 'KwData', isStatic=True), declare(self._varNameT, 'KwData')]
 		if withTime is False and self.isPnut():
 			init.append(declare(self._varNameX, 'KwData', suffix='p'))
 
