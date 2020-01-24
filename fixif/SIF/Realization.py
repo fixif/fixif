@@ -34,10 +34,12 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 	a Realization is a structured SIF object implementing a particular filter
 	Inherit from a SIF, and also contains:
 	- _filter: the filter that it implements
-	- _varNameT, _varNameX, _varNameU, _varNameY : lists of the name of the intermediate variables (varNameT), the states (varNameX), the inputs (varNameU) and the outputs (varNameY)
+	- _varNameT, _varNameX, _varNameU, _varNameY : lists of the name of the intermediate variables (varNameT),
+		the states (varNameX), the inputs (varNameU) and the outputs (varNameY)
 
 	Some other methods are defined in the mixin classes R_algorithm, R_FxP_Nastia and R_implementation
-	# see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY and http://www.qtrac.eu/pyclassmulti.html
+	see https://groups.google.com/forum/?hl=en#!topic/comp.lang.python/goLBrqcozNY and
+	http://www.qtrac.eu/pyclassmulti.html
 	"""
 
 	def __init__(self, filt, JtoS, dJtodS=None, structureName="", shortName="", surnameVarT=None, surnameVarX=None):
@@ -46,9 +48,11 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 		Parameters
 		----------
 		- JtoS: tuple (J, K, L, M, N, P, Q, R, S)
-		- dJtodS: tuple (dJ, dK, dL, dM, dN, dP, dQ, dR, dS) -> if None, they are computed from J to S matrices (0 if the coefficient is close to a power of 2 (with epsilondZ error))
+		- dJtodS: tuple (dJ, dK, dL, dM, dN, dP, dQ, dR, dS) -> if None, they are computed from J to S matrices
+		(0 if the coefficient is close to a power of 2 (with epsilondZ error))
 
-		- varNameT and varNameX: None or lists of surname or lists of tuple (surname, index, shift) about the surname of the variables T and X
+		- varNameT and varNameX: None or lists of surname or lists of tuple (surname, index, shift) about the surname
+		of the variables T and X
 		- filter: the filter implemented by the Realization
 		- strucureName: name of a structure
 
@@ -89,29 +93,36 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 
 	@property
 	def MSB(self):
+		"""Returns the MSB"""
 		return self._MSB
 
 	@property
 	def LSB(self):
+		"""Returns the LSB"""
 		return self._LSB
 
 	@property
 	def filter(self):
+		"""Returns the filter"""
 		return self._filter
 
 	@property
 	def structureName(self):
+		"""Returns the name of the structure"""
 		return self._structureName
 
 	@property
 	def shortName(self):
+		"""Returns the short name"""
 		return self._shortName
 
 	@property
 	def name(self):
+		"""Returns the full name"""
 		return "Realization `%s` for filter `%s`" % (self._structureName, self._filter.name)
 
 	def __str__(self):
+		"""Convert to str"""
 		return self.name + "\n" + SIF.__str__(self)
 
 
