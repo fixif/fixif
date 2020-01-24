@@ -41,7 +41,7 @@ class SoP:
 
 		"""
 		# store the values
-		self._constants = constants
+		self._constValues = constants
 		self._varNames = varNames
 		self._resName = resName
 		# check the size
@@ -63,7 +63,7 @@ class SoP:
 		"""
 		# iterate over each coefficient	and variable for the dot product
 		dp = []
-		for var, co in zip(self._varNames, self._constants):
+		for var, co in zip(self._varNames, self._constValues):
 			if co == 1:
 				dp.append(var)
 			elif co == -1:
