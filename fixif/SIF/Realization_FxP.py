@@ -71,7 +71,7 @@ class R_FxP:
 			# and then the log2
 			msb = [int(mpmath.ceil(mpmath.log(x[0], 2))) for x in zeta_bar.tolist()]
 
-		return msb
+		self._MSB = msb
 
 
 	def _w_tilde(self, u_bar):
@@ -115,7 +115,8 @@ class R_FxP:
 			return d
 
 		# determining the MSB and w_tilde
-		m_tilde = matrix(self._computeNaiveMSB(u_bar)).transpose()
+		self._computeNaiveMSB(u_bar)
+		m_tilde = matrix(self._MSB).transpose()
 		w_tilde = matrix(self._w_tilde(u_bar)).transpose()
 
 		# error
@@ -150,7 +151,8 @@ class R_FxP:
 		wmax = wmax * ones((self.l + self.n + self.p, 1))
 
 		# determining the MSB
-		m_tilde = matrix(self._computeNaiveMSB(u_bar)).transpose()
+		self._computeNaiveMSB(u_bar)
+		m_tilde = matrix(self._MSB).transpose()
 		w_tilde = matrix(self._w_tilde(u_bar)).transpose()
 
 		# error

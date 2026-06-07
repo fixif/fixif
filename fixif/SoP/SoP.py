@@ -83,4 +83,4 @@ class SoP:
 
 	def __str__(self):
 		"""display the SoP"""
-		return self.toAlgoStr('%4f')
+		return self.toAlgoStr('<-', '%4f')

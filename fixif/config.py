@@ -14,8 +14,14 @@ __status__ = "Beta"
 Contains some configurations values, such as paths
 """
 
-import pkg_resources
+# import pkg_resources
+# try:
+# 	SIF_TEMPLATES_PATH = pkg_resources.resource_filename('fixif.fixif', 'SIF/templates/')
+# except ModuleNotFoundError:
+# 	SIF_TEMPLATES_PATH = pkg_resources.resource_filename('fixif', 'SIF/templates/')
+
+from importlib.resources import files
 try:
-	SIF_TEMPLATES_PATH = pkg_resources.resource_filename('fixif.fixif', 'SIF/templates/')
+	SIF_TEMPLATES_PATH = files('fixif.fixif').joinpath('SIF/templates/')
 except ModuleNotFoundError:
-	SIF_TEMPLATES_PATH = pkg_resources.resource_filename('fixif', 'SIF/templates/')
+	SIF_TEMPLATES_PATH = files('fixif').joinpath('SIF/templates/')

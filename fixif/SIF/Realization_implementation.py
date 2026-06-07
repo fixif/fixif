@@ -23,7 +23,7 @@ import numpy
 
 # set the PATHS
 from inspect import getfile
-from fixif import SIF
+from fixif.SIF import SIF
 from fixif.SoP import SoP
 from os.path import dirname
 FIXIF_SIF_PATH = dirname(getfile(SIF))

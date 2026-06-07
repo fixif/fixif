@@ -19,7 +19,8 @@ from fixif.LTI import dTF
 from fixif.func_aux import MatlabHelper, isMatlabInstalled
 
 from scipy.signal import iirdesign, freqz
-from numpy import array, pi, log10, infty
+from numpy import array, pi, log10
+from numpy import inf as infty
 from numpy.random import seed as set_seed, choice, randint, uniform
 
 import matplotlib.pyplot as plt

@@ -154,7 +154,7 @@ class Realization(SIF, R_algorithm, R_FxP, R_implementation):
 
 		# copy the realization and quantized the matrix Z
 		R = copy(self)
-		quantizeMat = np.vectorize(lambda x: quant(x, w), otypes=[np.float])
+		quantizeMat = np.vectorize(lambda x: quant(x, w), otypes=[float])
 		R.Z = quantizeMat(R.Z)
 		return R
 

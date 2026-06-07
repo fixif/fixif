@@ -20,7 +20,7 @@ from numpy import empty, float64, identity, dot, array
 from numpy import matrix as mat, set_printoptions
 from numpy import eye, zeros, r_, c_, sqrt
 from numpy.linalg import inv, solve, norm
-from numpy.linalg.linalg import LinAlgError
+from numpy.linalg import LinAlgError
 from scipy.linalg import solve_discrete_lyapunov
 
 from scipy.signal import ss2tf

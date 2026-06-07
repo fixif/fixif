@@ -58,7 +58,7 @@ class FxPSoP(SoP):
 		if len({len(constants), len(varNames), len(varFPF)}) != 1:
 			raise ValueError("The Constnants, the list of names and the list of FPF should have the same size!")
 		# compute the FxP format of the products
-		self._productFPF = [FPF(msb=v.msb+c.FPF.msb, lsb=v.lsb+c.FPF.lsb) for v, c in zip(varFPF, constants)]
+		self._productFPF = [FPF(msb=v.msb+c.FPF.msb, lsb=v.lsb+c.FPF.lsb) for v, c in zip(varFPF, constants) if c.value]
 		# initialize the SoP
 		super(FxPSoP, self).__init__([c.value for c in constants], varNames, resName)
 
