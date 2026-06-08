@@ -1,21 +1,10 @@
-# coding: utf8
+"""This class describes a SISO transfer function"""
 
-# This class describes a SISO transfer function
+
 from numpy.random.mtrand import randint, rand
-# from scipy.weave import inline
-
-__author__ = "Thibault Hilaire"
-__copyright__ = "Copyright 2015, FiXiF Project, LIP6"
-__credits__ = ["Thibault Hilaire"]
-
-__license__ = "GPL v3"
-__version__ = "0.4"
-__maintainer__ = "Thibault Hilaire"
-__email__ = "thibault.hilaire@lip6.fr"
-__status__ = "Beta"
 
 
-from fixif.WCPG import WCPG_TF
+#from fixif.WCPG import WCPG_TF
 from numpy import ndenumerate, array, linspace
 from numpy import matrix as mat, polymul, polyadd
 from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr

@@ -1,23 +1,8 @@
-# coding=utf8
-
 """
 This file contains tests for the dSS class and its methods
 """
 
-
-__author__ = "Thibault Hilaire, Joachim Kruithof"
-__copyright__ = "Copyright 2015, FiXiF Project, LIP6"
-__credits__ = ["Thibault Hilaire", "Joachim Kruithof"]
-
-__license__ = "GPL v3"
-__version__ = "0.4"
-__maintainer__ = "Thibault Hilaire"
-__email__ = "thibault.hilaire@lip6.fr"
-__status__ = "Beta"
-
-
 import pytest
-import mpmath
 from numpy import array, zeros, absolute, eye, all
 from numpy import matrix as mat
 from numpy.linalg import eigvals, norm
@@ -44,25 +29,26 @@ def test_construct_sollya_slycot(capsys):
 			print("Slycot is not installed")
 
 
-def my_assert_allclose_TFmp(H, b, a, tol):
+# def my_assert_allclose_TFmp(H, b, a, tol):
+#
+# 	if max(H.num.shape) != b.rows or max(H.den.shape) != a.rows:
+# 		raise ValueError('MP Transfer function is not the same size as the scipy transfer function!')
+#
+# 	for i in range(0, b.rows):
+# 		if mpmath.fabs(b[i, 0] - H.num[0, i]) < tol:
+# 			assert True
+# 		else:
+# 			raise ValueError("MP transfer function is not close to the dTF")
+#
+# 	for i in range(0, a.rows):
+# 		if mpmath.fabs(a[i, 0] - H.den[0, i]) < tol:
+# 			assert True
+# 		else:
+# 			raise ValueError("MP transfer function is not close to the dTF")
 
-	if max(H.num.shape) != b.rows or max(H.den.shape) != a.rows:
-		raise ValueError('MP Transfer function is not the same size as the scipy transfer function!')
 
-	for i in range(0, b.rows):
-		if mpmath.fabs(b[i, 0] - H.num[0, i]) < tol:
-			assert True
-		else:
-			raise ValueError("MP transfer function is not close to the dTF")
-
-	for i in range(0, a.rows):
-		if mpmath.fabs(a[i, 0] - H.den[0, i]) < tol:
-			assert True
-		else:
-			raise ValueError("MP transfer function is not close to the dTF")
-
-
-def my_assert_allclose(A, strA, B, strB, atol=None, rtol=None):
+def my_assert_allclose(A, strA: str, B, strB: str, atol=None, rtol=None):
+	"""compare A and B with absolue or relative error using assert_allclose"""
 	D = {}
 	if atol:
 		D['atol'] = atol
@@ -93,42 +79,35 @@ def test_construction():
 
 @pytest.mark.parametrize("S", iter_random_dSS(30, True, n=(2, 40), p=(2, 15), q=(2, 15)))
 def test_random_dSS(S):
-		# test for correct sizes of random dSS
-		assert S.A.shape == (S.n, S.n)
-		assert S.B.shape == (S.n, S.q)
-		assert S.C.shape == (S.p, S.n)
-		assert S.D.shape == (S.p, S.q)
+	# test for correct sizes of random dSS
+	assert S.A.shape == (S.n, S.n)
+	assert S.B.shape == (S.n, S.q)
+	assert S.C.shape == (S.p, S.n)
+	assert S.D.shape == (S.p, S.q)
 
-		# test for spectral radius lower than 1
-		assert max(abs(eigvals(S.A))) < 1
+	# test for spectral radius lower than 1
+	assert max(abs(eigvals(S.A))) < 1
 
 
 
 @pytest.mark.parametrize("S", iter_random_dSS(20, stable=True, n=(2, 40), p=(2, 15), q=(2, 15)))
 def test_Gramians(S):
 	"""
-	Test calculation of :math:`W_o` and :math:`W_c` with the two different methods (``linalg`` from scipy and ``slycot``from Slycot)
+	Test calculation of :math:`W_o` and :math:`W_c` with the two different methods
+	(``linalg`` from scipy and ``slycot``from Slycot), and compare them
 	"""
 
-	relative_tolerance_linalg = 1e-3
-	relative_tolerance_slycot = 1e-5
+	for method, tolerance in [('linalg', 1e-3), ('slycot', 1e-5)]:
+		dSS._W_method = method
+		assert_allclose(array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()), array(S.Wc), rtol=tolerance)
+		assert_allclose(array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C), array(S.Wo), rtol=tolerance)
+
+		# We have to explicitely remove Wo and Wc from S so that those are calculated again
+		S._Wo = None
+		S._Wc = None
 
 
-	# test with 'linalg' method
-	dSS._W_method = 'linalg'
-	assert_allclose(array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()), array(S.Wc), rtol=relative_tolerance_linalg)
-	assert_allclose(array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C), array(S.Wo), rtol=relative_tolerance_linalg)
-
-	# We have to explicitely remove Wo and Wc from S so that those are calculated again
-	S._Wo = None
-	S._Wc = None
-
-	# test for 'slycot' method (with slycot we expect a 8-digit accuracy)
-	dSS._W_method = 'slycot'
-	assert_allclose(array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()), array(S.Wc), rtol=relative_tolerance_slycot)
-	assert_allclose(array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C), array(S.Wo), rtol=relative_tolerance_slycot)
-
-	# test with non-existing method
+	# now test with non-existing method
 	dSS._W_method = 'toto'
 	S._Wc = None
 	S._Wo = None
@@ -140,15 +119,15 @@ def test_Gramians(S):
 	dSS._W_method = 'slycot'
 
 
-@pytest.mark.parametrize("S", iter_random_dSS(1, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
-def test_wcpgMP(S):
-
-	# TODO: code WCPGmp and test it !
-	# W = S.WCPGmp()
-
-	# print(W)
-
-	assert True
+# @pytest.mark.parametrize("S", iter_random_dSS(1, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
+# def test_wcpgMP(S):
+#
+# 	# TODO: code WCPGmp and test it !
+# 	# W = S.WCPGmp()
+#
+# 	# print(W)
+#
+# 	assert True
 
 
 def calc_wcpg_approx(S, nit):
