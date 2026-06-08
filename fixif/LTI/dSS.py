@@ -3,28 +3,20 @@ This file contains Object and methods for a Discrete State Space
 """
 
 from copy import copy
-from numpy import identity, dot
-from numpy import matrix as mat
-from numpy import eye, zeros, r_, c_, sqrt
-from numpy.linalg import inv, solve, norm
-from numpy.linalg import LinAlgError
-from scipy.linalg import solve_discrete_lyapunov
 
+from numpy import c_, concatenate, count_nonzero, delete, dot, eye, identity, r_, sqrt, zeros
+from numpy import matrix as mat
+from numpy.core.umath import cos, pi, sin
+from numpy.linalg import LinAlgError, inv, matrix_rank, norm, solve
+from numpy.random.mtrand import rand, randint, randn
+from scipy.linalg import solve_discrete_lyapunov
 from scipy.signal import ss2tf
-from numpy.core.umath import pi, cos, sin
-from numpy.random.mtrand import randint, rand, randn
-import numpy
-from itertools import chain
 
 #from fixif.WCPG import WCPG_ABCD
 
-try:
-    from slycot import sb03md, sb03md57, ab09ad
-except ImportError:
-    pass
 
-
-class dSS(object):
+# noinspection PyPep8Naming
+class dSS:
     r"""
 	The dSS class describes a discrete state space realization
 
@@ -74,8 +66,8 @@ class dSS(object):
         self._C = mat(C)
         self._D = mat(D)
 
-        # Initialize state space dimensions from user input
-        (self._n, self._p, self._q) = self._check_dimensions()  # Verify coherence, set dimensions
+        # Initialize state space dimensions from user input and verify coherence
+        (self._n, self._p, self._q) = self._check_dimensions()
 
         # Initialize Gramians
         self._Wo = None
@@ -191,15 +183,16 @@ class dSS(object):
             # If we don't use "copy" in the call, the result is plain false
 
             try:
-                X, scale, sep, ferr, w = sb03md57(copy(self._A.transpose()), eye(self.n, self.n),
+                from slycot import sb03md57
+                Ar, Ur, X, scale, sep, ferr, w = sb03md57(copy(self._A.transpose()), eye(self.n, self.n),
                                                   -self._C.transpose() * self._C, dico='D', trana='T')
                 self._Wo = mat(X)
 
-            except NameError:
-                return self.calc_Wo('linalg')
+            except ImportError:
+                self.calc_Wo('linalg')
 
         else:
-            raise ValueError("dSS: Unknown method to calculate observers (method=%s)" % method)
+            raise ValueError(f"dSS: Unknown method to calculate observers (method={method})")
 
     def calc_Wc(self, method=None):
         """
@@ -212,7 +205,7 @@ class dSS(object):
 		Available methods :
 
 		- ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
-		1 digit precision with bilinear algorithm for big matrixes (really bad).
+		1 digit precision with bilinear algorithm for big matrices (really bad).
 		not good enough with usual python data types
 
 		- ``slycot`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
@@ -245,18 +238,19 @@ class dSS(object):
             # Solve the Lyapunov equation by calling the Slycot function sb03md
             # If we don't use "copy" in the call, the result is plain false
             try:
-                Ar, Ur, X, scale, sep, ferr, w = sb03md57(copy(self._A), eye(self.n, self.n), -self._B * self._B.transpose(), dico='D', trana='T')
+                from slycot import sb03md57
+                Ar, Ur, X, scale, sep, ferr, w = sb03md57(copy(self._A), eye(self.n, self.n),
+                                                          -self._B * self._B.transpose(), dico='D', trana='T')
                 self._Wc = mat(X)
 
-
-            except NameError:
-                return self.calc_Wc(method='linalg')
+            except ImportError:
+                self.calc_Wc(method='linalg')
 
         else:
-            raise ValueError("dSS: Unknown method to calculate observers (method=%s)" % method)
+            raise ValueError(f"dSS: Unknown method to calculate observers (method={method})")
 
     # ======================
-    # Norms ccomputation
+    # Norms computation
     # ======================
 
     def H2norm(self):
@@ -425,14 +419,12 @@ class dSS(object):
             """Give the plural form (a s or not)"""
             return 's' if n > 0 else ''
 
-        size = [(x, plural(x)) for x in (self._n, self._p, self._q)]
-        matrices = [repr(x) for x in (self._A, self._B, self._C, self._D)]
-        str_mat = """State Space (%d state%s, %d output%s and %d input%s)
-		A= %s
-		B= %s
-		C= %s
-		D= %s
-		""" % tuple(chain(chain(*size), matrices))
+        str_mat = f"""State Space ({self._n} state{plural(self._n)}, {self.p} output{plural(self._p)} and {self._q} input{plural(self._q)})
+		A= {self._A}
+		B= {self._B}
+		C= {self._C}
+		D= {self._D}
+		"""
 
         # Observers Wo, Wc
         # str_mat += tostr( self._Wc, 'Wc')
@@ -530,32 +522,32 @@ class dSS(object):
 
         newS = self
 
-        while newS.n > numpy.linalg.matrix_rank(newS._A):
-            l = list()
+        while newS.n > matrix_rank(newS._A):
+            lnz = list()
             for i in range(0, newS.n):
-                if numpy.count_nonzero(newS._A[i, :]) == 0:
-                    l.append(i)
+                if count_nonzero(newS._A[i, :]) == 0:
+                    lnz.append(i)
 
             A = newS._A
             B = newS._B
             C = newS._C
             D = newS._D
 
-            while len(l) > 0:
-                index = l.pop()
+            while len(lnz) > 0:
+                index = lnz.pop()
 
-                A = numpy.delete(A, index, 1)
-                A = numpy.delete(A, index, 0)
+                A = delete(A, index, 1)
+                A = delete(A, index, 0)
 
                 D = D + C[:, index] * B[index, :]
 
-                C = numpy.delete(C, index, 1)
+                C = delete(C, index, 1)
 
-                B = numpy.delete(B, index, 0)
+                B = delete(B, index, 0)
 
             newS = dSS(A, B, C, D)
 
-            print("number of states: %d \n rank: %d " % (newS.n, numpy.linalg.matrix_rank(newS._A)))
+            print(f"number of states: {newS.n} \n rank: {matrix_rank(newS._A)} ")
 
         return newS
 
@@ -593,13 +585,14 @@ class dSS(object):
 		- a dSS object
 		"""
         try:
+            from slycot import ab09ad
             Nr, Ar, Br, Cr, hsv = ab09ad('D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr=self.n,
                                          tol=1e-18)
-        except NameError:
+        except ImportError:
             raise ImportError("dSS.balanced: slycot is not installed")
         if Nr == 0:
             raise ValueError("dSS: balanced: Cannot compute the balanced system "
-                             "(the selected order nr is greater than the order of a minimal realization of the given system)")
+                             "(the selected order is greater than the order of a minimal realization of the system)")
         return dSS(Ar, Br, Cr, self.D)
 
     def __add__(self, S):
@@ -618,12 +611,12 @@ class dSS(object):
 
         #TODO: check size and raise error
 
-        newA = numpy.concatenate((self.A, numpy.zeros([self.n, S.n])), axis=1)
-        tmp = numpy.concatenate((numpy.zeros([S.n, self.n]), S.A), axis=1)
-        newA = numpy.concatenate((newA, tmp), axis=0)
+        newA = concatenate((self.A, zeros([self.n, S.n])), axis=1)
+        tmp = concatenate((zeros([S.n, self.n]), S.A), axis=1)
+        newA = concatenate((newA, tmp), axis=0)
 
-        newB = numpy.concatenate((self.B, S.B), axis=0)
-        newC = numpy.concatenate((self.C, S.C), axis=1)
+        newB = concatenate((self.B, S.B), axis=0)
+        newC = concatenate((self.C, S.C), axis=1)
         newD = self.D + S.D
 
         return dSS(newA, newB, newC, newD)
@@ -645,18 +638,19 @@ class dSS(object):
 
         # TODO: check size and raise error
 
-        newA = numpy.concatenate((self.A, numpy.zeros([self.n, S.n])), axis=1)
-        tmp = numpy.concatenate((numpy.zeros([S.n, self.n]), S.A), axis=1)
-        newA = numpy.concatenate((newA, tmp), axis=0)
+        newA = concatenate((self.A, zeros([self.n, S.n])), axis=1)
+        tmp = concatenate((zeros([S.n, self.n]), S.A), axis=1)
+        newA = concatenate((newA, tmp), axis=0)
 
-        newB = numpy.concatenate((self.B, S.B), axis=0)
-        newC = numpy.concatenate((self.C, -S.C), axis=1)
+        newB =concatenate((self.B, S.B), axis=0)
+        newC = concatenate((self.C, -S.C), axis=1)
         newD = self.D - S.D
 
         return dSS(newA, newB, newC, newD)
 
 
-def iter_random_dSS(number, stable=True, n=(5, 10), p=(1, 5), q=(1, 5),
+# noinspection PyPep8Naming
+def iter_random_dSS(number, stable=True, n: tuple[int, int] =(5, 10), p:tuple[int, int]=(1, 5), q=(1, 5),
                     pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5):
     """
 	Generate some n-th order random (stable or not) state-spaces, with q inputs and p outputs
@@ -691,13 +685,13 @@ def iter_random_dSS(number, stable=True, n=(5, 10), p=(1, 5), q=(1, 5),
         if stable:
             yield random_dSS(randint(*n), randint(*p), randint(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
         else:
-            nn = randint(*n)
+            nn = randint(low=n[0], high=n[1])
             if p == 1 and q == 1:
                 pp = 1
                 qq = 1
             else:
-                pp = randint(*p)
-                qq = randint(*q)
+                pp = randint(low=p[0],  high=p[1])
+                qq = randint(low=q[0],  high=q[1])
             A = mat(rand(nn, nn))
             B = mat(rand(nn, qq))
             C = mat(rand(pp, nn))
@@ -706,6 +700,7 @@ def iter_random_dSS(number, stable=True, n=(5, 10), p=(1, 5), q=(1, 5),
             yield dSS(A, B, C, D)
 
 
+# noinspection PyPep8Naming
 def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5):
     """
 	Generate ONE n-th order random  stable state-spaces, with q inputs and p outputs
@@ -729,11 +724,11 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
 	"""
     # Check for valid input arguments.
     if n < 1 or n % 1:
-        raise ValueError("states must be a positive integer.  #states = %g." % n)
+        raise ValueError(f"nb of states must be a positive integer. #states = {n}.")
     if q < 1 or q % 1:
-        raise ValueError("inputs must be a positive integer.  #inputs = %g." % q)
+        raise ValueError(f"nb of inputs must be a positive integer. #inputs = {q}.")
     if p < 1 or p % 1:
-        raise ValueError("outputs must be a positive integer.  #outputs = %g." % p)
+        raise ValueError(f"nb of outputs must be a positive integer. #outputs = {p}.")
 
     # Make some poles for A.  Preallocate a complex array.
     poles = zeros(n) + zeros(n) * 0.j
@@ -808,7 +803,6 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
 
     if rand() < pDzero:
         Dmask = zeros((p, q))
-
     else:
         while True:
             Dmask = rand(p, q) < pDmask
@@ -818,6 +812,6 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
     # Apply masks.
     B *= Bmask
     C *= Cmask
-    # D *= Dmask
+    D *= Dmask
 
     return dSS(A, B, C, D)

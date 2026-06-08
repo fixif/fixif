@@ -2,12 +2,14 @@
 This file contains tests for the dSS class and its methods
 """
 
+from importlib.util import find_spec
+
 import pytest
-from numpy import array, zeros, absolute, eye, all
+from numpy import absolute, all, array, eye, zeros
 from numpy import matrix as mat
 from numpy.linalg import eigvals, norm
-from numpy.testing import assert_allclose
 from numpy.random import randint
+from numpy.testing import assert_allclose
 
 from fixif.LTI import dSS, iter_random_dSS
 
@@ -17,15 +19,13 @@ def test_construct_sollya_slycot(capsys):
 	# tell if sollya or slycot are disabled
 	with capsys.disabled():
 		print("")
-		try:
-			import sollya
+		if find_spec('sollya') is not None:
 			print("PythonSollya is installed")
-		except ImportError:
+		else:
 			print("PythonSollya is not installed")
-		try:
-			import slycot
+		if find_spec('slycot') is not None:
 			print("Slycot is installed")
-		except ImportError:
+		else:
 			print("Slycot is not installed")
 
 
@@ -183,11 +183,14 @@ def test_subsystems(S):
 def test_str(S):
 	str(S)
 
+@pytest.mark.parametrize("S", iter_random_dSS(20))
+def test_repr(S):
+	repr(S)
 
 @pytest.mark.parametrize("S", iter_random_dSS(20, False, n=(5, 15), p=(1, 2), q=(1, 2)))
 def test_to_dTF(S):
 	if S.p > 1 or S.q > 1:
-		print('Case of %d and %d' % (S.p, S.q))
+		print(f"Case of {S.p} and {S.q}")
 		assert True
 	else:
 		H = S.to_dTF()
@@ -197,11 +200,11 @@ def test_to_dTF(S):
 
 @pytest.mark.parametrize("S", iter_random_dSS(5, stable=True, n=(1, 15), p=(1, 5), q=(1, 5)))
 def test_balanced(S):
-	try:
-		import slycot   # ununsed, but just to know if slycot exists
-	except ImportError:
+	# should raise an exception if slycot is not installed
+	if find_spec('slycot') is  None:
 		with pytest.raises(ImportError):
 			S.balanced()
+	# otherwise we can compute the balanced state-space
 	else:
 		Sb = S.balanced()
 		# check if S and Sb represent the same systems
@@ -213,6 +216,7 @@ def test_balanced(S):
 # TODO: still need to test:
 # H2norm
 # DC-gain
-# addition
-# multiplication
+# add, mul, sub
+# simplify
+
 # TODO: filter `RandomFilter-12/1/1-833056621` cannot be converted in rhoDFIIt without NaN... to be investigated
