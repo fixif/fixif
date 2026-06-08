@@ -17,7 +17,10 @@ dependencies = [
     "numpy",
     "scipy>=1.17",
     "mpmath>=1.4",
-    "slycot>=0.6"
+    "slycot>=0.6",
+    "matplotlib",
+    "matplotlib2tikz",
+    "scipy-stubs~=1.17.1",
 ]
 
 [project.optional-dependencies]
