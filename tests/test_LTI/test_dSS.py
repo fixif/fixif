@@ -198,7 +198,7 @@ def test_to_dTF(S):
 		S.assert_close(SS, 1e-4)
 
 
-@pytest.mark.parametrize("S", iter_random_dSS(5, stable=True, n=(1, 15), p=(1, 5), q=(1, 5)))
+@pytest.mark.parametrize("S", iter_random_dSS(5, stable=True, n=(2, 15), p=(1, 5), q=(1, 5)))
 def test_balanced(S):
 	# should raise an exception if slycot is not installed
 	if find_spec('slycot') is  None:

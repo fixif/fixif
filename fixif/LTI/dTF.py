@@ -1,21 +1,18 @@
 """This class describes a SISO transfer function"""
 
 
-from numpy.random.mtrand import randint, rand
 
-
-#from fixif.WCPG import WCPG_TF
-from numpy import ndenumerate, array, linspace
-from numpy import matrix as mat, polymul, polyadd
-from numpy import diagflat, zeros, ones, r_, atleast_2d, fliplr
-from scipy.signal import tf2ss, TransferFunction, dbode
+from numpy import array, atleast_2d, diagflat, fliplr, linspace, ndenumerate, ones, polyadd, polymul, r_, zeros
+from numpy import matrix as mat
+from numpy.random.mtrand import rand, randint
 from scipy.linalg import norm
+from scipy.signal import TransferFunction, dbode, tf2ss
 
 
-class dTF(object):
+class dTF:
 
 	def __init__(self, num, den):
-		"""
+		r"""
 		Define a discrete-time SISO transfer function as
 
 		:math:`H(z) = \frac{\sum_i^n num[i] z^-i}{1 + \sum_i^n den[i] z^-i}`
@@ -35,9 +32,6 @@ class dTF(object):
 			self._den = den/den[0, 0]
 
 		# filter order
-		# if den.shape!=num.shape:
-		# 	raise ValueError( 'Numerator and denomintator must have same length !')
-
 		self._order = num.shape[1]-1
 
 		# cached sollya numerator and denominator
@@ -118,11 +112,11 @@ class dTF(object):
 			numer = polyadd(polymul(other.num.A1, self._den.A1), -polymul(other.den.A1, self._num.A1))
 			denom = polymul(self._den.A1, other.den.A1)
 			return dTF(numer, denom)
+		return None
 
-
-	def to_dTFmp(self):
-		from fixif.LTI import dTFmp
-		return dTFmp(self._num, self._den)
+	# def to_dTFmp(self):
+	# 	from fixif.LTI import dTFmp
+	# 	return dTFmp(self._num, self._den)
 
 	def to_dSS(self, form="ctrl"):
 		"""
@@ -144,7 +138,7 @@ class dTF(object):
 			# TODO: to it manually!!
 			A, B, C, D = tf2ss(array(self.num)[0, :], array(self.den)[0, :])
 		else:
-			raise ValueError('dTF.to_dSS: the form "%s" is invalid (must be "ctrl" or "obs")' % form)
+			raise ValueError(f'dTF.to_dSS: the form "{form}" is invalid (must be "ctrl" or "obs")')
 
 		return dSS(A, B, C, D)
 
@@ -202,7 +196,7 @@ class dTF(object):
 			return matplotlib2tikz.get_tikz_code(figurewidth='15cm', figureheight='7cm')
 		else:
 			plt.show()
-
+			return None
 
 	def assert_close(self, other, eps=1e-7):
 		"""
@@ -227,15 +221,15 @@ class dTF(object):
 		assert(norm(snum-onum) < eps)
 		assert(norm(sden-oden) < eps)
 
-	def WCPG(self):
-		r"""
-		Copute the Worst Case Peak Gain of a SISO filter described with its transfer function
-
-		"""
-		# compute the WCPG value if it's not already done
-		if self._WCPG is None:
-			self._WCPG = WCPG_TF(self._num, self._den)
-		return self._WCPG
+	# def WCPG(self):
+	# 	r"""
+	# 	Copute the Worst Case Peak Gain of a SISO filter described with its transfer function
+	#
+	# 	"""
+	# 	# compute the WCPG value if it's not already done
+	# 	if self._WCPG is None:
+	# 		self._WCPG = WCPG_TF(self._num, self._den)
+	# 	return self._WCPG
 
 
 def iter_random_dTF(number, order=(5, 10)):
@@ -262,7 +256,7 @@ def iter_random_dTF(number, order=(5, 10)):
 
 def random_dTF(order=(5, 10)):
 	"""
-	Generate a n-th order random transfer function (not necessary stable)
+	Generate an n-th order random transfer function (not necessary stable)
 	Parameters:
 		- order: tuple (mini,maxi) order of the filter (default:  random between 5 and 10)
 	"""
@@ -336,7 +330,7 @@ def random_dTF(order=(5, 10)):
 # 	na = a.rows
 #
 # 	if a[0,0] != mpmath.mpf('1.0'):
-# 		raise ValueError('Cannot convert a MP transfer function to dSS: a[0] must be 1 but it is not.')
+# 		raise ValueError('Cannot convert a MP transfer function to dSS: a[0] must be 1, but it is not.')
 #
 # 	alpha = a
 # 	beta = b
