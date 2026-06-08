@@ -12,7 +12,7 @@ import pytest
 import numpy
 import mpmath
 # from numpy.testing import assert_allclose
-# from fixif.func_aux import *
+# from fixif.test_func_aux import *
 
 from fixif.LTI import dSSmp, iter_random_dSSmp, Filter, iter_random_dSS
 # from fixif.SIF import SIF

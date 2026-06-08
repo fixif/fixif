@@ -32,8 +32,8 @@ from fixif.Structures import iterAllRealizationsRandomFilter
 from fixif.LTI import Filter, iter_random_Filter, iter_random_dSS, random_Filter, random_dSS, dSS
 #from scipy.weave import inline
 
-# from func_aux.get_data import get_data
-# from func_aux.MtlbHelper import MtlbHelper
+# from test_func_aux.get_data import get_data
+# from test_func_aux.MtlbHelper import MtlbHelper
 
 import mpmath
 from mpmath import *

@@ -9,7 +9,7 @@ where
 - the v_i are n variables (those FPF is given)
 The bounds of the sum s is given (it can be evaluated with WCPG when the SoP are used in a filter/controller)
 
-The class is based on the SoP class (in func_aux)
+The class is based on the SoP class (in test_func_aux)
 """
 
 
