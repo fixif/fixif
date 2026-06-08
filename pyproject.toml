@@ -10,10 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "GPL3" }
 authors = [{ name = "Thibault Hilaire", email = "thibault.hilaire@lip6.fr" }, { name = "Anastasia Volkova", email = "anastasia.volkova@inria.fr"}]
-dependencies = []
-
-[project.optional-dependencies]
-dev = [
+dependencies = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "ruff>=0.4",
@@ -21,6 +18,12 @@ dev = [
     "scipy>=1.17",
     "mpmath>=1.4",
     "slycot>=0.6"
+]
+
+[project.optional-dependencies]
+dev = [
+    "coverage>=7.14.1",
+    "scipy-stubs~=1.17.1",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -35,8 +38,16 @@ source = ["fixif/"]
 omit = ["tests/*"]
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP"]
+ignore = [
+    "N999",
+    "N801",
+    "N803",
+    "N802",
+    "N806",
+]
+
