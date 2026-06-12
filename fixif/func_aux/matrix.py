@@ -11,15 +11,17 @@ class matrix(arb_mat):
     `plus some extra methods to help its use (like numpy conversion, slices, etc.)"""
     
     def __init__(self, *args):
-        if isinstance(args[0], np.ndarray):
+        if len(args)==1 and isinstance(args[0], np.ndarray):
             M = np.atleast_2d(np.array(args[0], dtype=float))
             # copy the data
             arb_mat.__init__(self, *M.shape)
             for i, j in np.ndindex(M.shape):
                 self[i, j] = M[i, j]
 
-        elif isinstance(args[0], int) or isinstance(args[0], float):
+        elif  len(args)==1 and isinstance(args[0], (int,float)):
             arb_mat.__init__(self, [[args[0]]])
+        elif  len(args)==1 and isinstance(args[0], list) and all(isinstance(i, (int, float)) for i in args[0]):
+            arb_mat.__init__(self, [args[0]])
         else:
             # otherwise call arb_mat super
             arb_mat.__init__(self, *args)
@@ -67,6 +69,60 @@ class matrix(arb_mat):
 
     def transpose(self):
         return matrix(super().transpose())
+
+
+    def __getitem__(self, key):
+        # scalar m[i, j]
+        if isinstance(key, tuple) and len(key) == 2:
+            row_key, col_key = key
+
+            # for integer, ask arb_mat
+            if isinstance(row_key, int) and isinstance(col_key, int):
+                return super().__getitem__(key)
+
+            # for slices
+            rows = self._resolve(row_key, self.nrows())
+            cols = self._resolve(col_key, self.ncols())
+
+            result = matrix(len(rows), len(cols))
+            for i, r in enumerate(rows):
+                for j, c in enumerate(cols):
+                    result[i, j] = super().__getitem__((r, c))
+            return result
+
+        # m[i] or m[i:k] -> rows
+        if isinstance(key, (int, slice)):
+            rows = self._resolve(key, self.nrows())
+            ncols = self.ncols()
+            result = matrix(len(rows), ncols)
+            for i, r in enumerate(rows):
+                for j in range(ncols):
+                    result[i, j] = super().__getitem__((r, j))
+            return result
+
+        raise TypeError(f"unsupported index type: {type(key)}")
+
+    def _resolve(self, key: int | slice, size: int) -> list[int]:
+        """Convert an int or slice to a list of indices.
+
+        Args:
+            key:  An integer index or a slice object.
+            size: The dimension size (nrows or ncols).
+
+        Returns:
+            List of integer indices.
+
+        Raises:
+            IndexError: If an integer index is out of range.
+        """
+        if isinstance(key, int):
+            if key < -size or key >= size:
+                raise IndexError(f"index {key} out of range for size {size}")
+            return [key % size]
+        if isinstance(key, slice):
+            return list(range(*key.indices(size)))
+        raise TypeError(f"unsupported index type: {type(key)}")
+
 
 # ──────────────────────────────────────────────
 # Construction

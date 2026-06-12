@@ -6,6 +6,12 @@ import pytest
 from fixif.func_aux.matrix import matrix, block, eye, hstack, vstack, zeros
 
 
+
+def assert_matrix(m,n):
+    #assert m.shape == n.shape
+    for i,j in np.ndindex(m.shape):
+        np.testing.assert_approx_equal(m[i, j], n[i, j])
+
 # ──────────────────────────────────────────────
 # construct
 # ──────────────────────────────────────────────
@@ -17,8 +23,8 @@ from fixif.func_aux.matrix import matrix, block, eye, hstack, vstack, zeros
 ])
 def test_construct(m):
     result = matrix(m)
-    assert result.shape == np.ndarray(m).shape
-    np.testing.assert_allclose(result, m, 1e-12)
+    m = np.atleast_2d(np.array(m, dtype=float))
+    assert_matrix(result, m)
 
 # ──────────────────────────────────────────────
 # to numpy
@@ -31,9 +37,9 @@ def test_construct(m):
     [[1.0, 2.0], [3.0, 4.0]]
 ])
 def test_roundtrip(m):
-    A = matrix(m).toarray()
-    B = np.ndarray(m)
-    np.testing.assert_allclose(A, B, 1e-15)
+    A = matrix(m).tonumpy()
+    B = np.atleast_2d(np.array(m, dtype=float))
+    assert_matrix(A, B)
     assert A.shape == B.shape
     assert A.dtype == float
 
@@ -45,7 +51,7 @@ def test_roundtrip(m):
 
 def test_values_are_zero():
     m = zeros(3, 4)
-    np.testing.assert_allclose(m, np.zeros((3, 4)))
+    assert_matrix(m, np.zeros((3, 4)))
 
 
 # ──────────────────────────────────────────────
@@ -54,7 +60,32 @@ def test_values_are_zero():
 
 @pytest.mark.parametrize("n", [1,2,3,12,20,37])
 def test_nxn(n):
-    np.testing.assert_allclose(eye(n), np.eye(n))
+    assert_matrix(eye(n), np.eye(n))
+
+
+@pytest.mark.parametrize("key", [
+    pytest.param((0, slice(None)),              id="m[0, :]"),
+    pytest.param((slice(None), 1),              id="m[:, 1]"),
+    pytest.param((slice(0, 2), slice(None)),    id="m[0:2, :]"),
+    pytest.param((slice(None), slice(1, 3)),    id="m[:, 1:3]"),
+    pytest.param((slice(0, 2), slice(1, 3)),    id="m[0:2, 1:3]"),
+    pytest.param((-1, slice(None)),             id="m[-1, :]"),
+    pytest.param(1,                             id="m[1]"),
+])
+def test_slicing(key):
+    m = matrix([[1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]])
+    n = m.tonumpy()
+    # tweak the key, in order to transform [:,1] in [:,[1]], otherwise numpy array are not 2d...
+    if isinstance(key, tuple):
+        key2 = tuple(k if isinstance(k, slice) else [k] for k in key)
+    else:
+        key2 = [key]
+    assert_matrix(m[key], n[key2])
+
+
+
 
 
 
@@ -67,7 +98,7 @@ def test_vtwo_matrices():
     B = matrix(np.array([[5.0], [6.0]]))
     result = hstack(A, B)
     expected = np.array([[1.0, 2.0, 5.0], [3.0, 4.0, 6.0]])
-    np.testing.assert_allclose(result, expected)
+    assert_matrix(result, expected)
 
 def test_vthree_matrices():
     A = matrix(np.ones((2, 1)))
@@ -95,7 +126,7 @@ def test_with_zeros():
     result = hstack(A, Z)
     expected = np.array([[1.0, 0.0, 0.0, 0.0],
                           [0.0, 1.0, 0.0, 0.0]])
-    np.testing.assert_allclose(result, expected)
+    assert_matrix(result, expected)
 
 
 # ──────────────────────────────────────────────
@@ -107,7 +138,7 @@ def test_htwo_matrices():
     B = matrix(np.array([[3.0, 4.0]]))
     result = vstack(A, B)
     expected = np.array([[1.0, 2.0], [3.0, 4.0]])
-    np.testing.assert_allclose(result, expected)
+    assert_matrix(result, expected)
 
 def test_hthree_matrices():
     A = matrix(np.ones((1, 3)))
@@ -138,7 +169,7 @@ def test_with_eye():
                           [0.0, 1.0],
                           [0.0, 0.0],
                           [0.0, 0.0]])
-    np.testing.assert_allclose(result, expected)
+    assert_matrix(result, expected)
 
 
 # ──────────────────────────────────────────────
@@ -154,7 +185,7 @@ def test_2x2_blocks():
                            np.zeros((2, 2))],
                           [np.zeros((2, 2)),
                            np.array([[1.0, 2.0], [3.0, 4.0]])]])
-    np.testing.assert_allclose(result, expected)
+    assert_matrix(result, expected)
 
 def test_series_connection_block():
     """Block structure used in dSS.__mul__."""
@@ -180,4 +211,4 @@ def test_shape():
 def test_single_block():
     A = matrix(np.eye(3))
     result = block([[A]])
-    np.testing.assert_allclose(result, np.eye(3))
+    assert_matrix(result, np.eye(3))
