@@ -3,17 +3,27 @@ This file contains Object and methods for a Discrete State Space
 """
 
 from copy import copy
+from typing import Self
 
-from numpy import c_, concatenate, count_nonzero, delete, dot, eye, identity, r_, sqrt, zeros
-from numpy import matrix as mat
-from numpy.core.umath import cos, pi, sin
-from numpy.linalg import LinAlgError, inv, matrix_rank, norm, solve
-from numpy.random.mtrand import rand, randint, randn
+import numpy as np
+from flint import acb, acb_mat, arb_mat
+from numpy import dot
+
+# from numpy import c_, concatenate, count_nonzero, delete, dot, eye, identity, r_, sqrt, zeros
+# from numpy import matrix as mat
+# from numpy.core.umath import cos, pi, sin
+from numpy.linalg import LinAlgError, solve
+
+#from numpy.random.mtrand import rand, randint, randn
+from numpy.random import default_rng
 from scipy.linalg import solve_discrete_lyapunov
 from scipy.signal import ss2tf
 
+from fixif.func_aux.arb_mtx_helper import arb2numpy, eye, something2arb, zeros, numpy2arb
+
 #from fixif.WCPG import WCPG_ABCD
 
+rng = default_rng()
 
 # noinspection PyPep8Naming
 class dSS:
@@ -61,10 +71,11 @@ class dSS:
 		.. TODO
 
 		"""
-        self._A = mat(A)  # User input
-        self._B = mat(B)
-        self._C = mat(C)
-        self._D = mat(D)
+        # conversion to arb_mat
+        self._A = something2arb(A)
+        self._B = something2arb(B)
+        self._C = something2arb(C)
+        self._D = something2arb(D)
 
         # Initialize state space dimensions from user input and verify coherence
         (self._n, self._p, self._q) = self._check_dimensions()
@@ -130,7 +141,7 @@ class dSS:
         return self._Wc
 
     @property
-    def size(self):
+    def size(self) -> (int, int, int):
         """Returns the size of state space, as a tuple (n,p,q)"""
         return self._n, self._p, self._q
 
@@ -175,21 +186,21 @@ class dSS:
             method = dSS._W_method
 
         if method == 'linalg':
-            X = solve_discrete_lyapunov(self._A.transpose(), self._C.transpose() * self._C)
-            self._Wo = mat(X)
-
+            self._Wo = solve_discrete_lyapunov(arb2numpy(self._A).transpose(), arb2numpy(self._C.transpose() * self._C))
+            print("Wo has been computed from float64 with float64 precision (`linalg` algorithm)\n")
         elif method == 'slycot':
             # Solve the Lyapunov equation by calling the Slycot function sb03md
             # If we don't use "copy" in the call, the result is plain false
 
             try:
                 from slycot import sb03md57
-                Ar, Ur, X, scale, sep, ferr, w = sb03md57(copy(self._A.transpose()), eye(self.n, self.n),
-                                                  -self._C.transpose() * self._C, dico='D', trana='T')
-                self._Wo = mat(X)
+                _, _, self._Wo, _, _, _, _ = sb03md57(arb2numpy(self._A.transpose()), np.eye(self.n, self.n),
+                                                          -arb2numpy(self._C.transpose() * self._C), dico='D', trana='T')
+                # TODO: use the estimate forward error bound given by sb03md57 ??
+                print("Wo has been computed from float64 with float64 precision (slycot `sb03md57` algorithm)\n")
 
             except ImportError:
-                self.calc_Wo('linalg')
+                self.calc_Wo("linalg")
 
         else:
             raise ValueError(f"dSS: Unknown method to calculate observers (method={method})")
@@ -231,20 +242,21 @@ class dSS:
             method = dSS._W_method
 
         if method == 'linalg':
-            X = solve_discrete_lyapunov(self._A, self._B * self._B.transpose())
-            self._Wc = mat(X)
+            self._Wc = solve_discrete_lyapunov(arb2numpy(self._A), arb2numpy(self._B * self._B.transpose()))
+            print("Wc has been computed from float64 with float64 precision (`linalg` algorithm)\n")
 
         elif method == 'slycot':
             # Solve the Lyapunov equation by calling the Slycot function sb03md
             # If we don't use "copy" in the call, the result is plain false
             try:
                 from slycot import sb03md57
-                Ar, Ur, X, scale, sep, ferr, w = sb03md57(copy(self._A), eye(self.n, self.n),
-                                                          -self._B * self._B.transpose(), dico='D', trana='T')
-                self._Wc = mat(X)
+                _, _, self._Wc, _, _, _, _ = sb03md57(arb2numpy(self._A), np.eye(self.n, self.n),
+                                                          arb2numpy(-self._B * self._B.transpose()), dico='D', trana='T')
+                # TODO: use the estimate forward error bound given by sb03md57 ??
+                print("Wc has been computed from float64 with float64 precision (slycot `sb03md57` algorithm)\n")
 
             except ImportError:
-                self.calc_Wc(method='linalg')
+                self.calc_Wc(method="linalg")
 
         else:
             raise ValueError(f"dSS: Unknown method to calculate observers (method={method})")
@@ -272,13 +284,13 @@ class dSS:
         try:
             # less errors when Wc is big and Wo is small
             M = self._C * self.Wc * self._C.transpose() + self._D * self._D.transpose()
-            self._H2norm = sqrt(M.trace())[0, 0]
+            self._H2norm = M.trace()[0, 0].sqrt()
         except ValueError:  # TODO: check what kind of exception we need to catch here
             try:
                 M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
-                self._H2norm = sqrt(M.trace())[0, 0]
+                self._H2norm = M.trace()[0, 0].sqrt()
             except ValueError:
-                raise ValueError("dSS: h2-norm : Impossible to compute M. Default value is 'inf'")
+                raise ValueError("dSS: h2-norm : Impossible to compute")
 
         return self._H2norm
 
@@ -351,8 +363,8 @@ class dSS:
         # compute the DC gain if it is not already done
         if self._DC_gain is None:
             try:
-                self._DC_gain = self._C * inv(identity(self._n) - self._A) * self._B + self._D
-            except LinAlgError:
+                self._DC_gain = self._C * (eye(self._n) - self._A) .inv()* self._B + self._D
+            except ZeroDivisionError:
                 raise ValueError('dSS: Impossible to compute DC-gain from current discrete state space')
 
         return self._DC_gain
@@ -362,48 +374,42 @@ class dSS:
 		Apply a similarity transform T
 		"""
         #TODO: check T size
-        #TODO: check computational errors !
-        Tinv = inv(T)
+        Tinv = arb2numpy(T).inv()
         self._A = Tinv * self._A * T
         self._B = Tinv * self._B
         self._C = self._C * T
-
-    # D is unchanged
+        # D is unchanged
 
     # ======================================================================================
-    def _check_dimensions(self):
+    def _check_dimensions(self) -> (int,int,int):
         """
 		Computes the number of inputs and outputs.
 		Check for concordance of the matrices' size
 		"""
 
         # A
-        a1, a2 = self._A.shape
-        if a1 != a2:
+        if self._A.nrows() != self._A.ncols():
             raise ValueError('dSS: A is not a square matrix')
-        n = a1
+        n = self._A.nrows()
 
         # B
-        b1, b2 = self._B.shape
-        if b1 != n:
+        if self._B.nrows() != n:
             raise ValueError('dSS: A and B should have the same number of rows')
-        inputs = b2
+        inputs = self._B.ncols()
 
         # C
-        c1, c2 = self._C.shape
-        if c2 != n:
+        if self._C.ncols() != n:
             raise ValueError('dSS: A and C should have the same number of columns')
-        outputs = c1
+        outputs = self._C.nrows()
 
         # D
-        d1, d2 = self._D.shape
-        if d1 != outputs or d2 != inputs:
+        if self._D.nrows() != outputs or self._D.ncols() != inputs:
             raise ValueError('dSS: D should be consistent with C and B')
 
         return n, outputs, inputs
 
     # ======================================================================================
-    def __str__(self):
+    def __str__(self) -> str:
         """
 		Display the state-space
 		"""
@@ -436,37 +442,14 @@ class dSS:
 
         return str_mat
 
-    # ======================================================================================
-    def __mul__(self, other):
-        """
-		We overload the multiplication operator so that two state spaces in series  give
-		a resultant state space with formula checked in matlab and available at :
-		https://en.wikibooks.org/wiki/Control_Systems/Block_Diagrams
-		To be able to multiply matrixes, systems must respect some constraints
-		"""
 
-        n1, p1, q1 = self.size
-        n2, p2, q2 = other.size
-
-        if p1 != q2:
-            raise ValueError(
-                "dSS: second state space should have same number of inputs as first state number of outputs")
-
-        # TODO: possible simplification if self.A==other.A ??
-
-        amul = r_[c_[self.A, self.B * other.C], c_[zeros((n2, n1)), other.A]]
-        bmul = r_[self.B * other.D, other.B]
-        cmul = c_[self.C, self.D * other.C]
-        dmul = self.D * other.D
-
-        return dSS(amul, bmul, cmul, dmul)
 
     # ======================================================================================
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Returns the representation of the dSS"""
         return str(self)
 
-    def __getitem__(self, *args):
+    def __getitem__(self, *args) -> Self:
         """Returns a subsystem"""
         return dSS(self._A, self._B[:, args[0][1]], self._C[args[0][0], :], self._D[args[0][0], args[0][1]])
 
@@ -483,7 +466,7 @@ class dSS:
         if self._p != 1 or self._q != 1:
             raise ValueError('dSS: the state-space must be SISO to be converted in transfer function')
         from fixif.LTI import dTF
-        num, den = ss2tf(self._A, self._B, self._C, self._D)
+        num, den = ss2tf(arb2numpy(self._A), arb2numpy(self._B), arb2numpy(self._C), arb2numpy(self._D))
         return dTF(num[0], den)
 
     def simplify(self):
@@ -574,7 +557,8 @@ class dSS:
         assert norm(self.C * self.A * self.A * self.B - other.C * other.A * other.A * other.B) < eps
         assert norm(self.D - other.D) < eps
 
-    def balanced(self):
+
+    def balanced(self) -> Self:
         """
 		Returns an equivalent balanced state-space system
 
@@ -595,7 +579,8 @@ class dSS:
                              "(the selected order is greater than the order of a minimal realization of the system)")
         return dSS(Ar, Br, Cr, self.D)
 
-    def __add__(self, S):
+
+    def __add__(self, other:Self) -> Self:
         """
 		This method computes the difference between self and a filter S given in the argument such that
 		the result filter H := self + S has
@@ -608,20 +593,23 @@ class dSS:
 
 		Returns a dSS which is equal to (self - S)
 		"""
+        # check type
+        if not isinstance(other, dSS):
+            raise TypeError("dSS: cannot add dSS with something else than another dSS")
 
         #TODO: check size and raise error
 
-        newA = concatenate((self.A, zeros([self.n, S.n])), axis=1)
-        tmp = concatenate((zeros([S.n, self.n]), S.A), axis=1)
+        newA = concatenate((self.A, zeros([self.n, other.n])), axis=1)
+        tmp = concatenate((zeros([other.n, self.n]), other.A), axis=1)
         newA = concatenate((newA, tmp), axis=0)
 
-        newB = concatenate((self.B, S.B), axis=0)
-        newC = concatenate((self.C, S.C), axis=1)
-        newD = self.D + S.D
+        newB = concatenate((self.B, other.B), axis=0)
+        newC = concatenate((self.C, other.C), axis=1)
+        newD = self.D + other.D
 
         return dSS(newA, newB, newC, newD)
 
-    def __sub__(self, S):
+    def __sub__(self, other: Self) -> Self:
         """
 		This method computes the difference between self and a dSS S given in the argument such that
 		the result dSS H := self - S has
@@ -635,18 +623,70 @@ class dSS:
 
 		Returns a dSS which is equal to (self - S)
 		"""
+        # check type
+        if not isinstance(other, dSS):
+            raise TypeError("dSS: cannot sub dSS with something else than another dSS")
+
 
         # TODO: check size and raise error
 
-        newA = concatenate((self.A, zeros([self.n, S.n])), axis=1)
-        tmp = concatenate((zeros([S.n, self.n]), S.A), axis=1)
+        newA = concatenate((self.A, zeros([self.n, other.n])), axis=1)
+        tmp = concatenate((zeros([other.n, self.n]), other.A), axis=1)
         newA = concatenate((newA, tmp), axis=0)
 
-        newB =concatenate((self.B, S.B), axis=0)
-        newC = concatenate((self.C, -S.C), axis=1)
-        newD = self.D - S.D
+        newB =concatenate((self.B, other.B), axis=0)
+        newC = concatenate((self.C, -other.C), axis=1)
+        newD = self.D - other.D
 
         return dSS(newA, newB, newC, newD)
+
+
+# ======================================================================================
+    def __mul__(self, other: Self) -> Self:
+        """
+		We overload the multiplication operator so that two state spaces in series
+
+		Given S1 := (A1, B1, C1, D1) and S2 := (A2, B2, C2, D2),
+        the series connection S = S2 * S1 is defined by:
+
+        A = [ A1        0  ]
+            [ B2*C1    A2  ]
+
+        B = [ B1    ]
+            [ B2*D1 ]
+
+        C = [ D2*C1  C2 ]
+
+        D = D2 * D1
+
+        where the global state is x = (x1, x2)^T,
+        x1 being the state of SS1 (size n1) and
+        x2 being the state of SS2 (size n2).
+
+        The input of SS2 is the output of SS1: u2 = y1 = C1*x1 + D1*u
+
+
+		To be able to multiply matrixes, systems must respect some constraints
+		"""
+        # check type
+        if not isinstance(other, dSS):
+            raise TypeError("dSS: cannot add dSS with something else than another dSS")
+
+        n1, p1, q1 = self.size
+        n2, p2, q2 = other.size
+
+        if p1 != q2:
+            raise ValueError(
+                "dSS: second state space should have same number of inputs as first state number of outputs")
+
+        # TODO: possible simplification if self.A==other.A ??
+
+        amul = r_[c_[self.A, self.B * other.C], c_[zeros((n2, n1)), other.A]]
+        bmul = r_[self.B * other.D, other.B]
+        cmul = c_[self.C, self.D * other.C]
+        dmul = self.D * other.D
+
+        return dSS(amul, bmul, cmul, dmul)
 
 
 # noinspection PyPep8Naming
@@ -683,25 +723,25 @@ def iter_random_dSS(number, stable=True, n: tuple[int, int] =(5, 10), p:tuple[in
 	"""
     for i in range(number):
         if stable:
-            yield random_dSS(randint(*n), randint(*p), randint(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
+            yield random_dSS(rng.integers(*n), rng.integers(*p), rng.integers(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
         else:
-            nn = randint(low=n[0], high=n[1])
+            nn = rng.integers(low=n[0], high=n[1])
             if p == 1 and q == 1:
                 pp = 1
                 qq = 1
             else:
-                pp = randint(low=p[0],  high=p[1])
-                qq = randint(low=q[0],  high=q[1])
-            A = mat(rand(nn, nn))
-            B = mat(rand(nn, qq))
-            C = mat(rand(pp, nn))
-            D = mat(rand(pp, qq))
+                pp = rng.integers(low=p[0],  high=p[1])
+                qq = rng.integers(low=q[0],  high=q[1])
+            A = numpy2arb(rng.normal(size=(nn, nn)))
+            B = numpy2arb(rng.normal(size=(nn, qq)))
+            C = numpy2arb(rng.normal(size=(pp, nn)))
+            D = numpy2arb(rng.normal(size=(pp, qq)))
 
             yield dSS(A, B, C, D)
 
 
 # noinspection PyPep8Naming
-def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5):
+def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5) -> Self: 
     """
 	Generate ONE n-th order random  stable state-spaces, with q inputs and p outputs
 	copy/adapted from control-python library (Richard Murray): https://sourceforge.net/projects/python-control/
@@ -731,12 +771,12 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
         raise ValueError(f"nb of outputs must be a positive integer. #outputs = {p}.")
 
     # Make some poles for A.  Preallocate a complex array.
-    poles = zeros(n) + zeros(n) * 0.j
+    poles = np.zeros(n) + np.zeros(n) * 0.j
     i = 0
 
     while i < n:
 
-        if rand() < pRepeat and i != 0 and i != n - 1:
+        if rng.random() < pRepeat and i != 0 and i != n - 1:
             # Small chance of copying poles, if we're not at the first or last  element.
             if poles[i - 1].imag == 0:
                 poles[i] = poles[i - 1]  # Copy previous real pole.
@@ -746,20 +786,20 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
                 poles[i:i + 2] = poles[i - 2:i]  # Copy previous complex conjugate pair of poles.
                 i += 2
 
-        elif rand() < pReal or i == n - 1:
-            poles[i] = 2. * rand() - 1.  # No-oscillation pole.
+        elif rng.random() < pReal or i == n - 1:
+            poles[i] = 2. * rng.random() - 1.  # No-oscillation pole.
             i += 1
 
         else:
-            mag = rand()  # Complex conjugate pair of oscillating poles.
-            phase = 2. * pi * rand()
-            poles[i] = complex(mag * cos(phase), mag * sin(phase))
+            mag = rng.random()  # Complex conjugate pair of oscillating poles.
+            phase = 2. * np.pi * rng.random()
+            poles[i] = complex(mag * np.cos(phase), mag * np.sin(phase))
             poles[i + 1] = complex(poles[i].real, -poles[i].imag)
             i += 2
 
     # Now put the poles in A as real blocks on the diagonal.
 
-    A = zeros((n, n))
+    A = np.zeros((n, n))
     i = 0
 
     while i < n:
@@ -775,7 +815,7 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
             i += 2
 
     while True:  # Finally, apply a transformation so that A is not block-diagonal.
-        T = randn(n, n)
+        T = rng.standard_normal((n, n))
 
         try:
             A = dot(solve(T, A), T)  # A = T \ A * T
@@ -786,26 +826,26 @@ def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzer
             pass
 
     # Make the remaining matrices.
-    B = randn(n, q)
-    C = randn(p, n)
-    D = randn(p, q)
+    B = rng.standard_normal((n, q))
+    C = rng.standard_normal((p, n))
+    D = rng.standard_normal((p, q))
 
     # Make masks to zero out some of the elements.
     while True:
-        Bmask = rand(n, q) < pBCmask
+        Bmask = rng.standard_normal((n, q)) < pBCmask
         if not Bmask.all():  # Retry if we get all zeros.
             break
 
     while True:
-        Cmask = rand(p, n) < pBCmask
+        Cmask = rng.standard_normal((p, n)) < pBCmask
         if not Cmask.all():  # Retry if we get all zeros.
             break
 
-    if rand() < pDzero:
-        Dmask = zeros((p, q))
+    if rng.random() < pDzero:
+        Dmask = np.zeros((p, q))
     else:
         while True:
-            Dmask = rand(p, q) < pDmask
+            Dmask = rng.random((p, q)) < pDmask
             if not Dmask.all():  # Retry if we get all zeros.
                 break
 

@@ -5,17 +5,19 @@ This file contains tests for the dSS class and its methods
 from importlib.util import find_spec
 
 import pytest
+from fixif.func_aux.arb_mtx_helper import numpy2arb, arb2numpy
 from numpy import absolute, all, array, eye, zeros
 from numpy import matrix as mat
 from numpy.linalg import eigvals, norm
 from numpy.random import randint
 from numpy.testing import assert_allclose
 
-from fixif.LTI import dSS, iter_random_dSS
+from fixif.LTI import dSS, iter_random_dSS, random_dSS
 
 
 # FIXME: move this test somewhere else...
 def test_construct_sollya_slycot(capsys):
+	"""simple test to check if sollya and slycot are installed"""
 	# tell if sollya or slycot are disabled
 	with capsys.disabled():
 		print("")
@@ -79,14 +81,15 @@ def test_construction():
 
 @pytest.mark.parametrize("S", iter_random_dSS(30, True, n=(2, 40), p=(2, 15), q=(2, 15)))
 def test_random_dSS(S):
+	"""Test random_dSS generator"""
 	# test for correct sizes of random dSS
-	assert S.A.shape == (S.n, S.n)
-	assert S.B.shape == (S.n, S.q)
-	assert S.C.shape == (S.p, S.n)
-	assert S.D.shape == (S.p, S.q)
+	assert S.A.nrows(),S.A.ncols() == (S.n, S.n)
+	assert S.B.nrows(),S.B.ncols() == (S.n, S.q)
+	assert S.C.nrows(),S.C.ncols() == (S.p, S.n)
+	assert S.D.nrows(),S.D.ncols() == (S.p, S.q)
 
 	# test for spectral radius lower than 1
-	assert max(abs(eigvals(S.A))) < 1
+	assert max(e.abs_upper() for e in S.A.eig(multiple=True)) < 1
 
 
 
@@ -99,8 +102,8 @@ def test_Gramians(S):
 
 	for method, tolerance in [('linalg', 1e-3), ('slycot', 1e-5)]:
 		dSS._W_method = method
-		assert_allclose(array(S.A * S.Wc * S.A.transpose() + S.B * S.B.transpose()), array(S.Wc), rtol=tolerance)
-		assert_allclose(array(S.A.transpose() * S.Wo * S.A + S.C.transpose() * S.C), array(S.Wo), rtol=tolerance)
+		assert_allclose(arb2numpy(S.A) @ S.Wc @ arb2numpy(S.A.transpose()) + arb2numpy(S.B * S.B.transpose()), S.Wc, rtol=tolerance)
+		assert_allclose(arb2numpy(S.A.transpose()) @ S.Wo @ arb2numpy(S.A) + arb2numpy(S.C.transpose() * S.C), S.Wo, rtol=tolerance)
 
 		# We have to explicitely remove Wo and Wc from S so that those are calculated again
 		S._Wo = None
@@ -146,7 +149,6 @@ def calc_wcpg_approx(S, nit):
 
 @pytest.mark.parametrize("S", iter_random_dSS(20, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
 def test_wcpg(S):
-
 	"""
 	Test Worst Case Peak Gain calculation
 	"""
@@ -160,7 +162,7 @@ def test_wcpg(S):
 
 @pytest.mark.parametrize("S", iter_random_dSS(50, True, (5, 10), (1, 5), (1, 5)))
 def test_subsystems(S):
-
+	"""Test subsystems calculation"""
 	# random slices
 	beg_i = randint(0, S.p)
 	end_i = randint(beg_i, S.p)
@@ -181,14 +183,17 @@ def test_subsystems(S):
 
 @pytest.mark.parametrize("S", iter_random_dSS(20))
 def test_str(S):
+	"""Test string representation"""
 	str(S)
 
 @pytest.mark.parametrize("S", iter_random_dSS(20))
 def test_repr(S):
+	"""Test representation"""
 	repr(S)
 
 @pytest.mark.parametrize("S", iter_random_dSS(20, False, n=(5, 15), p=(1, 2), q=(1, 2)))
 def test_to_dTF(S):
+	"""Test transformation from dSS to dTF and dTF to dSS"""
 	if S.p > 1 or S.q > 1:
 		print(f"Case of {S.p} and {S.q}")
 		assert True
@@ -200,6 +205,7 @@ def test_to_dTF(S):
 
 @pytest.mark.parametrize("S", iter_random_dSS(5, stable=True, n=(2, 15), p=(1, 5), q=(1, 5)))
 def test_balanced(S):
+	"""Test balanced realization calculation"""
 	# should raise an exception if slycot is not installed
 	if find_spec('slycot') is  None:
 		with pytest.raises(ImportError):
@@ -213,10 +219,27 @@ def test_balanced(S):
 		my_assert_allclose(Sb.Wo, 'Wo', Sb.Wc, 'Wc', atol=1e-3)
 
 
-# TODO: still need to test:
-# H2norm
-# DC-gain
-# add, mul, sub
-# simplify
+@pytest.mark.parametrize("S", iter_random_dSS(5, stable=True, n=(2, 15), p=(1, 5), q=(1, 5)))
+def test_operations(S):
+	"""Test the add, sub and mul operations"""
+	# check types
+	with pytest.raises(TypeError):
+		S += 1
+	with pytest.raises(TypeError):
+		S -= 1
+	with pytest.raises(TypeError):
+		S *= 2
+
+	S1 = S + S
+	S2 = S + random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5)
+	S3 = S - S
+	S4 = random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5) - S
+	S5 = S - random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5)
+	S6 = S * random_dSS(n=randint(5, 10), q=S.p, p=randint(1, 5), pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5)
+
+# TODO: add unit test for H2norm
+# TODO: add unit test for DC-gain
+# TODO add unit test for add, mul, sub
+# TODO: add unit test for simplify
 
 # TODO: filter `RandomFilter-12/1/1-833056621` cannot be converted in rhoDFIIt without NaN... to be investigated
