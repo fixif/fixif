@@ -5,7 +5,7 @@ This file contains tests for the dSS class and its methods
 from importlib.util import find_spec
 
 import pytest
-from fixif.func_aux.arb_mtx_helper import numpy2arb, arb2numpy
+from fixif.func_aux.matrix import matrix
 from numpy import absolute, all, array, eye, zeros
 from numpy import matrix as mat
 from numpy.linalg import eigvals, norm
@@ -102,8 +102,8 @@ def test_Gramians(S):
 
 	for method, tolerance in [('linalg', 1e-3), ('slycot', 1e-5)]:
 		dSS._W_method = method
-		assert_allclose(arb2numpy(S.A) @ S.Wc @ arb2numpy(S.A.transpose()) + arb2numpy(S.B * S.B.transpose()), S.Wc, rtol=tolerance)
-		assert_allclose(arb2numpy(S.A.transpose()) @ S.Wo @ arb2numpy(S.A) + arb2numpy(S.C.transpose() * S.C), S.Wo, rtol=tolerance)
+		assert_allclose(S.A.tonumpy() @ S.Wc @ S.A.transpose().tonumpy() + (S.B * S.B.transpose()).tonumpy(), S.Wc, rtol=tolerance)
+		assert_allclose(S.A.transpose().tonumpy() @ S.Wo @ S.A.tonumpy() + (S.C.transpose() * S.C).tonumpy(), S.Wo, rtol=tolerance)
 
 		# We have to explicitely remove Wo and Wc from S so that those are calculated again
 		S._Wo = None

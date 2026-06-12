@@ -6,71 +6,73 @@ import numpy as np
 from flint import arb_mat
 
 
-# ──────────────────────────────────────────────
-# Conversions
-# ──────────────────────────────────────────────
+class matrix(arb_mat):
+    """arbitrary precision ball matrices based on arb_mat
+    `plus some extra methods to help its use (like numpy conversion, slices, etc.)"""
+    
+    def __init__(self, *args):
+        if isinstance(args[0], np.ndarray):
+            M = np.atleast_2d(np.array(args[0], dtype=float))
+            # copy the data
+            arb_mat.__init__(self, *M.shape)
+            for i, j in np.ndindex(M.shape):
+                self[i, j] = M[i, j]
 
-def something2arb(M) -> arb_mat:
-    if isinstance(M, np.ndarray):
-        return numpy2arb(M)
-    elif isinstance(M, int) or isinstance(M, float):
-        return arb_mat([[M]])
-    else:
-        return arb_mat(M)
+        elif isinstance(args[0], int) or isinstance(args[0], float):
+            arb_mat.__init__(self, [[args[0]]])
+        else:
+            # otherwise call arb_mat super
+            arb_mat.__init__(self, *args)
+    
 
-def numpy2arb(M: np.ndarray) -> arb_mat:
-    """Convert a 2D numpy array to an arb_mat.
+    def tonumpy(self) -> np.ndarray:
+        """Convert an arb_mat to a 2D numpy array (midpoints only).
+            ⚠️ Only the midpoint of each ball is extracted;
 
-    Args:
-        M: A 2D numpy array (or matrix).
+        Returns:
+            A 2D numpy array of float64.
 
-    Returns:
-        The corresponding :class:`arb_mat`.
+        Example::
 
-    Example::
-
-        >>> np_to_arb(np.eye(2))
-        [1, 0]
-        [0, 1]
-    """
-    M = np.atleast_2d(np.array(M, dtype=float))
-    # copy the data
-    A = arb_mat(*M.shape)
-    for i, j in np.ndindex(M.shape):
-        A[i, j] = M[i, j]
-    return A
+            >>> matrix([[1, 2], [3, 4]]).tonumpy()
+            array([[1., 2.],
+                   [3., 4.]])
+        """
+        A = np.zeros(self.shape, dtype=float)
+        for i, j in np.ndindex(A.shape):
+                A[i, j] = float(self[i, j].mid())
+        return A
 
 
-def arb2numpy(M: arb_mat) -> np.ndarray:
-    """Convert an arb_mat to a 2D numpy array (midpoints only).
+    @property
+    def shape(self) -> tuple:
+        """Return the shape of the matrix, as in numpy array."""
+        return self.nrows(), self.ncols()
 
-    Note:
-        Only the midpoint of each ball is extracted;
+    def __add__(self, other):
+        result = super().__add__(other)
+        return matrix(result)
 
-    Args:
-        M: An :class:`arb_mat`.
+    def __sub__(self, other):
+        result = super().__sub__(other)
+        return matrix(result)
 
-    Returns:
-        A 2D numpy array of float64.
+    def __neg__(self):
+        result = super().__neg__()
+        return matrix(result)
 
-    Example::
+    def __mul__(self, other):
+        result = super().__mul__(other)
+        return matrix(result)
 
-        >>> arb_to_np(arb_mat([[1, 2], [3, 4]]))
-        array([[1., 2.],
-               [3., 4.]])
-    """
-    nrows, ncols = M.nrows(), M.ncols()
-    A = np.zeros((nrows, ncols), dtype=float)
-    for i, j in np.ndindex(A.shape):
-            A[i, j] = float(M[i, j].mid())
-    return A
-
+    def transpose(self):
+        return matrix(super().transpose())
 
 # ──────────────────────────────────────────────
 # Construction
 # ──────────────────────────────────────────────
 
-def zeros(nrows: int, ncols: int) -> arb_mat:
+def zeros(nrows: int, ncols: int) -> matrix:
     """Return a zero :class:`arb_mat` of shape (nrows, ncols).
 
     Equivalent to :func:`numpy.zeros`.
@@ -82,10 +84,10 @@ def zeros(nrows: int, ncols: int) -> arb_mat:
     Returns:
         Zero matrix of shape ``(nrows, ncols)``.
     """
-    return arb_mat(nrows, ncols)
+    return matrix(nrows, ncols)
 
 
-def eye(n: int) -> arb_mat:
+def eye(n: int) -> matrix:
     """Return the n-by-n identity :class:`arb_mat`.
 
     Equivalent to :func:`numpy.eye`.
@@ -96,7 +98,7 @@ def eye(n: int) -> arb_mat:
     Returns:
         Identity matrix of shape ``(n, n)``.
     """
-    result = arb_mat(n, n)
+    result = matrix(n, n)
     for i in range(n):
         result[i, i] = 1
     return result
@@ -106,7 +108,7 @@ def eye(n: int) -> arb_mat:
 # Stacking / concatenation
 # ──────────────────────────────────────────────
 
-def hstack(*matrices: arb_mat) -> arb_mat:
+def hstack(*matrices: matrix) -> matrix:
     """Concatenate :class:`arb_mat` matrices horizontally.
 
     Equivalent to :func:`numpy.concatenate` along axis=1,
@@ -125,16 +127,16 @@ def hstack(*matrices: arb_mat) -> arb_mat:
     if any(m.nrows() != nrows for m in matrices):
         raise ValueError("All matrices must have the same number of rows")
     ncols = sum(m.ncols() for m in matrices)
-    result = arb_mat(nrows, ncols)
+    result = matrix(nrows, ncols)
     col_offset = 0
     for m in matrices:
-        for i,j in np.ndindex((nrows, m.ncols())):
+        for i,j in np.ndindex(m.shape):
              result[i, col_offset + j] = m[i, j]
         col_offset += m.ncols()
     return result
 
 
-def vstack(*matrices: arb_mat) -> arb_mat:
+def vstack(*matrices: matrix) -> matrix:
     """Concatenate :class:`arb_mat` matrices vertically.
 
     Equivalent to :func:`numpy.concatenate` along axis=0,
@@ -153,17 +155,17 @@ def vstack(*matrices: arb_mat) -> arb_mat:
     if any(m.ncols() != ncols for m in matrices):
         raise ValueError("All matrices must have the same number of columns")
     nrows = sum(m.nrows() for m in matrices)
-    result = arb_mat(nrows, ncols)
+    result = matrix(nrows, ncols)
     row_offset = 0
     for m in matrices:
-        for i,j in np.ndindex((m.nrows(), ncols)):
+        for i,j in np.ndindex(m.shape):
             result[row_offset + i, j] = m[i, j]
         row_offset += m.nrows()
     return result
 
 
 
-def block(blocks: list[list[arb_mat]]) -> arb_mat:
+def block(blocks: list[list[matrix]]) -> matrix:
     """Assemble an :class:`arb_mat` from nested lists of blocks.
 
     Equivalent to :func:`numpy.block`.

@@ -2,24 +2,17 @@
 This file contains Object and methods for a Discrete State Space
 """
 
-from copy import copy
 from typing import Self
 
 import numpy as np
-from flint import acb, acb_mat, arb_mat
 from numpy import dot
 
-# from numpy import c_, concatenate, count_nonzero, delete, dot, eye, identity, r_, sqrt, zeros
-# from numpy import matrix as mat
-# from numpy.core.umath import cos, pi, sin
 from numpy.linalg import LinAlgError, solve
-
-#from numpy.random.mtrand import rand, randint, randn
 from numpy.random import default_rng
 from scipy.linalg import solve_discrete_lyapunov
 from scipy.signal import ss2tf
 
-from fixif.func_aux.arb_mtx_helper import arb2numpy, eye, something2arb, zeros, numpy2arb
+from fixif.func_aux.matrix import matrix, eye, zeros, vstack, hstack, block
 
 #from fixif.WCPG import WCPG_ABCD
 
@@ -72,10 +65,10 @@ class dSS:
 
 		"""
         # conversion to arb_mat
-        self._A = something2arb(A)
-        self._B = something2arb(B)
-        self._C = something2arb(C)
-        self._D = something2arb(D)
+        self._A = matrix(A)
+        self._B = matrix(B)
+        self._C = matrix(C)
+        self._D = matrix(D)
 
         # Initialize state space dimensions from user input and verify coherence
         (self._n, self._p, self._q) = self._check_dimensions()
@@ -159,7 +152,7 @@ class dSS:
 		Available methods :
 
 		- ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
-		1 digit precision with bilinear algorithm for big matrixes (really bad).
+		1 digit precision with bilinear algorithm for big matrices (really bad).
 		not good enough with usual python data types
 
 		- ``slycot`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
@@ -186,7 +179,7 @@ class dSS:
             method = dSS._W_method
 
         if method == 'linalg':
-            self._Wo = solve_discrete_lyapunov(arb2numpy(self._A).transpose(), arb2numpy(self._C.transpose() * self._C))
+            self._Wo = solve_discrete_lyapunov(self._A.transpose().tonumpy(), (self._C.transpose() * self._C).tonumpy())
             print("Wo has been computed from float64 with float64 precision (`linalg` algorithm)\n")
         elif method == 'slycot':
             # Solve the Lyapunov equation by calling the Slycot function sb03md
@@ -194,8 +187,8 @@ class dSS:
 
             try:
                 from slycot import sb03md57
-                _, _, self._Wo, _, _, _, _ = sb03md57(arb2numpy(self._A.transpose()), np.eye(self.n, self.n),
-                                                          -arb2numpy(self._C.transpose() * self._C), dico='D', trana='T')
+                _, _, self._Wo, _, _, _, _ = sb03md57(self._A.transpose().tonumpy(), np.eye(self.n, self.n),
+                                                          (-self._C.transpose() * self._C).tonumpy(), dico='D', trana='T')
                 # TODO: use the estimate forward error bound given by sb03md57 ??
                 print("Wo has been computed from float64 with float64 precision (slycot `sb03md57` algorithm)\n")
 
@@ -242,7 +235,7 @@ class dSS:
             method = dSS._W_method
 
         if method == 'linalg':
-            self._Wc = solve_discrete_lyapunov(arb2numpy(self._A), arb2numpy(self._B * self._B.transpose()))
+            self._Wc = solve_discrete_lyapunov(self._A.tonumpy(), (self._B * self._B.transpose()).tonumpy())
             print("Wc has been computed from float64 with float64 precision (`linalg` algorithm)\n")
 
         elif method == 'slycot':
@@ -250,8 +243,8 @@ class dSS:
             # If we don't use "copy" in the call, the result is plain false
             try:
                 from slycot import sb03md57
-                _, _, self._Wc, _, _, _, _ = sb03md57(arb2numpy(self._A), np.eye(self.n, self.n),
-                                                          arb2numpy(-self._B * self._B.transpose()), dico='D', trana='T')
+                _, _, self._Wc, _, _, _, _ = sb03md57(self._A.tonumpy(), np.eye(self.n, self.n),
+                                                          (-self._B * self._B.transpose()).tonumpy(), dico='D', trana='T')
                 # TODO: use the estimate forward error bound given by sb03md57 ??
                 print("Wc has been computed from float64 with float64 precision (slycot `sb03md57` algorithm)\n")
 
@@ -374,7 +367,7 @@ class dSS:
 		Apply a similarity transform T
 		"""
         #TODO: check T size
-        Tinv = arb2numpy(T).inv()
+        Tinv = matrix(T).inv()
         self._A = Tinv * self._A * T
         self._B = Tinv * self._B
         self._C = self._C * T
@@ -388,22 +381,26 @@ class dSS:
 		"""
 
         # A
-        if self._A.nrows() != self._A.ncols():
+        a1, a2 = self._A.shape
+        if a1 != a2:
             raise ValueError('dSS: A is not a square matrix')
-        n = self._A.nrows()
+        n = a1
 
         # B
-        if self._B.nrows() != n:
+        b1, b2 = self._B.shape
+        if b1 != n:
             raise ValueError('dSS: A and B should have the same number of rows')
-        inputs = self._B.ncols()
+        inputs = b2
 
         # C
-        if self._C.ncols() != n:
+        c1, c2 = self._C.shape
+        if c2 != n:
             raise ValueError('dSS: A and C should have the same number of columns')
-        outputs = self._C.nrows()
+        outputs = c1
 
         # D
-        if self._D.nrows() != outputs or self._D.ncols() != inputs:
+        d1, d2 = self._D.shape
+        if d1 != outputs or d2 != inputs:
             raise ValueError('dSS: D should be consistent with C and B')
 
         return n, outputs, inputs
@@ -466,12 +463,12 @@ class dSS:
         if self._p != 1 or self._q != 1:
             raise ValueError('dSS: the state-space must be SISO to be converted in transfer function')
         from fixif.LTI import dTF
-        num, den = ss2tf(arb2numpy(self._A), arb2numpy(self._B), arb2numpy(self._C), arb2numpy(self._D))
+        num, den = ss2tf(self._A.tonumpy(), self._B.tonumpy(), self._C.tonumpy(), self._D.tonumpy())
         return dTF(num[0], den)
 
     def simplify(self):
         """
-		This function tries to simplify the state-space msystem.
+		This function tries to simplify the state-space system.
 		It may occur that matrix A contains one or several rows that contain only zeros.
 		In this case we have that the corresponding state-space variable depends only on
 		the term B[i,:]*u(k):
@@ -732,10 +729,10 @@ def iter_random_dSS(number, stable=True, n: tuple[int, int] =(5, 10), p:tuple[in
             else:
                 pp = rng.integers(low=p[0],  high=p[1])
                 qq = rng.integers(low=q[0],  high=q[1])
-            A = numpy2arb(rng.normal(size=(nn, nn)))
-            B = numpy2arb(rng.normal(size=(nn, qq)))
-            C = numpy2arb(rng.normal(size=(pp, nn)))
-            D = numpy2arb(rng.normal(size=(pp, qq)))
+            A = matrix(rng.normal(size=(nn, nn)))
+            B = matrix(rng.normal(size=(nn, qq)))
+            C = matrix(rng.normal(size=(pp, nn)))
+            D = matrix(rng.normal(size=(pp, qq)))
 
             yield dSS(A, B, C, D)
 
