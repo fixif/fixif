@@ -15,56 +15,56 @@ from numpy.testing import assert_allclose
 
 from fixif.func_aux.matrix import matrix, eye, zeros, vstack, hstack, block
 
-#from fixif.WCPG import WCPG_ABCD
+from fixif.WCPG import WCPG_ABCD
 
 rng = default_rng()
 
 # noinspection PyPep8Naming
 class dSS:
     r"""
-	The dSS class describes a discrete state space realization
+    The dSS class describes a discrete state space realization
 
-	A state space system :math:`(A,B,C,D)` is defined by
+    A state space system :math:`(A,B,C,D)` is defined by
 
-	.. math::
+    .. math::
 
-		\left\lbrace \begin{aligned}
-		x(k+1) &= Ax(k) + Bu(k) \\
-		y(k)   &= Cx(k) + Du(k)
-		\end{aligned}\right.
+        \left\lbrace \begin{aligned}
+        x(k+1) &= Ax(k) + Bu(k) \\
+        y(k)   &= Cx(k) + Du(k)
+        \end{aligned}\right.
 
-	with :math:`A \in \mathbb{R}^{n \times n}, B \in \mathbb{R}^{n \times q},
-	C \in \mathbb{R}^{p \times n} \text{ and } D \in \mathbb{R}^{p \times q}`.
+    with :math:`A \in \mathbb{R}^{n \times n}, B \in \mathbb{R}^{n \times q},
+    C \in \mathbb{R}^{p \times n} \text{ and } D \in \mathbb{R}^{p \times q}`.
 
-	**Dimensions of the state space :**
+    **Dimensions of the state space :**
 
-	.. math::
-		:align: left
-		n,p,q \in \mathbb{N}
+    .. math::
+        :align: left
+        n,p,q \in \mathbb{N}
 
-	==  ==================
-	n   number of states
-	p   number of outputs
-	q   number of inputs
-	==  ==================
+    ==  ==================
+    n   number of states
+    p   number of outputs
+    q   number of inputs
+    ==  ==================
 
-	Additional data available, computed once when asked for :
-	dSS.Wo, dSS.Wc, dSS.norm_h2, dSS.WCPG
+    Additional data available, computed once when asked for :
+    dSS.Wo, dSS.Wc, dSS.norm_h2, dSS.WCPG
 
-	- Gramians : Wo and Wc
-	- "Norms"   : H2-norm (H2norm), Worst Case Peak Gain (WCPG) (see doc for each)
+    - Gramians : Wo and Wc
+    - "Norms"   : H2-norm (H2norm), Worst Case Peak Gain (WCPG) (see doc for each)
 
-	"""
+    """
 
     _W_method = 'slycot'  # linalg, slycot
 
     def __init__(self, A, B, C, D):
         """
-		Construction of a discrete state space
+        Construction of a discrete state space
 
-		.. TODO
+        .. TODO
 
-		"""
+        """
         # conversion to arb_mat
         self._A = matrix(A)
         self._B = matrix(B)
@@ -144,37 +144,37 @@ class dSS:
     # ================================
     def calc_Wo(self, method=None):
         """
-		Computes observers :math:`W_o`  with method 'method' :
+        Computes observers :math:`W_o`  with method 'method' :
 
-		:math:`W_o` is solution of equation :
-		.. math::
-			A^T * W_o * A + C^T * C = W_o
+        :math:`W_o` is solution of equation :
+        .. math::
+            A^T * W_o * A + C^T * C = W_o
 
-		Available methods :
+        Available methods :
 
-		- ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
-		1 digit precision with bilinear algorithm for big matrices (really bad).
-		not good enough with usual python data types
+        - ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
+        1 digit precision with bilinear algorithm for big matrices (really bad).
+        not good enough with usual python data types
 
-		- ``slycot`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
-		see http://slicot.org/objects/software/shared/libindex.html
+        - ``slycot`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
+        see http://slicot.org/objects/software/shared/libindex.html
 
-		- ``None`` (default) : use the default method defined in the dSS class (dSS._W_method)
+        - ``None`` (default) : use the default method defined in the dSS class (dSS._W_method)
 
-		..Example::
+        ..Example::
 
-			>>> mydSS = random_dSS() ## define a new state space from random data
-			>>> mydSS.calc_Wo('linalg') # use numpy
-			>>> mydSS.calc_Wo('slycot') # use slycot
-			>>> mydSS.calc_Wo() # use the default method defined in dSS
+            >>> mydSS = random_dSS() ## define a new state space from random data
+            >>> mydSS.calc_Wo('linalg') # use numpy
+            >>> mydSS.calc_Wo('slycot') # use slycot
+            >>> mydSS.calc_Wo() # use the default method defined in dSS
 
-		.. warning::
+        .. warning::
 
-			solve_discrete_lyapunov does not work as intended, see
-			http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
-			Precision is not good (4 digits, failed tests)
+            solve_discrete_lyapunov does not work as intended, see
+            http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
+            Precision is not good (4 digits, failed tests)
 
-		"""
+        """
 
         if method is None:
             method = dSS._W_method
@@ -201,37 +201,37 @@ class dSS:
 
     def calc_Wc(self, method=None):
         """
-		Computes observers :math:`W_c`  with method 'method' :
+        Computes observers :math:`W_c`  with method 'method' :
 
-		:math:`W_c` is solution of equation :
-		.. math::
-			A * W_c * A^T + B * B^T = W_c
+        :math:`W_c` is solution of equation :
+        .. math::
+            A * W_c * A^T + B * B^T = W_c
 
-		Available methods :
+        Available methods :
 
-		- ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
-		1 digit precision with bilinear algorithm for big matrices (really bad).
-		not good enough with usual python data types
+        - ``linalg`` : ``scipy.linalg.solve_discrete_lyapunov``, 4-digit precision with small sizes,
+        1 digit precision with bilinear algorithm for big matrices (really bad).
+        not good enough with usual python data types
 
-		- ``slycot`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
-		see http://slicot.org/objects/software/shared/libindex.html
+        - ``slycot`` : using ``slycot`` lib with func ``sb03md``, like in [matlab ,pydare]
+        see http://slicot.org/objects/software/shared/libindex.html
 
-		- ``None`` (default) : use the default method defined in the dSS class (dSS._W_method)
+        - ``None`` (default) : use the default method defined in the dSS class (dSS._W_method)
 
-		..Example::
+        ..Example::
 
-			>>> mydSS = random_dSS() ## define a new state space from random data
-			>>> mydSS.calc_Wc('linalg') # use numpy
-			>>> mydSS.calc_Wc('slycot') # use slycot
-			>>> mydSS.calc_Wo() # use the default method defined in dSS
+            >>> mydSS = random_dSS() ## define a new state space from random data
+            >>> mydSS.calc_Wc('linalg') # use numpy
+            >>> mydSS.calc_Wc('slycot') # use slycot
+            >>> mydSS.calc_Wo() # use the default method defined in dSS
 
-		.. warning::
+        .. warning::
 
-			solve_discrete_lyapunov does not work as intended, see
-			http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
-			Precision is not good (4 digits, failed tests)
+            solve_discrete_lyapunov does not work as intended, see
+            http://stackoverflow.com/questions/16315645/am-i-using-scipy-linalg-solve-discrete-lyapunov-correctl
+            Precision is not good (4 digits, failed tests)
 
-		"""
+        """
         if method is None:
             method = dSS._W_method
 
@@ -262,14 +262,14 @@ class dSS:
     def H2norm(self):
         r"""
 
-		Compute the H2-norm of the system
+        Compute the H2-norm of the system
 
-		.. math::
+        .. math::
 
-			\langle \langle H \rangle \rangle = \sqrt{tr ( C*W_c * C^T + D*D^T )}
+            \langle \langle H \rangle \rangle = \sqrt{tr ( C*W_c * C^T + D*D^T )}
 
 
-		"""
+        """
         # return cached value if already computed
         if self._H2norm is not None:
             return self._H2norm
@@ -329,31 +329,32 @@ class dSS:
     #
     # 	return self._WCPG
 
-    # def WCPG(self, output_info=None):
-    # 	r"""
-    # 	Compute the Worst Case Peak Gain of the state space
-    # 	if output_info is given, it should be a dictionary that will be fill by WCPG library.
-    # 	It then contains some informations about the computation (nb iterations, etc.)
-    # 	.. math::
-    # 		\langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
-    #
-    # 	Using algorithm developed in paper, and implement in the WCPG library (and its Python wrapper) :
-    #
-    # 	"""
-    # 	# compute the WCPG value if it's not already done
-    # 	if self._WCPG is None or output_info is not None:
-    # 		self._WCPG = WCPG_ABCD(self._A, self._B, self._C, self._D, output_info)
-    # 	return self._WCPG
+    def WCPG(self, output_info=None):
+        r"""
+        Compute the Worst Case Peak Gain of the state space
+        if output_info is given, it should be a dictionary that will be fill by WCPG library.
+        It then contains some informations about the computation (nb iterations, etc.)
+        .. math::
+            \langle \langle H \rangle \rangle \triangleq |D| + \sum_{k=0}^\infty |C * A^k * B|
+
+        Using algorithm developed in paper, and implement in the WCPG library (and its Python wrapper) :
+
+        """
+        # compute the WCPG value if it's not already done
+        if self._WCPG is None or output_info is not None:
+            print("The WCPG has been computed from float64 values \n")
+            self._WCPG = WCPG_ABCD(self._A.tonumpy(), self._B.tonumpy(), self._C.tonumpy(), self._D.tonumpy(), output_info)
+        return matrix(self._WCPG)
 
     # ======================================================================================
     def calc_DC_gain(self):
         r"""
-		Compute the DC-gain of the filter
+        Compute the DC-gain of the filter
 
-		.. math::
-			\langle H \rangle = C * (I_n - A)^{-1} * B + D
+        .. math::
+            \langle H \rangle = C * (I_n - A)^{-1} * B + D
 
-		"""
+        """
         # compute the DC gain if it is not already done
         if self._DC_gain is None:
             try:
@@ -365,8 +366,8 @@ class dSS:
 
     def similarity(self, T):
         """
-		Apply a similarity transform T
-		"""
+        Apply a similarity transform T
+        """
         #TODO: check T size
         Tinv = matrix(T).inv()
         self._A = Tinv * self._A * T
@@ -377,9 +378,9 @@ class dSS:
     # ======================================================================================
     def _check_dimensions(self) -> (int,int,int):
         """
-		Computes the number of inputs and outputs.
-		Check for concordance of the matrices' size
-		"""
+        Computes the number of inputs and outputs.
+        Check for concordance of the matrices' size
+        """
 
         # A
         a1, a2 = self._A.shape
@@ -409,8 +410,8 @@ class dSS:
     # ======================================================================================
     def __str__(self) -> str:
         """
-		Display the state-space
-		"""
+        Display the state-space
+        """
 
         # def tostr(M, name):
         # 	"""Returns a string representation of the value, except if it's None"""
@@ -424,11 +425,11 @@ class dSS:
             return 's' if n > 0 else ''
 
         str_mat = f"""State Space ({self._n} state{plural(self._n)}, {self.p} output{plural(self._p)} and {self._q} input{plural(self._q)})
-		A= {self._A}
-		B= {self._B}
-		C= {self._C}
-		D= {self._D}
-		"""
+        A= {self._A}
+        B= {self._B}
+        C= {self._C}
+        D= {self._D}
+        """
 
         # Observers Wo, Wc
         # str_mat += tostr( self._Wc, 'Wc')
@@ -459,8 +460,8 @@ class dSS:
 
     def to_dTF(self):
         """
-		Transform a SISO state-space into a transfer function
-		"""
+        Transform a SISO state-space into a transfer function
+        """
         if self._p != 1 or self._q != 1:
             raise ValueError('dSS: the state-space must be SISO to be converted in transfer function')
         from fixif.LTI import dTF
@@ -469,37 +470,37 @@ class dSS:
 
     def simplify(self):
         """
-		This function tries to simplify the state-space system.
-		It may occur that matrix A contains one or several rows that contain only zeros.
-		In this case we have that the corresponding state-space variable depends only on
-		the term B[i,:]*u(k):
-		x1(k+1) = A[1,:] * x(k) +  B[1,:]*u(k)
-		..
-		xi(k+1) = B[i,:]*u(k)
-		...
-		y(k) = C * x(k) + D * u(k)
+        This function tries to simplify the state-space system.
+        It may occur that matrix A contains one or several rows that contain only zeros.
+        In this case we have that the corresponding state-space variable depends only on
+        the term B[i,:]*u(k):
+        x1(k+1) = A[1,:] * x(k) +  B[1,:]*u(k)
+        ..
+        xi(k+1) = B[i,:]*u(k)
+        ...
+        y(k) = C * x(k) + D * u(k)
 
-		Then, we can re-write
-		x1(k+1) = A[1,:] * x(k) +  B[1,:]*u(k)
-		..
-		xi(k+1) = 0
-		...
-		y(k) = C * x(k) + C[:,i]*(B[i,:]*u(k)) + D * u(k)
+        Then, we can re-write
+        x1(k+1) = A[1,:] * x(k) +  B[1,:]*u(k)
+        ..
+        xi(k+1) = 0
+        ...
+        y(k) = C * x(k) + C[:,i]*(B[i,:]*u(k)) + D * u(k)
 
-		or in matrix form:
+        or in matrix form:
 
-			A' is the matrix A with column i and row i deleted
-			C' is the matrix C with column i deleted
+            A' is the matrix A with column i and row i deleted
+            C' is the matrix C with column i deleted
 
-			then,
+            then,
 
-			x(k+1) = A' * x(k) + B * u(k)
-			y(k)   = C' * x(k) + (D + C[:, i] * B[i,:]) * u(k)
+            x(k+1) = A' * x(k) + B * u(k)
+            y(k)   = C' * x(k) + (D + C[:, i] * B[i,:]) * u(k)
 
-		Returns
-		-------
+        Returns
+        -------
 
-		"""
+        """
 
         newS = self
 
@@ -534,11 +535,11 @@ class dSS:
 
     def assert_close(self, other, eps=1e-8):
         """
-		Check if two dSS are almost equal
-		Parameters:
-		- other: (dSS) the 2nd dSS we want to compare
-		- atol: absolute tolerance used for assert_allclose
-		"""
+        Check if two dSS are almost equal
+        Parameters:
+        - other: (dSS) the 2nd dSS we want to compare
+        - atol: absolute tolerance used for assert_allclose
+        """
         # at this point, it should exist an invertible matrix T such that
         # self.A == inv(T) * other.A * T
         # self.B == inv(T) * other.B
@@ -554,14 +555,14 @@ class dSS:
 
     def balanced(self) -> Self:
         """
-		Returns an equivalent balanced state-space system
+        Returns an equivalent balanced state-space system
 
-		Use ab09ad method from Slicot to get balanced state-space
-		see http://slicot.org/objects/software/shared/doc/AB09AD.html
+        Use ab09ad method from Slicot to get balanced state-space
+        see http://slicot.org/objects/software/shared/doc/AB09AD.html
 
-		Returns
-		- a dSS object
-		"""
+        Returns
+        - a dSS object
+        """
         try:
             from slycot import ab09ad
             Nr, Ar, Br, Cr, hsv = ab09ad('D', 'B', 'N', self.n, self.q, self.p,
@@ -576,17 +577,17 @@ class dSS:
 
     def __add__(self, other):
         """
-		This method computes the difference between self and a filter S given in the argument such that
-		the result filter H := self + S has
-					H.A = [[self.A, zeros(self.n, S.n)], [zeros(S.n, self.n), S.A]]
-					H.B = [[self.B], [S.B]]
-					H.C = [self.C, S.C]
-					H.D = [self.D + S.D]
-		Parameters:
-		- S: a dSS to substract from self
+        This method computes the difference between self and a filter S given in the argument such that
+        the result filter H := self + S has
+                    H.A = [[self.A, zeros(self.n, S.n)], [zeros(S.n, self.n), S.A]]
+                    H.B = [[self.B], [S.B]]
+                    H.C = [self.C, S.C]
+                    H.D = [self.D + S.D]
+        Parameters:
+        - S: a dSS to substract from self
 
-		Returns a dSS which is equal to (self - S)
-		"""
+        Returns a dSS which is equal to (self - S)
+        """
         # check type
         if not isinstance(other, dSS):
             raise TypeError("dSS: cannot add dSS with something else than another dSS")
@@ -603,18 +604,18 @@ class dSS:
 
     def __sub__(self, other):
         """
-		This method computes the difference between self and a dSS S given in the argument such that
-		the result dSS H := self - S has
-			H.A = [[self.A, zeros(self.n, S.n)], [zeros(S.n, self.n), S.A]]
-			H.B = [[self.B], [S.B]]
-			H.C = [self.C, -S.C]
-			H.D = [self.D - S.D]
+        This method computes the difference between self and a dSS S given in the argument such that
+        the result dSS H := self - S has
+            H.A = [[self.A, zeros(self.n, S.n)], [zeros(S.n, self.n), S.A]]
+            H.B = [[self.B], [S.B]]
+            H.C = [self.C, -S.C]
+            H.D = [self.D - S.D]
 
-		Parameters:
-		- S: a dSS to substract from self
+        Parameters:
+        - S: a dSS to substract from self
 
-		Returns a dSS which is equal to (self - S)
-		"""
+        Returns a dSS which is equal to (self - S)
+        """
         # check type
         if not isinstance(other, dSS):
             raise TypeError("dSS: cannot add dSS with something else than another dSS")
@@ -636,9 +637,9 @@ class dSS:
 # ======================================================================================
     def __mul__(self, other):
         """
-		We overload the multiplication operator so that two state spaces in series
+        We overload the multiplication operator so that two state spaces in series
 
-		Given S1 := (A1, B1, C1, D1) and S2 := (A2, B2, C2, D2),
+        Given S1 := (A1, B1, C1, D1) and S2 := (A2, B2, C2, D2),
         the series connection S = S2 * S1 is defined by:
 
         A = [ A2        0  ]
@@ -654,8 +655,8 @@ class dSS:
         The input of dSS1 is the output of dSS2: u1 = y2 = C2*x1 + D2*u
 
         Here S2 is self, S1 is other
-		To be able to multiply matrixes, systems must respect some constraints
-		"""
+        To be able to multiply matrixes, systems must respect some constraints
+        """
         # check type
         if isinstance(other, (int,float)):
             return dSS(self.A, other*self.B, self.C, other*self.D)
@@ -681,34 +682,34 @@ class dSS:
 def iter_random_dSS(number, stable=True, n: tuple[int, int] =(5, 10), p:tuple[int, int]=(1, 5), q=(1, 5),
                     pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5):
     """
-	Generate some n-th order random (stable or not) state-spaces, with q inputs and p outputs
-	copy/Adapted from control-python library (thanks guys): https://sourceforge.net/projects/python-control/
-	possibly already adpated from Mathworks or Octave
+    Generate some n-th order random (stable or not) state-spaces, with q inputs and p outputs
+    copy/Adapted from control-python library (thanks guys): https://sourceforge.net/projects/python-control/
+    possibly already adpated from Mathworks or Octave
 
-	Parameters:
-		- number: number of state-space to generate
-		- stable: indicate if the state-spaces are stable or not
-		- n: tuple (mini,maxi) number of states (default:  random between 5 and 10)
-		- p: 1 or a tuple (mini,maxi) number of outputs (default: 1)
-		- q: 1 or a tuple (mini,maxi) number of inputs (default: 1)
+    Parameters:
+        - number: number of state-space to generate
+        - stable: indicate if the state-spaces are stable or not
+        - n: tuple (mini,maxi) number of states (default:  random between 5 and 10)
+        - p: 1 or a tuple (mini,maxi) number of outputs (default: 1)
+        - q: 1 or a tuple (mini,maxi) number of inputs (default: 1)
 
-		- pRepeat: Probability of repeating a previous root (default: 0.01)
-		- pReal: Probability of choosing a real root (default: 0.5). Note that when choosing a complex root,
-		the conjugate gets chosen as well. So the expected proportion of real roots is pReal / (pReal + 2 * (1 - pReal))
-		- pBCmask: Probability that an element in B or C will not be masked out (default: 0.9)
-		- pDmask: Probability that an element in D will not be masked out (default: 0.8)
-		- pDzero: Probability that D = 0 (default: 0.5)
+        - pRepeat: Probability of repeating a previous root (default: 0.01)
+        - pReal: Probability of choosing a real root (default: 0.5). Note that when choosing a complex root,
+        the conjugate gets chosen as well. So the expected proportion of real roots is pReal / (pReal + 2 * (1 - pReal))
+        - pBCmask: Probability that an element in B or C will not be masked out (default: 0.9)
+        - pDmask: Probability that an element in D will not be masked out (default: 0.8)
+        - pDzero: Probability that D = 0 (default: 0.5)
 
-	Returns:
-		- returns a generator of dSS objects (to use in a for loop for example)
+    Returns:
+        - returns a generator of dSS objects (to use in a for loop for example)
 
-	..Example::
-		>>> sys = list( iter_random_dSS( 12, True, (10,20)) )
-		>>> for S in iter_random_dSS( 12, True, (10,20)):
-		>>>		print( S )
+    ..Example::
+        >>> sys = list( iter_random_dSS( 12, True, (10,20)) )
+        >>> for S in iter_random_dSS( 12, True, (10,20)):
+        >>>		print( S )
 
 
-	"""
+    """
     for i in range(number):
         if stable:
             yield random_dSS(rng.integers(*n), rng.integers(*p), rng.integers(*q), pRepeat, pReal, pBCmask, pDmask, pDzero)
@@ -731,25 +732,25 @@ def iter_random_dSS(number, stable=True, n: tuple[int, int] =(5, 10), p:tuple[in
 # noinspection PyPep8Naming
 def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5) -> dSS:
     """
-	Generate ONE n-th order random  stable state-spaces, with q inputs and p outputs
-	copy/adapted from control-python library (Richard Murray): https://sourceforge.net/projects/python-control/
-	(thanks guys!)
-	possibly already adpated/copied from Mathworks or Octave
+    Generate ONE n-th order random  stable state-spaces, with q inputs and p outputs
+    copy/adapted from control-python library (Richard Murray): https://sourceforge.net/projects/python-control/
+    (thanks guys!)
+    possibly already adpated/copied from Mathworks or Octave
 
-	Parameters:
-	- n: number of states (default:  random between 5 and 10)
-	- p: number of outputs (default: 1)
-	- q: number of inputs (default: 1)
+    Parameters:
+    - n: number of states (default:  random between 5 and 10)
+    - p: number of outputs (default: 1)
+    - q: number of inputs (default: 1)
 
-	- pRepeat: Probability of repeating a previous root (default: 0.01)
-	- pReal: Probability of choosing a real root (default: 0.5). Note that when choosing a complex root,
-		the conjugate gets chosen as well. So the expected proportion of real roots is pReal / (pReal + 2 * (1 - pReal))
-	- pBCmask: Probability that an element in B or C will not be masked out (default: 0.90)
-	- pDmask: Probability that an element in D will not be masked out (default: 0.8)
-	- pDzero: Probability that D = 0 (default: 0.5)
+    - pRepeat: Probability of repeating a previous root (default: 0.01)
+    - pReal: Probability of choosing a real root (default: 0.5). Note that when choosing a complex root,
+        the conjugate gets chosen as well. So the expected proportion of real roots is pReal / (pReal + 2 * (1 - pReal))
+    - pBCmask: Probability that an element in B or C will not be masked out (default: 0.90)
+    - pDmask: Probability that an element in D will not be masked out (default: 0.8)
+    - pDzero: Probability that D = 0 (default: 0.5)
 
-	Returns a dSS object
-	"""
+    Returns a dSS object
+    """
     # Check for valid input arguments.
     if n < 1 or n % 1:
         raise ValueError(f"nb of states must be a positive integer. #states = {n}.")

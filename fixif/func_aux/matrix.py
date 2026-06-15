@@ -131,6 +131,27 @@ class matrix(arb_mat):
         return total.abs_upper().sqrt()
 
 
+    def __abs__(self):
+        """Return the elementwise absolute value of the matrix.
+
+        Equivalent to ``numpy.abs(m)``.
+
+        Returns:
+            A new :class:`matrix` with all entries replaced by their absolute value.
+
+        Example::
+
+            >>> m = matrix([[-1, 2], [-3, 4]])
+            >>> abs(m)
+            [1, 2]
+            [3, 4]
+        """
+        result = matrix(*self.shape)
+        for i, j in np.ndindex(self.shape):
+            result[i, j] = self[i, j].abs_upper()
+        return result
+
+
 
 # ──────────────────────────────────────────────
 # Construction

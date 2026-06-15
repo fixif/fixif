@@ -5,10 +5,8 @@ This file contains tests for the dSS class and its methods
 from importlib.util import find_spec
 
 import pytest
-from fixif.func_aux.matrix import matrix
-from numpy import absolute, all, array, eye, zeros
-from numpy import matrix as mat
-from numpy.linalg import eigvals, norm
+from fixif.func_aux.matrix import matrix, zeros, eye
+import numpy as np
 from numpy.random import randint
 from numpy.testing import assert_allclose
 
@@ -30,23 +28,6 @@ def test_construct_sollya_slycot(capsys):
 		else:
 			print("Slycot is not installed")
 
-
-# def my_assert_allclose_TFmp(H, b, a, tol):
-#
-# 	if max(H.num.shape) != b.rows or max(H.den.shape) != a.rows:
-# 		raise ValueError('MP Transfer function is not the same size as the scipy transfer function!')
-#
-# 	for i in range(0, b.rows):
-# 		if mpmath.fabs(b[i, 0] - H.num[0, i]) < tol:
-# 			assert True
-# 		else:
-# 			raise ValueError("MP transfer function is not close to the dTF")
-#
-# 	for i in range(0, a.rows):
-# 		if mpmath.fabs(a[i, 0] - H.den[0, i]) < tol:
-# 			assert True
-# 		else:
-# 			raise ValueError("MP transfer function is not close to the dTF")
 
 
 def my_assert_allclose(A, strA: str, B, strB: str, atol=None, rtol=None):
@@ -137,14 +118,14 @@ def calc_wcpg_approx(S, nit):
 	"""Very bad WCPG approximation (we hope to get the first digits....)
 	Only used to compare with true, reliable Anastasia's WCPG"""
 
-	res = mat(zeros((S.p, S.q)))
-	powerA = mat(eye(S.n, S.n))
+	res = np.zeros((S.p, S.q))
+	powerA = np.eye(S.n,S.n)
 
 	for i in range(0, nit):
-		res += absolute(S.C * powerA * S.B)
-		powerA = powerA * S.A
+		res += np.absolute(S.C.tonumpy() @ powerA @ S.B.tonumpy())
+		powerA = powerA @ S.A.tonumpy()
 
-	return res + absolute(S.D)
+	return res + np.absolute(S.D.tonumpy())
 
 
 @pytest.mark.parametrize("S", iter_random_dSS(20, True, (5, 10), (1, 5), (1, 5), pBCmask=0.1))
@@ -157,7 +138,7 @@ def test_wcpg(S):
 	W = S.WCPG()
 	wcpg = calc_wcpg_approx(S, nit)
 
-	assert norm(array(W) - array(wcpg)) < 1e-2
+	assert (W - matrix(wcpg)).frobenius() < 1e-5
 
 
 @pytest.mark.parametrize("S", iter_random_dSS(50, True, (5, 10), (1, 5), (1, 5)))
