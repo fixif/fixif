@@ -3,7 +3,7 @@ A collection of functions to deal with arb_mat objects (matrices with ball inter
 """
 
 import numpy as np
-from flint import arb_mat
+from flint import arb_mat, arb
 
 
 class matrix(arb_mat):
@@ -122,6 +122,14 @@ class matrix(arb_mat):
         if isinstance(key, slice):
             return list(range(*key.indices(size)))
         raise TypeError(f"unsupported index type: {type(key)}")
+
+
+    def frobenius(self):
+        total = arb(0)
+        for i,j in np.ndindex(self.shape):
+                total += self[i, j] ** 2
+        return total.abs_upper().sqrt()
+
 
 
 # ──────────────────────────────────────────────
@@ -250,3 +258,5 @@ def block(blocks: list[list[matrix]]) -> matrix:
 
     rows = [hstack(*row) for row in blocks]
     return vstack(*rows)
+
+

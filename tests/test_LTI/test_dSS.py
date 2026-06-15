@@ -221,21 +221,30 @@ def test_balanced(S):
 
 @pytest.mark.parametrize("S", iter_random_dSS(5, stable=True, n=(2, 15), p=(1, 5), q=(1, 5)))
 def test_operations(S):
-	"""Test the add, sub and mul operations"""
-	# check types
-	with pytest.raises(TypeError):
-		S += 1
-	with pytest.raises(TypeError):
-		S -= 1
-	with pytest.raises(TypeError):
-		S *= 2
+    """Test the add, sub and mul operations"""
+    # check types
+    with pytest.raises(TypeError):
+        S += 1
+    with pytest.raises(TypeError):
+        S -= 1
 
-	S1 = S + S
-	S2 = S + random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5)
-	S3 = S - S
-	S4 = random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5) - S
-	S5 = S - random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5)
-	S6 = S * random_dSS(n=randint(5, 10), q=S.p, p=randint(1, 5), pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5)
+    O = random_dSS(n=17, p=6, q=6)
+    with pytest.raises(ValueError):
+        S + O
+    with pytest.raises(ValueError):
+        S - O
+
+
+    # assert (S*2-(S+S)).H2norm() < 1e-5
+
+    S1 = S + S
+    S2 = S + random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5)
+    S3 = S - S
+    S4 = random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5) - S
+    S5 = S - random_dSS(n=randint(5, 10), p=S.p, q=S.q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5)
+    S6 = S * random_dSS(
+        n=randint(5, 10), q=S.p, p=randint(1, 5), pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5
+    )
 
 # TODO: add unit test for H2norm
 # TODO: add unit test for DC-gain

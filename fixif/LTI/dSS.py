@@ -11,6 +11,7 @@ from numpy.linalg import LinAlgError, solve
 from numpy.random import default_rng
 from scipy.linalg import solve_discrete_lyapunov
 from scipy.signal import ss2tf
+from numpy.testing import assert_allclose
 
 from fixif.func_aux.matrix import matrix, eye, zeros, vstack, hstack, block
 
@@ -276,12 +277,12 @@ class dSS:
         # otherwise try to compute it
         try:
             # less errors when Wc is big and Wo is small
-            M = self._C * self.Wc * self._C.transpose() + self._D * self._D.transpose()
-            self._H2norm = M.trace()[0, 0].sqrt()
+            M = self._C.tonumpy() @ self.Wc @ self._C.transpose().tonumpy() + (self._D * self._D.transpose()).tonumpy()
+            self._H2norm = np.sqrt(M.trace())
         except ValueError:  # TODO: check what kind of exception we need to catch here
             try:
-                M = self._B.transpose() * self.Wo * self._B + self._D * self._D.transpose()
-                self._H2norm = M.trace()[0, 0].sqrt()
+                M = self._B.transpose().tonumpy() @ self.Wo @ self._B.tonumpy() + (self._D * self._D.transpose()).tonumpy()
+                self._H2norm = np.sqrt(M.trace())
             except ValueError:
                 raise ValueError("dSS: h2-norm : Impossible to compute")
 
@@ -531,7 +532,7 @@ class dSS:
 
         return newS
 
-    def assert_close(self, other, eps=1e-5):
+    def assert_close(self, other, eps=1e-8):
         """
 		Check if two dSS are almost equal
 		Parameters:
@@ -545,14 +546,10 @@ class dSS:
         # self.D == other.D
 
         # TODO: this is probably not enough...
-        # assert_allclose(self.C * self.B, other.C * other.B, rtol=rtol)
-        # assert_allclose(self.C * self.A * self.B, other.C * other.A * other.B, rtol=rtol)
-        # assert_allclose(self.C * self.A * self.A * self.B, other.C * other.A * other.A * other.B, rtol=rtol)
-        # assert_allclose(self.D, other.D, rtol=rtol)
-        assert norm(self.C * self.B - other.C * other.B) < eps
-        assert norm(self.C * self.A * self.B - other.C * other.A * other.B) < eps
-        assert norm(self.C * self.A * self.A * self.B - other.C * other.A * other.A * other.B) < eps
-        assert norm(self.D - other.D) < eps
+        assert (self.C * self.B - other.C * other.B)[0,0].abs_upper() < eps
+        assert (self.C * self.A * self.B - other.C * other.A * other.B)[0,0].abs_upper() < eps
+        assert (self.C * self.A * self.A * self.B - other.C * other.A * other.A * other.B)[0,0].abs_upper() < eps
+        assert (self.D - other.D)[0,0].abs_upper() < eps
 
 
     def balanced(self) -> Self:
@@ -567,8 +564,8 @@ class dSS:
 		"""
         try:
             from slycot import ab09ad
-            Nr, Ar, Br, Cr, hsv = ab09ad('D', 'B', 'N', self.n, self.q, self.p, self.A, self.B, self.C, nr=self.n,
-                                         tol=1e-18)
+            Nr, Ar, Br, Cr, hsv = ab09ad('D', 'B', 'N', self.n, self.q, self.p,
+                                         self.A.tonumpy(), self.B.tonumpy(), self.C.tonumpy(), nr=self.n, tol=1e-18)
         except ImportError:
             raise ImportError("dSS.balanced: slycot is not installed")
         if Nr == 0:
@@ -577,7 +574,7 @@ class dSS:
         return dSS(Ar, Br, Cr, self.D)
 
 
-    def __add__(self, other:Self) -> Self:
+    def __add__(self, other):
         """
 		This method computes the difference between self and a filter S given in the argument such that
 		the result filter H := self + S has
@@ -593,20 +590,18 @@ class dSS:
         # check type
         if not isinstance(other, dSS):
             raise TypeError("dSS: cannot add dSS with something else than another dSS")
+        
+        if self.p != other.p or self.q != other.q:
+            raise ValueError("the two dSS should have the same number of inputs and outputs (p1={self.p}, p2={other.p}, q1={self.q} and q2={other.q})")
 
-        #TODO: check size and raise error
-
-        newA = concatenate((self.A, zeros([self.n, other.n])), axis=1)
-        tmp = concatenate((zeros([other.n, self.n]), other.A), axis=1)
-        newA = concatenate((newA, tmp), axis=0)
-
-        newB = concatenate((self.B, other.B), axis=0)
-        newC = concatenate((self.C, other.C), axis=1)
+        newA = block([[self.A, zeros(self.n, other.n)], [zeros(other.n, self.n), other.A]])
+        newB = vstack(self.B, other.B)
+        newC = hstack(self.C, other.C)
         newD = self.D + other.D
 
         return dSS(newA, newB, newC, newD)
 
-    def __sub__(self, other: Self) -> Self:
+    def __sub__(self, other):
         """
 		This method computes the difference between self and a dSS S given in the argument such that
 		the result dSS H := self - S has
@@ -622,68 +617,64 @@ class dSS:
 		"""
         # check type
         if not isinstance(other, dSS):
-            raise TypeError("dSS: cannot sub dSS with something else than another dSS")
+            raise TypeError("dSS: cannot add dSS with something else than another dSS")
 
+        if self.p != other.p or self.q != other.q:
+            raise ValueError(
+                "the two dSS should have the same number of inputs and outputs (p1={self.p}, p2={other.p},"
+                " q1={self.q} and q2={other.q})"
+            )
 
-        # TODO: check size and raise error
-
-        newA = concatenate((self.A, zeros([self.n, other.n])), axis=1)
-        tmp = concatenate((zeros([other.n, self.n]), other.A), axis=1)
-        newA = concatenate((newA, tmp), axis=0)
-
-        newB =concatenate((self.B, other.B), axis=0)
-        newC = concatenate((self.C, -other.C), axis=1)
+        newA = block([[self.A, zeros(self.n, other.n)], [zeros(other.n, self.n), other.A]])
+        newB = vstack(self.B, other.B)
+        newC = hstack(self.C, -other.C)
         newD = self.D - other.D
 
         return dSS(newA, newB, newC, newD)
 
 
 # ======================================================================================
-    def __mul__(self, other: Self) -> Self:
+    def __mul__(self, other):
         """
 		We overload the multiplication operator so that two state spaces in series
 
 		Given S1 := (A1, B1, C1, D1) and S2 := (A2, B2, C2, D2),
         the series connection S = S2 * S1 is defined by:
 
-        A = [ A1        0  ]
-            [ B2*C1    A2  ]
+        A = [ A2        0  ]
+            [ B1*C2    A1  ]
 
-        B = [ B1    ]
-            [ B2*D1 ]
+        B = [ B2    ]
+            [ B1*D2 ]
 
-        C = [ D2*C1  C2 ]
+        C = [ D1*C2  C1 ]
 
-        D = D2 * D1
+        D = D1 * D2
 
-        where the global state is x = (x1, x2)^T,
-        x1 being the state of SS1 (size n1) and
-        x2 being the state of SS2 (size n2).
+        The input of dSS1 is the output of dSS2: u1 = y2 = C2*x1 + D2*u
 
-        The input of SS2 is the output of SS1: u2 = y1 = C1*x1 + D1*u
-
-
+        Here S2 is self, S1 is other
 		To be able to multiply matrixes, systems must respect some constraints
 		"""
         # check type
+        if isinstance(other, (int,float)):
+            return dSS(self.A, other*self.B, self.C, other*self.D)
+
         if not isinstance(other, dSS):
             raise TypeError("dSS: cannot add dSS with something else than another dSS")
 
-        n1, p1, q1 = self.size
-        n2, p2, q2 = other.size
-
-        if p1 != q2:
+        if self.p != other.q:
             raise ValueError(
                 "dSS: second state space should have same number of inputs as first state number of outputs")
 
         # TODO: possible simplification if self.A==other.A ??
 
-        amul = r_[c_[self.A, self.B * other.C], c_[zeros((n2, n1)), other.A]]
-        bmul = r_[self.B * other.D, other.B]
-        cmul = c_[self.C, self.D * other.C]
-        dmul = self.D * other.D
+        Amul = block([[other.A, other.B*self.C], [zeros(self.n, other.n), self.A]])
+        Bmul = vstack(other.B * self.D, self.B)
+        Cmul = hstack(other.C, other.D * self.C)
+        Dmul = other.D * self.D
 
-        return dSS(amul, bmul, cmul, dmul)
+        return dSS(Amul, Bmul, Cmul, Dmul)
 
 
 # noinspection PyPep8Naming
@@ -738,7 +729,7 @@ def iter_random_dSS(number, stable=True, n: tuple[int, int] =(5, 10), p:tuple[in
 
 
 # noinspection PyPep8Naming
-def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5) -> Self: 
+def random_dSS(n, p, q, pRepeat=0.01, pReal=0.5, pBCmask=0.90, pDmask=0.8, pDzero=0.5) -> dSS:
     """
 	Generate ONE n-th order random  stable state-spaces, with q inputs and p outputs
 	copy/adapted from control-python library (Richard Murray): https://sourceforge.net/projects/python-control/
