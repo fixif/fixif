@@ -6,20 +6,17 @@ from typing import Self
 
 import numpy as np
 from numpy import dot
-
 from numpy.linalg import LinAlgError, solve
 from numpy.random import default_rng
 from scipy.linalg import solve_discrete_lyapunov
 from scipy.signal import ss2tf
-from numpy.testing import assert_allclose
 
-from fixif.func_aux.matrix import matrix, eye, zeros, vstack, hstack, block
-
+from fixif.func_aux.matrix import block, eye, hstack, matrix, vstack, zeros
 from fixif.WCPG import WCPG_ABCD
 
 rng = default_rng()
 
-# noinspection PyPep8Naming
+
 class dSS:
     r"""
     The dSS class describes a discrete state space realization
@@ -347,7 +344,7 @@ class dSS:
         return matrix(self._WCPG)
 
     # ======================================================================================
-    def calc_DC_gain(self):
+    def DC_gain(self):
         r"""
         Compute the DC-gain of the filter
 
@@ -363,6 +360,7 @@ class dSS:
                 raise ValueError('dSS: Impossible to compute DC-gain from current discrete state space')
 
         return self._DC_gain
+
 
     def similarity(self, T):
         """
