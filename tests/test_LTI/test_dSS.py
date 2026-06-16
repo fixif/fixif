@@ -7,11 +7,13 @@ from importlib.util import find_spec
 import pytest
 from fixif.func_aux.matrix import matrix, zeros, eye
 import numpy as np
-from numpy.random import randint
 from numpy.testing import assert_allclose
-
+from numpy.random import default_rng
 from fixif.LTI import dSS, iter_random_dSS, random_dSS
 
+
+
+rng = default_rng()
 
 # FIXME: move this test somewhere else...
 def test_construct_sollya_slycot(capsys):
@@ -141,25 +143,36 @@ def test_wcpg(S):
 	assert (W - matrix(wcpg)).frobenius() < 1e-5
 
 
+def random_slice(p: int) -> slice:
+    """Return a random row slice with random start, stop and step.
+
+    Args:
+        p:   Number of rows in the matrix.
+        rng: A numpy random generator (e.g. np.random.default_rng(42)).
+
+    Returns:
+        A slice with random start, stop and step, guaranteed to select
+        at least one row.
+    """
+    step  = int(rng.integers(1, max(2, p)))   # step in [1, p-1]
+    start = int(rng.integers(0, p))
+    # stop must be strictly greater than start to select at least one element
+    stop  = int(rng.integers(start + 1, p + 1))
+    return slice(start, stop, step)
+
+
 @pytest.mark.parametrize("S", iter_random_dSS(50, True, (5, 10), (1, 5), (1, 5)))
 def test_subsystems(S):
 	"""Test subsystems calculation"""
 	# random slices
-	beg_i = randint(0, S.p)
-	end_i = randint(beg_i, S.p)
-	step_i = randint(1, 3)
-	i = slice(beg_i, end_i, step_i)
-
-	beg_j = randint(0, S.q)
-	end_j = randint(beg_j, S.q)
-	step_j = randint(1, 3)
-	j = slice(beg_j, end_j, step_j)
+	i = random_slice(S.p)
+	j = random_slice(S.q)
 
 	Sub = S[i, j]
-	assert all(Sub.A == S.A)
-	assert all(Sub.B == S.B[:, j])
-	assert all(Sub.C == S.C[i, :])
-	assert all(Sub.D == S.D[i, j])
+	assert Sub.A == S.A
+	assert Sub.B == S.B[:, j]
+	assert Sub.C == S.C[i, :]
+	assert Sub.D == S.D[i, j]
 
 
 @pytest.mark.parametrize("S", iter_random_dSS(20))
